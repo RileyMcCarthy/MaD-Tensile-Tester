@@ -1,0 +1,99 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP +3.3V
+D Power symbol creates a global label with name "+3.3V"
+K power-flag
+$ENDCMP
+#
+$CMP +3.3V_TS
+D Power symbol creates a global label with name "+3V3"
+K power-flag
+$ENDCMP
+#
+$CMP +5V_FG
+D Power symbol creates a global label with name "+5V"
+K power-flag
+$ENDCMP
+#
+$CMP +5V_SC
+D Power symbol creates a global label with name "+5V"
+K power-flag
+$ENDCMP
+#
+$CMP +5V_TS
+D Power symbol creates a global label with name "+5V"
+K power-flag
+$ENDCMP
+#
+$CMP 5V_IO
+D Power symbol creates a global label with name "VDC"
+K power-flag
+$ENDCMP
+#
+$CMP AM26LS32ACDR
+D RS-485 & RS-422 0/4 4.75V ~ 5.25V SOIC-16_150MIL ROHS
+K receiver rs485 rs422 differential
+F http://www.ti.com/lit/ds/symlink/am26lv32.pdf
+$ENDCMP
+#
+$CMP GND_ENC
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_FG
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_IO
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_IO_RAW
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_RLY
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_SC
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP GND_TSD
+D Power symbol creates a global label with name "GND" , ground
+K power-flag
+$ENDCMP
+#
+$CMP SHIELD
+D Power symbol creates a global label with name "GNDPWR" , power ground
+K power-flag
+$ENDCMP
+#
+$CMP VCC_RLY
+D Power symbol creates a global label with name "VCC"
+K power-flag
+$ENDCMP
+#
+$CMP VIN_IO
+D Power symbol creates a global label with name "VDC"
+K power-flag
+$ENDCMP
+#
+$CMP VIN_IO_RAW
+D Power symbol creates a global label with name "VDC"
+K power-flag
+$ENDCMP
+#
+$CMP V_IN
+D Power symbol creates a global label with name "+10V"
+K power-flag
+$ENDCMP
+#
+#End Doc Library
