@@ -1,2 +1,2 @@
-# Tensile-Testing-Machine
+# Tensile Testing Machine
 Tensile testing machine
