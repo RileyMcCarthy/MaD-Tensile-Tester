@@ -1,0 +1,127 @@
+
+(rules PCB Tensile_Board
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (eu.mihosoft.freerouting.autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 781)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.2)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.8)
+    )
+  )
+  (rule
+    (width 250.0)
+    (clear 200.2)
+    (clear 125.0 (type smd_to_turn_gap))
+    (clear 500.2 (type default_SHIELD))
+    (clear 50.0 (type smd_smd))
+    (clear 500.2 (type smd_SHIELD))
+    (clear 500.2 (type "kicad_default"_SHIELD))
+    (clear 500.2 (type SHIELD_SHIELD))
+  )
+  (padstack "Via[0-1]_800:400_um"
+    (shape
+      (circle F.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_800:400_um" "Via[0-1]_800:400_um" default
+  )
+  (via 
+    "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_800:400_um-SHIELD" "Via[0-1]_800:400_um" SHIELD
+  )
+  (via_rule
+    default "Via[0-1]_800:400_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_800:400_um-kicad_default"
+  )
+  (via_rule
+    SHIELD "Via[0-1]_800:400_um-SHIELD"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    "Net-(BT1-Pad1)" GND P9 P7 P5 P3 P1 P8
+    P6 P4 P2 P0 P10 P12 P14 P16
+    P18 P11 P13 P15 P17 P19 SCL P27
+    P25 P23 P21 SDA P26 P24 P22 P20
+    "Net-(J4-Pad1)" "Net-(J4-Pad3)" "Net-(J4-Pad2)" "Net-(J4-Pad10)" "Net-(J5-Pad8)" "Net-(J5-Pad1)" SRDY "PUL-"
+    PUL+ "DIR-" DIR+ ENA "FG_RX" "FG_TX" "FG_OVLD" OUTA+
+    OUTB+ OUTZ+ "OUTA-" "OUTB-" "OUTZ-" "Net-(JP1-Pad2)" "Net-(JP2-Pad2)" "Net-(JP3-Pad2)"
+    "Net-(Q3-Pad1)" "Net-(Q4-Pad1)" "Net-(Q5-Pad1)" "Net-(Q6-Pad1)" "Net-(R6-Pad2)" "Net-(R7-Pad2)" "Net-(R10-Pad2)" DIR
+    PUL "Net-(R11-Pad2)" "Net-(R12-Pad2)" "Net-(R13-Pad1)" "Net-(R14-Pad1)" "Net-(R15-Pad1)" "Net-(R16-Pad2)" "Net-(R19-Pad2)"
+    "Net-(R20-Pad2)" "Net-(R21-Pad1)" "Net-(R22-Pad2)" "Net-(R23-Pad2)" "Net-(R28-Pad2)" "Net-(R32-Pad2)" "Net-(R33-Pad2)" "Net-(R34-Pad2)"
+    "Net-(R35-Pad2)" GPB0 "Net-(R45-Pad1)" "Net-(R46-Pad2)" "Net-(U3-Pad4)" "Net-(U4-Pad9)" "Net-(U4-Pad10)" "Net-(U4-Pad11)"
+    "Net-(U4-Pad13)" "Net-(U4-Pad14)" "Net-(U4-Pad15)" "Net-(U5-Pad1)" "Net-(U6-Pad1)" "Net-(U7-Pad1)" "Net-(U8-Pad1)" "Net-(U9-Pad1)"
+    "Net-(U10-Pad1)" "Net-(U11-Pad1)" GPB1 GPB2 GPB3 GPB4 GPB5 GPB6
+    GPB7 "Net-(U12-Pad11)" "Net-(U12-Pad14)" "Net-(U12-Pad19)" "Net-(U12-Pad20)" GPA0 GPA1 GPA2
+    GPA3 GPA4 GPA5 GPA6 GPA7 "Net-(U15-Pad1)" "Net-(U16-Pad1)" "Net-(U17-Pad1)"
+    "Net-(U18-Pad1)" "GND_TSD" "+3V3_TS" "V_IN" "+5V_TS" "+5V_FG" "GND_FG" "GND_SC"
+    "+5V_SC" "GND_ENC" "GND_IO" "VIN_IO" "5V_IO" "Net-(J6-Pad1)" "GPI_1+" "Net-(Q7-Pad1)"
+    "Net-(Q8-Pad1)" "GPI_2+" "GPI_3+" "Net-(Q9-Pad1)" "GPI_4+" "Net-(Q10-Pad1)" "Net-(Q11-Pad1)" "GPI_5+"
+    "Net-(Q12-Pad1)" "GPI_6+" "Net-(Q13-Pad1)" "GPI_7+" "Net-(Q14-Pad1)" "GPI_8+" "Net-(Q15-Pad1)" "Net-(Q16-Pad1)"
+    "Net-(Q17-Pad1)" "Net-(Q18-Pad1)" "Net-(R42-Pad1)" "Net-(R43-Pad1)" "Net-(R44-Pad1)" "Net-(R47-Pad2)" "Net-(R48-Pad2)" "Net-(R49-Pad2)"
+    "Net-(R50-Pad2)" "Net-(R51-Pad2)" "Net-(R52-Pad2)" "Net-(R53-Pad2)" "Net-(R54-Pad2)" "Net-(R55-Pad2)" "Net-(R62-Pad2)" "Net-(R63-Pad2)"
+    "Net-(R64-Pad2)" "Net-(R65-Pad2)" "Net-(R66-Pad2)" "Net-(R67-Pad2)" "Net-(U22-Pad1)" "Net-(U23-Pad1)" "Net-(U24-Pad1)" "Net-(U25-Pad1)"
+    "Net-(U30-Pad1)" "GPI_1-" "GPI_2-" "Net-(U31-Pad1)" "Net-(U32-Pad1)" "GPI_3-" "Net-(U33-Pad1)" "GPI_4-"
+    "Net-(U34-Pad1)" "GPI_5-" "GPI_6-" "Net-(U35-Pad1)" "GPI_7-" "Net-(U36-Pad1)" "Net-(U37-Pad1)" "GPI_8-"
+    "Net-(U38-Pad1)" "Net-(U39-Pad1)" "Net-(U40-Pad1)" "Net-(U41-Pad1)" "Net-(R74-Pad1)" "GPO_4+" "GPO_4-" "GPO_2+"
+    "GPO_2-" "GPO_3-" "GPO_3+" "GPO_1-" "GPO_1+" "V_GPO4" "V_GPO2" "V_GPO3"
+    "V_GPO1" "GPO_D4" "GPO_D2" "GPO_D3" "GPO_D1" "Net-(D1-Pad1)" "Net-(D2-Pad1)" "Net-(D3-Pad1)"
+    "Net-(D4-Pad1)" "Net-(D5-Pad1)" "Net-(D6-Pad1)" "Net-(D7-Pad1)" "Net-(D8-Pad1)" "Net-(D9-Pad1)" "Net-(D10-Pad1)" "Net-(D11-Pad1)"
+    "Net-(D12-Pad1)" "Net-(D13-Pad1)" "Net-(D14-Pad1)" "Net-(D15-Pad1)" "Net-(D16-Pad1)" "Net-(D17-Pad1)" "Net-(D18-Pad1)" "Net-(D19-Pad1)"
+    "Net-(D20-Pad1)" "Net-(D21-Pad1)" "Net-(D22-Pad1)" "Net-(D23-Pad1)" "Net-(D24-Pad1)" "Net-(D25-Pad1)" "Net-(D26-Pad1)" "Net-(D27-Pad1)"
+    "GPI_9" "GPI_10" "GPI_11" "GPI_12" "OUTZI-" OUTZI+ "Net-(J10-Pad1)"
+    (clearance_class "kicad_default")
+    (via_rule kicad_default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class SHIELD
+    SHIELD
+    (clearance_class SHIELD)
+    (via_rule SHIELD)
+    (rule
+      (width 500.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)

@@ -1,0 +1,729 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 3 6
+Title "Tensile Board"
+Date "2021-02-23"
+Rev "1"
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Tensile_Board:GND_TSD #PWR?
+U 1 1 60138EB9
+P 6125 5675
+AR Path="/60138EB9" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/60138EB9" Ref="#PWR0129"  Part="1" 
+F 0 "#PWR0129" H 6125 5425 50  0001 C CNN
+F 1 "GND_TSD" H 6130 5502 50  0000 C CNN
+F 2 "" H 6125 5675 50  0001 C CNN
+F 3 "" H 6125 5675 50  0001 C CNN
+	1    6125 5675
+	1    0    0    -1  
+$EndComp
+$Comp
+L Isolator:6N137 U?
+U 1 1 60167637
+P 5975 3900
+AR Path="/60167637" Ref="U?"  Part="1" 
+AR Path="/60271F1A/60167637" Ref="U?"  Part="1" 
+AR Path="/60137DC9/60167637" Ref="U11"  Part="1" 
+F 0 "U11" H 5975 4367 50  0000 C CNN
+F 1 "6N137" H 6050 4250 50  0000 C CNN
+F 2 "Package_SO:SOP-8_6.62x9.15mm_P2.54mm" H 5975 3400 50  0001 C CNN
+F 3 "https://docs.broadcom.com/docs/AV02-0940EN" H 5125 4450 50  0001 C CNN
+F 4 "C110020" H 5975 3900 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5975 3900 50  0001 C CNN "Type"
+	1    5975 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6275 4100 6325 4100
+Wire Wire Line
+	6325 4100 6325 4150
+$Comp
+L Device:R_Small R?
+U 1 1 6016763F
+P 6975 3700
+AR Path="/6016763F" Ref="R?"  Part="1" 
+AR Path="/60271F1A/6016763F" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6016763F" Ref="R23"  Part="1" 
+F 0 "R23" H 7034 3746 50  0000 L CNN
+F 1 "330R" H 7034 3655 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6975 3700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF3300T5E_C23138.pdf" H 6975 3700 50  0001 C CNN
+F 4 "C23138" H 6975 3700 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6975 3700 50  0001 C CNN "Type"
+	1    6975 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 60167645
+P 6375 3900
+AR Path="/60167645" Ref="C?"  Part="1" 
+AR Path="/60271F1A/60167645" Ref="C?"  Part="1" 
+AR Path="/60137DC9/60167645" Ref="C20"  Part="1" 
+F 0 "C20" H 6467 3946 50  0000 L CNN
+F 1 "0.1uF" H 6467 3855 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6375 3900 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/YAGEO-CC0603KRX7R9BB104_C14663.pdf" H 6375 3900 50  0001 C CNN
+F 4 "C14663" H 6375 3900 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6375 3900 50  0001 C CNN "Type"
+	1    6375 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6275 3900 6975 3900
+Wire Wire Line
+	6975 3900 6975 3800
+Wire Wire Line
+	6475 3700 6475 3600
+Wire Wire Line
+	6275 3700 6375 3700
+Wire Wire Line
+	6325 4100 6375 4100
+Wire Wire Line
+	6375 4100 6375 4000
+Connection ~ 6325 4100
+Wire Wire Line
+	6375 3800 6375 3700
+Connection ~ 6375 3700
+Wire Wire Line
+	6375 3700 6475 3700
+Wire Wire Line
+	5675 4200 5675 4100
+Wire Wire Line
+	6275 3800 6275 3700
+Connection ~ 6275 3700
+$Comp
+L Device:R_Small R?
+U 1 1 60167658
+P 7925 3900
+AR Path="/60167658" Ref="R?"  Part="1" 
+AR Path="/60271F1A/60167658" Ref="R?"  Part="1" 
+AR Path="/60137DC9/60167658" Ref="R25"  Part="1" 
+F 0 "R25" V 7729 3900 50  0000 C CNN
+F 1 "10K" V 7820 3900 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 7925 3900 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" H 7925 3900 50  0001 C CNN
+F 4 "C25804" H 7925 3900 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7925 3900 50  0001 C CNN "Type"
+	1    7925 3900
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6975 3900 7325 3900
+Connection ~ 6975 3900
+Text GLabel 8025 3900 2    50   Input ~ 0
+P15
+$Comp
+L Device:R_Small R?
+U 1 1 60167661
+P 5475 3750
+AR Path="/60167661" Ref="R?"  Part="1" 
+AR Path="/60271F1A/60167661" Ref="R?"  Part="1" 
+AR Path="/60137DC9/60167661" Ref="R20"  Part="1" 
+F 0 "R20" H 5534 3796 50  0000 L CNN
+F 1 "470R" H 5534 3705 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 5475 3750 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF4700T5E_C23179.pdf" H 5475 3750 50  0001 C CNN
+F 4 "C23179" H 5475 3750 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5475 3750 50  0001 C CNN "Type"
+	1    5475 3750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5475 3850 5475 3900
+Wire Wire Line
+	5475 3900 5675 3900
+Wire Wire Line
+	5475 3650 5475 3550
+$Comp
+L Isolator:6N137 U?
+U 1 1 6016766C
+P 5825 5175
+AR Path="/6016766C" Ref="U?"  Part="1" 
+AR Path="/60271F1A/6016766C" Ref="U?"  Part="1" 
+AR Path="/60137DC9/6016766C" Ref="U9"  Part="1" 
+F 0 "U9" H 5825 5642 50  0000 C CNN
+F 1 "6N137" H 5900 5550 50  0000 C CNN
+F 2 "Package_SO:SOP-8_6.62x9.15mm_P2.54mm" H 5825 4675 50  0001 C CNN
+F 3 "https://docs.broadcom.com/docs/AV02-0940EN" H 4975 5725 50  0001 C CNN
+F 4 "C110020" H 5825 5175 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5825 5175 50  0001 C CNN "Type"
+	1    5825 5175
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5525 5375 5475 5375
+Wire Wire Line
+	5475 5375 5475 5425
+$Comp
+L Device:C_Small C?
+U 1 1 6016767A
+P 5425 5175
+AR Path="/6016767A" Ref="C?"  Part="1" 
+AR Path="/60271F1A/6016767A" Ref="C?"  Part="1" 
+AR Path="/60137DC9/6016767A" Ref="C18"  Part="1" 
+F 0 "C18" H 5517 5221 50  0000 L CNN
+F 1 "0.1uF" H 5517 5130 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5425 5175 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/YAGEO-CC0603KRX7R9BB104_C14663.pdf" H 5425 5175 50  0001 C CNN
+F 4 "C14663" H 5425 5175 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5425 5175 50  0001 C CNN "Type"
+	1    5425 5175
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	5525 4975 5425 4975
+Wire Wire Line
+	5475 5375 5425 5375
+Wire Wire Line
+	5425 5375 5425 5275
+Connection ~ 5475 5375
+Wire Wire Line
+	5425 5075 5425 4975
+$Comp
+L Device:R_Small R?
+U 1 1 6016768A
+P 6125 5575
+AR Path="/6016768A" Ref="R?"  Part="1" 
+AR Path="/60271F1A/6016768A" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6016768A" Ref="R21"  Part="1" 
+F 0 "R21" H 5950 5600 50  0000 L CNN
+F 1 "270R" H 5850 5500 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6125 5575 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF2700T5E_C22966.pdf" H 6125 5575 50  0001 C CNN
+F 4 "C22966" H 6125 5575 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6125 5575 50  0001 C CNN "Type"
+	1    6125 5575
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	6125 5475 6125 5375
+Wire Wire Line
+	5525 5075 5525 4975
+Connection ~ 5525 4975
+Text GLabel 7075 5175 2    50   Input ~ 0
+P16
+$Comp
+L Tensile_Board:+5V_TS #PWR?
+U 1 1 601676B5
+P 6475 3600
+AR Path="/60271F1A/601676B5" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601676B5" Ref="#PWR0130"  Part="1" 
+F 0 "#PWR0130" H 6475 3450 50  0001 C CNN
+F 1 "+5V_TS" H 6490 3773 50  0000 C CNN
+F 2 "" H 6475 3600 50  0001 C CNN
+F 3 "" H 6475 3600 50  0001 C CNN
+	1    6475 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:+3.3V_TS #PWR?
+U 1 1 601676BB
+P 6975 3600
+AR Path="/60271F1A/601676BB" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601676BB" Ref="#PWR0131"  Part="1" 
+F 0 "#PWR0131" H 6975 3450 50  0001 C CNN
+F 1 "+3.3V_TS" H 6990 3773 50  0000 C CNN
+F 2 "" H 6975 3600 50  0001 C CNN
+F 3 "" H 6975 3600 50  0001 C CNN
+	1    6975 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:GND_TSD #PWR?
+U 1 1 601676C1
+P 6325 4150
+AR Path="/60271F1A/601676C1" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601676C1" Ref="#PWR0132"  Part="1" 
+F 0 "#PWR0132" H 6325 3900 50  0001 C CNN
+F 1 "GND_TSD" H 6330 3977 50  0000 C CNN
+F 2 "" H 6325 4150 50  0001 C CNN
+F 3 "" H 6325 4150 50  0001 C CNN
+	1    6325 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Isolator:6N137 U?
+U 1 1 601A01AA
+P 5975 2650
+AR Path="/601A01AA" Ref="U?"  Part="1" 
+AR Path="/60271F1A/601A01AA" Ref="U?"  Part="1" 
+AR Path="/60137DC9/601A01AA" Ref="U10"  Part="1" 
+F 0 "U10" H 5975 3117 50  0000 C CNN
+F 1 "6N137" H 6050 3000 50  0000 C CNN
+F 2 "Package_SO:SOP-8_6.62x9.15mm_P2.54mm" H 5975 2150 50  0001 C CNN
+F 3 "https://docs.broadcom.com/docs/AV02-0940EN" H 5125 3200 50  0001 C CNN
+F 4 "C110020" H 5975 2650 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5975 2650 50  0001 C CNN "Type"
+	1    5975 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6275 2850 6325 2850
+Wire Wire Line
+	6325 2850 6325 2900
+$Comp
+L Device:R_Small R?
+U 1 1 601A01B2
+P 6975 2450
+AR Path="/601A01B2" Ref="R?"  Part="1" 
+AR Path="/60271F1A/601A01B2" Ref="R?"  Part="1" 
+AR Path="/60137DC9/601A01B2" Ref="R22"  Part="1" 
+F 0 "R22" H 7034 2496 50  0000 L CNN
+F 1 "330R" H 7034 2405 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6975 2450 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF3300T5E_C23138.pdf" H 6975 2450 50  0001 C CNN
+F 4 "C23138" H 6975 2450 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6975 2450 50  0001 C CNN "Type"
+	1    6975 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 601A01B8
+P 6375 2650
+AR Path="/601A01B8" Ref="C?"  Part="1" 
+AR Path="/60271F1A/601A01B8" Ref="C?"  Part="1" 
+AR Path="/60137DC9/601A01B8" Ref="C19"  Part="1" 
+F 0 "C19" H 6467 2696 50  0000 L CNN
+F 1 "0.1uF" H 6467 2605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6375 2650 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/YAGEO-CC0603KRX7R9BB104_C14663.pdf" H 6375 2650 50  0001 C CNN
+F 4 "C14663" H 6375 2650 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6375 2650 50  0001 C CNN "Type"
+	1    6375 2650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6275 2650 6975 2650
+Wire Wire Line
+	6975 2650 6975 2550
+Wire Wire Line
+	6475 2450 6475 2350
+Wire Wire Line
+	6275 2450 6375 2450
+Wire Wire Line
+	6325 2850 6375 2850
+Wire Wire Line
+	6375 2850 6375 2750
+Connection ~ 6325 2850
+Wire Wire Line
+	6375 2550 6375 2450
+Connection ~ 6375 2450
+Wire Wire Line
+	6375 2450 6475 2450
+Wire Wire Line
+	5675 2950 5675 2850
+Wire Wire Line
+	6275 2550 6275 2450
+Connection ~ 6275 2450
+$Comp
+L Device:R_Small R?
+U 1 1 601A01CB
+P 7925 2650
+AR Path="/601A01CB" Ref="R?"  Part="1" 
+AR Path="/60271F1A/601A01CB" Ref="R?"  Part="1" 
+AR Path="/60137DC9/601A01CB" Ref="R24"  Part="1" 
+F 0 "R24" V 7729 2650 50  0000 C CNN
+F 1 "10K" V 7820 2650 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 7925 2650 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF1002T5E_C25804.pdf" H 7925 2650 50  0001 C CNN
+F 4 "C25804" H 7925 2650 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7925 2650 50  0001 C CNN "Type"
+	1    7925 2650
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6975 2650 7325 2650
+Connection ~ 6975 2650
+Text GLabel 8025 2650 2    50   Input ~ 0
+P17
+$Comp
+L Device:R_Small R?
+U 1 1 601A01D4
+P 5475 2500
+AR Path="/601A01D4" Ref="R?"  Part="1" 
+AR Path="/60271F1A/601A01D4" Ref="R?"  Part="1" 
+AR Path="/60137DC9/601A01D4" Ref="R19"  Part="1" 
+F 0 "R19" H 5534 2546 50  0000 L CNN
+F 1 "470R" H 5534 2455 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 5475 2500 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF4700T5E_C23179.pdf" H 5475 2500 50  0001 C CNN
+F 4 "C23179" H 5475 2500 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 5475 2500 50  0001 C CNN "Type"
+	1    5475 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5475 2600 5475 2650
+Wire Wire Line
+	5475 2650 5675 2650
+Wire Wire Line
+	5475 2400 5475 2300
+Text Notes 8250 2675 0    50   ~ 0
+OVERLOAD
+$Comp
+L Tensile_Board:+5V_TS #PWR?
+U 1 1 601A01EA
+P 6475 2350
+AR Path="/60271F1A/601A01EA" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601A01EA" Ref="#PWR0133"  Part="1" 
+F 0 "#PWR0133" H 6475 2200 50  0001 C CNN
+F 1 "+5V_TS" H 6490 2523 50  0000 C CNN
+F 2 "" H 6475 2350 50  0001 C CNN
+F 3 "" H 6475 2350 50  0001 C CNN
+	1    6475 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:+3.3V_TS #PWR?
+U 1 1 601A01F0
+P 6975 2350
+AR Path="/60271F1A/601A01F0" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601A01F0" Ref="#PWR0134"  Part="1" 
+F 0 "#PWR0134" H 6975 2200 50  0001 C CNN
+F 1 "+3.3V_TS" H 6990 2523 50  0000 C CNN
+F 2 "" H 6975 2350 50  0001 C CNN
+F 3 "" H 6975 2350 50  0001 C CNN
+	1    6975 2350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:GND_TSD #PWR?
+U 1 1 601A01F6
+P 6325 2900
+AR Path="/60271F1A/601A01F6" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/601A01F6" Ref="#PWR0135"  Part="1" 
+F 0 "#PWR0135" H 6325 2650 50  0001 C CNN
+F 1 "GND_TSD" H 6330 2727 50  0000 C CNN
+F 2 "" H 6325 2900 50  0001 C CNN
+F 3 "" H 6325 2900 50  0001 C CNN
+	1    6325 2900
+	1    0    0    -1  
+$EndComp
+Text GLabel 2950 3900 2    50   Input ~ 0
+FG_OVLD
+Text GLabel 2950 4000 2    50   Input ~ 0
+FG_TX
+Text GLabel 2950 4100 2    50   Input ~ 0
+FG_RX
+Text GLabel 4475 5175 0    50   Input ~ 0
+FG_RX
+Text GLabel 5475 3550 1    50   Input ~ 0
+FG_TX
+$Comp
+L Tensile_Board:GND_FG #PWR0136
+U 1 1 601ABAD3
+P 5675 4200
+F 0 "#PWR0136" H 5675 3950 50  0001 C CNN
+F 1 "GND_FG" H 5680 4027 50  0000 C CNN
+F 2 "" H 5675 4200 50  0001 C CNN
+F 3 "" H 5675 4200 50  0001 C CNN
+	1    5675 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:GND_FG #PWR0137
+U 1 1 601AC45C
+P 5675 2950
+F 0 "#PWR0137" H 5675 2700 50  0001 C CNN
+F 1 "GND_FG" H 5680 2777 50  0000 C CNN
+F 2 "" H 5675 2950 50  0001 C CNN
+F 3 "" H 5675 2950 50  0001 C CNN
+	1    5675 2950
+	1    0    0    -1  
+$EndComp
+Text GLabel 5475 2300 1    50   Input ~ 0
+FG_OVLD
+Wire Wire Line
+	4475 5175 4625 5175
+$Comp
+L Tensile_Board:GND_FG #PWR0138
+U 1 1 601A76BA
+P 2950 3800
+F 0 "#PWR0138" H 2950 3550 50  0001 C CNN
+F 1 "GND_FG" V 2955 3672 50  0000 R CNN
+F 2 "" H 2950 3800 50  0001 C CNN
+F 3 "" H 2950 3800 50  0001 C CNN
+	1    2950 3800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Tensile_Board:+5V_FG #PWR0139
+U 1 1 60157576
+P 2950 4200
+F 0 "#PWR0139" H 2950 4050 50  0001 C CNN
+F 1 "+5V_FG" V 2965 4328 50  0000 L CNN
+F 2 "" H 2950 4200 50  0001 C CNN
+F 3 "" H 2950 4200 50  0001 C CNN
+	1    2950 4200
+	0    1    1    0   
+$EndComp
+$Comp
+L Tensile_Board:+5V_FG #PWR0140
+U 1 1 601594E9
+P 5350 4850
+F 0 "#PWR0140" H 5350 4700 50  0001 C CNN
+F 1 "+5V_FG" H 5365 5023 50  0000 C CNN
+F 2 "" H 5350 4850 50  0001 C CNN
+F 3 "" H 5350 4850 50  0001 C CNN
+	1    5350 4850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5425 4975 5350 4975
+Wire Wire Line
+	5350 4975 5350 4850
+Connection ~ 5425 4975
+$Comp
+L Device:R_Small R?
+U 1 1 6015C23E
+P 4625 5025
+AR Path="/6015C23E" Ref="R?"  Part="1" 
+AR Path="/60271F1A/6015C23E" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6015C23E" Ref="R18"  Part="1" 
+F 0 "R18" H 4684 5071 50  0000 L CNN
+F 1 "360R" H 4684 4980 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 4625 5025 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF3600T5E_C25194.pdf" H 4625 5025 50  0001 C CNN
+F 4 "C25194" H 4625 5025 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 4625 5025 50  0001 C CNN "Type"
+	1    4625 5025
+	1    0    0    -1  
+$EndComp
+Connection ~ 4625 5175
+Wire Wire Line
+	4625 5175 5525 5175
+$Comp
+L Tensile_Board:+5V_FG #PWR0141
+U 1 1 6015D112
+P 4625 4850
+F 0 "#PWR0141" H 4625 4700 50  0001 C CNN
+F 1 "+5V_FG" H 4640 5023 50  0000 C CNN
+F 2 "" H 4625 4850 50  0001 C CNN
+F 3 "" H 4625 4850 50  0001 C CNN
+	1    4625 4850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4625 5175 4625 5125
+Wire Wire Line
+	4625 4925 4625 4850
+$Comp
+L Tensile_Board:GND_FG #PWR0142
+U 1 1 601C0E40
+P 5475 5425
+F 0 "#PWR0142" H 5475 5175 50  0001 C CNN
+F 1 "GND_FG" H 5480 5252 50  0000 C CNN
+F 2 "" H 5475 5425 50  0001 C CNN
+F 3 "" H 5475 5425 50  0001 C CNN
+	1    5475 5425
+	1    0    0    -1  
+$EndComp
+Text Notes 8250 3925 0    50   ~ 0
+RX
+Text Notes 7325 5225 0    50   ~ 0
+TX
+Wire Notes Line
+	5900 550  5900 7675
+Text Notes 5425 650  0    59   ~ 0
+Outboard
+Text Notes 5975 650  0    59   ~ 0
+Inboard
+Text Notes 2425 3125 0    59   ~ 0
+Force Gauge Screw Terminal
+$Comp
+L Tensile_Board:SHIELD #PWR0161
+U 1 1 601D91DB
+P 3025 3700
+F 0 "#PWR0161" H 3025 3500 50  0001 C CNN
+F 1 "SHIELD" H 3030 3545 50  0000 C CNN
+F 2 "" H 3025 3650 50  0001 C CNN
+F 3 "" H 3025 3650 50  0001 C CNN
+	1    3025 3700
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x06 J8
+U 1 1 601DA13E
+P 2750 4000
+F 0 "J8" H 2750 3575 50  0000 C CNN
+F 1 "Screw_Terminal_01x06" V 2875 3950 50  0000 C CNN
+F 2 "TerminalBlock_4Ucon:TerminalBlock_4Ucon_1x06_P3.50mm_Vertical" H 2750 4000 50  0001 C CNN
+F 3 "~" H 2750 4000 50  0001 C CNN
+F 4 "NA" H 2750 4000 50  0001 C CNN "Type"
+	1    2750 4000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	2950 3700 3025 3700
+$Comp
+L Device:LED D?
+U 1 1 6044A94C
+P 6825 4575
+AR Path="/6017311C/6044A94C" Ref="D?"  Part="1" 
+AR Path="/60137DC9/6044A94C" Ref="D21"  Part="1" 
+F 0 "D21" V 6864 4457 50  0000 R CNN
+F 1 "BLUE" V 6773 4457 50  0000 R CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 6825 4575 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf" H 6825 4575 50  0001 C CNN
+F 4 "C72041" H 6825 4575 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6825 4575 50  0001 C CNN "Type"
+	1    6825 4575
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 6044A954
+P 6825 4825
+AR Path="/6044A954" Ref="R?"  Part="1" 
+AR Path="/60271F1A/6044A954" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6044A954" Ref="R80"  Part="1" 
+AR Path="/6017311C/6044A954" Ref="R?"  Part="1" 
+F 0 "R80" H 6625 4875 50  0000 L CNN
+F 1 "100R" H 6575 4775 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6825 4825 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF330JT5E_C23140.pdf" H 6825 4825 50  0001 C CNN
+F 4 "C22775" H 6825 4825 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 6825 4825 50  0001 C CNN "Type"
+	1    6825 4825
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7325 2650 7325 2550
+$Comp
+L Device:R_Small R?
+U 1 1 6045880C
+P 7325 2450
+AR Path="/60135B63/6045880C" Ref="R?"  Part="1" 
+AR Path="/604E5842/6045880C" Ref="R?"  Part="1" 
+AR Path="/605221B0/6045880C" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6045880C" Ref="R81"  Part="1" 
+F 0 "R81" H 7384 2496 50  0000 L CNN
+F 1 "100R" H 7384 2405 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 7325 2450 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF330JT5E_C23140.pdf" H 7325 2450 50  0001 C CNN
+F 4 "C22775" H 7325 2450 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7325 2450 50  0001 C CNN "Type"
+	1    7325 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:+3.3V_TS #PWR?
+U 1 1 60458812
+P 7325 2000
+AR Path="/60135B63/60458812" Ref="#PWR?"  Part="1" 
+AR Path="/604E5842/60458812" Ref="#PWR?"  Part="1" 
+AR Path="/605221B0/60458812" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/60458812" Ref="#PWR0247"  Part="1" 
+F 0 "#PWR0247" H 7325 1850 50  0001 C CNN
+F 1 "+3.3V_TS" H 7325 2150 50  0000 C CNN
+F 2 "" H 7325 2000 50  0001 C CNN
+F 3 "" H 7325 2000 50  0001 C CNN
+	1    7325 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 6045881A
+P 7325 2150
+AR Path="/605221B0/6045881A" Ref="D?"  Part="1" 
+AR Path="/60137DC9/6045881A" Ref="D22"  Part="1" 
+F 0 "D22" V 7364 2032 50  0000 R CNN
+F 1 "BLUE" V 7273 2032 50  0000 R CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 7325 2150 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf" H 7325 2150 50  0001 C CNN
+F 4 "C72041" H 7325 2150 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7325 2150 50  0001 C CNN "Type"
+	1    7325 2150
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7325 2300 7325 2350
+Wire Wire Line
+	7325 3900 7325 3800
+$Comp
+L Device:R_Small R?
+U 1 1 6045A514
+P 7325 3700
+AR Path="/60135B63/6045A514" Ref="R?"  Part="1" 
+AR Path="/604E5842/6045A514" Ref="R?"  Part="1" 
+AR Path="/605221B0/6045A514" Ref="R?"  Part="1" 
+AR Path="/60137DC9/6045A514" Ref="R82"  Part="1" 
+F 0 "R82" H 7384 3746 50  0000 L CNN
+F 1 "100R" H 7384 3655 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 7325 3700 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Uniroyal-Elec-0603WAF330JT5E_C23140.pdf" H 7325 3700 50  0001 C CNN
+F 4 "C22775" H 7325 3700 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7325 3700 50  0001 C CNN "Type"
+	1    7325 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L Tensile_Board:+3.3V_TS #PWR?
+U 1 1 6045A51A
+P 7325 3250
+AR Path="/60135B63/6045A51A" Ref="#PWR?"  Part="1" 
+AR Path="/604E5842/6045A51A" Ref="#PWR?"  Part="1" 
+AR Path="/605221B0/6045A51A" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/6045A51A" Ref="#PWR0248"  Part="1" 
+F 0 "#PWR0248" H 7325 3100 50  0001 C CNN
+F 1 "+3.3V_TS" H 7325 3400 50  0000 C CNN
+F 2 "" H 7325 3250 50  0001 C CNN
+F 3 "" H 7325 3250 50  0001 C CNN
+	1    7325 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED D?
+U 1 1 6045A522
+P 7325 3400
+AR Path="/605221B0/6045A522" Ref="D?"  Part="1" 
+AR Path="/60137DC9/6045A522" Ref="D23"  Part="1" 
+F 0 "D23" V 7364 3282 50  0000 R CNN
+F 1 "BLUE" V 7273 3282 50  0000 R CNN
+F 2 "LED_SMD:LED_0603_1608Metric" H 7325 3400 50  0001 C CNN
+F 3 "https://datasheet.lcsc.com/szlcsc/Everlight-Elec-19-217-BHC-ZL1M2RY-3T_C72041.pdf" H 7325 3400 50  0001 C CNN
+F 4 "C72041" H 7325 3400 50  0001 C CNN "LCSC"
+F 5 "BASIC" H 7325 3400 50  0001 C CNN "Type"
+	1    7325 3400
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	7325 3550 7325 3600
+Wire Wire Line
+	7825 3900 7325 3900
+Connection ~ 7325 3900
+Connection ~ 7325 2650
+Wire Wire Line
+	7325 2650 7825 2650
+Wire Wire Line
+	6125 5175 6825 5175
+$Comp
+L Tensile_Board:+3.3V_TS #PWR?
+U 1 1 60463BAD
+P 6825 4425
+AR Path="/60271F1A/60463BAD" Ref="#PWR?"  Part="1" 
+AR Path="/60137DC9/60463BAD" Ref="#PWR0249"  Part="1" 
+F 0 "#PWR0249" H 6825 4275 50  0001 C CNN
+F 1 "+3.3V_TS" H 6840 4598 50  0000 C CNN
+F 2 "" H 6825 4425 50  0001 C CNN
+F 3 "" H 6825 4425 50  0001 C CNN
+	1    6825 4425
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6825 4925 6825 5175
+Connection ~ 6825 5175
+Wire Wire Line
+	6825 5175 7075 5175
+$EndSCHEMATC
