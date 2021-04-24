@@ -14,25 +14,25 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Sheet
-S -4300 4800 2000 1150
+S 2750 4750 2000 1150
 U 60271F1A
 F0 "Servo_Controller" 50
 F1 "Servo_Controller.sch" 50
 $EndSheet
 $Sheet
-S -2250 4800 2200 1200
+S 4800 4750 2200 1200
 U 60137DC9
 F0 "Force_Gauge" 50
 F1 "Force_Gauge.sch" 50
 $EndSheet
 $Sheet
-S -6250 6325 2025 1200
+S 800  6275 2025 1200
 U 6017311C
 F0 "IO_Expansion" 50
 F1 "IO_Expansion.sch" 50
 $EndSheet
 $Sheet
-S -6250 4800 1900 1150
+S 800  4750 1900 1150
 U 60135B63
 F0 "Distance_Gauge" 50
 F1 "Distance_Gauge.sch" 50
@@ -49,7 +49,7 @@ F 3 "" H 2975 4375 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Sheet
-S -4000 6350 2000 1200
+S 3050 6300 2000 1200
 U 605221B0
 F0 "IO_Expansion_Inputs" 79
 F1 "IO_Expansion_Inputs.sch" 79
