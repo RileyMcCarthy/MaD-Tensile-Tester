@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "propware.h": "c",
+        "encoderapi.h": "c",
+        "typeinfo": "cpp",
+        "*.cogcxx": "c",
+        "propeller.h": "c"
+    }
+}
