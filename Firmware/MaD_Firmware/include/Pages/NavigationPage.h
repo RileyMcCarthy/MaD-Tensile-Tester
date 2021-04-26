@@ -6,6 +6,11 @@
 #include "Style.h"
 #include "State.h"
 
+/**
+ * @brief Enumeration representing the pages available to select from navigation
+ * 
+ */
+
 enum Pages
 {
     PAGE_STATUS,
@@ -14,6 +19,10 @@ enum Pages
     PAGE_SETTINGS
 };
 
+/**
+ * @brief Runs the UI that lets the user select which page to run
+ * 
+ */
 class NavigationPage
 {
 public:

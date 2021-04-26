@@ -9,6 +9,10 @@
 #include "DYN4.h"
 #include "Motion.h"
 
+/**
+ * @brief Runs the UI for running tests
+ * 
+ */
 class AutomaticPage
 {
 public:

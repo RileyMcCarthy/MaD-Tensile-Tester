@@ -2,21 +2,23 @@
 #define DS3231_H
 #include "simpletools.h"
 #include "Error.h"
-#define REG_SECONDS 0x00
-#define REG_MINUTES 0x01
-#define REG_HOURS 0x02
-#define REG_DAY 0x04
-#define REG_MONTHS 0x05
-#define REG_YEARS 0x06
-#define REG_CONTROL 0x0E
-#define REG_STATUS 0x0F
 
-#define STATUS_RST 0x80
+#define REG_SECONDS 0x00    //Second register
+#define REG_MINUTES 0x01    //Minute register
+#define REG_HOURS 0x02  //Hour register
+#define REG_DAY 0x04    //Day register
+#define REG_MONTHS 0x05 //Month register
+#define REG_YEARS 0x06  //Year register
+#define REG_CONTROL 0x0E    //Control register
+#define REG_STATUS 0x0F //Status register
 
-#define SET_PM 0x20
-#define SET_12HOUR 0x40
+#define STATUS_RST 0x80 //Clock reset status bit
+
+#define SET_PM 0x20 //Control AM/PM set bit
+#define SET_12HOUR 0x40 //Control 12/24 set bit
 
 #define ADDR 0x68
+
 typedef struct time_st
 {
     uint8_t second;
@@ -28,6 +30,11 @@ typedef struct time_st
     bool am;
 } Time;
 
+
+/**
+ * @brief Real Time Clock IC Interface
+ * 
+ */
 class DS3231
 {
 public:

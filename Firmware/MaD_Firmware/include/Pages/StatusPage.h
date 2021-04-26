@@ -6,6 +6,11 @@
 #include "Style.h"
 #include "State.h"
 
+
+/**
+ * @brief Runs the UI that displays machine information and status
+ * 
+ */
 class StatusPage
 {
 public:

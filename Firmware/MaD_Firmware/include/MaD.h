@@ -17,18 +17,23 @@
 #include "ManualPage.h"
 #include "AutomaticPage.h"
 
-#define GT9271_INT 7
-#define CLK 28
-#define DATA 29
-#define RA8876_XNSCS 10
-#define RA8876_XNRESET 9
-#define BACKLIGHT 8
+#define GT9271_INT 7 //SPI Interrupt pin
+#define CLK 28  //SPI Clock Pin
+#define DATA 29 //SPI Data Pin
+#define RA8876_XNSCS 10 //SPI Chip Select Pin
+#define RA8876_XNRESET 9    //Display reset
+#define BACKLIGHT 8 //Display Backlight (replaced with pullup resistor)
 
-#define MAD_SD_DO 22
-#define MAD_SD_CLK 23
-#define MAD_CD_DI 24
-#define MAD_CD_CS 25
+#define MAD_SD_DO 22    //SD Data out
+#define MAD_SD_CLK 23   //SD Clock
+#define MAD_CD_DI 24    //SD Data In
+#define MAD_CD_CS 25    //SD Chip Select
 
+
+/**
+ * @brief Main class responsible for initializing and starting components
+ * 
+ */
 class MAD
 {
 public:

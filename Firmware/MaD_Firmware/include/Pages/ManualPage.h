@@ -7,6 +7,10 @@
 #include "State.h"
 #include "DYN4.h"
 
+/**
+ * @brief Runs the UI for manually controlling the machine
+ * 
+ */
 class ManualPage
 {
 public:

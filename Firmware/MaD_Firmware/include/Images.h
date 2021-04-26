@@ -4,14 +4,42 @@
 #include "Ra8876_Lite.h"
 #include "MaD.h"
 
+/**
+ * @brief Keyboard image
+ * 
+ */
 static Image keyboardImg;
+/**
+ * @brief Navigation ICON
+ * 
+ */
 static Image navigationImg;
+/**
+ * @brief General Button
+ * 
+ */
 static Image button_wide;
+/**
+ * @brief General Button Border
+ * 
+ */
 static Image button_wide_border;
+/**
+ * @brief Manual Page ICON
+ * 
+ */
 static Image manualImg;
+/**
+ * @brief Automatic Page ICON
+ * 
+ */
 static Image automaticImg;
 
-static void loadAssets()
+/**
+ * @brief Creates Image Objects in preparation for loading
+ * 
+ */
+static void createAssets()
 {
     strcpy(keyboardImg.name, "keyboard.bin");
     keyboardImg.page = 3;
@@ -54,6 +82,10 @@ static void loadAssets()
     automaticImg.backgroundColor = 0xf800;
 }
 
+/**
+ * @brief Loads images from MaD SD card to display SDRAM
+ * 
+ */
 static void loadAssets(Ra8876_Lite *display)
 {
     libpropeller::SD sd;

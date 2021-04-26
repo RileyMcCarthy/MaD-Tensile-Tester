@@ -3,6 +3,10 @@
 #include "simpletools.h"
 #include "Ra8876_Lite.h"
 
+/**
+ * @brief The keyboard class contains an ondisplay keyboard that can be used to gather user input
+ *
+ **/
 class Keyboard
 {
 public:

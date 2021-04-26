@@ -38,6 +38,10 @@ public:
     bool activeState;
 };
 
+/**
+ * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state. 
+ * 
+ */
 class SelfCheck : public State
 {
 public:
@@ -49,12 +53,23 @@ public:
         activeState = false;
     }
 
+/**
+ * @brief Disables motion via charge pump
+ * 
+ */
     void enter()
     {
         //default flags when entering state
         activeState = true;
+
+        //TODO add code in enter for self check then automatically go to next state
     }
 
+/**
+ * @brief Attempts to move to the next state
+ * 
+ * @return State* is the new state to enter. Will return current state if parameters not satisfied
+ */
     State *nextState()
     {
         if (chargePumpOK)
@@ -74,6 +89,12 @@ public:
     }
 };
 
+/**
+ * @brief Automatic transition into when all Self Check conditions satisfied or if any Machine Check condition not satisfied and Self Check conditions are satisfied. 
+ * No motion shall occur in Machine Check.  
+ * Motion Status is Disabled in Machine Check State. 
+ * 
+ */
 class MachineCheck : public State
 {
 public:
@@ -98,6 +119,10 @@ public:
         activeState = false;
     }
 
+/**
+ * @brief 
+ * 
+ */
     void enter()
     {
         //default values when entering state

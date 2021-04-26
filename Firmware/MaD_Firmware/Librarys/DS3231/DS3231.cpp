@@ -1,5 +1,13 @@
 #include "DS3231.h"
 
+
+/**
+ * @brief Communicates with the DS3231 Real Time Clock IC
+ * 
+ * @param scl I2C Clock Pin
+ * @param sda I2C Data Pin
+ * @return Error: RTC_RESET if RTC lost power, RTC_NOT_FOUND if communication failed, SUCCESS otherwise.
+ */
 Error DS3231::begin(int scl, int sda)
 {
     Error error = SUCCESS;
@@ -23,6 +31,13 @@ Error DS3231::begin(int scl, int sda)
     return error;
 }
 
+/**
+ * @brief Sets the RTC Time
+ * 
+ * @param newTime The new time
+ * @return Error: RTC_NOT_FOUND if communication error, SUCCESS otherwise
+ * @TODO Error checking for bad Time struct values
+ */
 Error DS3231::setTime(Time *newTime)
 {
     int hourFormat = dectobcd(newTime->hour);
@@ -45,6 +60,11 @@ Error DS3231::setTime(Time *newTime)
     return SUCCESS;
 }
 
+/**
+ * @brief Read time for RTC and update local copy
+ * 
+ * @return Error: RTC_NOT_FOUND if communication error, SUCCESS otherwise.
+ */
 Error DS3231::updateTime()
 {
     time.second = bcdtodec(readRegister(REG_SECONDS));
@@ -56,7 +76,12 @@ Error DS3231::updateTime()
     return SUCCESS;
 }
 
-//*Helper function for reading registers*//
+/**
+ * @brief Private helper function to read RTC register
+ * 
+ * @param addr 
+ * @return uint8_t 
+ */
 uint8_t DS3231::readRegister(uint8_t addr)
 {
     uint8_t rdata = 0xFF;
@@ -69,8 +94,14 @@ uint8_t DS3231::readRegister(uint8_t addr)
     i2c_stop(rtc_bus);
     return rdata;
 }
-
-//*Helper function for writing registers*//
+/**
+ * @brief Private helper function to write RTC register
+ * 
+ * @param addr Register address
+ * @param value Value to write to the register
+ * @return true if write was acknoledged
+ * @return false if write was not acknoledged
+ */
 bool DS3231::writeRegister(uint8_t addr, uint8_t value)
 {
     i2c_start(rtc_bus);
@@ -81,11 +112,23 @@ bool DS3231::writeRegister(uint8_t addr, uint8_t value)
     return !ack;
 }
 
+/**
+ * @brief Decimal number to binary coded decimal format
+ * 
+ * @param val the decimal number to convert
+ * @return uint8_t the equivalent binary coded decimal value
+ */
 uint8_t DS3231::dectobcd(const uint8_t val)
 {
     return ((val / 10 * 16) + (val % 10));
 }
 
+/**
+ * @brief Binary coded decimal to decimal format
+ * 
+ * @param val The binary coded decimal number
+ * @return uint8_t the equivalent decimal value
+ */
 uint8_t DS3231::bcdtodec(const uint8_t val)
 {
     return ((val / 16 * 10) + (val % 16));
