@@ -1,6 +1,7 @@
 #include "AutomaticPage.h"
+#include "Motion.h"
 
-void AutomaticPage::run(Ra8876_Lite *p_display, struct mailbox_t *motionMailbox, MachineState *machineState)
+void AutomaticPage::run(Ra8876_Lite *p_display, Motion_Cog *motionCog)
 {
     display = p_display;
     // dyn4 = p_dyn4;
@@ -95,17 +96,7 @@ void AutomaticPage::run(Ra8876_Lite *p_display, struct mailbox_t *motionMailbox,
     float total = 0;
     int max = 0;
     int min = 0;
-    /*int *stack = (int *)malloc(sizeof(unsigned int) * (300 / 4));
-    if (stack != NULL)
-    {
-        printf("loading motion cog\n");
-        cog_run(&motionCOG, NULL, stack, sizeof(stack));
-    }
-    else
-    {
-        printf("stack overflow...\n");
-    }*/
-    motionMailbox->dyn4->send_command(0x0c, 1000);
+    //motionMailbox->dyn4->send_command(0x0c, 1000);
     while (1)
     {
         //navkey.updateStatus();
@@ -116,7 +107,9 @@ void AutomaticPage::run(Ra8876_Lite *p_display, struct mailbox_t *motionMailbox,
 
         display->putString(160, 350, pos);
         //int tempForce = force.getForce();
-        int tempForce = motionMailbox->force;
+        //int tempForce = motionMailbox->force;
+        int tempForce = motionCog->force;
+        int tempPosition = motionCog->position;
         if (tempForce != -1)
         {
             samples++;
@@ -139,15 +132,15 @@ void AutomaticPage::run(Ra8876_Lite *p_display, struct mailbox_t *motionMailbox,
             display->putString(575, 480, forceVal);
             sprintf(forceVal, "Max: %d.%d ", max / 1000, max - (max / 1000));
             display->putString(575, 510, forceVal);
-            display->drawLine(498 + samples - 1, 182 + lastForce / 34, 498 + samples, 182 + tempForce / 34, COLOR65K_GREEN);                          //force is -5000 to 5000 with 300px resolution
-            display->drawLine(498 + samples - 1, 182 + lastPosition / 5, 498 + samples, 182 + motionMailbox->dyn4->getPosition() / 5, COLOR65K_BLUE); //force is -5000 to 5000 with 300px resolution
+            display->drawLine(498 + samples - 1, 182 + lastForce / 34, 498 + samples, 182 + tempForce / 34, COLOR65K_GREEN);    //force is -5000 to 5000 with 300px resolution
+            display->drawLine(498 + samples - 1, 182 + lastPosition / 5, 498 + samples, 182 + tempPosition / 5, COLOR65K_BLUE); //force is -5000 to 5000 with 300px resolution
             if (samples >= 445)
             {
                 drawGraph(display);
                 samples = 0;
             }
             lastForce = tempForce;
-            lastPosition = motionMailbox->dyn4->getPosition();
+            lastPosition = tempPosition;
         }
         pause(10);
     }

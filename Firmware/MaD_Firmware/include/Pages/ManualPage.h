@@ -6,7 +6,7 @@
 #include "Style.h"
 #include "State.h"
 #include "DYN4.h"
-
+#include "Motion.h"
 /**
  * @brief Runs the UI for manually controlling the machine
  * 
@@ -14,7 +14,7 @@
 class ManualPage
 {
 public:
-    void run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machineState);
+    void run(Ra8876_Lite *the_display, Motion_Cog *motionCog);
     void checkButtons(Button *buttons);
 
 private:

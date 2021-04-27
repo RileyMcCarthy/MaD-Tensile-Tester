@@ -6,7 +6,6 @@
 #include "Style.h"
 #include "State.h"
 
-
 /**
  * @brief Runs the UI that displays machine information and status
  * 
@@ -14,13 +13,12 @@
 class StatusPage
 {
 public:
-    void run(Ra8876_Lite *the_display, MachineState *machineState);
-    void checkButtons(Button *buttons);
+    void run(Ra8876_Lite *the_display);
 
 private:
+    void checkButtons(Button *buttons);
     bool complete;
     Ra8876_Lite *display;
-    MachineState *machineState;
     enum button_names
     {
         BUTTON_MACHINE_ENABLE,

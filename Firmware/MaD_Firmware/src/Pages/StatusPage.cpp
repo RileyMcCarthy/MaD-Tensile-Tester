@@ -16,11 +16,11 @@ void StatusPage::checkButtons(Button *buttons)
                 {
                 case button_names::BUTTON_MACHINE_ENABLE:
                     printf("enabling motion\n");
-                    machineState->motion.Status(Motion_Status::STATUS_ENABLED);
+                    MachineState.motionParameters.status = STATUS_ENABLED;
                     break;
                 case button_names::BUTTON_MACHINE_DISABLE:
                     printf("disabling motion\n");
-                    machineState->motion.Status(Motion_Status::STATUS_DISABLED);
+                    MachineState.motionParameters.status = STATUS_DISABLED;
                     break;
                 case button_names::BUTTON_NAVIGATION:
                     complete = true;
@@ -33,10 +33,9 @@ void StatusPage::checkButtons(Button *buttons)
     }
 }
 
-void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
+void StatusPage::run(Ra8876_Lite *the_display)
 {
     display = the_display;
-    machineState = the_machineState;
     complete = false;
 
     MCP23017 gpio;
@@ -131,7 +130,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
         display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-        machineState->update();
+        updateMachineState();
 
         display->textColor(MAINTEXTCOLOR, COLOR65K_BLACK);
         strcpy(buf, "Enable");
@@ -142,7 +141,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
 
         /*Self Check State*/
         //self check status
-        if (machineState->selfCheck.chargePumpOK)
+        if (MachineState.selfCheckParameters.chargePumpOK)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Self check: COMPLETE");
@@ -155,7 +154,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(selfCheckStartX, selfCheckStartY + 30, buf);
 
         //charge pump
-        if (machineState->selfCheck.chargePumpOK)
+        if (MachineState.selfCheckParameters.chargePumpOK)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Charge Pump: OK  ");
@@ -169,7 +168,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
 
         /*Machine Check State*/
         //switched power enabled
-        if (machineState->machineCheck.power)
+        if (MachineState.machineCheckParameters.power)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Switched Power: ON ");
@@ -182,7 +181,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(machineCheckStartX, machineCheckStartY + 30, buf);
 
         //upper overtravel
-        if (machineState->machineCheck.upperLimit)
+        if (MachineState.machineCheckParameters.upperLimit)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Upper Limit Fault: NONE  ");
@@ -195,7 +194,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(machineCheckStartX, machineCheckStartY + 60, buf);
 
         //ESD
-        if (machineState->machineCheck.esd)
+        if (MachineState.machineCheckParameters.esd)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "ESD Fault: NONE  ");
@@ -208,7 +207,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(machineCheckStartX, machineCheckStartY + 90, buf);
 
         //Servo
-        if (machineState->machineCheck.servoReady)
+        if (MachineState.machineCheckParameters.servoReady)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Servo: READY   ");
@@ -221,7 +220,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(machineCheckStartX, machineCheckStartY + 120, buf);
 
         //Force Gauge
-        if (machineState->machineCheck.forceGaugeResponding)
+        if (MachineState.machineCheckParameters.forceGaugeResponding)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Force Gauge: READY   ");
@@ -234,7 +233,7 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(machineCheckStartX, machineCheckStartY + 150, buf);
 
         //machine Ready
-        if (machineState->machineCheck.machineReady)
+        if (MachineState.machineCheckParameters.machineReady)
         {
             display->textColor(MAINTEXTCOLOR, BACKCOLOR);
             strcpy(buf, "Machine: READY   ");
@@ -248,17 +247,17 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
 
         /*Motion State*/
         //motion enabled
-        if (machineState->motion.status == Motion_Status::STATUS_ENABLED)
+        if (MachineState.motionParameters.status == STATUS_ENABLED)
         {
             display->textColor(ENABLEDTEXT, ENABLEDBACK);
             strcpy(buf, "Motion: ENABLED       ");
         }
-        else if (machineState->motion.status == Motion_Status::STATUS_DISABLED)
+        else if (MachineState.motionParameters.status == STATUS_DISABLED)
         {
             display->textColor(DISABLEDTEXT, DISABLEDBACK);
             strcpy(buf, "Motion: DISABLED      ");
         }
-        else if (machineState->motion.status == Motion_Status::STATUS_RESTRICTED)
+        else if (MachineState.motionParameters.status == STATUS_RESTRICTED)
         {
             display->textColor(ERRORTEXT, ERRORBACK);
             strcpy(buf, "Motion: RESTRICTED    ");
@@ -266,33 +265,33 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(motionStartX, motionStartY + 30, buf);
 
         //Motion Status
-        switch (machineState->motion.condition)
+        switch (MachineState.motionParameters.condition)
         {
-        case Motion_Condition::MOTION_STOPPED:
+        case MOTION_STOPPED:
             display->textColor(ERRORTEXT, ERRORBACK);
             strcpy(buf, "Condition: STOPPED    ");
             break;
-        case Motion_Condition::MOTION_MOVING:
+        case MOTION_MOVING:
             display->textColor(ACTIVETEXT, ACTIVEBACK);
             strcpy(buf, "Condition: MOVING     ");
             break;
-        case Motion_Condition::MOTION_TENSION:
+        case MOTION_TENSION:
             display->textColor(WARNINGTEXT, WARNINGBACK);
             strcpy(buf, "Condition: TENSION    ");
             break;
-        case Motion_Condition::MOTION_COMPRESSION:
+        case MOTION_COMPRESSION:
             display->textColor(WARNINGTEXT, WARNINGBACK);
             strcpy(buf, "Condition: COMPRESSION");
             break;
-        case Motion_Condition::MOTION_UPPER:
+        case MOTION_UPPER:
             display->textColor(WARNINGTEXT, WARNINGBACK);
             strcpy(buf, "Condition: UPPER      ");
             break;
-        case Motion_Condition::MOTION_LOWER:
+        case MOTION_LOWER:
             display->textColor(WARNINGTEXT, WARNINGBACK);
             strcpy(buf, "Condition: LOWER     ");
             break;
-        case Motion_Condition::MOTION_DOOR:
+        case MOTION_DOOR:
             display->textColor(WARNINGTEXT, WARNINGBACK);
             strcpy(buf, "Condition: DOOR      ");
             break;
@@ -302,17 +301,17 @@ void StatusPage::run(Ra8876_Lite *the_display, MachineState *the_machineState)
         display->putString(motionStartX, motionStartY + 60, buf);
 
         //Motion Mode
-        switch (machineState->motion.mode)
+        switch (MachineState.motionParameters.mode)
         {
-        case Motion_Mode::MODE_MANUAL:
+        case MODE_MANUAL:
             display->textColor(COLOR65K_WHITE, COLOR65K_BLUE);
             strcpy(buf, "Mode: MANUAL          ");
             break;
-        case Motion_Mode::MODE_AUTOMATIC:
+        case MODE_AUTOMATIC:
             display->textColor(COLOR65K_WHITE, COLOR65K_LIGHTBLUE);
             strcpy(buf, "Mode: AUTOMATIC       ");
             break;
-        case Motion_Mode::MODE_OVERRIDE:
+        case MODE_OVERRIDE:
             display->textColor(ERRORTEXT, ERRORBACK);
             strcpy(buf, "Mode: OVERRIDE        ");
             break;

@@ -3,11 +3,10 @@
 #include "Keyboard.h"
 #include "Motion.h"
 #include "BufferlessSerial.h"
-struct
-{
-  unsigned stack[160];
-  struct mailbox_t mailbox;
-} cogdata;
+
+unsigned int stack[STACK_SIZE];
+volatile Motion_Cog motionCog;
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  * 
@@ -20,21 +19,10 @@ void MAD::begin()
   uart_start(&serial, 14, 12, 2, 9600);
   pause(2000);
   uart_write(&serial, 0x55);*/
-  DYN4 dyn;
-  dyn.begin(14, 12, 0x03);
-  dyn.send_command(0x0a, 1000);
-  return;
 
   startDisplay();
   printf("Finished\n");
   printf("Updating machine state\n");
-  machineState.update(); //update will pass selfcheck then go to machineCheck
-  machineState.machineCheck.power = true;
-  machineState.machineCheck.upperLimit = true;
-  machineState.machineCheck.lowerLimit = true;
-  machineState.machineCheck.esd = true;
-  machineState.machineCheck.servoReady = true;
-  machineState.machineCheck.forceGaugeResponding = true;
   printf("Finished\n");
   //end of State testing configuration
 
@@ -53,22 +41,17 @@ void MAD::begin()
   printf("Loading images\n");
   //loadAssets();
   printf("loading dyn4\n");
-  dyn4.begin(14, 12, 0x03);
-  forceGauge.begin(FORCE_RX, FORCE_TX);
+
+  //ForceGauge_begin(&forceGauge, FORCE_RX, FORCE_TX);
   //forceGauge.begin(FORCE_RX, FORCE_TX);
   printf("Getting keyboard input\n");
-
-  cogdata.mailbox.dyn4 = &dyn4;
-  cogdata.mailbox.forceGauge = &forceGauge;
+  //dyn4_send_command(&dyn4, 0x0c, 1000);
+  // motion.dyn4 = &dyn4;
+  //motion.forceGauge = &forceGauge;
   extern unsigned int _load_start_Motion_cog[];
-  /*if (cognew(_load_start_Motion_cog, &cogdata.mailbox) >= 0)
-  {
-    printf("Cog successfully started\n");
-  }
-  while (1)
-  {
-    printf("force:%d\n", cogdata.mailbox.force);
-  }*/
+  int *cogAddr = cog_run(runMotion, 200);
+  printf("Cog successfully started:\n");
+
   // getKeyboardInput(buf);
   //start status page
   Pages newPage = Pages::PAGE_STATUS;
@@ -80,7 +63,7 @@ void MAD::begin()
     {
       printf("Loading status page\n");
       StatusPage statusPage;
-      statusPage.run(&display, &machineState);
+      statusPage.run(&display);
       printf("Leaving status page\n");
     }
     break;
@@ -88,7 +71,7 @@ void MAD::begin()
     {
       printf("Loading manual page\n");
       ManualPage manual;
-      manual.run(&display, &dyn4, &machineState);
+      manual.run(&display, (Motion_Cog *)(&motionCog));
       printf("Leaving manual page\n");
     }
     break;
@@ -96,7 +79,7 @@ void MAD::begin()
     {
       printf("Loading automatic page\n");
       AutomaticPage automatic;
-      automatic.run(&display, &(cogdata.mailbox), &machineState);
+      automatic.run(&display, (Motion_Cog *)(&motionCog));
     }
     break;
     default:

@@ -42,7 +42,7 @@ void ManualPage::checkButtons(Button *buttons)
  * @brief Starts manual page
  * 
  */
-void ManualPage::run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machineState)
+void ManualPage::run(Ra8876_Lite *the_display, Motion_Cog *motionCog)
 {
     printf("Manual page running\n");
     display = the_display;
@@ -119,12 +119,11 @@ void ManualPage::run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machine
     display->drawSquareFill(buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
     display->bteMemoryCopyImage(navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     bool initialRender = true;
-
     printf("Manual page finished laoding\n");
-    MachineState localState;
+    struct MachineState_t previousState;
     while (!complete)
     {
-        MachineState currentState = *machineState;
+        struct MachineState_t currentState;
         navkey.updateStatus();
         checkButtons(buttons);
 
@@ -133,23 +132,23 @@ void ManualPage::run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machine
         int textcolor = 0;
         int backcolor = 0;
         int bordercolor = 0;
-        if ((localState.motion.status != currentState.motion.status) || initialRender)
+        if ((previousState.motionParameters.status != currentState.motionParameters.status) || initialRender)
         {
-            switch (machineState->motion.status)
+            switch (currentState.motionParameters.status)
             {
-            case Motion_Status::STATUS_DISABLED:
+            case STATUS_DISABLED:
                 strcpy(buf, "DISABLED");
                 textcolor = COLOR65K_WHITE;
                 backcolor = COLOR65K_BLACK;
                 bordercolor = COLOR65K_GREEN;
                 break;
-            case Motion_Status::STATUS_ENABLED:
+            case STATUS_ENABLED:
                 strcpy(buf, "ENABLED");
                 textcolor = COLOR65K_BLACK;
                 backcolor = COLOR65K_WHITE;
                 bordercolor = COLOR65K_GREEN;
                 break;
-            case Motion_Status::STATUS_RESTRICTED:
+            case STATUS_RESTRICTED:
                 strcpy(buf, "RESTRICTED");
                 textcolor = COLOR65K_WHITE;
                 backcolor = COLOR65K_RED;
@@ -166,7 +165,7 @@ void ManualPage::run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machine
         }
         display->textColor(MAINTEXTCOLOR, BACKCOLOR);
         int position = navkey.readCounterInt();
-        dyn4->send_command(0x01, position);
+        //dyn4_send_command(dyn4, 0x01, position);
         sprintf(buf, "Relitive Position: %d", position);
         display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 160, buf);
         strcpy(buf, "Relative Force: 0.00");
@@ -177,6 +176,6 @@ void ManualPage::run(Ra8876_Lite *the_display, DYN4 *dyn4, MachineState *machine
         display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 260, buf);
         // clock.render();
         initialRender = false;
-        localState = currentState;
+        previousState = currentState;
     }
 }

@@ -16,7 +16,7 @@
 class AutomaticPage
 {
 public:
-    void run(Ra8876_Lite *p_display, struct mailbox_t *motionMailbox, MachineState *machineState);
+    void run(Ra8876_Lite *p_display, Motion_Cog *motionCog);
     void checkButtons(Button *buttons);
     static void motionCOG(void *par);
     void loadGraph(Ra8876_Lite *display);

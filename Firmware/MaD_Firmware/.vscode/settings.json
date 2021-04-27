@@ -4,6 +4,8 @@
         "encoderapi.h": "c",
         "typeinfo": "cpp",
         "*.cogcxx": "c",
-        "propeller.h": "c"
+        "propeller.h": "c",
+        "*.cogc": "c",
+        "forcegauge.h": "c"
     }
 }

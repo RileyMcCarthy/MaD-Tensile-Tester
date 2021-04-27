@@ -1,315 +1,207 @@
 #ifndef State_H
 #define State_H
-#include "ForceGauge.h"
-#include "DS3231.h"
-#include "MCP23017.h"
 #include "propeller.h"
+#include "stdbool.h"
 
-enum Motion_Status
+//FIX STATE MACHINE USING https://stackoverflow.com/questions/1371460/state-machines-tutorials#:~:text=State%20machines%20are%20very%20simple,and%20then%20just%20execute%20it.
+#ifdef __cplusplus
+extern "C"
 {
-    STATUS_DISABLED,
-    STATUS_ENABLED,
-    STATUS_RESTRICTED
-};
-enum Motion_Condition
-{
-    MOTION_STOPPED,
-    MOTION_MOVING,
-    MOTION_TENSION,
-    MOTION_COMPRESSION,
-    MOTION_UPPER,
-    MOTION_LOWER,
-    MOTION_DOOR
-};
-enum Motion_Mode
-{
-    MODE_MANUAL,
-    MODE_AUTOMATIC,
-    MODE_OVERRIDE
-};
-class State
-{
-public:
-    virtual void enter() = 0;
-    virtual State *nextState() = 0;
-    virtual void exit() = 0;
-    State *previousState;
-    State *successState;
-    bool activeState;
-};
+#endif
 
-/**
- * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state. 
- * 
- */
-class SelfCheck : public State
-{
-public:
-    bool chargePumpOK; //internal
-    SelfCheck()
+    typedef enum States_e
     {
-        //default flags
-        chargePumpOK = true;
-        activeState = false;
-    }
+        State_SelfCheck,
+        State_MachineCheck,
+        State_Motion
+    } State;
 
-/**
- * @brief Disables motion via charge pump
- * 
- */
-    void enter()
+    typedef enum MotionStatus_e
     {
-        //default flags when entering state
-        activeState = true;
-
-        //TODO add code in enter for self check then automatically go to next state
-    }
-
-/**
- * @brief Attempts to move to the next state
- * 
- * @return State* is the new state to enter. Will return current state if parameters not satisfied
- */
-    State *nextState()
+        STATUS_DISABLED,
+        STATUS_ENABLED,
+        STATUS_RESTRICTED
+    } MotionStatus;
+    typedef enum MotionCondition_e
     {
-        if (chargePumpOK)
+        MOTION_STOPPED,
+        MOTION_MOVING,
+        MOTION_TENSION,
+        MOTION_COMPRESSION,
+        MOTION_UPPER,
+        MOTION_LOWER,
+        MOTION_DOOR
+    } MotionCondition;
+    typedef enum MotionMode_e
+    {
+        MODE_MANUAL,
+        MODE_AUTOMATIC,
+        MODE_OVERRIDE
+    } MotionMode;
+
+    typedef struct SelfCheck_t
+    {
+        bool chargePumpOK;
+    } SelfCheckParameters;
+
+    typedef struct MachineCheck_t
+    {
+        bool power;
+        bool upperLimit;
+        bool lowerLimit;
+        bool esd;
+        bool servoReady;
+        bool forceGaugeResponding;
+        bool machineReady;
+    } MachineCheckParameters;
+
+    typedef struct Motion_t
+    {
+        MotionStatus status;       //internal and external
+        MotionCondition condition; //internal and external
+        MotionMode mode;           //internal and external
+
+    } MotionParameters;
+
+    static struct MachineState_t
+    {
+        State currentState;
+        SelfCheckParameters selfCheckParameters;
+        MachineCheckParameters machineCheckParameters;
+        MotionParameters motionParameters;
+
+    } MachineState;
+
+    /**
+    * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state. 
+    * 
+    */
+    static State SelfCheckState()
+    {
+        State newState;
+        //Entering Self Check State
+        bool tempChargePumpOK = false;
+
+        //Checking Self Check Conditions
+        //@TODO Make this more in depth
+        if (1 == 1)
         {
-            return successState;
+            tempChargePumpOK = true;
+        }
+
+        //Decide the next state
+        if (MachineState.selfCheckParameters.chargePumpOK)
+        {
+            newState = State_MachineCheck;
         }
         else
         {
-            return this;
+            newState = State_SelfCheck;
         }
+
+        //Dump temporary parameters to machine state
+        MachineState.selfCheckParameters.chargePumpOK = tempChargePumpOK;
+
+        return newState;
     }
 
-    void exit()
-    {
-        //default flags when exiting state
-        activeState = false;
-    }
-};
-
-/**
+    /**
  * @brief Automatic transition into when all Self Check conditions satisfied or if any Machine Check condition not satisfied and Self Check conditions are satisfied. 
  * No motion shall occur in Machine Check.  
  * Motion Status is Disabled in Machine Check State. 
  * 
  */
-class MachineCheck : public State
-{
-public:
-    bool power;
-    bool upperLimit;
-    bool lowerLimit;
-    bool esd;
-    bool servoReady;
-    bool forceGaugeResponding;
-    bool machineReady;
-
-    MachineCheck()
+    static State MachineCheckState()
     {
-        power = false;                //internal
-        upperLimit = false;           //internal
-        lowerLimit = false;           //internal
-        esd = false;                  //internal
-        servoReady = false;           //internal
-        forceGaugeResponding = false; //external
-        machineReady = false;         //internal
+        State newState;
+        //Entering Machine Check State, Set default state parameters
+        bool tempPower = false;
+        bool tempUpperLimit = false;
+        bool tempLowerLimit = false;
+        bool tempESD = false;
+        bool tempServoReady = false;
+        bool tempForceGaugeResponding = false;
+        bool tempMachineReady = false;
 
-        activeState = false;
-    }
+        //Checking Machine Check Conditions
+        //For example is the force gauge responding, are limits hit... need to figure out how to give State these objects
+        tempMachineReady = true; //This flag says all conditions meet, placeholder for actual checks
 
-/**
- * @brief 
- * 
- */
-    void enter()
-    {
-        //default values when entering state
-        power = false;
-        upperLimit = false;
-        lowerLimit = false;
-        esd = false;
-        servoReady = false;
-        forceGaugeResponding = false;
-        machineReady = false;
-
-        activeState = true;
-    }
-    State *nextState()
-    {
-        machineReady = power && upperLimit && lowerLimit && esd && servoReady && forceGaugeResponding;
-        if (previousState->nextState() != this)
+        //Decide the next state
+        if (MachineState.machineCheckParameters.machineReady)
         {
-            //previous state has error, revert back
-            return previousState;
-        }
-        else if (machineReady)
-        {
-            //no errrors move onto next state
-            return successState;
+            newState = State_Motion;
         }
         else
         {
-            return this;
+            newState = State_MachineCheck;
         }
-    }
-    void exit()
-    {
-        //default values when exiting state
-        activeState = false;
-    }
-};
 
-class Motion : public State
-{
-public:
-    Motion_Status status;       //internal and external
-    Motion_Condition condition; //internal and external
-    Motion_Mode mode;           //internal and external
-    Motion()
-    {
-        status = Motion_Status::STATUS_DISABLED;
-        condition = Motion_Condition::MOTION_STOPPED;
-        mode = Motion_Mode::MODE_MANUAL;
+        //Dump temporary parameters to machine state
+        MachineState.machineCheckParameters.power = tempPower;
+        MachineState.machineCheckParameters.upperLimit = tempUpperLimit;
+        MachineState.machineCheckParameters.lowerLimit = tempLowerLimit;
+        MachineState.machineCheckParameters.esd = tempESD;
+        MachineState.machineCheckParameters.servoReady = tempServoReady;
+        MachineState.machineCheckParameters.forceGaugeResponding = tempForceGaugeResponding;
+        MachineState.machineCheckParameters.machineReady = tempMachineReady;
 
-        activeState = false;
+        return newState;
     }
 
-    void enter()
+    static State MotionState()
     {
-        //default values when entering state
-        status = Motion_Status::STATUS_DISABLED;
-        condition = Motion_Condition::MOTION_STOPPED;
-        mode = Motion_Mode::MODE_MANUAL;
+        State newState;
+        //Entering Motion State
+        MotionStatus tempStatus = STATUS_DISABLED;
+        MotionCondition tempCondition = MOTION_STOPPED;
+        MotionMode tempMode = MODE_MANUAL;
 
-        activeState = true;
-    }
+        //Check Machine Conditions
 
-    State *nextState()
-    {
-        if (previousState->nextState() != this)
+        //Decide the next state
+        if (MachineCheckState() != State_Motion) //Check if previous state conditions are still valid back
         {
-            return previousState;
+            newState = State_MachineCheck;
+
+            tempStatus = STATUS_DISABLED;
+            tempCondition = MOTION_STOPPED;
+            tempMode = MODE_MANUAL;
         }
         else
         {
-            return this;
+            newState = State_Motion;
         }
+        //Dump temporary parameters to machine state
+        MachineState.motionParameters.status = tempStatus;
+        MachineState.motionParameters.condition = tempCondition;
+        MachineState.motionParameters.mode = tempMode;
+        return newState;
     }
 
-    void exit()
+    static bool updateMachineState()
     {
-        //default values when exiting state
-        status = Motion_Status::STATUS_DISABLED;
-        condition = Motion_Condition::MOTION_STOPPED;
-        mode = Motion_Mode::MODE_MANUAL;
-
-        activeState = false;
-    }
-    void Status(Motion_Status newStatus)
-    {
-        if (!activeState)
+        State previousState = MachineState.currentState;
+        State newState;
+        switch (previousState)
         {
-            return;
-        }
-        if (status != Motion_Status::STATUS_RESTRICTED)
-        {
-            status = newStatus;
-        }
-    }
-    Motion_Status Status()
-    {
-        return status;
-    }
-
-    //will set condition flag only if valid substate of status
-    void Condition(Motion_Condition newCondition)
-    {
-        if (!activeState)
-        {
-            return;
-        }
-        switch (newCondition)
-        {
-        case Motion_Condition::MOTION_STOPPED:
-            //condition cannot be STOPPED with status RESTRICTED
-            if (status != Motion_Status::STATUS_RESTRICTED)
-            {
-                condition = newCondition;
-            }
+        case State_SelfCheck:
+            newState = SelfCheckState();
             break;
-        case Motion_Condition::MOTION_MOVING:
-            //condition can only be MOVING exist when status is ENABLED
-            if (status == Motion_Status::STATUS_ENABLED)
-            {
-                condition = newCondition;
-            }
+        case State_MachineCheck:
+            newState = MachineCheckState();
             break;
-        default: //all other states are faults
-                 //condition can only be FAULT when status is RESTRICTED
-            if (status == Motion_Status::STATUS_RESTRICTED)
-            {
-                condition = newCondition;
-            }
+        case State_Motion:
+            newState = MotionState();
+            break;
+        default:
             break;
         }
-    }
-    Motion_Condition Condition()
-    {
-        return condition;
+        MachineState.currentState = newState;
+        return newState != previousState;
     }
 
-    void Mode(Motion_Mode newMode)
-    {
-        if (condition == Motion_Condition::MOTION_STOPPED)
-        {
-            mode = newMode;
-        }
-    }
-    Motion_Mode Mode()
-    {
-        return mode;
-    }
-};
-
-class MachineState
-{
-public:
-    //state varables
-    State *currentState;
-
-    //state objects
-    SelfCheck selfCheck;
-    MachineCheck machineCheck;
-    Motion motion;
-
-    //utility
-    MCP23017 *gpio;
-
-    MachineState()
-    {
-        currentState = &selfCheck;
-        selfCheck.previousState = NULL;
-        selfCheck.successState = &machineCheck;
-
-        machineCheck.previousState = &selfCheck;
-        machineCheck.successState = &motion;
-
-        motion.previousState = &machineCheck;
-        motion.successState = NULL;
-    }
-    void update()
-    {
-        State *newState;
-        if ((newState = currentState->nextState()) != currentState)
-        {
-            currentState->exit();
-            currentState = newState;
-            currentState->enter();
-        }
-    }
-
-private:
-};
+#ifdef __cplusplus
+}
+#endif
 #endif
