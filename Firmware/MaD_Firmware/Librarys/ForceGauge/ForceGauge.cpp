@@ -1,32 +1,38 @@
 #include "ForceGauge.h"
 #include "simpletools.h"
-#include "libpropeller/fullduplexserial/full_duplex_serial.h"
+
 void write(ForceGauge *forceGauge, uint8_t reg, uint8_t data)
 {
     //Write has format(rrr = reg to write): 0x55, 0b0001 rrrx {data}
-    //uart_write(&(forceGauge->serial), 0x55);
-    //uart_write(&(forceGauge->serial), 0x40 + (reg << 1));
-    //uart_write(&(forceGauge->serial), data);
-    forceGauge->serial.Put(0x55);
-    forceGauge->serial.Put(0x40 + (reg << 1));
-    forceGauge->serial.Put(data);
+    uart_write(&(forceGauge->serial), 0x55);
+    uart_write(&(forceGauge->serial), 0x40 + (reg << 1));
+    uart_write(&(forceGauge->serial), data);
 }
 
 uint8_t read(ForceGauge *forceGauge, uint8_t reg)
 {
     //read has format(rrr = reg to read): 0x55, 0b0010 rrrx, {returned data}
-    //input(15);
-    //uart_write(&(forceGauge->serial), 0x55);
-    //uart_write(&(forceGauge->serial), 0x20 + (reg << 1));
-    forceGauge->serial.Put(0x55);
-    forceGauge->serial.Put(0x20 + (reg << 1));
-    uint8_t temp = forceGauge->serial.Get();
-    printf("read:%d\n", temp);
+    input(15);
+    uart_write(&(forceGauge->serial), 0x55);
+    uart_write(&(forceGauge->serial), 0x20 + (reg << 1));
+    uint8_t temp;
+    uart_read(&(forceGauge->serial), 1, &temp);
+    printf("read:%u\n", temp);
     return temp;
 }
 ForceGauge *cogForceGauge;
 void monitor(void *par)
 {
+    cogForceGauge->counter = 0;
+    while (1)
+    {
+        union Data_v _temp_data;
+        uart_read(&(cogForceGauge->serial), 3, _temp_data.bval);
+        int force = (_temp_data.val - 2048402) / -666;
+        //printf("Force:%d\n", force);
+        cogForceGauge->counter++;
+        cogForceGauge->force = force;
+    }
 }
 
 //UART is LSB first
@@ -34,12 +40,9 @@ void monitor(void *par)
 //Add data integrity check...
 void ForceGauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
-    forceGauge->serial.Start(15, 16, 3, 38400);
-    forceGauge->serial.Put(0x55);
-    forceGauge->serial.Put(0x06);
-    //uart_start(&(forceGauge->serial), rx, tx, 2, 38400);
-    //uart_write(&(forceGauge->serial), 0x55); //Synchronization word
-    // uart_write(&(forceGauge->serial), 0x06); //Reset
+    uart_start(&(forceGauge->serial), rx, tx, 2, 57600);
+    uart_write(&(forceGauge->serial), 0x55); //Synchronization word
+    uart_write(&(forceGauge->serial), 0x06); //Reset
     cogForceGauge = forceGauge;
     printf("finished writing registers\n");
     pause(10);
@@ -53,34 +56,13 @@ void ForceGauge_begin(ForceGauge *forceGauge, int rx, int tx)
     write(forceGauge, CONFIG_3, 0b00000001);
     //write(CONFIG_3, 0x01);
     // printf("config0: %d\n", read(forceGauge, CONFIG_0));
-    printf("config1: %d\n", read(cogForceGauge, CONFIG_1));
+    //printf("config1: %d\n", read(cogForceGauge, CONFIG_1));
     //printf("config1: %d\n", read(forceGauge, CONFIG_1));
 
-    //uart_write(&(forceGauge->serial), 0x55);
-    //uart_write(&(forceGauge->serial), 0x08);
-    forceGauge->serial.Put(0x55);
-    forceGauge->serial.Put(0x08);
+    uart_write(&(forceGauge->serial), 0x55);
+    uart_write(&(forceGauge->serial), 0x08);
     pause(10);
-    int prevCNT = 0;
-    cogForceGauge->counter = 0;
-    while (1)
-    {
-        union Data_v _temp_data;
-        _temp_data.bval[0] = forceGauge->serial.Get();
-        _temp_data.bval[1] = forceGauge->serial.Get();
-        _temp_data.bval[2] = forceGauge->serial.Get();
-        int temp = _temp_data.val;
-        // int temp = uart_read(&(forceGauge->serial), 24);
-        printf("%d\n", temp);
-        int force = (_temp_data.val - 2029542) / -665.760;
-        printf("Force:%d\n", force);
-        cogForceGauge->counter++;
-        prevCNT = CNT;
-        //int force = (_temp_data.val - 16259784) / -665.760;
-        cogForceGauge->force = temp;
-        forceGauge->serial.GetFlush();
-        pause(500);
-    }
+    cog_run(monitor, 200);
 }
 
 int ForceGauge_getForce(ForceGauge *forceGauge)
@@ -93,10 +75,8 @@ int ForceGauge_getForce(ForceGauge *forceGauge)
     }*/
     //reading force has format: 0x55, 0x1X, {returned force data}
     /* union Data_v _temp_data;
-    //uart_write(&(forceGauge->serial), 0x55);
-    //uart_write(&(forceGauge->serial), 0x10);
-    forceGauge->serial.Put(0x55);
-    forceGauge->serial.Put(0x10);
+    uart_write(&(forceGauge->serial), 0x55);
+    uart_write(&(forceGauge->serial), 0x10);
     int newCount = uart_read(&(forceGauge->serial), 8);
     if (newCount == forceGauge->counter)
     {

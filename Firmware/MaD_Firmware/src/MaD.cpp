@@ -49,22 +49,9 @@ void MAD::begin()
   // motion.dyn4 = &dyn4;
   //motion.forceGauge = &forceGauge;
   extern unsigned int _load_start_Motion_cog[];
-  //int *cogAddr = cog_run(runMotion, 200);
-  // printf("Cog successfully started:%d\n", cog_num(cogAddr));
-  ForceGauge forceGauge;
-  ForceGauge_begin(&forceGauge, 15, 16);
-  int prevTime = 0;
-  while (1)
-  {
-    printf("Force(%d): %u,TIME:%d\n", forceGauge.counter, forceGauge.force, CNT - prevTime);
-    prevTime = CNT;
-    pause(100);
-  }
-  pause(100);
-  while (1)
-  {
-    printf("position:%d, force:%d,time:%d\n", motionCog.position, motionCog.force, motionCog.time);
-  }
+  int *cogAddr = cog_run(runMotion, 800);
+  printf("Cog successfully started:%d\n", cog_num(cogAddr));
+
   // getKeyboardInput(buf);
   //start status page
   Pages newPage = Pages::PAGE_STATUS;

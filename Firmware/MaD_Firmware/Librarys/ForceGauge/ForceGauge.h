@@ -4,7 +4,6 @@
 #include "propeller.h"
 #include "Error.h"
 #include "BufferlessSerial.h"
-#include "libpropeller/fullduplexserial/full_duplex_serial.h"
 #define CONFIG_0 0x00
 #define CONFIG_1 0x01
 #define CONFIG_2 0x02
@@ -26,8 +25,7 @@ extern "C"
         int counter;
         unsigned int force;
         uint8_t buffer[4];
-        BLSerial serialold;
-        libpropeller::FullDuplexSerial serial;
+        BLSerial serial;
 
     } ForceGauge;
 

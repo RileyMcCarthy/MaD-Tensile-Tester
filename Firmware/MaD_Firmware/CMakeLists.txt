@@ -17,7 +17,7 @@ create_simple_executable(${PROJECT_NAME}
     Librarys/DYN4/DYN4.c
     src/main.cpp
     src/MaD.cpp
-    src/Motion.c
+    src/Motion.cpp
     Librarys/Serial/BufferlessSerial.c
     src/Elements/Keyboard.cpp
     src/Elements/Clock.cpp

@@ -14,7 +14,7 @@ extern "C"
         int baudCNT;
     } BLSerial;
 
-    int32_t uart_read(BLSerial *serial, unsigned int p_bits);
+    void uart_read(BLSerial *serial, unsigned int bytes, uint8_t *buffer);
     void uart_write(BLSerial *serial, uint8_t data);
     void uart_start(BLSerial *serial, int rx, int tx, int mode, int baud);
 
