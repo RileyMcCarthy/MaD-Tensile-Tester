@@ -1,5 +1,12 @@
 #include "MCP23017.h"
 
+/**
+ * @brief 
+ * 
+ * @param addr 
+ * @param theSDA 
+ * @param theSCL 
+ */
 void MCP23017::begin(uint8_t addr, int theSDA, int theSCL)
 {
     i2c_open(&bus, theSCL, theSDA, 1);

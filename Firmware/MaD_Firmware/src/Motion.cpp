@@ -10,57 +10,26 @@ extern Motion_Cog motionCog;
 void runMotion(void *par)
 {
     //Start state machine
-    if (!RunStateMachine())
+    /* if (!RunStateMachine())
     {
         //state machine failed to run
-    }
+    }*/
 
-    MachineState.selfCheckParameters.chargePumpOK = true; //motion cog started up successfully, enable charge pump
+    //MachineState.selfCheckParameters.chargePumpOK = true; //motion cog started up successfully, enable charge pump
 
     ForceGauge forceGauge;
-    if (ForceGauge_begin(&forceGauge, 15, 16) == SUCCESS)
+    ForceGauge_begin(&forceGauge, 15, 16);
+    /* if (ForceGauge_begin(&forceGauge, 15, 16) == SUCCESS)
     {
         MachineState.machineCheckParameters.forceGaugeResponding = true;
-    }
+    }*/
 
     DYN4 dyn4;
-    if (dyn4_begin(&dyn4, 14, 12, 0x03) == SUCCESS)
+    dyn4_begin(&dyn4, 14, 12, 0x03);
+    /* if (dyn4_begin(&dyn4, 14, 12, 0x03) == SUCCESS)
     {
         MachineState.machineCheckParameters.dyn4Responding = true;
-    }
-    for (;;)
-    {
-        switch (MachineState.currentState)
-        {
-        case State_SelfCheck:
-            /* motion code for self check */
-            //do nothing, motion isnt enabled
-            break;
-        case State_MachineCheck:
-            /* Machine Check motion code */
-            break;
-        case State_Motion:
-            /* Motion state motion code */
-            switch (MachineState.motionParameters.mode)
-            {
-            case MODE_MANUAL:
-                /* code */
-
-                break;
-            case MODE_AUTOMATIC:
-                /* code */
-                break;
-            case MODE_OVERRIDE:
-                /* code */
-                break;
-            default:
-                break;
-            }
-            break;
-        default:
-            break;
-        }
-    }
+    }*/
     dyn4_send_command(&dyn4, 0x0c, 1000);
     int startCNT = CNT;
     for (;;)
@@ -73,5 +42,6 @@ void runMotion(void *par)
         // count++;
         waitcnt(CNT + CLKFREQ / 1000);
     }
+
     // sd.Close();
 }
