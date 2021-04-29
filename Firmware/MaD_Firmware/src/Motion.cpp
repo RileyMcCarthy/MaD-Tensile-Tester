@@ -45,6 +45,7 @@ void runMotion(void *par)
             {
             case MODE_MANUAL:
                 /* code */
+
                 break;
             case MODE_AUTOMATIC:
                 /* code */
