@@ -1,9 +1,27 @@
 #include "DYN4.h"
-void dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
+
+#define STATUS_ONRANGE 0x00
+#define STATUS_MOTORFREE 0x01
+#define STATUS_ALARM 0x02
+#define STATUS_MOTORBUSY 0x05
+#define STATUS_JP3STATUS 0x06
+
+/**
+ * @brief Begin communication with the servo controller
+ * 
+ * @param dyn4 dyn4 struct that will be used to hold servo information
+ * @param rx serial rx pin
+ * @param tx serial tx pin
+ * @param new_device_id servo device id
+ * @return Error: DYN4_NOT_RESPONDING if communications fail, DYN4_COG_FAIL if starting communications cog failed, SUCCESS otherwise.
+ */
+Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 {
     dyn4->device_id = new_device_id & 0x7F;
-    // driver = serial_open(rx, tx, 3, 38400);
     uart_start(&(dyn4->serial), 14, 12, 2, 38400);
+
+    DYN4Status status;
+    Error ret = getStatus(dyn4, &status);
 
     //start encoder
     dyn4->encoder.Totenc = 1; // Number of encoders
@@ -13,13 +31,71 @@ void dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
     dyn4->encoder.PosPointer = dyn4->encoder.POS; // Pointer to POS counters
 
     int EncCog = encoder_start(&(dyn4->encoder)); // Start asm cog with address to first variable in static block
+    if (EncCog <= 0)
+    {
+        ret = DYN4_COG_FAIL;
+    }
+    return ret;
 }
 
-int dyn4_getPosition(DYN4 *dyn4)
+/**
+ * @brief Get the Status of the servo
+ * 
+ * @param dyn4 the servo to get the status from
+ * @param status the address status struct that will contain the updated status
+ * @return Error: DYN4_NOT_RESPONDING if communications fail, SUCCESS otherwise.
+ */
+Error getStatus(DYN4 *dyn4, DYN4Status *status)
 {
-    return (dyn4->encoder).POS[0];
+    dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
+    uint8_t *statusReg;
+    if (readCommand(dyn4, IS_STATUS, statusReg) == -1)
+    {
+        return DYN4_NOT_RESPONDING;
+    }
+    status->onRange = (statusReg[0] & (STATUS_ONRANGE + 1)) >> STATUS_ONRANGE;
+    status->motorFree = (statusReg[0] & (STATUS_MOTORFREE + 1)) >> STATUS_MOTORFREE;
+    status->alarm = (statusReg[0] & (STATUS_ALARM + 1)) >> STATUS_ALARM;
+    status->motorBusy = (statusReg[0] & (STATUS_MOTORBUSY + 1)) >> STATUS_MOTORBUSY;
+    status->jp3P2Status = (statusReg[0] & (STATUS_JP3STATUS + 1)) >> STATUS_JP3STATUS;
+    free(statusReg);
+    return SUCCESS;
 }
 
+/**
+ * @brief Read incomming command from servo.
+ * @todo if sending command then reading command in seperate functions is too slow, combine them.
+ * @param dyn4 the servo to read command from
+ * @param readCommand the command the statement read should contain
+ * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE) 
+ * @return int number of bytes recieved
+ */
+int readCommand(DYN4 *dyn4, int readCommand, uint8_t *returnData)
+{
+    uint8_t byte;
+    uart_read(&(dyn4->serial), 1, &byte);
+    if ((byte & dyn4->device_id) != dyn4->device_id)
+    {
+        return -1;
+    }
+    uart_read(&(dyn4->serial), 1, &byte);
+    if ((byte & IS_STATUS) != IS_STATUS)
+    {
+        return -1;
+    }
+    int n = (byte >> 5) & 0x03;
+    returnData = (uint8_t *)malloc(sizeof(uint8_t) * (n + 1));
+    uart_read(&(dyn4->serial), n + 1, returnData);
+    return n + 1;
+}
+
+/**
+ * @brief Send command to servo controller
+ * 
+ * @param dyn4 The servo to send the command
+ * @param command The command to send
+ * @param data The data to send with the command
+ */
 void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
 {
     int n = 0;

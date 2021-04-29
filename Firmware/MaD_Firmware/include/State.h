@@ -22,6 +22,7 @@ extern "C"
         STATUS_ENABLED,
         STATUS_RESTRICTED
     } MotionStatus;
+
     typedef enum MotionCondition_e
     {
         MOTION_STOPPED,
@@ -52,6 +53,7 @@ extern "C"
         bool esd;
         bool servoReady;
         bool forceGaugeResponding;
+        bool dyn4Responding;
         bool machineReady;
     } MachineCheckParameters;
 
@@ -84,13 +86,10 @@ extern "C"
 
         //Checking Self Check Conditions
         //@TODO Make this more in depth
-        if (1 == 1)
-        {
-            tempChargePumpOK = true;
-        }
+        tempChargePumpOK = MachineState.selfCheckParameters.chargePumpOK; //This is set from external conditions
 
         //Decide the next state
-        if (MachineState.selfCheckParameters.chargePumpOK)
+        if (tempChargePumpOK)
         {
             newState = State_MachineCheck;
         }
@@ -128,7 +127,11 @@ extern "C"
         tempMachineReady = true; //This flag says all conditions meet, placeholder for actual checks
 
         //Decide the next state
-        if (MachineState.machineCheckParameters.machineReady)
+        if (SelfCheckState() != State_MachineCheck)
+        {
+            return State_SelfCheck;
+        }
+        if (MachineState.machineCheckParameters.forceGaugeResponding && MachineState.machineCheckParameters.dyn4Responding)
         {
             newState = State_Motion;
         }
@@ -179,26 +182,37 @@ extern "C"
         return newState;
     }
 
-    static bool updateMachineState()
+    static void MachineStateCog(void *par)
     {
         State previousState = MachineState.currentState;
-        State newState;
-        switch (previousState)
+        while (1)
         {
-        case State_SelfCheck:
-            newState = SelfCheckState();
-            break;
-        case State_MachineCheck:
-            newState = MachineCheckState();
-            break;
-        case State_Motion:
-            newState = MotionState();
-            break;
-        default:
-            break;
+            State newState;
+            switch (previousState)
+            {
+            case State_SelfCheck:
+                newState = SelfCheckState();
+                break;
+            case State_MachineCheck:
+                newState = MachineCheckState();
+                break;
+            case State_Motion:
+                newState = MotionState();
+                break;
+            default:
+                break;
+            }
+            MachineState.currentState = newState;
         }
-        MachineState.currentState = newState;
-        return newState != previousState;
+    }
+
+    static bool RunStateMachine()
+    {
+        int *cogAddr = cog_run(MachineStateCog, 200); //@TODO trim the stack until failure
+        if (cog_num(cogAddr) <= 0)
+        {
+            return true;
+        }
     }
 
 #ifdef __cplusplus

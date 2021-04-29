@@ -1,6 +1,12 @@
 #include "simpletools.h"
 #include "EncoderAPI.h" // Quad Encoder
 
+/**
+ * @brief Uses magic to start the cog in encoder_spin
+ * 
+ * @param encoder The encoder to start
+ * @return int the address of the cog that was started
+ */
 int encoder_start(encoder_t *encoder)
 {
     // The label binary_rqenc_dat_start is automatically placed

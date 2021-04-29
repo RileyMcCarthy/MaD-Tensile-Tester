@@ -10,8 +10,9 @@ extern "C"
  * 1: Generic Failure
  * 2-50: Display Error Codes
  * 51-100: RTC Error Codes
+ * 101-150: DYN4 Error Codes
  */
-    enum Error
+    typedef enum Error_e
     {
         SUCCESS, //Generic Success
         FAIL,    //Generic failure
@@ -22,7 +23,16 @@ extern "C"
 
         RTC_RESET = 51, //RTC power was lost, reset time
         RTC_NOT_FOUND,  //RTC communication failed
-    };
+
+        DYN4_NOT_RESPONDING = 101,
+        DYN4_CONNECTION_LOST,
+        DYN4_COG_FAIL,
+
+        FORCEGAUGE_NOT_RESPONDING = 151,
+        FORCEGAUGE_CONNECTION_LOST,
+        FORCEGAUGE_COG_FAIL,
+
+    } Error;
 #ifdef __cplusplus
 }
 #endif

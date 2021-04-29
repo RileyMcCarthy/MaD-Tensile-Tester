@@ -130,8 +130,6 @@ void StatusPage::run(Ra8876_Lite *the_display)
         display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
         display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-        updateMachineState();
-
         display->textColor(MAINTEXTCOLOR, COLOR65K_BLACK);
         strcpy(buf, "Enable");
         display->putString(buttons[0].xmin + 50 - strlen(buf) * 6, buttons[0].ymin + 25 - 12, buf);

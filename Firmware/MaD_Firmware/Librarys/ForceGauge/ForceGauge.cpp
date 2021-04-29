@@ -17,7 +17,6 @@ uint8_t read(ForceGauge *forceGauge, uint8_t reg)
     uart_write(&(forceGauge->serial), 0x20 + (reg << 1));
     uint8_t temp;
     uart_read(&(forceGauge->serial), 1, &temp);
-    printf("read:%u\n", temp);
     return temp;
 }
 ForceGauge *cogForceGauge;
@@ -35,59 +34,40 @@ void monitor(void *par)
     }
 }
 
-//UART is LSB first
-//Manual reading mode needs command sent to read data, automatic reading mode has ADC send data once its ready
-//Add data integrity check...
-void ForceGauge_begin(ForceGauge *forceGauge, int rx, int tx)
+/**
+ * @brief Begin the force gauge communication.
+ * @note UART is LSB first
+ * @todo Add data integrity check...
+ * @param forceGauge The force gauge structure to start
+ * @param rx serial rx pin
+ * @param tx serial tx pin
+ * @return Error: FORCEGAUGE_NOT_RESPONDING if communications fails, FORCEEGAUGE_COG_FAIL if cog fails to start, SUCCESS otherwise.
+ */
+Error ForceGauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
     uart_start(&(forceGauge->serial), rx, tx, 2, 57600);
     uart_write(&(forceGauge->serial), 0x55); //Synchronization word
     uart_write(&(forceGauge->serial), 0x06); //Reset
-    cogForceGauge = forceGauge;
-    printf("finished writing registers\n");
     pause(10);
-    //config 0: MUX=0000, GAIN=000, PGA_BYPASS: 0... 00000000 (default)
-    //config 1: Data Rate=000, Mode = 0 (normal), conversion mode 1 (continuous), V_ref = 00 (internal), TS=0... 00001000
-    //config 2: leave default
-    //config 3: data output mode to auto: bit0=1
-    //config 4: default
-    // write(CONFIG_0, 0b00001110);
-    write(forceGauge, CONFIG_1, 0b00001000);
-    write(forceGauge, CONFIG_3, 0b00000001);
-    //write(CONFIG_3, 0x01);
-    // printf("config0: %d\n", read(forceGauge, CONFIG_0));
-    //printf("config1: %d\n", read(cogForceGauge, CONFIG_1));
-    //printf("config1: %d\n", read(forceGauge, CONFIG_1));
+
+    write(forceGauge, CONFIG_1, 0b00001000); //Setting data mode to continuous
+    write(forceGauge, CONFIG_3, 0b00000001); //Setting data aquisition to automatic
 
     uart_write(&(forceGauge->serial), 0x55);
     uart_write(&(forceGauge->serial), 0x08);
-    pause(10);
-    cog_run(monitor, 200);
-}
 
-int ForceGauge_getForce(ForceGauge *forceGauge)
-{
-    /*int temp = read(forceGauge, CONFIG_2);
-    if ((temp & 0x80) != 0x80)
+    pause(10);
+
+    if (read(cogForceGauge, CONFIG_1) != 8) //sanity check to see if register was set successfully
     {
-        printf("Not ready:%d\n", temp);
-        return -1;
-    }*/
-    //reading force has format: 0x55, 0x1X, {returned force data}
-    /* union Data_v _temp_data;
-    uart_write(&(forceGauge->serial), 0x55);
-    uart_write(&(forceGauge->serial), 0x10);
-    int newCount = uart_read(&(forceGauge->serial), 8);
-    if (newCount == forceGauge->counter)
-    {
-        printf("dup\n");
-        return -1;
+        return FORCEGAUGE_NOT_RESPONDING;
     }
-    forceGauge->counter = newCount;
-    _temp_data.bval[0] = uart_read(&(forceGauge->serial), 8);
-    _temp_data.bval[1] = uart_read(&(forceGauge->serial), 8);
-    _temp_data.bval[2] = uart_read(&(forceGauge->serial), 8);
-    int force = ((_temp_data.val - 16556732));
-    printf("raw adc value(%d): %d, %d\n", newCount, _temp_data.val, force);
-    return (int32_t)force;*/
+
+    cogForceGauge = forceGauge;
+    int *cogAddr = cog_run(monitor, 200); //@todo trim the stack until failure
+    if (cog_num(cogAddr) <= 0)
+    {
+        return FORCEGAUGE_COG_FAIL;
+    }
+    return SUCCESS;
 }
