@@ -142,7 +142,6 @@ void AutomaticPage::run(Ra8876_Lite *p_display, Motion_Cog *motionCog)
             lastForce = tempForce;
             lastPosition = tempPosition;
         }
-        pause(10);
     }
 }
 

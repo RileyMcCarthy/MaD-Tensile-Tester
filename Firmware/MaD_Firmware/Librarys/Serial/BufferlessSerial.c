@@ -22,30 +22,39 @@
  * @param serial 
  * @return char 
  */
-char uart_read(BLSerial *serial)
+int32_t uart_read(BLSerial *serial, const unsigned int p_bits)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
-    unsigned int bits = 8;
+    unsigned int bits = p_bits;
     unsigned int clock;
-    unsigned int tempData;
+    unsigned int clockDelayhalf = serial->baudCNT / 2;
+    int tempData = 0xFFFFFFF;
     __asm__ volatile(
-        FC_START("readStart%=", "readEnd%=") "       ror %[_data], %[_bitCount]              '' move MSB into bit 31                 \n\t"
-                                             "       mov %[_clock], %[_clkDelay]                                                     \n\t"
-                                             "       add %[_clock], CNT                                                              \n\t"
-                                             "       test %[_rx], ina wc                                                             \n\t"
-                                             "       waitcnt %[_clock], %[_clkDelay]                                                 \n\t"
-                                             "loop%=:                                                                                \n\t"
-                                             "       rcr %[_data], #1                                                                \n\t"
-                                             "       waitcnt %[_clock], %[_clkDelay]                                                 \n\t"
-                                             "       djnz %[_bitCount], #" FC_ADDR("loop%=", "readStart%=") "              \n\t" FC_END("readEnd%=")
+        FC_START("readStart%=", "readEnd%=") //Start of read
+        "       ror %[_data], #32              '' move MSB into bit 8                 \n\t"
+        "       waitpeq %[_rx],%[_rx]                                                             \n\t"
+        "       mov %[_clock], CNT                                                     \n\t"
+        "       add %[_clock], %[_clkDelay]                                                               \n\t"
+        "       add %[_clock], %[_clkDelayHalf]                                           \n\t"
+        "       waitcnt %[_clock], %[_clkDelay]                                                 \n\t"
+        "loop%=:                                                                                \n\t"
+        "       test %[_rx], ina wc                                                             \n\t" //tests sets c flag if _rx&ina has odd number of 1 bits
+        "       rcr %[_data], #1                                                                \n\t"
+        "       waitcnt %[_clock], %[_clkDelay]                                                 \n\t"
+        "       djnz %[_bitCount], #" FC_ADDR("loop%=", "readStart%=") "                        \n\t" //decrement counter and jump to loop if counter isnt zero
+                                                                       "       waitcnt %[_clock], %[_clkDelay]                                                 \n\t"
+                                                                       "       ror %[_data], %[_finalRotate]  \n\t" //rotate bits into lsb
+        FC_END("readEnd%=")
         : [_bitCount] "+r"(bits),
           [_clock] "+r"(clock),
           [_data] "+r"(tempData)
         : [_rx] "r"(serial->rx_mask),
-          [_clkDelay] "r"(serial->baudCNT));
+          [_clkDelay] "r"(serial->baudCNT),
+          [_finalRotate] "r"(32 - bits),
+          [_clkDelayHalf] "r"(clockDelayhalf));
 #pragma GCC diagnostic pop
-    return tempData;
+    return ~tempData;
 }
 
 /**

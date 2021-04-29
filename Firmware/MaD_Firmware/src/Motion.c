@@ -4,7 +4,8 @@ extern Motion_Cog motionCog;
 
 void runMotion(void *par)
 {
-    ForceGauge forceGauge;
+    // ForceGauge forceGauge;
+    //ForceGauge_begin(&forceGauge, 15, 16);
     DYN4 dyn4;
     dyn4_begin(&dyn4, 14, 12, 0x03);
     //simpleterm_open();
@@ -19,10 +20,10 @@ void runMotion(void *par)
     {
         motionCog.time = (CNT - startCNT) / CLKFREQ;
         motionCog.position = dyn4_getPosition(&dyn4);
-        // mailbox->force = mailbox->forceGauge->getForce();
+        // motionCog.force = ForceGauge_getForce(&forceGauge);
         //char data[50];
         //sprintf(data, "%d,%d,%d\n", info.time, info.distance, info.force);
         // count++;
-        waitcnt(CNT + CLKFREQ);
+        waitcnt(CNT + CLKFREQ / 1000);
     }
 }

@@ -1,9 +1,10 @@
 #ifndef Motion_H
 #define Motion_H
 #include "DYN4.h"
-#include "ForceGauge.h"
+//#include "ForceGauge.h"
 #include "State.h"
-#define STACK_SIZE 600
+
+#define STACK_SIZE 200
 #ifdef __cplusplus
 extern "C"
 {
