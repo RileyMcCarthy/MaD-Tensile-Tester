@@ -208,7 +208,7 @@ extern "C"
 
     static bool RunStateMachine()
     {
-        int *cogAddr = cog_run(MachineStateCog, 200); //@TODO trim the stack until failure
+        int *cogAddr = cog_run(MachineStateCog, 200); //@todo trim the stack until failure
         if (cog_num(cogAddr) <= 0)
         {
             return true;
