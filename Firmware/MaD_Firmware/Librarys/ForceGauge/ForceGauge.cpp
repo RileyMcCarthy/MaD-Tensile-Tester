@@ -58,10 +58,10 @@ Error ForceGauge_begin(ForceGauge *forceGauge, int rx, int tx)
 
     pause(10);
 
-    if (read(cogForceGauge, CONFIG_1) != 8) //sanity check to see if register was set successfully
+    /*  if (read(cogForceGauge, CONFIG_1) != 8) //sanity check to see if register was set successfully
     {
         return FORCEGAUGE_NOT_RESPONDING;
-    }
+    }*/
 
     cogForceGauge = forceGauge;
     int *cogAddr = cog_run(monitor, 200); //@todo trim the stack until failure
