@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 3
+Sheet 1 5
 Title "MaD_P2"
 Date "2021-05-06"
 Rev "1"
@@ -252,13 +252,13 @@ Connection ~ 4500 1900
 Wire Wire Line
 	4500 1900 4600 1900
 $Sheet
-S -2100 3150 1950 1150
+S -2150 1150 1950 1150
 U 60E5FA00
 F0 "Power" 50
 F1 "Power.sch" 50
 $EndSheet
 $Sheet
-S -2100 4650 1950 1000
+S -2150 2650 1950 1000
 U 60F79100
 F0 "IO Power" 50
 F1 "IO Power.sch" 50
@@ -1287,4 +1287,37 @@ Wire Wire Line
 Connection ~ 9500 3150
 Wire Wire Line
 	9500 3150 9900 3150
+$Sheet
+S -2150 4050 1950 900 
+U 60B0DD34
+F0 "Memory" 50
+F1 "Memory.sch" 50
+$EndSheet
+$Comp
+L Device:R_Small R?
+U 1 1 60B1E34F
+P 2650 5850
+F 0 "R?" V 2846 5850 50  0000 C CNN
+F 1 "10K" V 2755 5850 50  0000 C CNN
+F 2 "" H 2650 5850 50  0001 C CNN
+F 3 "~" H 2650 5850 50  0001 C CNN
+	1    2650 5850
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	2850 5300 2850 5850
+Wire Wire Line
+	2850 5850 2750 5850
+Text Label 2350 5850 2    50   ~ 0
+V_56_59
+Wire Wire Line
+	2550 5850 2350 5850
+$Sheet
+S -2150 5300 1950 850 
+U 60B76FA1
+F0 "USB" 50
+F1 "USB.sch" 50
+$EndSheet
+Text Label 2850 5350 3    50   ~ 0
+RESET
 $EndSCHEMATC

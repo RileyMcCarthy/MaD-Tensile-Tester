@@ -1,0 +1,405 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 5
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:USB_C_Receptacle_USB2.0 J?
+U 1 1 60B77A07
+P 2950 3550
+F 0 "J?" H 3057 4417 50  0000 C CNN
+F 1 "USB_C_Receptacle_USB2.0" H 3057 4326 50  0000 C CNN
+F 2 "" H 3100 3550 50  0001 C CNN
+F 3 "https://www.usb.org/sites/default/files/documents/usb_type-c.zip" H 3100 3550 50  0001 C CNN
+	1    2950 3550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:Polyfuse_Small F?
+U 1 1 60B796B1
+P 3800 2700
+F 0 "F?" H 3868 2746 50  0000 L CNN
+F 1 "Polyfuse_Small" H 3868 2655 50  0000 L CNN
+F 2 "" H 3850 2500 50  0001 L CNN
+F 3 "~" H 3800 2700 50  0001 C CNN
+	1    3800 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3550 2950 3800 2950
+Wire Wire Line
+	3800 2950 3800 2800
+$Comp
+L Device:R_Small R?
+U 1 1 60B7AA43
+P 4100 3150
+F 0 "R?" V 3904 3150 50  0000 C CNN
+F 1 "5.1K" V 3995 3150 50  0000 C CNN
+F 2 "" H 4100 3150 50  0001 C CNN
+F 3 "~" H 4100 3150 50  0001 C CNN
+	1    4100 3150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60B7B7AC
+P 4400 3250
+F 0 "R?" V 4500 3250 50  0000 C CNN
+F 1 "5.1K" V 4600 3250 50  0000 C CNN
+F 2 "" H 4400 3250 50  0001 C CNN
+F 3 "~" H 4400 3250 50  0001 C CNN
+	1    4400 3250
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3550 3250 4300 3250
+Wire Wire Line
+	3550 3150 4000 3150
+$Comp
+L power:GND #PWR?
+U 1 1 60B7C574
+P 4500 3250
+F 0 "#PWR?" H 4500 3000 50  0001 C CNN
+F 1 "GND" V 4505 3122 50  0000 R CNN
+F 2 "" H 4500 3250 50  0001 C CNN
+F 3 "" H 4500 3250 50  0001 C CNN
+	1    4500 3250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 60B7CF7D
+P 4200 3150
+F 0 "#PWR?" H 4200 2900 50  0001 C CNN
+F 1 "GND" V 4205 3022 50  0000 R CNN
+F 2 "" H 4200 3150 50  0001 C CNN
+F 3 "" H 4200 3150 50  0001 C CNN
+	1    4200 3150
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	3550 3550 3550 3500
+Wire Wire Line
+	3550 3750 3550 3700
+$Comp
+L power:GND #PWR?
+U 1 1 60B7D6CC
+P 2950 4450
+F 0 "#PWR?" H 2950 4200 50  0001 C CNN
+F 1 "GND" H 2955 4277 50  0000 C CNN
+F 2 "" H 2950 4450 50  0001 C CNN
+F 3 "" H 2950 4450 50  0001 C CNN
+	1    2950 4450
+	1    0    0    -1  
+$EndComp
+NoConn ~ 2650 4450
+NoConn ~ 3550 4150
+NoConn ~ 3550 4050
+Text GLabel 3800 3700 2    50   Input ~ 0
+D+
+Wire Wire Line
+	3550 3500 3600 3500
+Connection ~ 3550 3500
+Wire Wire Line
+	3550 3500 3550 3450
+Wire Wire Line
+	3550 3700 3600 3700
+Connection ~ 3550 3700
+Wire Wire Line
+	3550 3700 3550 3650
+Text GLabel 3800 3500 2    50   Input ~ 0
+D-
+Text GLabel 3800 2500 1    50   Input ~ 0
+VBUS
+Wire Wire Line
+	3800 2500 3800 2600
+$Comp
+L Interface_USB:FT232RL U?
+U 1 1 60B86115
+P 6700 3650
+F 0 "U?" H 6700 3900 50  0000 C CNN
+F 1 "FT232RL" H 6700 3650 50  0000 C CNN
+F 2 "Package_SO:SSOP-28_5.3x10.2mm_P0.65mm" H 7800 2750 50  0001 C CNN
+F 3 "https://www.ftdichip.com/Support/Documents/DataSheets/ICs/DS_FT232R.pdf" H 6700 3650 50  0001 C CNN
+	1    6700 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 60B87C16
+P 5600 3050
+F 0 "C?" H 5692 3096 50  0000 L CNN
+F 1 "0.1uF" H 5692 3005 50  0000 L CNN
+F 2 "" H 5600 3050 50  0001 C CNN
+F 3 "~" H 5600 3050 50  0001 C CNN
+	1    5600 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 60B88B7C
+P 5600 3150
+F 0 "#PWR?" H 5600 2900 50  0001 C CNN
+F 1 "GND" H 5605 2977 50  0000 C CNN
+F 2 "" H 5600 3150 50  0001 C CNN
+F 3 "" H 5600 3150 50  0001 C CNN
+	1    5600 3150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5600 2950 5900 2950
+Text GLabel 5900 3350 0    50   Input ~ 0
+D-
+Text GLabel 5900 3250 0    50   Input ~ 0
+D+
+Wire Wire Line
+	5900 2950 5900 2650
+Wire Wire Line
+	5900 2650 6600 2650
+Connection ~ 5900 2950
+Text GLabel 6800 2650 1    50   Input ~ 0
+VBUS
+$Comp
+L Device:C_Small C?
+U 1 1 60B8A93C
+P 5050 3750
+F 0 "C?" H 5142 3796 50  0000 L CNN
+F 1 "0.01uF" H 5142 3705 50  0000 L CNN
+F 2 "" H 5050 3750 50  0001 C CNN
+F 3 "~" H 5050 3750 50  0001 C CNN
+	1    5050 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 60B8C57B
+P 5050 3850
+F 0 "#PWR?" H 5050 3600 50  0001 C CNN
+F 1 "GND" H 5055 3677 50  0000 C CNN
+F 2 "" H 5050 3850 50  0001 C CNN
+F 3 "" H 5050 3850 50  0001 C CNN
+	1    5050 3850
+	1    0    0    -1  
+$EndComp
+Text GLabel 5050 3650 1    50   Input ~ 0
+VBUS
+NoConn ~ 7500 3150
+NoConn ~ 7500 3250
+NoConn ~ 7500 3450
+NoConn ~ 7500 3550
+NoConn ~ 7500 3650
+NoConn ~ 7500 4150
+NoConn ~ 7500 4250
+NoConn ~ 7500 4350
+$Comp
+L power:GND #PWR?
+U 1 1 60B95839
+P 6700 4650
+F 0 "#PWR?" H 6700 4400 50  0001 C CNN
+F 1 "GND" H 6705 4477 50  0000 C CNN
+F 2 "" H 6700 4650 50  0001 C CNN
+F 3 "" H 6700 4650 50  0001 C CNN
+	1    6700 4650
+	1    0    0    -1  
+$EndComp
+Connection ~ 6700 4650
+Wire Wire Line
+	6700 4650 6800 4650
+Connection ~ 6800 4650
+Wire Wire Line
+	6800 4650 6900 4650
+Wire Wire Line
+	6500 4650 6700 4650
+Wire Wire Line
+	5900 4350 5900 4650
+Wire Wire Line
+	5900 4650 6500 4650
+Connection ~ 6500 4650
+NoConn ~ 5900 4050
+NoConn ~ 5900 3850
+NoConn ~ 5900 3650
+$Comp
+L Device:LED_Small D?
+U 1 1 60B99A44
+P 7800 3950
+F 0 "D?" H 7800 4185 50  0000 C CNN
+F 1 "BLUE" H 7800 4094 50  0000 C CNN
+F 2 "" V 7800 3950 50  0001 C CNN
+F 3 "~" V 7800 3950 50  0001 C CNN
+	1    7800 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:LED_Small D?
+U 1 1 60B9B480
+P 8000 4050
+F 0 "D?" H 8000 3950 50  0000 C CNN
+F 1 "GREEN" H 8000 3850 50  0000 C CNN
+F 2 "" V 8000 4050 50  0001 C CNN
+F 3 "~" V 8000 4050 50  0001 C CNN
+	1    8000 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60B9BA02
+P 8300 3950
+F 0 "R?" V 8104 3950 50  0000 C CNN
+F 1 "1K" V 8195 3950 50  0000 C CNN
+F 2 "" H 8300 3950 50  0001 C CNN
+F 3 "~" H 8300 3950 50  0001 C CNN
+	1    8300 3950
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60B9E847
+P 8300 4050
+F 0 "R?" V 8104 4050 50  0000 C CNN
+F 1 "1K" V 8195 4050 50  0000 C CNN
+F 2 "" H 8300 4050 50  0001 C CNN
+F 3 "~" H 8300 4050 50  0001 C CNN
+	1    8300 4050
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	7700 3950 7500 3950
+Wire Wire Line
+	7900 4050 7500 4050
+Text GLabel 8400 4050 2    50   Input ~ 0
+VBUS
+Text GLabel 8400 3950 2    50   Input ~ 0
+VBUS
+Wire Wire Line
+	8200 4050 8100 4050
+Wire Wire Line
+	8200 3950 7900 3950
+$Comp
+L Device:R_Small R?
+U 1 1 60BA7B0A
+P 7700 2950
+F 0 "R?" V 7504 2950 50  0000 C CNN
+F 1 "1K" V 7595 2950 50  0000 C CNN
+F 2 "" H 7700 2950 50  0001 C CNN
+F 3 "~" H 7700 2950 50  0001 C CNN
+	1    7700 2950
+	0    -1   1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60BA88CD
+P 7700 3050
+F 0 "R?" V 7504 3050 50  0000 C CNN
+F 1 "1K" V 7595 3050 50  0000 C CNN
+F 2 "" H 7700 3050 50  0001 C CNN
+F 3 "~" H 7700 3050 50  0001 C CNN
+	1    7700 3050
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	7600 2950 7500 2950
+Wire Wire Line
+	7600 3050 7500 3050
+$Comp
+L Device:C_Small C?
+U 1 1 60BA9894
+P 8000 3350
+F 0 "C?" V 7771 3350 50  0000 C CNN
+F 1 "0.01uF" V 7862 3350 50  0000 C CNN
+F 2 "" H 8000 3350 50  0001 C CNN
+F 3 "~" H 8000 3350 50  0001 C CNN
+	1    8000 3350
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60BAA573
+P 8250 3450
+F 0 "R?" H 8191 3404 50  0000 R CNN
+F 1 "10K" H 8191 3495 50  0000 R CNN
+F 2 "" H 8250 3450 50  0001 C CNN
+F 3 "~" H 8250 3450 50  0001 C CNN
+	1    8250 3450
+	-1   0    0    1   
+$EndComp
+$Comp
+L Transistor_BJT:MMBT3904 Q?
+U 1 1 60BAAED6
+P 8600 3350
+F 0 "Q?" H 8791 3396 50  0000 L CNN
+F 1 "MMBT3904" H 8791 3305 50  0000 L CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 8800 3275 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/2N3903-D.PDF" H 8600 3350 50  0001 L CNN
+	1    8600 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 60BAD42A
+P 8700 3600
+F 0 "#PWR?" H 8700 3350 50  0001 C CNN
+F 1 "GND" H 8705 3427 50  0000 C CNN
+F 2 "" H 8700 3600 50  0001 C CNN
+F 3 "" H 8700 3600 50  0001 C CNN
+	1    8700 3600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8250 3350 8400 3350
+Wire Wire Line
+	8100 3350 8250 3350
+Connection ~ 8250 3350
+Wire Wire Line
+	7900 3350 7500 3350
+Text Label 8700 3100 0    50   ~ 0
+RESET
+Wire Wire Line
+	8700 3100 8700 3150
+Wire Wire Line
+	8250 3550 8250 3600
+Wire Wire Line
+	8250 3600 8700 3600
+Wire Wire Line
+	8700 3600 8700 3550
+Connection ~ 8700 3600
+$Comp
+L Device:R_Small R?
+U 1 1 60BC2280
+P 3700 3500
+F 0 "R?" V 3504 3500 50  0000 C CNN
+F 1 "27R" V 3595 3500 50  0000 C CNN
+F 2 "" H 3700 3500 50  0001 C CNN
+F 3 "~" H 3700 3500 50  0001 C CNN
+	1    3700 3500
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60BC2815
+P 3700 3700
+F 0 "R?" V 3600 3700 50  0000 C CNN
+F 1 "27R" V 3500 3700 50  0000 C CNN
+F 2 "" H 3700 3700 50  0001 C CNN
+F 3 "~" H 3700 3700 50  0001 C CNN
+	1    3700 3700
+	0    -1   -1   0   
+$EndComp
+Text Label 7850 2950 0    50   ~ 0
+P63
+Text Label 7850 3050 0    50   ~ 0
+P62
+Wire Wire Line
+	7800 2950 7850 2950
+Wire Wire Line
+	7800 3050 7850 3050
+$EndSCHEMATC
