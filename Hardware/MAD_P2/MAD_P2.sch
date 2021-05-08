@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 5
+Sheet 1 7
 Title "MaD_P2"
 Date "2021-05-06"
 Rev "1"
@@ -16,241 +16,241 @@ $EndDescr
 $Comp
 L P2X8C4M64P:P2X8C4M64P-REF U1
 U 1 1 60A9652D
-P 3850 3650
-F 0 "U1" H 3850 4100 50  0000 C CNN
-F 1 "P2X8C4M64P-REF" H 3850 3700 50  0000 C CNN
-F 2 "" H 3850 3650 50  0001 C CNN
-F 3 "" H 3850 3650 50  0001 C CNN
-	1    3850 3650
+P 2750 2350
+F 0 "U1" H 2750 2650 50  0000 C CNN
+F 1 "P2X8C4M64P-REF" H 2750 2400 50  0000 C CNN
+F 2 "" H 2750 2350 50  0001 C CNN
+F 3 "" H 2750 2350 50  0001 C CNN
+	1    2750 2350
 	1    0    0    -1  
 $EndComp
-Text Label 2200 2050 2    50   ~ 0
+Text Label 1100 750  2    50   ~ 0
 P0
-Text Label 2200 2150 2    50   ~ 0
+Text Label 1100 850  2    50   ~ 0
 P1
-Text Label 2200 2250 2    50   ~ 0
+Text Label 1100 950  2    50   ~ 0
 P2
-Text Label 2200 2350 2    50   ~ 0
+Text Label 1100 1050 2    50   ~ 0
 P3
-Text Label 2200 2450 2    50   ~ 0
+Text Label 1100 1150 2    50   ~ 0
 P4
-Text Label 2200 2550 2    50   ~ 0
+Text Label 1100 1250 2    50   ~ 0
 P5
-Text Label 2200 2650 2    50   ~ 0
+Text Label 1100 1350 2    50   ~ 0
 P6
-Text Label 2200 2750 2    50   ~ 0
+Text Label 1100 1450 2    50   ~ 0
 P7
-Text Label 2200 2850 2    50   ~ 0
+Text Label 1100 1550 2    50   ~ 0
 P8
-Text Label 2200 2950 2    50   ~ 0
+Text Label 1100 1650 2    50   ~ 0
 P9
-Text Label 2200 3150 2    50   ~ 0
+Text Label 1100 1850 2    50   ~ 0
 P11
-Text Label 2200 3250 2    50   ~ 0
+Text Label 1100 1950 2    50   ~ 0
 P12
-Text Label 2200 3350 2    50   ~ 0
+Text Label 1100 2050 2    50   ~ 0
 P13
-Text Label 2200 3450 2    50   ~ 0
+Text Label 1100 2150 2    50   ~ 0
 P14
-Text Label 2200 3550 2    50   ~ 0
+Text Label 1100 2250 2    50   ~ 0
 P15
-Text Label 2200 3650 2    50   ~ 0
+Text Label 1100 2350 2    50   ~ 0
 P16
-Text Label 2200 3750 2    50   ~ 0
+Text Label 1100 2450 2    50   ~ 0
 P17
-Text Label 2200 3850 2    50   ~ 0
+Text Label 1100 2550 2    50   ~ 0
 P18
-Text Label 2200 3950 2    50   ~ 0
+Text Label 1100 2650 2    50   ~ 0
 P19
-Text Label 2200 4050 2    50   ~ 0
+Text Label 1100 2750 2    50   ~ 0
 P20
-Text Label 2200 4150 2    50   ~ 0
+Text Label 1100 2850 2    50   ~ 0
 P21
-Text Label 2200 4250 2    50   ~ 0
+Text Label 1100 2950 2    50   ~ 0
 P22
-Text Label 2200 4350 2    50   ~ 0
+Text Label 1100 3050 2    50   ~ 0
 P23
-Text Label 2200 4450 2    50   ~ 0
+Text Label 1100 3150 2    50   ~ 0
 P24
-Text Label 2200 4550 2    50   ~ 0
+Text Label 1100 3250 2    50   ~ 0
 P25
-Text Label 2200 4650 2    50   ~ 0
+Text Label 1100 3350 2    50   ~ 0
 P26
-Text Label 2200 4750 2    50   ~ 0
+Text Label 1100 3450 2    50   ~ 0
 P27
-Text Label 2200 4850 2    50   ~ 0
+Text Label 1100 3550 2    50   ~ 0
 P28
-Text Label 2200 4950 2    50   ~ 0
+Text Label 1100 3650 2    50   ~ 0
 P29
-Text Label 2200 5050 2    50   ~ 0
+Text Label 1100 3750 2    50   ~ 0
 P30
-Text Label 2200 5150 2    50   ~ 0
+Text Label 1100 3850 2    50   ~ 0
 P31
 $Comp
 L power:GND #PWR01
 U 1 1 60AAD525
-P 2550 5300
-F 0 "#PWR01" H 2550 5050 50  0001 C CNN
-F 1 "GND" H 2555 5127 50  0000 C CNN
-F 2 "" H 2550 5300 50  0001 C CNN
-F 3 "" H 2550 5300 50  0001 C CNN
-	1    2550 5300
+P 1450 4000
+F 0 "#PWR01" H 1450 3750 50  0001 C CNN
+F 1 "GND" H 1455 3827 50  0000 C CNN
+F 2 "" H 1450 4000 50  0001 C CNN
+F 3 "" H 1450 4000 50  0001 C CNN
+	1    1450 4000
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2550 5300 2650 5300
-Connection ~ 2550 5300
-Text Label 3450 5300 3    50   ~ 0
+	1450 4000 1550 4000
+Connection ~ 1450 4000
+Text Label 2350 4000 3    50   ~ 0
 V_0_3
-Text Label 3550 5300 3    50   ~ 0
+Text Label 2450 4000 3    50   ~ 0
 V_4_7
-Text Label 3650 5300 3    50   ~ 0
+Text Label 2550 4000 3    50   ~ 0
 V_8_11
-Text Label 3750 5300 3    50   ~ 0
+Text Label 2650 4000 3    50   ~ 0
 V_12_15
-Text Label 3850 5300 3    50   ~ 0
+Text Label 2750 4000 3    50   ~ 0
 V_16_19
-Text Label 3950 5300 3    50   ~ 0
+Text Label 2850 4000 3    50   ~ 0
 V_20_23
-Text Label 4050 5300 3    50   ~ 0
+Text Label 2950 4000 3    50   ~ 0
 V_24_27
-Text Label 4150 5300 3    50   ~ 0
+Text Label 3050 4000 3    50   ~ 0
 V_28_31
-Text Label 4250 5300 3    50   ~ 0
+Text Label 3150 4000 3    50   ~ 0
 V_32_35
-Text Label 4350 5300 3    50   ~ 0
+Text Label 3250 4000 3    50   ~ 0
 V_36_39
-Text Label 4450 5300 3    50   ~ 0
+Text Label 3350 4000 3    50   ~ 0
 V_40_43
-Text Label 4550 5300 3    50   ~ 0
+Text Label 3450 4000 3    50   ~ 0
 V_44_47
-Text Label 4650 5300 3    50   ~ 0
+Text Label 3550 4000 3    50   ~ 0
 V_48_51
-Text Label 4750 5300 3    50   ~ 0
+Text Label 3650 4000 3    50   ~ 0
 V_52_55
-Text Label 4850 5300 3    50   ~ 0
+Text Label 3750 4000 3    50   ~ 0
 V_56_59
-Text Label 4950 5300 3    50   ~ 0
+Text Label 3850 4000 3    50   ~ 0
 V_60_63
-Text Label 5300 5150 0    50   ~ 0
+Text Label 4200 3850 0    50   ~ 0
 P32
-Text Label 5300 5050 0    50   ~ 0
+Text Label 4200 3750 0    50   ~ 0
 P33
-Text Label 5300 4950 0    50   ~ 0
+Text Label 4200 3650 0    50   ~ 0
 P34
-Text Label 5300 4850 0    50   ~ 0
+Text Label 4200 3550 0    50   ~ 0
 P35
-Text Label 5300 4750 0    50   ~ 0
+Text Label 4200 3450 0    50   ~ 0
 P36
-Text Label 5300 4650 0    50   ~ 0
+Text Label 4200 3350 0    50   ~ 0
 P37
-Text Label 5300 4550 0    50   ~ 0
+Text Label 4200 3250 0    50   ~ 0
 P38
-Text Label 5300 4450 0    50   ~ 0
+Text Label 4200 3150 0    50   ~ 0
 P39
-Text Label 5300 4350 0    50   ~ 0
+Text Label 4200 3050 0    50   ~ 0
 P40
-Text Label 5300 4250 0    50   ~ 0
+Text Label 4200 2950 0    50   ~ 0
 P41
-Text Label 5300 4150 0    50   ~ 0
+Text Label 4200 2850 0    50   ~ 0
 P42
-Text Label 5300 4050 0    50   ~ 0
+Text Label 4200 2750 0    50   ~ 0
 P43
-Text Label 5300 3950 0    50   ~ 0
+Text Label 4200 2650 0    50   ~ 0
 P44
-Text Label 5300 3850 0    50   ~ 0
+Text Label 4200 2550 0    50   ~ 0
 P45
-Text Label 5300 3750 0    50   ~ 0
+Text Label 4200 2450 0    50   ~ 0
 P46
-Text Label 5300 3650 0    50   ~ 0
+Text Label 4200 2350 0    50   ~ 0
 P47
-Text Label 5300 3550 0    50   ~ 0
+Text Label 4200 2250 0    50   ~ 0
 P48
-Text Label 5300 3450 0    50   ~ 0
+Text Label 4200 2150 0    50   ~ 0
 P49
-Text Label 5300 3350 0    50   ~ 0
+Text Label 4200 2050 0    50   ~ 0
 P50
-Text Label 5300 3250 0    50   ~ 0
+Text Label 4200 1950 0    50   ~ 0
 P51
-Text Label 5300 3150 0    50   ~ 0
+Text Label 4200 1850 0    50   ~ 0
 P52
-Text Label 5300 3050 0    50   ~ 0
+Text Label 4200 1750 0    50   ~ 0
 P53
-Text Label 5300 2950 0    50   ~ 0
+Text Label 4200 1650 0    50   ~ 0
 P54
-Text Label 5300 2850 0    50   ~ 0
+Text Label 4200 1550 0    50   ~ 0
 P55
-Text Label 5300 2750 0    50   ~ 0
+Text Label 4200 1450 0    50   ~ 0
 P56
-Text Label 5300 2650 0    50   ~ 0
+Text Label 4200 1350 0    50   ~ 0
 P57
-Text Label 5300 2550 0    50   ~ 0
+Text Label 4200 1250 0    50   ~ 0
 P58
-Text Label 5300 2450 0    50   ~ 0
+Text Label 4200 1150 0    50   ~ 0
 P59
-Text Label 5300 2350 0    50   ~ 0
+Text Label 4200 1050 0    50   ~ 0
 P60
-Text Label 5300 2250 0    50   ~ 0
+Text Label 4200 950  0    50   ~ 0
 P61
-Text Label 5300 2150 0    50   ~ 0
+Text Label 4200 850  0    50   ~ 0
 P62
-Text Label 5300 2050 0    50   ~ 0
+Text Label 4200 750  0    50   ~ 0
 P63
 $Comp
 L power:+1V8 #PWR04
 U 1 1 60E4AF33
-P 3800 1900
-F 0 "#PWR04" H 3800 1750 50  0001 C CNN
-F 1 "+1V8" H 3815 2073 50  0000 C CNN
-F 2 "" H 3800 1900 50  0001 C CNN
-F 3 "" H 3800 1900 50  0001 C CNN
-	1    3800 1900
+P 2700 600
+F 0 "#PWR04" H 2700 450 50  0001 C CNN
+F 1 "+1V8" H 2715 773 50  0000 C CNN
+F 2 "" H 2700 600 50  0001 C CNN
+F 3 "" H 2700 600 50  0001 C CNN
+	1    2700 600 
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3100 1900 3200 1900
-Connection ~ 3200 1900
+	2000 600  2100 600 
+Connection ~ 2100 600 
 Wire Wire Line
-	3200 1900 3300 1900
-Connection ~ 3300 1900
+	2100 600  2200 600 
+Connection ~ 2200 600 
 Wire Wire Line
-	3300 1900 3400 1900
-Connection ~ 3400 1900
+	2200 600  2300 600 
+Connection ~ 2300 600 
 Wire Wire Line
-	3400 1900 3500 1900
-Connection ~ 3500 1900
+	2300 600  2400 600 
+Connection ~ 2400 600 
 Wire Wire Line
-	3500 1900 3600 1900
-Connection ~ 3600 1900
+	2400 600  2500 600 
+Connection ~ 2500 600 
 Wire Wire Line
-	3600 1900 3700 1900
-Connection ~ 3700 1900
+	2500 600  2600 600 
+Connection ~ 2600 600 
 Wire Wire Line
-	3700 1900 3800 1900
-Connection ~ 3800 1900
+	2600 600  2700 600 
+Connection ~ 2700 600 
 Wire Wire Line
-	3800 1900 3900 1900
-Connection ~ 3900 1900
+	2700 600  2800 600 
+Connection ~ 2800 600 
 Wire Wire Line
-	3900 1900 4000 1900
-Connection ~ 4000 1900
+	2800 600  2900 600 
+Connection ~ 2900 600 
 Wire Wire Line
-	4000 1900 4100 1900
-Connection ~ 4100 1900
+	2900 600  3000 600 
+Connection ~ 3000 600 
 Wire Wire Line
-	4100 1900 4200 1900
-Connection ~ 4200 1900
+	3000 600  3100 600 
+Connection ~ 3100 600 
 Wire Wire Line
-	4200 1900 4300 1900
-Connection ~ 4300 1900
+	3100 600  3200 600 
+Connection ~ 3200 600 
 Wire Wire Line
-	4300 1900 4400 1900
-Connection ~ 4400 1900
+	3200 600  3300 600 
+Connection ~ 3300 600 
 Wire Wire Line
-	4400 1900 4500 1900
-Connection ~ 4500 1900
+	3300 600  3400 600 
+Connection ~ 3400 600 
 Wire Wire Line
-	4500 1900 4600 1900
+	3400 600  3500 600 
 $Sheet
 S -2150 1150 1950 1150
 U 60E5FA00
@@ -263,54 +263,54 @@ U 60F79100
 F0 "IO Power" 50
 F1 "IO Power.sch" 50
 $EndSheet
-Text Label 2200 3050 2    50   ~ 0
+Text Label 1100 1750 2    50   ~ 0
 P10
 $Comp
 L Device:Crystal_GND24_Small Y1
 U 1 1 60FD14C8
-P 3150 5700
-F 0 "Y1" H 3294 5746 50  0000 L CNN
-F 1 "20MHz" H 3294 5655 50  0000 L CNN
-F 2 "" H 3150 5700 50  0001 C CNN
-F 3 "~" H 3150 5700 50  0001 C CNN
-F 4 "" H 3150 5700 50  0001 C CNN "LCSC"
-	1    3150 5700
+P 2050 4400
+F 0 "Y1" H 2194 4446 50  0000 L CNN
+F 1 "20MHz" H 2194 4355 50  0000 L CNN
+F 2 "" H 2050 4400 50  0001 C CNN
+F 3 "~" H 2050 4400 50  0001 C CNN
+F 4 "" H 2050 4400 50  0001 C CNN "LCSC"
+	1    2050 4400
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR03
 U 1 1 60FD5E5B
-P 3150 5800
-F 0 "#PWR03" H 3150 5550 50  0001 C CNN
-F 1 "GND" H 3155 5627 50  0000 C CNN
-F 2 "" H 3150 5800 50  0001 C CNN
-F 3 "" H 3150 5800 50  0001 C CNN
-	1    3150 5800
+P 2050 4500
+F 0 "#PWR03" H 2050 4250 50  0001 C CNN
+F 1 "GND" H 2055 4327 50  0000 C CNN
+F 2 "" H 2050 4500 50  0001 C CNN
+F 3 "" H 2050 4500 50  0001 C CNN
+	1    2050 4500
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR02
 U 1 1 60FD7D73
-P 3150 5600
-F 0 "#PWR02" H 3150 5350 50  0001 C CNN
-F 1 "GND" H 3155 5427 50  0000 C CNN
-F 2 "" H 3150 5600 50  0001 C CNN
-F 3 "" H 3150 5600 50  0001 C CNN
-	1    3150 5600
+P 2050 4300
+F 0 "#PWR02" H 2050 4050 50  0001 C CNN
+F 1 "GND" H 2055 4127 50  0000 C CNN
+F 2 "" H 2050 4300 50  0001 C CNN
+F 3 "" H 2050 4300 50  0001 C CNN
+	1    2050 4300
 	-1   0    0    1   
 $EndComp
 Wire Wire Line
-	3050 5350 3100 5350
+	1950 4050 2000 4050
 Wire Wire Line
-	3100 5350 3100 5300
+	2000 4050 2000 4000
 Wire Wire Line
-	3050 5350 3050 5700
+	1950 4050 1950 4400
 Wire Wire Line
-	3250 5350 3200 5350
+	2150 4050 2100 4050
 Wire Wire Line
-	3200 5350 3200 5300
+	2100 4050 2100 4000
 Wire Wire Line
-	3250 5350 3250 5700
+	2150 4050 2150 4400
 $Comp
 L Device:C_Small C5
 U 1 1 60FD9FF2
@@ -1296,28 +1296,40 @@ $EndSheet
 $Comp
 L Device:R_Small R?
 U 1 1 60B1E34F
-P 2650 5850
-F 0 "R?" V 2846 5850 50  0000 C CNN
-F 1 "10K" V 2755 5850 50  0000 C CNN
-F 2 "" H 2650 5850 50  0001 C CNN
-F 3 "~" H 2650 5850 50  0001 C CNN
-	1    2650 5850
+P 1550 4550
+F 0 "R?" V 1746 4550 50  0000 C CNN
+F 1 "10K" V 1655 4550 50  0000 C CNN
+F 2 "" H 1550 4550 50  0001 C CNN
+F 3 "~" H 1550 4550 50  0001 C CNN
+	1    1550 4550
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	2850 5300 2850 5850
+	1750 4000 1750 4550
 Wire Wire Line
-	2850 5850 2750 5850
-Text Label 2350 5850 2    50   ~ 0
+	1750 4550 1650 4550
+Text Label 1250 4550 2    50   ~ 0
 V_56_59
 Wire Wire Line
-	2550 5850 2350 5850
+	1450 4550 1250 4550
 $Sheet
 S -2150 5300 1950 850 
 U 60B76FA1
 F0 "USB" 50
 F1 "USB.sch" 50
 $EndSheet
-Text Label 2850 5350 3    50   ~ 0
+Text Label 1750 4050 3    50   ~ 0
 RESET
+$Sheet
+S -2150 6450 1950 1000
+U 60BD9EA1
+F0 "Connections" 50
+F1 "Connections.sch" 50
+$EndSheet
+$Sheet
+S -2150 7650 1950 950 
+U 609BFBB9
+F0 "Peripherals" 50
+F1 "Peripherals.sch" 50
+$EndSheet
 $EndSCHEMATC
