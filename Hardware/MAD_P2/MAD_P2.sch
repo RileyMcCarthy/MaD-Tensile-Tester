@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 6
+Sheet 1 7
 Title "MaD_P2"
 Date "2021-05-06"
 Rev "1"
@@ -1328,4 +1328,12 @@ F1 "Peripherals.sch" 50
 $EndSheet
 Text Notes 2950 2050 0    129  ~ 0
 Propeller 2
+$Sheet
+S -2150 7500 1950 900 
+U 60C11A52
+F0 "PeripheralsCont" 50
+F1 "PeripheralsCont.sch" 50
+$EndSheet
+Wire Wire Line
+	-1050 7800 -1050 7750
 $EndSCHEMATC

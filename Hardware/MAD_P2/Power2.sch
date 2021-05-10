@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 6
+Sheet 3 7
 Title "MaD_P2"
 Date "2021-05-06"
 Rev "1"
@@ -964,7 +964,7 @@ $EndComp
 Wire Wire Line
 	2700 6300 2850 6300
 Text Notes 650  5350 0    118  ~ 0
-ADC Power
+ADC/DAC Power
 Text GLabel 1050 6300 0    50   Input ~ 0
 VIN_ADC
 $Comp
@@ -1365,6 +1365,4 @@ Wire Notes Line
 	500  5050 6950 5050
 Wire Notes Line
 	6950 500  6950 7800
-Text Notes 3500 6300 0    50   ~ 0
-note the 1.8 is no longer needed for adc, leaving in case of DAC
 $EndSCHEMATC
