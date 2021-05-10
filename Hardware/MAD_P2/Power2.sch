@@ -1365,4 +1365,6 @@ Wire Notes Line
 	500  5050 6950 5050
 Wire Notes Line
 	6950 500  6950 7800
+Text Notes 3500 6300 0    50   ~ 0
+note the 1.8 is no longer needed for adc, leaving in case of DAC
 $EndSCHEMATC
