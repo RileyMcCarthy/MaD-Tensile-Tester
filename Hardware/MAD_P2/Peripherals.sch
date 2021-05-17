@@ -993,7 +993,7 @@ F 3 "" H 8700 2550 50  0001 C CNN
 	1    8700 2550
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 2100 0    50   Input ~ 0
+Text GLabel 9450 2100 2    50   Input ~ 0
 A1+
 Wire Wire Line
 	8600 2100 8700 2100
@@ -1016,7 +1016,7 @@ F 3 "" H 8700 1900 50  0001 C CNN
 	1    8700 1900
 	-1   0    0    1   
 $EndComp
-Text GLabel 8600 2350 0    50   Input ~ 0
+Text GLabel 9550 2350 2    50   Input ~ 0
 A1-
 $Comp
 L Device:R_Small R42
@@ -1077,7 +1077,7 @@ F 3 "" H 8700 3650 50  0001 C CNN
 	1    8700 3650
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 3200 0    50   Input ~ 0
+Text GLabel 9450 3200 2    50   Input ~ 0
 A2+
 Wire Wire Line
 	8600 3200 8700 3200
@@ -1100,7 +1100,7 @@ F 3 "" H 8700 3000 50  0001 C CNN
 	1    8700 3000
 	-1   0    0    1   
 $EndComp
-Text GLabel 8600 3450 0    50   Input ~ 0
+Text GLabel 9550 3450 2    50   Input ~ 0
 A2-
 $Comp
 L Device:R_Small R44
@@ -1161,7 +1161,7 @@ F 3 "" H 8700 4750 50  0001 C CNN
 	1    8700 4750
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 4300 0    50   Input ~ 0
+Text GLabel 9450 4300 2    50   Input ~ 0
 A3+
 Wire Wire Line
 	8600 4300 8700 4300
@@ -1184,7 +1184,7 @@ F 3 "" H 8700 4100 50  0001 C CNN
 	1    8700 4100
 	-1   0    0    1   
 $EndComp
-Text GLabel 8600 4550 0    50   Input ~ 0
+Text GLabel 9550 4550 2    50   Input ~ 0
 A3-
 $Comp
 L Device:R_Small R46
@@ -1245,7 +1245,7 @@ F 3 "" H 8700 5850 50  0001 C CNN
 	1    8700 5850
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 5400 0    50   Input ~ 0
+Text GLabel 9450 5400 2    50   Input ~ 0
 A4+
 Wire Wire Line
 	8600 5400 8700 5400
@@ -1268,7 +1268,7 @@ F 3 "" H 8700 5200 50  0001 C CNN
 	1    8700 5200
 	-1   0    0    1   
 $EndComp
-Text GLabel 8600 5650 0    50   Input ~ 0
+Text GLabel 9550 5650 2    50   Input ~ 0
 A4-
 $Comp
 L Device:R_Small R54
@@ -1329,7 +1329,7 @@ F 3 "" H 10100 5850 50  0001 C CNN
 	1    10100 5850
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 5400 0    50   Input ~ 0
+Text GLabel 10850 5400 2    50   Input ~ 0
 A8+
 Wire Wire Line
 	10000 5400 10100 5400
@@ -1352,7 +1352,7 @@ F 3 "" H 10100 5200 50  0001 C CNN
 	1    10100 5200
 	-1   0    0    1   
 $EndComp
-Text GLabel 10000 5650 0    50   Input ~ 0
+Text GLabel 10950 5650 2    50   Input ~ 0
 A8-
 $Comp
 L Device:R_Small R52
@@ -1413,7 +1413,7 @@ F 3 "" H 10100 4750 50  0001 C CNN
 	1    10100 4750
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 4300 0    50   Input ~ 0
+Text GLabel 10850 4300 2    50   Input ~ 0
 A7+
 Wire Wire Line
 	10000 4300 10100 4300
@@ -1436,7 +1436,7 @@ F 3 "" H 10100 4100 50  0001 C CNN
 	1    10100 4100
 	-1   0    0    1   
 $EndComp
-Text GLabel 10000 4550 0    50   Input ~ 0
+Text GLabel 10950 4550 2    50   Input ~ 0
 A7-
 $Comp
 L Device:R_Small R50
@@ -1497,7 +1497,7 @@ F 3 "" H 10100 3650 50  0001 C CNN
 	1    10100 3650
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 3200 0    50   Input ~ 0
+Text GLabel 10850 3200 2    50   Input ~ 0
 A6+
 Wire Wire Line
 	10000 3200 10100 3200
@@ -1520,7 +1520,7 @@ F 3 "" H 10100 3000 50  0001 C CNN
 	1    10100 3000
 	-1   0    0    1   
 $EndComp
-Text GLabel 10000 3450 0    50   Input ~ 0
+Text GLabel 10950 3450 2    50   Input ~ 0
 A6-
 $Comp
 L Device:R_Small R48
@@ -1581,7 +1581,7 @@ F 3 "" H 10100 2550 50  0001 C CNN
 	1    10100 2550
 	1    0    0    -1  
 $EndComp
-Text GLabel 10000 2100 0    50   Input ~ 0
+Text GLabel 10850 2100 2    50   Input ~ 0
 A5+
 Wire Wire Line
 	10000 2100 10100 2100
@@ -1604,7 +1604,7 @@ F 3 "" H 10100 1900 50  0001 C CNN
 	1    10100 1900
 	-1   0    0    1   
 $EndComp
-Text GLabel 10000 2350 0    50   Input ~ 0
+Text GLabel 10950 2350 2    50   Input ~ 0
 A5-
 Text Label 4950 4800 2    50   ~ 0
 IN1P
@@ -1638,37 +1638,37 @@ Text Label 4950 3400 2    50   ~ 0
 IN8P
 Text Label 4950 3300 2    50   ~ 0
 IN8N
-Text Label 9450 2100 0    50   ~ 0
+Text Label 8600 2100 2    50   ~ 0
 IN1P
-Text Label 9550 2350 0    50   ~ 0
+Text Label 8600 2350 2    50   ~ 0
 IN1N
-Text Label 9450 3200 0    50   ~ 0
+Text Label 8600 3200 2    50   ~ 0
 IN2P
-Text Label 9550 3450 0    50   ~ 0
+Text Label 8600 3450 2    50   ~ 0
 IN2N
-Text Label 9450 4300 0    50   ~ 0
+Text Label 8600 4300 2    50   ~ 0
 IN3P
-Text Label 9550 4550 0    50   ~ 0
+Text Label 8600 4550 2    50   ~ 0
 IN3N
-Text Label 9450 5400 0    50   ~ 0
+Text Label 8600 5400 2    50   ~ 0
 IN4P
-Text Label 9550 5650 0    50   ~ 0
+Text Label 8600 5650 2    50   ~ 0
 IN4N
-Text Label 10850 2100 0    50   ~ 0
+Text Label 10000 2100 2    50   ~ 0
 IN5P
-Text Label 10950 2350 0    50   ~ 0
+Text Label 10000 2350 2    50   ~ 0
 IN5N
-Text Label 10850 3200 0    50   ~ 0
+Text Label 10000 3200 2    50   ~ 0
 IN6P
-Text Label 10950 3450 0    50   ~ 0
+Text Label 10000 3450 2    50   ~ 0
 IN6N
-Text Label 10850 4300 0    50   ~ 0
+Text Label 10000 4300 2    50   ~ 0
 IN7P
-Text Label 10950 4550 0    50   ~ 0
+Text Label 10000 4550 2    50   ~ 0
 IN7N
-Text Label 10850 5400 0    50   ~ 0
+Text Label 10000 5400 2    50   ~ 0
 IN8P
-Text Label 10950 5650 0    50   ~ 0
+Text Label 10000 5650 2    50   ~ 0
 IN8N
 $Comp
 L Connector:TestPoint TP14

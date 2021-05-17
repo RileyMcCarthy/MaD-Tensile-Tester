@@ -999,7 +999,7 @@ F 3 "" H 9500 1150 50  0001 C CNN
 	1    9500 1150
 	1    0    0    -1  
 $EndComp
-Text GLabel 10850 2800 2    50   Input ~ 0
+Text GLabel 10650 2800 2    50   Input ~ 0
 VIN_RAW
 Wire Wire Line
 	8300 2750 8300 2850
@@ -1049,7 +1049,7 @@ F 3 "" H 8100 2450 50  0001 C CNN
 $EndComp
 Text GLabel 9800 3750 0    50   Input ~ 0
 VIN_L2
-Text GLabel 8950 2750 2    50   Input ~ 0
+Text GLabel 8750 2750 2    50   Input ~ 0
 VIN_RAW
 Wire Wire Line
 	10200 3850 10200 3950
@@ -1111,7 +1111,7 @@ F 3 "" H 10700 3600 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Connection ~ 10200 3850
-Text GLabel 10850 3850 2    50   Input ~ 0
+Text GLabel 10650 3850 2    50   Input ~ 0
 VIN_RAW
 $Comp
 L MAD_Board:APM4953 U11
@@ -1768,7 +1768,7 @@ F 3 "" H 8150 3550 50  0001 C CNN
 $EndComp
 Text GLabel 7950 3850 0    50   Input ~ 0
 VIN_ADC
-Text GLabel 9000 3850 2    50   Input ~ 0
+Text GLabel 8800 3850 2    50   Input ~ 0
 VIN_RAW
 Connection ~ 8350 3850
 $Comp
@@ -1822,50 +1822,6 @@ Wire Wire Line
 	850  5150 1150 5150
 Wire Wire Line
 	900  3350 1200 3350
-$Comp
-L Device:Fuse_Small F1
-U 1 1 60DA25BC
-P 8850 2750
-F 0 "F1" H 8850 2935 50  0000 C CNN
-F 1 "5A" H 8850 2844 50  0000 C CNN
-F 2 "MAD_P2:Wurth 696106003002 (15mm x 1.5mm)" H 8850 2750 50  0001 C CNN
-F 3 "~" H 8850 2750 50  0001 C CNN
-	1    8850 2750
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:Fuse_Small F2
-U 1 1 60DABDF0
-P 8900 3850
-F 0 "F2" H 8900 4035 50  0000 C CNN
-F 1 "5A" H 8900 3944 50  0000 C CNN
-F 2 "MAD_P2:Wurth 696106003002 (15mm x 1.5mm)" H 8900 3850 50  0001 C CNN
-F 3 "~" H 8900 3850 50  0001 C CNN
-	1    8900 3850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:Fuse_Small F5
-U 1 1 60DAC8FE
-P 10750 3850
-F 0 "F5" H 10750 4035 50  0000 C CNN
-F 1 "5A" H 10750 3944 50  0000 C CNN
-F 2 "MAD_P2:Wurth 696106003002 (15mm x 1.5mm)" H 10750 3850 50  0001 C CNN
-F 3 "~" H 10750 3850 50  0001 C CNN
-	1    10750 3850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:Fuse_Small F3
-U 1 1 60DADAD3
-P 10750 2800
-F 0 "F3" H 10750 2985 50  0000 C CNN
-F 1 "5A" H 10750 2894 50  0000 C CNN
-F 2 "MAD_P2:Wurth 696106003002 (15mm x 1.5mm)" H 10750 2800 50  0001 C CNN
-F 3 "~" H 10750 2800 50  0001 C CNN
-	1    10750 2800
-	1    0    0    -1  
-$EndComp
 $Comp
 L Regulator_Linear:AMS1117-3.3 U8
 U 1 1 610B0E1E

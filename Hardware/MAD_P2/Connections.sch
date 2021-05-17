@@ -1168,38 +1168,6 @@ F 3 "~" H 10450 3200 50  0001 C CNN
 	1    10450 3200
 	0    -1   -1   0   
 $EndComp
-Text Label 9250 3400 3    50   ~ 0
-IN1P
-Text Label 9250 2900 1    50   ~ 0
-IN1N
-Text Label 9350 3400 3    50   ~ 0
-IN2P
-Text Label 9350 2900 1    50   ~ 0
-IN2N
-Text Label 9450 3400 3    50   ~ 0
-IN3P
-Text Label 9450 2900 1    50   ~ 0
-IN3N
-Text Label 9550 3400 3    50   ~ 0
-IN4P
-Text Label 9550 2900 1    50   ~ 0
-IN4N
-Text Label 10250 3400 3    50   ~ 0
-IN5P
-Text Label 10250 2900 1    50   ~ 0
-IN5N
-Text Label 10350 3400 3    50   ~ 0
-IN6P
-Text Label 10350 2900 1    50   ~ 0
-IN6N
-Text Label 10450 3400 3    50   ~ 0
-IN7P
-Text Label 10450 2900 1    50   ~ 0
-IN7N
-Text Label 10550 3400 3    50   ~ 0
-IN8P
-Text Label 10550 2900 1    50   ~ 0
-IN8N
 $Comp
 L power:GND #PWR?
 U 1 1 60E0688D
@@ -1234,6 +1202,251 @@ Text Notes 8850 2500 0    129  ~ 0
 ADC
 Wire Notes Line
 	8750 2200 11200 2200
+Text GLabel 9250 3400 3    50   Input ~ 0
+A1+
+Text GLabel 9250 2900 1    50   Input ~ 0
+A1-
+Text GLabel 9350 3400 3    50   Input ~ 0
+A2+
+Text GLabel 9450 3400 3    50   Input ~ 0
+A3+
+Text GLabel 9550 3400 3    50   Input ~ 0
+A4+
+Text GLabel 9350 2900 1    50   Input ~ 0
+A2-
+Text GLabel 9450 2900 1    50   Input ~ 0
+A3-
+Text GLabel 9550 2900 1    50   Input ~ 0
+A4-
+Text GLabel 10250 3400 3    50   Input ~ 0
+A5+
+Text GLabel 10350 3400 3    50   Input ~ 0
+A6+
+Text GLabel 10450 3400 3    50   Input ~ 0
+A7+
+Text GLabel 10550 3400 3    50   Input ~ 0
+A8+
+Text GLabel 10250 2900 1    50   Input ~ 0
+A5-
+Text GLabel 10350 2900 1    50   Input ~ 0
+A6-
+Text GLabel 10450 2900 1    50   Input ~ 0
+A7-
+Text GLabel 10550 2900 1    50   Input ~ 0
+A8-
+$Comp
+L Connector_Generic:Conn_01x08 J20
+U 1 1 60AAE656
+P 9450 4200
+F 0 "J20" H 9530 4192 50  0000 L CNN
+F 1 "P2" H 9530 4101 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 9450 4200 50  0001 C CNN
+F 3 "~" H 9450 4200 50  0001 C CNN
+	1    9450 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x08 J18
+U 1 1 60AAEBA7
+P 9100 5100
+F 0 "J18" H 9180 5092 50  0000 L CNN
+F 1 "P3" H 9180 5001 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 9100 5100 50  0001 C CNN
+F 3 "~" H 9100 5100 50  0001 C CNN
+	1    9100 5100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x08 J19
+U 1 1 60AB01A9
+P 9100 6000
+F 0 "J19" H 9180 5992 50  0000 L CNN
+F 1 "P4" H 9180 5901 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 9100 6000 50  0001 C CNN
+F 3 "~" H 9100 6000 50  0001 C CNN
+	1    9100 6000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x08 J26
+U 1 1 60AB0F6B
+P 10400 6050
+F 0 "J26" H 10500 5950 50  0000 C CNN
+F 1 "P7" H 10500 6050 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 10400 6050 50  0001 C CNN
+F 3 "~" H 10400 6050 50  0001 C CNN
+	1    10400 6050
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x10 J24
+U 1 1 60AB2A80
+P 10400 4250
+F 0 "J24" H 10550 4000 50  0000 C CNN
+F 1 "P5" H 10550 4150 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x10_P2.54mm_Vertical" H 10400 4250 50  0001 C CNN
+F 3 "~" H 10400 4250 50  0001 C CNN
+	1    10400 4250
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_02x03_Odd_Even J23
+U 1 1 60AB4D8A
+P 9700 5800
+F 0 "J23" H 9750 6117 50  0000 C CNN
+F 1 "Conn_02x03_Odd_Even" H 9750 6026 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x03_P2.54mm_Vertical" H 9700 5800 50  0001 C CNN
+F 3 "~" H 9700 5800 50  0001 C CNN
+	1    9700 5800
+	-1   0    0    -1  
+$EndComp
 Wire Notes Line
-	2350 3800 11200 3800
+	2350 3750 11200 3750
+NoConn ~ 9250 3900
+Text Label 9250 4100 2    50   ~ 0
+RESET
+Text GLabel 9200 3950 0    50   Input ~ 0
+3.3V_MAIN
+Wire Wire Line
+	9200 3950 9200 4000
+Wire Wire Line
+	9200 4000 9250 4000
+Text GLabel 9250 4200 0    50   Input ~ 0
+3.3V_MAIN
+Text GLabel 9250 4300 0    50   Input ~ 0
+5V_MAIN
+$Comp
+L power:GND #PWR0236
+U 1 1 60ACF8EA
+P 9100 4450
+F 0 "#PWR0236" H 9100 4200 50  0001 C CNN
+F 1 "GND" H 9105 4277 50  0000 C CNN
+F 2 "" H 9100 4450 50  0001 C CNN
+F 3 "" H 9100 4450 50  0001 C CNN
+	1    9100 4450
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9250 4500 9150 4500
+Wire Wire Line
+	9150 4500 9150 4450
+Wire Wire Line
+	9150 4450 9100 4450
+Wire Wire Line
+	9250 4400 9150 4400
+Wire Wire Line
+	9150 4400 9150 4450
+Connection ~ 9150 4450
+Text GLabel 9250 4600 0    50   Input ~ 0
+VIN_MAIN
+NoConn ~ 8900 4800
+NoConn ~ 8900 4900
+NoConn ~ 8900 5000
+NoConn ~ 8900 5100
+NoConn ~ 8900 5200
+NoConn ~ 8900 5300
+NoConn ~ 8900 5400
+NoConn ~ 8900 5500
+NoConn ~ 8900 5700
+NoConn ~ 8900 5800
+NoConn ~ 8900 5900
+NoConn ~ 8900 6000
+NoConn ~ 8900 6100
+NoConn ~ 8900 6200
+NoConn ~ 8900 6300
+NoConn ~ 8900 6400
+NoConn ~ 10600 5750
+NoConn ~ 10600 5850
+NoConn ~ 10600 5950
+NoConn ~ 10600 6050
+NoConn ~ 10600 6150
+NoConn ~ 10600 6250
+NoConn ~ 10600 5600
+NoConn ~ 10600 5500
+NoConn ~ 10600 5400
+NoConn ~ 10600 5300
+NoConn ~ 10600 5200
+NoConn ~ 10600 5100
+NoConn ~ 10600 5000
+$Comp
+L Device:R_Small R?
+U 1 1 60AF985C
+P 10900 4750
+AR Path="/60B76FA1/60AF985C" Ref="R?"  Part="1" 
+AR Path="/60BD9EA1/60AF985C" Ref="R1"  Part="1" 
+F 0 "R1" V 10704 4750 50  0000 C CNN
+F 1 "10K" V 10795 4750 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 10900 4750 50  0001 C CNN
+F 3 "~" H 10900 4750 50  0001 C CNN
+	1    10900 4750
+	0    1    -1   0   
+$EndComp
+Wire Wire Line
+	11000 4750 11100 4750
+Text GLabel 11100 4750 1    50   Input ~ 0
+5V_MAIN
+$Comp
+L Connector_Generic:Conn_01x08 J25
+U 1 1 60AB1BA6
+P 10400 5200
+F 0 "J25" H 10550 5050 50  0000 C CNN
+F 1 "P6" H 10550 5200 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 10400 5200 50  0001 C CNN
+F 3 "~" H 10400 5200 50  0001 C CNN
+	1    10400 5200
+	-1   0    0    -1  
+$EndComp
+NoConn ~ 10600 3850
+NoConn ~ 10600 3950
+NoConn ~ 10600 4050
+NoConn ~ 10600 4250
+NoConn ~ 10600 4350
+NoConn ~ 10600 4450
+Wire Wire Line
+	10600 4750 10800 4750
+NoConn ~ 10600 4900
+$Comp
+L power:GND #PWR0237
+U 1 1 60B1AC64
+P 10600 4150
+F 0 "#PWR0237" H 10600 3900 50  0001 C CNN
+F 1 "GND" H 10605 3977 50  0000 C CNN
+F 2 "" H 10600 4150 50  0001 C CNN
+F 3 "" H 10600 4150 50  0001 C CNN
+	1    10600 4150
+	0    -1   -1   0   
+$EndComp
+Text Label 9400 5800 2    50   ~ 0
+P51
+Text Label 9900 5800 0    50   ~ 0
+P52
+Text Label 9400 5700 2    50   ~ 0
+P53
+Text Label 10600 4650 0    50   ~ 0
+P54
+Text Label 10600 4550 0    50   ~ 0
+P55
+Text Label 10600 6450 0    50   ~ 0
+P56
+Text Label 10600 6350 0    50   ~ 0
+P57
+Text Label 9400 5900 2    50   ~ 0
+RESET
+Text GLabel 9950 5650 2    50   Input ~ 0
+5V_MAIN
+Wire Wire Line
+	9900 5700 9950 5700
+Wire Wire Line
+	9950 5700 9950 5650
+$Comp
+L power:GND #PWR0238
+U 1 1 60B28B51
+P 9900 5900
+F 0 "#PWR0238" H 9900 5650 50  0001 C CNN
+F 1 "GND" H 9905 5727 50  0000 C CNN
+F 2 "" H 9900 5900 50  0001 C CNN
+F 3 "" H 9900 5900 50  0001 C CNN
+	1    9900 5900
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
