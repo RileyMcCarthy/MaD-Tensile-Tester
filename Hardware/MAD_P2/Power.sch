@@ -999,7 +999,7 @@ F 3 "" H 9500 1150 50  0001 C CNN
 	1    9500 1150
 	1    0    0    -1  
 $EndComp
-Text GLabel 10650 2800 2    50   Input ~ 0
+Text GLabel 10850 2800 2    50   Input ~ 0
 VIN_RAW
 Wire Wire Line
 	8300 2750 8300 2850
@@ -1049,7 +1049,7 @@ F 3 "" H 8100 2450 50  0001 C CNN
 $EndComp
 Text GLabel 9800 3750 0    50   Input ~ 0
 VIN_L2
-Text GLabel 8750 2750 2    50   Input ~ 0
+Text GLabel 8950 2750 2    50   Input ~ 0
 VIN_RAW
 Wire Wire Line
 	10200 3850 10200 3950
@@ -1111,7 +1111,7 @@ F 3 "" H 10700 3600 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 Connection ~ 10200 3850
-Text GLabel 10650 3850 2    50   Input ~ 0
+Text GLabel 10850 3850 2    50   Input ~ 0
 VIN_RAW
 $Comp
 L MAD_Board:APM4953 U11
@@ -1768,7 +1768,7 @@ F 3 "" H 8150 3550 50  0001 C CNN
 $EndComp
 Text GLabel 7950 3850 0    50   Input ~ 0
 VIN_ADC
-Text GLabel 8800 3850 2    50   Input ~ 0
+Text GLabel 9000 3850 2    50   Input ~ 0
 VIN_RAW
 Connection ~ 8350 3850
 $Comp
@@ -2287,4 +2287,48 @@ Connection ~ 3150 6900
 Wire Wire Line
 	4900 6900 4800 6900
 Connection ~ 4800 6900
+$Comp
+L Device:Polyfuse_Small F?
+U 1 1 60B225D6
+P 8850 2750
+F 0 "F?" V 8645 2750 50  0000 C CNN
+F 1 "5A" V 8736 2750 50  0000 C CNN
+F 2 "" H 8900 2550 50  0001 L CNN
+F 3 "~" H 8850 2750 50  0001 C CNN
+	1    8850 2750
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:Polyfuse_Small F?
+U 1 1 60B239BA
+P 8900 3850
+F 0 "F?" V 8695 3850 50  0000 C CNN
+F 1 "5A" V 8786 3850 50  0000 C CNN
+F 2 "" H 8950 3650 50  0001 L CNN
+F 3 "~" H 8900 3850 50  0001 C CNN
+	1    8900 3850
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:Polyfuse_Small F?
+U 1 1 60B24B24
+P 10750 3850
+F 0 "F?" V 10545 3850 50  0000 C CNN
+F 1 "5A" V 10636 3850 50  0000 C CNN
+F 2 "" H 10800 3650 50  0001 L CNN
+F 3 "~" H 10750 3850 50  0001 C CNN
+	1    10750 3850
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:Polyfuse_Small F?
+U 1 1 60B25972
+P 10750 2800
+F 0 "F?" V 10545 2800 50  0000 C CNN
+F 1 "5A" V 10636 2800 50  0000 C CNN
+F 2 "" H 10800 2600 50  0001 L CNN
+F 3 "~" H 10750 2800 50  0001 C CNN
+	1    10750 2800
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
