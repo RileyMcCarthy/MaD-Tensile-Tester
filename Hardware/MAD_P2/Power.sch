@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 2 7
+Sheet 2 6
 Title "MaD_P2"
 Date "2021-05-06"
 Rev "1"
@@ -334,73 +334,6 @@ F 3 "" H 2750 3700 50  0001 C CNN
 $EndComp
 Text Notes 650  2750 0    118  ~ 0
 Line Out #1
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED8882
-P 6100 3050
-AR Path="/60ED8882" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED8882" Ref="JP7"  Part="1" 
-F 0 "JP7" H 6100 3285 50  0000 C CNN
-F 1 "Jumper_1_3.3V" H 6100 3194 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6100 3050 50  0001 C CNN
-F 3 "~" H 6100 3050 50  0001 C CNN
-	1    6100 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED8888
-P 6100 3400
-AR Path="/60ED8888" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED8888" Ref="JP8"  Part="1" 
-F 0 "JP8" H 6100 3635 50  0000 C CNN
-F 1 "Jumper_1_5V" H 6100 3544 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6100 3400 50  0001 C CNN
-F 3 "~" H 6100 3400 50  0001 C CNN
-	1    6100 3400
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED888E
-P 6100 3750
-AR Path="/60ED888E" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED888E" Ref="JP9"  Part="1" 
-F 0 "JP9" H 6100 3985 50  0000 C CNN
-F 1 "Jumper_1_VIN" H 6100 3894 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6100 3750 50  0001 C CNN
-F 3 "~" H 6100 3750 50  0001 C CNN
-	1    6100 3750
-	1    0    0    -1  
-$EndComp
-Text GLabel 5900 3750 0    50   Input ~ 0
-VIN
-$Comp
-L Connector_Generic:Conn_01x02 J?
-U 1 1 60ED8895
-P 6850 3400
-AR Path="/60ED8895" Ref="J?"  Part="1" 
-AR Path="/60E5FA00/60ED8895" Ref="J2"  Part="1" 
-F 0 "J2" H 6930 3392 50  0000 L CNN
-F 1 "Line_1" H 6930 3301 50  0000 L CNN
-F 2 "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal" H 6850 3400 50  0001 C CNN
-F 3 "~" H 6850 3400 50  0001 C CNN
-	1    6850 3400
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 60ED889B
-P 6650 3500
-AR Path="/60ED889B" Ref="#PWR?"  Part="1" 
-AR Path="/60E5FA00/60ED889B" Ref="#PWR070"  Part="1" 
-F 0 "#PWR070" H 6650 3250 50  0001 C CNN
-F 1 "GND" H 6655 3327 50  0000 C CNN
-F 2 "" H 6650 3500 50  0001 C CNN
-F 3 "" H 6650 3500 50  0001 C CNN
-	1    6650 3500
-	1    0    0    -1  
-$EndComp
 Text GLabel 850  5150 0    50   Input ~ 0
 VIN_L2
 $Comp
@@ -554,73 +487,6 @@ F 3 "" H 2700 5500 50  0001 C CNN
 $EndComp
 Text Notes 650  4500 0    118  ~ 0
 Line Out #2
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED88ED
-P 6050 4900
-AR Path="/60ED88ED" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED88ED" Ref="JP4"  Part="1" 
-F 0 "JP4" H 6050 5135 50  0000 C CNN
-F 1 "Jumper_2_3.3V" H 6050 5044 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6050 4900 50  0001 C CNN
-F 3 "~" H 6050 4900 50  0001 C CNN
-	1    6050 4900
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED88F3
-P 6050 5250
-AR Path="/60ED88F3" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED88F3" Ref="JP5"  Part="1" 
-F 0 "JP5" H 6050 5485 50  0000 C CNN
-F 1 "Jumper_2_5V" H 6050 5394 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6050 5250 50  0001 C CNN
-F 3 "~" H 6050 5250 50  0001 C CNN
-	1    6050 5250
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED88F9
-P 6050 5600
-AR Path="/60ED88F9" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED88F9" Ref="JP6"  Part="1" 
-F 0 "JP6" H 6050 5835 50  0000 C CNN
-F 1 "Jumper_2_VIN" H 6050 5744 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 6050 5600 50  0001 C CNN
-F 3 "~" H 6050 5600 50  0001 C CNN
-	1    6050 5600
-	1    0    0    -1  
-$EndComp
-Text GLabel 5850 5600 0    50   Input ~ 0
-VIN
-$Comp
-L Connector_Generic:Conn_01x02 J?
-U 1 1 60ED8900
-P 6850 5250
-AR Path="/60ED8900" Ref="J?"  Part="1" 
-AR Path="/60E5FA00/60ED8900" Ref="J3"  Part="1" 
-F 0 "J3" H 6930 5242 50  0000 L CNN
-F 1 "Line_2" H 6930 5151 50  0000 L CNN
-F 2 "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal" H 6850 5250 50  0001 C CNN
-F 3 "~" H 6850 5250 50  0001 C CNN
-	1    6850 5250
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 60ED8906
-P 6650 5350
-AR Path="/60ED8906" Ref="#PWR?"  Part="1" 
-AR Path="/60E5FA00/60ED8906" Ref="#PWR071"  Part="1" 
-F 0 "#PWR071" H 6650 5100 50  0001 C CNN
-F 1 "GND" H 6655 5177 50  0000 C CNN
-F 2 "" H 6650 5350 50  0001 C CNN
-F 3 "" H 6650 5350 50  0001 C CNN
-	1    6650 5350
-	1    0    0    -1  
-$EndComp
 Text GLabel 850  6900 0    50   Input ~ 0
 VIN_L3
 $Comp
@@ -773,132 +639,12 @@ F 3 "" H 2600 7250 50  0001 C CNN
 $EndComp
 Text Notes 600  6300 0    118  ~ 0
 Line Out #3
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED8958
-P 5750 6750
-AR Path="/60ED8958" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED8958" Ref="JP1"  Part="1" 
-F 0 "JP1" H 5750 6985 50  0000 C CNN
-F 1 "Jumper_3_3.3V" H 5750 6894 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 5750 6750 50  0001 C CNN
-F 3 "~" H 5750 6750 50  0001 C CNN
-	1    5750 6750
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED895E
-P 5750 7100
-AR Path="/60ED895E" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED895E" Ref="JP2"  Part="1" 
-F 0 "JP2" H 5750 7335 50  0000 C CNN
-F 1 "Jumper_3_5V" H 5750 7244 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 5750 7100 50  0001 C CNN
-F 3 "~" H 5750 7100 50  0001 C CNN
-	1    5750 7100
-	1    0    0    -1  
-$EndComp
-$Comp
-L Jumper:Jumper_2_Open JP?
-U 1 1 60ED8964
-P 5750 7450
-AR Path="/60ED8964" Ref="JP?"  Part="1" 
-AR Path="/60E5FA00/60ED8964" Ref="JP3"  Part="1" 
-F 0 "JP3" H 5750 7685 50  0000 C CNN
-F 1 "Jumper_3_VIN" H 5750 7594 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 5750 7450 50  0001 C CNN
-F 3 "~" H 5750 7450 50  0001 C CNN
-	1    5750 7450
-	1    0    0    -1  
-$EndComp
-Text GLabel 5550 7450 0    50   Input ~ 0
-VIN
-$Comp
-L Connector_Generic:Conn_01x02 J?
-U 1 1 60ED896B
-P 6600 7100
-AR Path="/60ED896B" Ref="J?"  Part="1" 
-AR Path="/60E5FA00/60ED896B" Ref="J1"  Part="1" 
-F 0 "J1" H 6680 7092 50  0000 L CNN
-F 1 "Line_3" H 6680 7001 50  0000 L CNN
-F 2 "Connector_AMASS:AMASS_XT30PW-M_1x02_P2.50mm_Horizontal" H 6600 7100 50  0001 C CNN
-F 3 "~" H 6600 7100 50  0001 C CNN
-	1    6600 7100
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 60ED8971
-P 6400 7200
-AR Path="/60ED8971" Ref="#PWR?"  Part="1" 
-AR Path="/60E5FA00/60ED8971" Ref="#PWR068"  Part="1" 
-F 0 "#PWR068" H 6400 6950 50  0001 C CNN
-F 1 "GND" H 6405 7027 50  0000 C CNN
-F 2 "" H 6400 7200 50  0001 C CNN
-F 3 "" H 6400 7200 50  0001 C CNN
-	1    6400 7200
-	1    0    0    -1  
-$EndComp
 Text GLabel 2850 3050 2    50   Input ~ 0
 +5V_1
-Text GLabel 5900 3400 0    50   Input ~ 0
-+5V_1
-Text GLabel 5900 3050 0    50   Input ~ 0
-+3.3V_1
 Text GLabel 2800 4850 2    50   Input ~ 0
 +5V_2
-Text GLabel 5850 5250 0    50   Input ~ 0
-+5V_2
-Text GLabel 5850 4900 0    50   Input ~ 0
-+3.3V_2
-Wire Wire Line
-	5950 6750 6150 6750
-Wire Wire Line
-	6150 6750 6150 7100
-Wire Wire Line
-	6150 7100 5950 7100
-Wire Wire Line
-	5950 7450 6150 7450
-Wire Wire Line
-	6150 7450 6150 7100
-Connection ~ 6150 7100
-Wire Wire Line
-	6150 7100 6400 7100
-Wire Wire Line
-	6250 4900 6450 4900
-Wire Wire Line
-	6450 4900 6450 5250
-Wire Wire Line
-	6450 5250 6250 5250
-Wire Wire Line
-	6450 5250 6450 5600
-Wire Wire Line
-	6450 5600 6250 5600
-Connection ~ 6450 5250
-Wire Wire Line
-	6450 5250 6650 5250
-Wire Wire Line
-	6300 3050 6500 3050
-Wire Wire Line
-	6500 3050 6500 3400
-Wire Wire Line
-	6500 3400 6300 3400
-Wire Wire Line
-	6500 3400 6500 3750
-Wire Wire Line
-	6500 3750 6300 3750
-Connection ~ 6500 3400
-Wire Wire Line
-	6500 3400 6650 3400
 Text GLabel 2700 6600 2    50   Input ~ 0
 +5V_3
-Text GLabel 5550 6750 0    50   Input ~ 0
-+3.3V_3
-Text GLabel 5550 7100 0    50   Input ~ 0
-+5V_3
-Text Label 5900 2900 2    50   ~ 0
-P10
 Text GLabel 4900 6900 2    50   Input ~ 0
 +3.3V_3
 Text GLabel 5050 5150 2    50   Input ~ 0

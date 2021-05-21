@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 6 7
+Sheet 6 6
 Title ""
 Date ""
 Rev ""
@@ -1486,219 +1486,186 @@ AIN4P
 $Comp
 L MAD_P2-rescue:MAX5134-7 U?
 U 1 1 60CE76E1
-P 5700 7000
-F 0 "U?" H 5700 7450 50  0000 C CNN
-F 1 "MAX5134-7" H 5650 6550 50  0000 C CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 5750 7000 50  0001 C CNN
-F 3 "" H 5750 7000 50  0001 C CNN
-	1    5700 7000
+P 5300 7300
+AR Path="/60C11A52/60CE76E1" Ref="U?"  Part="1" 
+AR Path="/609BFBB9/60CE76E1" Ref="U?"  Part="1" 
+F 0 "U?" H 5300 7750 50  0000 C CNN
+F 1 "MAX5134-7" H 5250 6850 50  0000 C CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 5350 7300 50  0001 C CNN
+F 3 "" H 5350 7300 50  0001 C CNN
+	1    5300 7300
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5300 6650 5300 6450
-Wire Wire Line
-	5300 6450 5700 6450
-Wire Wire Line
-	6050 6450 6050 6650
 $Comp
 L Device:C_Small C?
 U 1 1 60CE76EA
-P 5700 6350
-F 0 "C?" H 5792 6396 50  0000 L CNN
-F 1 "47pF" H 5792 6305 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 5700 6350 50  0001 C CNN
-F 3 "~" H 5700 6350 50  0001 C CNN
-	1    5700 6350
-	1    0    0    -1  
+P 5750 6950
+AR Path="/60C11A52/60CE76EA" Ref="C?"  Part="1" 
+AR Path="/609BFBB9/60CE76EA" Ref="C?"  Part="1" 
+F 0 "C?" H 5842 6996 50  0000 L CNN
+F 1 "47pF" H 5842 6905 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5750 6950 50  0001 C CNN
+F 3 "~" H 5750 6950 50  0001 C CNN
+	1    5750 6950
+	0    -1   -1   0   
 $EndComp
-Connection ~ 5700 6450
-Wire Wire Line
-	5700 6450 6050 6450
 $Comp
 L power:GND #PWR?
 U 1 1 60CE76F2
-P 5700 6250
-F 0 "#PWR?" H 5700 6000 50  0001 C CNN
-F 1 "GND" H 5705 6077 50  0000 C CNN
-F 2 "" H 5700 6250 50  0001 C CNN
-F 3 "" H 5700 6250 50  0001 C CNN
-	1    5700 6250
-	-1   0    0    1   
+P 5900 6950
+AR Path="/60C11A52/60CE76F2" Ref="#PWR?"  Part="1" 
+AR Path="/609BFBB9/60CE76F2" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 5900 6700 50  0001 C CNN
+F 1 "GND" H 5905 6777 50  0000 C CNN
+F 2 "" H 5900 6950 50  0001 C CNN
+F 3 "" H 5900 6950 50  0001 C CNN
+	1    5900 6950
+	0    -1   -1   0   
 $EndComp
-Text Label 6050 7350 0    50   ~ 0
+Text Label 5650 7650 0    50   ~ 0
 P48
-Text Label 6050 7250 0    50   ~ 0
+Text Label 5650 7550 0    50   ~ 0
 P49
-Text Label 5300 7350 2    50   ~ 0
+Text Label 4900 7650 2    50   ~ 0
 P50
 $Comp
 L power:GND #PWR?
 U 1 1 60CE76FB
-P 5000 7350
+P 4700 7550
 AR Path="/609BFBB9/60CE76FB" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60CE76FB" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 5000 7100 50  0001 C CNN
-F 1 "GND" H 5005 7177 50  0000 C CNN
-F 2 "" H 5000 7350 50  0001 C CNN
-F 3 "" H 5000 7350 50  0001 C CNN
-	1    5000 7350
-	1    0    0    -1  
+F 0 "#PWR?" H 4700 7300 50  0001 C CNN
+F 1 "GND" H 4705 7377 50  0000 C CNN
+F 2 "" H 4700 7550 50  0001 C CNN
+F 3 "" H 4700 7550 50  0001 C CNN
+	1    4700 7550
+	0    1    1    0   
 $EndComp
-Wire Wire Line
-	5000 7350 5000 7250
-Wire Wire Line
-	5000 7250 5300 7250
-NoConn ~ 5300 7050
+NoConn ~ 4900 7350
 $Comp
 L power:GND #PWR?
 U 1 1 60CE7704
-P 6200 6750
+P 5750 7050
 AR Path="/609BFBB9/60CE7704" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60CE7704" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 6200 6500 50  0001 C CNN
-F 1 "GND" V 6205 6622 50  0000 R CNN
-F 2 "" H 6200 6750 50  0001 C CNN
-F 3 "" H 6200 6750 50  0001 C CNN
-	1    6200 6750
+F 0 "#PWR?" H 5750 6800 50  0001 C CNN
+F 1 "GND" V 5755 6922 50  0000 R CNN
+F 2 "" H 5750 7050 50  0001 C CNN
+F 3 "" H 5750 7050 50  0001 C CNN
+	1    5750 7050
 	0    -1   -1   0   
 $EndComp
-Text GLabel 5300 6950 0    50   Input ~ 0
+Text GLabel 4900 7250 0    50   Input ~ 0
 3.3V_ADC
-Text GLabel 5300 6750 0    50   Input ~ 0
+Text GLabel 4900 7050 0    50   Input ~ 0
 5V_ADC
-Text Label 5300 7150 2    50   ~ 0
+Text Label 4850 7450 2    50   ~ 0
 A03
-Text Label 6050 7150 0    50   ~ 0
+Text Label 5650 7450 0    50   ~ 0
 A02
-Text Label 6050 6850 0    50   ~ 0
+Text Label 5650 7150 0    50   ~ 0
 A01
 $Comp
 L power:GND #PWR?
 U 1 1 60CE770F
-P 6200 6950
+P 5800 7250
 AR Path="/609BFBB9/60CE770F" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60CE770F" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 6200 6700 50  0001 C CNN
-F 1 "GND" V 6205 6822 50  0000 R CNN
-F 2 "" H 6200 6950 50  0001 C CNN
-F 3 "" H 6200 6950 50  0001 C CNN
-	1    6200 6950
+F 0 "#PWR?" H 5800 7000 50  0001 C CNN
+F 1 "GND" V 5805 7122 50  0000 R CNN
+F 2 "" H 5800 7250 50  0001 C CNN
+F 3 "" H 5800 7250 50  0001 C CNN
+	1    5800 7250
 	0    -1   -1   0   
 $EndComp
 Wire Wire Line
-	6050 6750 6200 6750
-Wire Wire Line
-	6050 6950 6200 6950
-Text GLabel 6550 5900 1    50   Input ~ 0
+	5650 7250 5800 7250
+Text GLabel 6550 7450 0    50   Input ~ 0
 3.3V_ADC
 $Comp
 L Device:C_Small C?
 U 1 1 60CE7718
-P 6300 6100
-F 0 "C?" H 6392 6146 50  0000 L CNN
-F 1 "0.1uF" H 6392 6055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 6300 6100 50  0001 C CNN
-F 3 "~" H 6300 6100 50  0001 C CNN
-	1    6300 6100
-	1    0    0    -1  
+P 6650 7450
+AR Path="/60C11A52/60CE7718" Ref="C?"  Part="1" 
+AR Path="/609BFBB9/60CE7718" Ref="C?"  Part="1" 
+F 0 "C?" V 6742 7496 50  0000 L CNN
+F 1 "0.1uF" V 6750 7250 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6650 7450 50  0001 C CNN
+F 3 "~" H 6650 7450 50  0001 C CNN
+	1    6650 7450
+	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:C_Small C?
 U 1 1 60CE771E
-P 6750 6100
-F 0 "C?" H 6842 6146 50  0000 L CNN
-F 1 "4.7uF" H 6842 6055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 6750 6100 50  0001 C CNN
-F 3 "~" H 6750 6100 50  0001 C CNN
-	1    6750 6100
-	1    0    0    -1  
+P 6650 7700
+AR Path="/60C11A52/60CE771E" Ref="C?"  Part="1" 
+AR Path="/609BFBB9/60CE771E" Ref="C?"  Part="1" 
+F 0 "C?" V 6742 7746 50  0000 L CNN
+F 1 "4.7uF" V 6750 7500 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6650 7700 50  0001 C CNN
+F 3 "~" H 6650 7700 50  0001 C CNN
+	1    6650 7700
+	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	6300 5900 6300 6000
-Wire Wire Line
-	6750 5900 6750 6000
-Wire Wire Line
-	6300 5900 6750 5900
 $Comp
 L power:GND #PWR?
 U 1 1 60CE7727
-P 6550 6250
+P 6750 7450
 AR Path="/609BFBB9/60CE7727" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60CE7727" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 6550 6000 50  0001 C CNN
-F 1 "GND" H 6555 6077 50  0000 C CNN
-F 2 "" H 6550 6250 50  0001 C CNN
-F 3 "" H 6550 6250 50  0001 C CNN
-	1    6550 6250
-	1    0    0    -1  
+F 0 "#PWR?" H 6750 7200 50  0001 C CNN
+F 1 "GND" H 6755 7277 50  0000 C CNN
+F 2 "" H 6750 7450 50  0001 C CNN
+F 3 "" H 6750 7450 50  0001 C CNN
+	1    6750 7450
+	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	6300 6200 6300 6250
-Wire Wire Line
-	6300 6250 6550 6250
-Wire Wire Line
-	6750 6200 6750 6250
-Wire Wire Line
-	6750 6250 6550 6250
-Connection ~ 6550 6250
-Text GLabel 7400 5900 1    50   Input ~ 0
-3.3V_ADC
 $Comp
 L Device:C_Small C?
 U 1 1 60CE7733
-P 7150 6100
-F 0 "C?" H 7242 6146 50  0000 L CNN
-F 1 "0.1uF" H 7242 6055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 7150 6100 50  0001 C CNN
-F 3 "~" H 7150 6100 50  0001 C CNN
-	1    7150 6100
-	1    0    0    -1  
+P 6650 7050
+AR Path="/60C11A52/60CE7733" Ref="C?"  Part="1" 
+AR Path="/609BFBB9/60CE7733" Ref="C?"  Part="1" 
+F 0 "C?" V 6750 7100 50  0000 L CNN
+F 1 "0.1uF" V 6750 6850 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6650 7050 50  0001 C CNN
+F 3 "~" H 6650 7050 50  0001 C CNN
+	1    6650 7050
+	0    -1   -1   0   
 $EndComp
 $Comp
 L Device:C_Small C?
 U 1 1 60CE7739
-P 7600 6100
-F 0 "C?" H 7692 6146 50  0000 L CNN
-F 1 "4.7uF" H 7692 6055 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 7600 6100 50  0001 C CNN
-F 3 "~" H 7600 6100 50  0001 C CNN
-	1    7600 6100
-	1    0    0    -1  
+P 6650 6800
+AR Path="/60C11A52/60CE7739" Ref="C?"  Part="1" 
+AR Path="/609BFBB9/60CE7739" Ref="C?"  Part="1" 
+F 0 "C?" V 6800 6850 50  0000 L CNN
+F 1 "4.7uF" V 6800 6600 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6650 6800 50  0001 C CNN
+F 3 "~" H 6650 6800 50  0001 C CNN
+	1    6650 6800
+	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	7150 5900 7150 6000
-Wire Wire Line
-	7600 5900 7600 6000
-Wire Wire Line
-	7150 5900 7600 5900
 $Comp
 L power:GND #PWR?
 U 1 1 60CE7742
-P 7400 6250
+P 6750 7050
 AR Path="/609BFBB9/60CE7742" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60CE7742" Ref="#PWR?"  Part="1" 
-F 0 "#PWR?" H 7400 6000 50  0001 C CNN
-F 1 "GND" H 7405 6077 50  0000 C CNN
-F 2 "" H 7400 6250 50  0001 C CNN
-F 3 "" H 7400 6250 50  0001 C CNN
-	1    7400 6250
-	1    0    0    -1  
+F 0 "#PWR?" H 6750 6800 50  0001 C CNN
+F 1 "GND" H 6755 6877 50  0000 C CNN
+F 2 "" H 6750 7050 50  0001 C CNN
+F 3 "" H 6750 7050 50  0001 C CNN
+	1    6750 7050
+	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	7150 6200 7150 6250
-Wire Wire Line
-	7150 6250 7400 6250
-Wire Wire Line
-	7600 6200 7600 6250
-Wire Wire Line
-	7600 6250 7400 6250
-Connection ~ 7400 6250
-Text Notes 5650 5650 2    129  ~ 0
+Text Notes 5550 6750 2    129  ~ 0
 16 Bit DAC
-Text GLabel 6250 7050 2    50   Input ~ 0
+Text GLabel 5850 7350 2    50   Input ~ 0
 3.3V_ADC
 Wire Wire Line
-	6250 7050 6050 7050
+	5850 7350 5650 7350
 Wire Notes Line
 	500  5350 11200 5350
 $Comp
@@ -1904,4 +1871,379 @@ F 3 "~" H 9900 3700 50  0001 C CNN
 	1    9900 3700
 	0    1    1    0   
 $EndComp
+$Comp
+L Transistor_FET:2N7002 Q?
+U 1 1 60FD400A
+P 5300 6150
+F 0 "Q?" V 5549 6150 50  0000 C CNN
+F 1 "2N7002" V 5640 6150 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 5500 6075 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF" H 5300 6150 50  0001 L CNN
+	1    5300 6150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 60FDBF62
+P 4950 6100
+F 0 "R?" H 5009 6146 50  0000 L CNN
+F 1 "10K" H 5009 6055 50  0000 L CNN
+F 2 "" H 4950 6100 50  0001 C CNN
+F 3 "~" H 4950 6100 50  0001 C CNN
+	1    4950 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5100 6250 4950 6250
+Wire Wire Line
+	4950 6250 4950 6200
+Wire Wire Line
+	4950 6000 4950 5950
+Wire Wire Line
+	4950 5950 5150 5950
+$Comp
+L Device:R_Small R?
+U 1 1 60FE737F
+P 5600 6100
+F 0 "R?" H 5659 6146 50  0000 L CNN
+F 1 "10K" H 5659 6055 50  0000 L CNN
+F 2 "" H 5600 6100 50  0001 C CNN
+F 3 "~" H 5600 6100 50  0001 C CNN
+	1    5600 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5500 6250 5600 6250
+Wire Wire Line
+	5600 6250 5600 6200
+Wire Wire Line
+	5600 6000 5600 5950
+Wire Wire Line
+	4950 6250 4850 6250
+Connection ~ 4950 6250
+Wire Wire Line
+	5600 6250 5750 6250
+Connection ~ 5600 6250
+Text Label 4850 6250 2    50   ~ 0
+P51
+Text GLabel 5750 6250 2    50   Input ~ 0
+HS_1
+$Comp
+L power:+3.3V #PWR?
+U 1 1 60FFF90F
+P 5150 5950
+F 0 "#PWR?" H 5150 5800 50  0001 C CNN
+F 1 "+3.3V" H 5165 6123 50  0000 C CNN
+F 2 "" H 5150 5950 50  0001 C CNN
+F 3 "" H 5150 5950 50  0001 C CNN
+	1    5150 5950
+	1    0    0    -1  
+$EndComp
+Connection ~ 5150 5950
+Wire Wire Line
+	5150 5950 5300 5950
+Text GLabel 5600 5950 1    50   Input ~ 0
+HS_VIN
+$Comp
+L Transistor_FET:2N7002 Q?
+U 1 1 61008355
+P 6650 6150
+F 0 "Q?" V 6899 6150 50  0000 C CNN
+F 1 "2N7002" V 6990 6150 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 6850 6075 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF" H 6650 6150 50  0001 L CNN
+	1    6650 6150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 6100835B
+P 6300 6100
+F 0 "R?" H 6359 6146 50  0000 L CNN
+F 1 "10K" H 6359 6055 50  0000 L CNN
+F 2 "" H 6300 6100 50  0001 C CNN
+F 3 "~" H 6300 6100 50  0001 C CNN
+	1    6300 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6450 6250 6300 6250
+Wire Wire Line
+	6300 6250 6300 6200
+Wire Wire Line
+	6300 6000 6300 5950
+Wire Wire Line
+	6300 5950 6500 5950
+$Comp
+L Device:R_Small R?
+U 1 1 61008365
+P 6950 6100
+F 0 "R?" H 7009 6146 50  0000 L CNN
+F 1 "10K" H 7009 6055 50  0000 L CNN
+F 2 "" H 6950 6100 50  0001 C CNN
+F 3 "~" H 6950 6100 50  0001 C CNN
+	1    6950 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6850 6250 6950 6250
+Wire Wire Line
+	6950 6250 6950 6200
+Wire Wire Line
+	6950 6000 6950 5950
+Wire Wire Line
+	6300 6250 6200 6250
+Connection ~ 6300 6250
+Wire Wire Line
+	6950 6250 7100 6250
+Connection ~ 6950 6250
+Text Label 6200 6250 2    50   ~ 0
+P52
+Text GLabel 7100 6250 2    50   Input ~ 0
+HS_2
+$Comp
+L power:+3.3V #PWR?
+U 1 1 61008374
+P 6500 5950
+F 0 "#PWR?" H 6500 5800 50  0001 C CNN
+F 1 "+3.3V" H 6515 6123 50  0000 C CNN
+F 2 "" H 6500 5950 50  0001 C CNN
+F 3 "" H 6500 5950 50  0001 C CNN
+	1    6500 5950
+	1    0    0    -1  
+$EndComp
+Connection ~ 6500 5950
+Wire Wire Line
+	6500 5950 6650 5950
+Text GLabel 6950 5950 1    50   Input ~ 0
+HS_VIN
+$Comp
+L Transistor_FET:2N7002 Q?
+U 1 1 61012BE9
+P 8050 6150
+F 0 "Q?" V 8299 6150 50  0000 C CNN
+F 1 "2N7002" V 8390 6150 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 8250 6075 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF" H 8050 6150 50  0001 L CNN
+	1    8050 6150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 61012BEF
+P 7700 6100
+F 0 "R?" H 7759 6146 50  0000 L CNN
+F 1 "10K" H 7759 6055 50  0000 L CNN
+F 2 "" H 7700 6100 50  0001 C CNN
+F 3 "~" H 7700 6100 50  0001 C CNN
+	1    7700 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7850 6250 7700 6250
+Wire Wire Line
+	7700 6250 7700 6200
+Wire Wire Line
+	7700 6000 7700 5950
+Wire Wire Line
+	7700 5950 7900 5950
+$Comp
+L Device:R_Small R?
+U 1 1 61012BF9
+P 8350 6100
+F 0 "R?" H 8409 6146 50  0000 L CNN
+F 1 "10K" H 8409 6055 50  0000 L CNN
+F 2 "" H 8350 6100 50  0001 C CNN
+F 3 "~" H 8350 6100 50  0001 C CNN
+	1    8350 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8250 6250 8350 6250
+Wire Wire Line
+	8350 6250 8350 6200
+Wire Wire Line
+	8350 6000 8350 5950
+Wire Wire Line
+	7700 6250 7600 6250
+Connection ~ 7700 6250
+Wire Wire Line
+	8350 6250 8500 6250
+Connection ~ 8350 6250
+Text Label 7600 6250 2    50   ~ 0
+P53
+Text GLabel 8500 6250 2    50   Input ~ 0
+HS_3
+$Comp
+L power:+3.3V #PWR?
+U 1 1 61012C08
+P 7900 5950
+F 0 "#PWR?" H 7900 5800 50  0001 C CNN
+F 1 "+3.3V" H 7915 6123 50  0000 C CNN
+F 2 "" H 7900 5950 50  0001 C CNN
+F 3 "" H 7900 5950 50  0001 C CNN
+	1    7900 5950
+	1    0    0    -1  
+$EndComp
+Connection ~ 7900 5950
+Wire Wire Line
+	7900 5950 8050 5950
+Text GLabel 8350 5950 1    50   Input ~ 0
+HS_VIN
+$Comp
+L Transistor_FET:2N7002 Q?
+U 1 1 6101CB09
+P 9450 6150
+F 0 "Q?" V 9699 6150 50  0000 C CNN
+F 1 "2N7002" V 9790 6150 50  0000 C CNN
+F 2 "Package_TO_SOT_SMD:SOT-23" H 9650 6075 50  0001 L CIN
+F 3 "https://www.onsemi.com/pub/Collateral/NDS7002A-D.PDF" H 9450 6150 50  0001 L CNN
+	1    9450 6150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R_Small R?
+U 1 1 6101CB0F
+P 9100 6100
+F 0 "R?" H 9159 6146 50  0000 L CNN
+F 1 "10K" H 9159 6055 50  0000 L CNN
+F 2 "" H 9100 6100 50  0001 C CNN
+F 3 "~" H 9100 6100 50  0001 C CNN
+	1    9100 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9250 6250 9100 6250
+Wire Wire Line
+	9100 6250 9100 6200
+Wire Wire Line
+	9100 6000 9100 5950
+Wire Wire Line
+	9100 5950 9300 5950
+$Comp
+L Device:R_Small R?
+U 1 1 6101CB19
+P 9750 6100
+F 0 "R?" H 9809 6146 50  0000 L CNN
+F 1 "10K" H 9809 6055 50  0000 L CNN
+F 2 "" H 9750 6100 50  0001 C CNN
+F 3 "~" H 9750 6100 50  0001 C CNN
+	1    9750 6100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9650 6250 9750 6250
+Wire Wire Line
+	9750 6250 9750 6200
+Wire Wire Line
+	9750 6000 9750 5950
+Wire Wire Line
+	9100 6250 9000 6250
+Connection ~ 9100 6250
+Wire Wire Line
+	9750 6250 9900 6250
+Connection ~ 9750 6250
+Text Label 9000 6250 2    50   ~ 0
+P54
+Text GLabel 9900 6250 2    50   Input ~ 0
+HS_4
+$Comp
+L power:+3.3V #PWR?
+U 1 1 6101CB28
+P 9300 5950
+F 0 "#PWR?" H 9300 5800 50  0001 C CNN
+F 1 "+3.3V" H 9315 6123 50  0000 C CNN
+F 2 "" H 9300 5950 50  0001 C CNN
+F 3 "" H 9300 5950 50  0001 C CNN
+	1    9300 5950
+	1    0    0    -1  
+$EndComp
+Connection ~ 9300 5950
+Wire Wire Line
+	9300 5950 9450 5950
+Text GLabel 9750 5950 1    50   Input ~ 0
+HS_VIN
+Text GLabel 10500 5750 0    50   Input ~ 0
+HS_VIN
+$Comp
+L Connector_Generic:Conn_01x06 J?
+U 1 1 610270FA
+P 10700 5950
+F 0 "J?" H 10780 5942 50  0000 L CNN
+F 1 "Shifted IO" H 10780 5851 50  0000 L CNN
+F 2 "" H 10700 5950 50  0001 C CNN
+F 3 "~" H 10700 5950 50  0001 C CNN
+	1    10700 5950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 61028EB3
+P 10500 6250
+F 0 "#PWR?" H 10500 6000 50  0001 C CNN
+F 1 "GND" H 10505 6077 50  0000 C CNN
+F 2 "" H 10500 6250 50  0001 C CNN
+F 3 "" H 10500 6250 50  0001 C CNN
+	1    10500 6250
+	1    0    0    -1  
+$EndComp
+Text GLabel 10500 6150 0    50   Input ~ 0
+HS_4
+Text GLabel 10500 6050 0    50   Input ~ 0
+HS_3
+Text GLabel 10500 5950 0    50   Input ~ 0
+HS_2
+Text GLabel 10500 5850 0    50   Input ~ 0
+HS_1
+Wire Wire Line
+	4700 7550 4900 7550
+Wire Wire Line
+	4900 6950 4900 6800
+Wire Wire Line
+	4900 6800 5650 6800
+Wire Wire Line
+	5650 6800 5650 6950
+Connection ~ 5650 6950
+Text GLabel 6550 7050 0    50   Input ~ 0
+3.3V_ADC
+$Comp
+L power:GND #PWR?
+U 1 1 6110A1BD
+P 6750 7700
+AR Path="/609BFBB9/6110A1BD" Ref="#PWR?"  Part="1" 
+AR Path="/60C11A52/6110A1BD" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 6750 7450 50  0001 C CNN
+F 1 "GND" H 6755 7527 50  0000 C CNN
+F 2 "" H 6750 7700 50  0001 C CNN
+F 3 "" H 6750 7700 50  0001 C CNN
+	1    6750 7700
+	0    -1   -1   0   
+$EndComp
+Text GLabel 6550 7700 0    50   Input ~ 0
+3.3V_ADC
+$Comp
+L power:GND #PWR?
+U 1 1 6110AFD1
+P 6750 6800
+AR Path="/609BFBB9/6110AFD1" Ref="#PWR?"  Part="1" 
+AR Path="/60C11A52/6110AFD1" Ref="#PWR?"  Part="1" 
+F 0 "#PWR?" H 6750 6550 50  0001 C CNN
+F 1 "GND" H 6755 6627 50  0000 C CNN
+F 2 "" H 6750 6800 50  0001 C CNN
+F 3 "" H 6750 6800 50  0001 C CNN
+	1    6750 6800
+	0    -1   -1   0   
+$EndComp
+Text GLabel 6550 6800 0    50   Input ~ 0
+3.3V_ADC
+Wire Notes Line
+	6950 6550 4450 6550
+Text Notes 6300 5600 2    129  ~ 0
+Voltage Shifted IO
+Wire Wire Line
+	5650 7050 5750 7050
+Wire Wire Line
+	5850 6950 5900 6950
+Wire Wire Line
+	4850 7450 4900 7450
 $EndSCHEMATC

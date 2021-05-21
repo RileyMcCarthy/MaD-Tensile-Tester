@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 7
+Sheet 5 6
 Title ""
 Date ""
 Rev ""
@@ -188,7 +188,7 @@ P 7150 1900
 AR Path="/60B76FA1/60B4419B" Ref="R?"  Part="1" 
 AR Path="/60BD9EA1/60B4419B" Ref="R19"  Part="1" 
 F 0 "R19" V 6954 1900 50  0000 C CNN
-F 1 "1K" V 7045 1900 50  0000 C CNN
+F 1 "240R" V 7045 1900 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" H 7150 1900 50  0001 C CNN
 F 3 "~" H 7150 1900 50  0001 C CNN
 	1    7150 1900
@@ -201,7 +201,7 @@ P 7150 1800
 AR Path="/60B76FA1/60B44195" Ref="R?"  Part="1" 
 AR Path="/60BD9EA1/60B44195" Ref="R18"  Part="1" 
 F 0 "R18" V 6954 1800 50  0000 C CNN
-F 1 "1K" V 7045 1800 50  0000 C CNN
+F 1 "240R" V 7045 1800 50  0000 C CNN
 F 2 "Resistor_SMD:R_0603_1608Metric" H 7150 1800 50  0001 C CNN
 F 3 "~" H 7150 1800 50  0001 C CNN
 	1    7150 1800
@@ -1044,13 +1044,13 @@ P63
 $Comp
 L power:GND #PWR0217
 U 1 1 60DCCC5E
-P 5000 7450
-F 0 "#PWR0217" H 5000 7200 50  0001 C CNN
-F 1 "GND" H 5005 7277 50  0000 C CNN
-F 2 "" H 5000 7450 50  0001 C CNN
-F 3 "" H 5000 7450 50  0001 C CNN
-	1    5000 7450
-	1    0    0    -1  
+P 5050 7700
+F 0 "#PWR0217" H 5050 7450 50  0001 C CNN
+F 1 "GND" H 5055 7527 50  0000 C CNN
+F 2 "" H 5050 7700 50  0001 C CNN
+F 3 "" H 5050 7700 50  0001 C CNN
+	1    5050 7700
+	0    -1   -1   0   
 $EndComp
 Text Label 4600 6950 1    50   ~ 0
 V_0_3
@@ -1060,25 +1060,19 @@ Text Label 4700 6950 1    50   ~ 0
 V_32_35
 Text Label 4800 7450 3    50   ~ 0
 V_48_51
-Wire Wire Line
-	5000 7450 4900 7450
-Connection ~ 5000 7450
 $Comp
 L power:GND #PWR0218
 U 1 1 60DD69AB
-P 5000 6950
-F 0 "#PWR0218" H 5000 6700 50  0001 C CNN
-F 1 "GND" H 5005 6777 50  0000 C CNN
-F 2 "" H 5000 6950 50  0001 C CNN
-F 3 "" H 5000 6950 50  0001 C CNN
-	1    5000 6950
-	-1   0    0    1   
+P 5050 6700
+F 0 "#PWR0218" H 5050 6450 50  0001 C CNN
+F 1 "GND" H 5055 6527 50  0000 C CNN
+F 2 "" H 5050 6700 50  0001 C CNN
+F 3 "" H 5050 6700 50  0001 C CNN
+	1    5050 6700
+	0    -1   -1   0   
 $EndComp
 Text GLabel 4800 6950 1    50   Input ~ 0
 VIN_MAIN
-Wire Wire Line
-	4900 6950 5000 6950
-Connection ~ 5000 6950
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J16
 U 1 1 60DE4CD2
@@ -1143,97 +1137,52 @@ DAC
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J15
 U 1 1 60E06871
-P 9450 3200
+P 9950 3100
 AR Path="/60BD9EA1/60E06871" Ref="J15"  Part="1" 
 AR Path="/60C11A52/60E06871" Ref="J?"  Part="1" 
 AR Path="/609BFBB9/60E06871" Ref="J?"  Part="1" 
-F 0 "J15" V 9500 3250 50  0000 R CNN
-F 1 "Conn_ADC1" V 9455 2912 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 9450 3200 50  0001 C CNN
-F 3 "~" H 9450 3200 50  0001 C CNN
-	1    9450 3200
-	0    -1   -1   0   
-$EndComp
-$Comp
-L Connector_Generic:Conn_02x05_Odd_Even J17
-U 1 1 60E06877
-P 10450 3200
-AR Path="/60BD9EA1/60E06877" Ref="J17"  Part="1" 
-AR Path="/60C11A52/60E06877" Ref="J?"  Part="1" 
-AR Path="/609BFBB9/60E06877" Ref="J?"  Part="1" 
-F 0 "J17" V 10500 3250 50  0000 R CNN
-F 1 "Conn_ADC2" V 10455 2912 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 10450 3200 50  0001 C CNN
-F 3 "~" H 10450 3200 50  0001 C CNN
-	1    10450 3200
+F 0 "J15" V 10000 3150 50  0000 R CNN
+F 1 "Conn_ADC1" V 9955 2812 50  0000 R CNN
+F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 9950 3100 50  0001 C CNN
+F 3 "~" H 9950 3100 50  0001 C CNN
+	1    9950 3100
 	0    -1   -1   0   
 $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 60E0688D
-P 9650 3400
+P 10150 3450
 AR Path="/609BFBB9/60E0688D" Ref="#PWR?"  Part="1" 
 AR Path="/60BD9EA1/60E0688D" Ref="#PWR0221"  Part="1" 
-F 0 "#PWR0221" H 9650 3150 50  0001 C CNN
-F 1 "GND" H 9655 3227 50  0000 C CNN
-F 2 "" H 9650 3400 50  0001 C CNN
-F 3 "" H 9650 3400 50  0001 C CNN
-	1    9650 3400
+F 0 "#PWR0221" H 10150 3200 50  0001 C CNN
+F 1 "GND" H 10155 3277 50  0000 C CNN
+F 2 "" H 10150 3450 50  0001 C CNN
+F 3 "" H 10150 3450 50  0001 C CNN
+	1    10150 3450
 	1    0    0    -1  
 $EndComp
-$Comp
-L power:GND #PWR?
-U 1 1 60E06893
-P 10650 3400
-AR Path="/609BFBB9/60E06893" Ref="#PWR?"  Part="1" 
-AR Path="/60BD9EA1/60E06893" Ref="#PWR0222"  Part="1" 
-F 0 "#PWR0222" H 10650 3150 50  0001 C CNN
-F 1 "GND" H 10655 3227 50  0000 C CNN
-F 2 "" H 10650 3400 50  0001 C CNN
-F 3 "" H 10650 3400 50  0001 C CNN
-	1    10650 3400
-	1    0    0    -1  
-$EndComp
-Text GLabel 9650 2900 1    50   Input ~ 0
-3.3V_ADC
-Text GLabel 10650 2900 1    50   Input ~ 0
+Text GLabel 10150 2800 1    50   Input ~ 0
 3.3V_ADC
 Text Notes 8850 2500 0    129  ~ 0
 ADC
 Wire Notes Line
 	8750 2200 11200 2200
-Text GLabel 9250 3400 3    50   Input ~ 0
+Text GLabel 9750 3300 3    50   Input ~ 0
 A1+
-Text GLabel 9250 2900 1    50   Input ~ 0
+Text GLabel 9750 2800 1    50   Input ~ 0
 A1-
-Text GLabel 9350 3400 3    50   Input ~ 0
+Text GLabel 9850 3300 3    50   Input ~ 0
 A2+
-Text GLabel 9450 3400 3    50   Input ~ 0
+Text GLabel 9950 3300 3    50   Input ~ 0
 A3+
-Text GLabel 9550 3400 3    50   Input ~ 0
+Text GLabel 10050 3300 3    50   Input ~ 0
 A4+
-Text GLabel 9350 2900 1    50   Input ~ 0
+Text GLabel 9850 2800 1    50   Input ~ 0
 A2-
-Text GLabel 9450 2900 1    50   Input ~ 0
+Text GLabel 9950 2800 1    50   Input ~ 0
 A3-
-Text GLabel 9550 2900 1    50   Input ~ 0
+Text GLabel 10050 2800 1    50   Input ~ 0
 A4-
-Text GLabel 10250 3400 3    50   Input ~ 0
-A5+
-Text GLabel 10350 3400 3    50   Input ~ 0
-A6+
-Text GLabel 10450 3400 3    50   Input ~ 0
-A7+
-Text GLabel 10550 3400 3    50   Input ~ 0
-A8+
-Text GLabel 10250 2900 1    50   Input ~ 0
-A5-
-Text GLabel 10350 2900 1    50   Input ~ 0
-A6-
-Text GLabel 10450 2900 1    50   Input ~ 0
-A7-
-Text GLabel 10550 2900 1    50   Input ~ 0
-A8-
 $Comp
 L Connector_Generic:Conn_01x08 J20
 U 1 1 60AAE656
@@ -1305,16 +1254,6 @@ Wire Notes Line
 NoConn ~ 9250 3900
 Text Label 9250 4100 2    50   ~ 0
 RESET
-Text GLabel 9200 3950 0    50   Input ~ 0
-3.3V_MAIN
-Wire Wire Line
-	9200 3950 9200 4000
-Wire Wire Line
-	9200 4000 9250 4000
-Text GLabel 9250 4200 0    50   Input ~ 0
-3.3V_MAIN
-Text GLabel 9250 4300 0    50   Input ~ 0
-5V_MAIN
 $Comp
 L power:GND #PWR0236
 U 1 1 60ACF8EA
@@ -1383,8 +1322,6 @@ F 3 "~" H 10900 4750 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	11000 4750 11100 4750
-Text GLabel 11100 4750 1    50   Input ~ 0
-5V_MAIN
 $Comp
 L Connector_Generic:Conn_01x08 J25
 U 1 1 60AB1BA6
@@ -1432,12 +1369,6 @@ Text Label 10600 6350 0    50   ~ 0
 P57
 Text Label 9400 5900 2    50   ~ 0
 RESET
-Text GLabel 9950 5650 2    50   Input ~ 0
-5V_MAIN
-Wire Wire Line
-	9900 5700 9950 5700
-Wire Wire Line
-	9950 5700 9950 5650
 $Comp
 L power:GND #PWR0238
 U 1 1 60B28B51
@@ -1449,4 +1380,32 @@ F 3 "" H 9900 5900 50  0001 C CNN
 	1    9900 5900
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	5050 7700 5000 7700
+Wire Wire Line
+	5000 7700 5000 7450
+Wire Wire Line
+	5050 6700 5000 6700
+Wire Wire Line
+	5000 6700 5000 6950
+Wire Wire Line
+	10150 3450 10150 3300
+Text GLabel 4900 6950 1    50   Input ~ 0
+5V_MAIN1
+Text GLabel 4900 7450 3    50   Input ~ 0
+3.3V_MAIN1
+Text GLabel 9250 4300 0    50   Input ~ 0
+5V_MAIN1
+Text GLabel 11100 4750 1    50   Input ~ 0
+5V_MAIN1
+Text GLabel 9250 3950 0    50   Input ~ 0
+3.3V_MAIN1
+Text GLabel 9250 4200 0    50   Input ~ 0
+3.3V_MAIN1
+Wire Wire Line
+	9250 3950 9250 4000
+Text GLabel 9900 5650 2    50   Input ~ 0
+5V_MAIN1
+Wire Wire Line
+	9900 5650 9900 5700
 $EndSCHEMATC
