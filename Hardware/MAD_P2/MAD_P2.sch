@@ -1328,4 +1328,28 @@ F1 "Peripherals.sch" 50
 $EndSheet
 Text Notes 2950 2050 0    129  ~ 0
 Propeller 2
+$Comp
+L Power-cache:Switch_SW_Push SW?
+U 1 1 61238802
+P 3600 6750
+F 0 "SW?" H 3600 7035 50  0000 C CNN
+F 1 "Switch_SW_Push" H 3600 6944 50  0000 C CNN
+F 2 "" H 3600 6950 50  0001 C CNN
+F 3 "" H 3600 6950 50  0001 C CNN
+	1    3600 6750
+	1    0    0    -1  
+$EndComp
+Text Label 3400 6750 2    50   ~ 0
+RESET
+$Comp
+L power:GND #PWR?
+U 1 1 6123970E
+P 3800 6750
+F 0 "#PWR?" H 3800 6500 50  0001 C CNN
+F 1 "GND" H 3805 6577 50  0000 C CNN
+F 2 "" H 3800 6750 50  0001 C CNN
+F 3 "" H 3800 6750 50  0001 C CNN
+	1    3800 6750
+	0    -1   -1   0   
+$EndComp
 $EndSCHEMATC

@@ -560,221 +560,221 @@ F 3 "~" H 2450 7250 50  0001 C CNN
 	1    2450 7250
 	0    -1   -1   0   
 $EndComp
-Text Label 5100 5050 1    50   ~ 0
+Text Label 4250 5100 1    50   ~ 0
 P29
-Text Label 5000 5050 1    50   ~ 0
+Text Label 4150 5100 1    50   ~ 0
 P27
-Text Label 4900 5050 1    50   ~ 0
+Text Label 4050 5100 1    50   ~ 0
 P25
-Text Label 4800 5050 1    50   ~ 0
+Text Label 3950 5100 1    50   ~ 0
 P23
-Text Label 4700 5050 1    50   ~ 0
+Text Label 3850 5100 1    50   ~ 0
 P21
-Text Label 4450 5050 1    50   ~ 0
+Text Label 3600 5100 1    50   ~ 0
 P19
-Text Label 4350 5050 1    50   ~ 0
+Text Label 3500 5100 1    50   ~ 0
 P17
-Text Label 4250 5050 1    50   ~ 0
+Text Label 3400 5100 1    50   ~ 0
 P15
-Text Label 4150 5050 1    50   ~ 0
+Text Label 3300 5100 1    50   ~ 0
 P13
-Text Label 4050 5050 1    50   ~ 0
+Text Label 3200 5100 1    50   ~ 0
 P11
-Text Label 5100 5550 3    50   ~ 0
+Text Label 4250 5600 3    50   ~ 0
 P28
-Text Label 5000 5550 3    50   ~ 0
+Text Label 4150 5600 3    50   ~ 0
 P26
-Text Label 4900 5550 3    50   ~ 0
+Text Label 4050 5600 3    50   ~ 0
 P24
-Text Label 4800 5550 3    50   ~ 0
+Text Label 3950 5600 3    50   ~ 0
 P22
-Text Label 4700 5550 3    50   ~ 0
+Text Label 3850 5600 3    50   ~ 0
 P20
-Text Label 4450 5550 3    50   ~ 0
+Text Label 3600 5600 3    50   ~ 0
 P18
-Text Label 4350 5550 3    50   ~ 0
+Text Label 3500 5600 3    50   ~ 0
 P16
-Text Label 4250 5550 3    50   ~ 0
+Text Label 3400 5600 3    50   ~ 0
 P14
-Text Label 4150 5550 3    50   ~ 0
+Text Label 3300 5600 3    50   ~ 0
 P12
-Text Label 4050 5550 3    50   ~ 0
+Text Label 3200 5600 3    50   ~ 0
 P10
-Text Label 3800 5050 1    50   ~ 0
+Text Label 2950 5100 1    50   ~ 0
 P9
-Text Label 3700 5050 1    50   ~ 0
+Text Label 2850 5100 1    50   ~ 0
 P7
-Text Label 3600 5050 1    50   ~ 0
+Text Label 2750 5100 1    50   ~ 0
 P5
-Text Label 3800 5550 3    50   ~ 0
+Text Label 2950 5600 3    50   ~ 0
 P8
-Text Label 3700 5550 3    50   ~ 0
+Text Label 2850 5600 3    50   ~ 0
 P6
-Text Label 3600 5550 3    50   ~ 0
+Text Label 2750 5600 3    50   ~ 0
 P4
-Text Label 3500 5050 1    50   ~ 0
+Text Label 2650 5100 1    50   ~ 0
 P3
-Text Label 3500 5550 3    50   ~ 0
+Text Label 2650 5600 3    50   ~ 0
 P2
-Text Label 3400 5050 1    50   ~ 0
+Text Label 2550 5100 1    50   ~ 0
 P1
-Text Label 3400 5550 3    50   ~ 0
+Text Label 2550 5600 3    50   ~ 0
 P0
-Text Notes 8200 5050 2    50   ~ 0
+Text Notes 4450 4800 2    50   ~ 0
 Jumpers used for Tensile board v1 capatability
 Wire Wire Line
-	6200 4850 6200 5050
+	5100 5050 5100 5250
 Wire Wire Line
-	5800 4850 5800 5050
+	4700 5050 4700 5250
 $Comp
 L Jumper:SolderJumper_2_Open JP17
 U 1 1 60991820
-P 6200 4700
-F 0 "JP17" V 6154 4768 50  0000 L CNN
-F 1 "J_P30" V 6245 4768 50  0000 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 6200 4700 50  0001 C CNN
-F 3 "~" H 6200 4700 50  0001 C CNN
-	1    6200 4700
+P 5100 4900
+F 0 "JP17" V 5054 4968 50  0000 L CNN
+F 1 "J_P30" V 5145 4968 50  0000 L CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 5100 4900 50  0001 C CNN
+F 3 "~" H 5100 4900 50  0001 C CNN
+	1    5100 4900
 	0    1    1    0   
 $EndComp
 $Comp
 L Jumper:SolderJumper_2_Open JP15
 U 1 1 60990D91
-P 5800 4700
-F 0 "JP15" V 5754 4612 50  0000 R CNN
-F 1 "J_P31" V 5845 4612 50  0000 R CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 5800 4700 50  0001 C CNN
-F 3 "~" H 5800 4700 50  0001 C CNN
-	1    5800 4700
+P 4700 4900
+F 0 "JP15" V 4654 4812 50  0000 R CNN
+F 1 "J_P31" V 4745 4812 50  0000 R CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4700 4900 50  0001 C CNN
+F 3 "~" H 4700 4900 50  0001 C CNN
+	1    4700 4900
 	0    -1   1    0   
 $EndComp
 Wire Wire Line
-	5800 5650 5800 5550
+	4700 5850 4700 5750
 Wire Wire Line
-	5300 5650 5800 5650
+	4200 5850 4700 5850
 Wire Wire Line
-	5300 5750 5300 5650
+	4200 5950 4200 5850
 Wire Wire Line
-	5900 5750 5900 5550
+	4800 5950 4800 5750
 Wire Wire Line
-	5650 5750 5900 5750
+	4550 5950 4800 5950
 Wire Wire Line
-	6000 5750 6000 5550
+	4900 5950 4900 5750
 $Comp
 L Jumper:SolderJumper_2_Open JP13
 U 1 1 6098F74E
-P 5300 5900
-F 0 "JP13" V 5254 5968 50  0000 L CNN
-F 1 "J_P30" V 5345 5968 50  0000 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 5300 5900 50  0001 C CNN
-F 3 "~" H 5300 5900 50  0001 C CNN
-	1    5300 5900
+P 4200 6100
+F 0 "JP13" V 4154 6168 50  0000 L CNN
+F 1 "J_P30" V 4245 6168 50  0000 L CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4200 6100 50  0001 C CNN
+F 3 "~" H 4200 6100 50  0001 C CNN
+	1    4200 6100
 	0    1    1    0   
 $EndComp
 $Comp
 L Jumper:SolderJumper_2_Open JP14
 U 1 1 6098D6A7
-P 5650 5900
-F 0 "JP14" V 5604 5968 50  0000 L CNN
-F 1 "J_P32" V 5695 5968 50  0000 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 5650 5900 50  0001 C CNN
-F 3 "~" H 5650 5900 50  0001 C CNN
-	1    5650 5900
+P 4550 6100
+F 0 "JP14" V 4504 6168 50  0000 L CNN
+F 1 "J_P32" V 4595 6168 50  0000 L CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4550 6100 50  0001 C CNN
+F 3 "~" H 4550 6100 50  0001 C CNN
+	1    4550 6100
 	0    1    1    0   
 $EndComp
 $Comp
 L Jumper:SolderJumper_2_Open JP16
 U 1 1 6098BE34
-P 6000 5900
-F 0 "JP16" V 5954 5968 50  0000 L CNN
-F 1 "J_P33" V 6045 5968 50  0000 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 6000 5900 50  0001 C CNN
-F 3 "~" H 6000 5900 50  0001 C CNN
-	1    6000 5900
+P 4900 6100
+F 0 "JP16" V 4854 6168 50  0000 L CNN
+F 1 "J_P33" V 4945 6168 50  0000 L CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4900 6100 50  0001 C CNN
+F 3 "~" H 4900 6100 50  0001 C CNN
+	1    4900 6100
 	0    1    1    0   
 $EndComp
-Text Label 6200 4550 1    50   ~ 0
+Text Label 5100 4750 1    50   ~ 0
 P34
-Text Label 6000 6050 3    50   ~ 0
+Text Label 4900 6250 3    50   ~ 0
 P33
-Text Label 5650 6050 3    50   ~ 0
+Text Label 4550 6250 3    50   ~ 0
 P32
-Text Label 5800 4550 1    50   ~ 0
+Text Label 4700 4750 1    50   ~ 0
 P31
-Text Label 5300 6050 3    50   ~ 0
+Text Label 4200 6250 3    50   ~ 0
 P30
 Wire Wire Line
-	6000 5050 6100 5050
-Connection ~ 6000 5050
+	4900 5250 5000 5250
+Connection ~ 4900 5250
 Wire Wire Line
-	5900 5050 6000 5050
-Connection ~ 6200 5550
+	4800 5250 4900 5250
+Connection ~ 5100 5750
 Wire Wire Line
-	6100 5550 6200 5550
+	5000 5750 5100 5750
 $Comp
 L power:GND #PWR0158
 U 1 1 609867C6
-P 6200 5550
-F 0 "#PWR0158" H 6200 5300 50  0001 C CNN
-F 1 "GND" H 6205 5377 50  0000 C CNN
-F 2 "" H 6200 5550 50  0001 C CNN
-F 3 "" H 6200 5550 50  0001 C CNN
-	1    6200 5550
+P 5100 5750
+F 0 "#PWR0158" H 5100 5500 50  0001 C CNN
+F 1 "GND" H 5105 5577 50  0000 C CNN
+F 2 "" H 5100 5750 50  0001 C CNN
+F 3 "" H 5100 5750 50  0001 C CNN
+	1    5100 5750
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0159
 U 1 1 60985CC6
-P 6000 5050
-F 0 "#PWR0159" H 6000 4800 50  0001 C CNN
-F 1 "GND" H 6005 4877 50  0000 C CNN
-F 2 "" H 6000 5050 50  0001 C CNN
-F 3 "" H 6000 5050 50  0001 C CNN
-	1    6000 5050
+P 4900 5250
+F 0 "#PWR0159" H 4900 5000 50  0001 C CNN
+F 1 "GND" H 4905 5077 50  0000 C CNN
+F 2 "" H 4900 5250 50  0001 C CNN
+F 3 "" H 4900 5250 50  0001 C CNN
+	1    4900 5250
 	-1   0    0    1   
 $EndComp
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J14
 U 1 1 609848F0
-P 6000 5350
-F 0 "J14" V 6050 5400 50  0000 R CNN
-F 1 "Conn_02x05_Odd_Even" V 6005 5062 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 6000 5350 50  0001 C CNN
-F 3 "~" H 6000 5350 50  0001 C CNN
-	1    6000 5350
+P 4900 5550
+F 0 "J14" V 4950 5600 50  0000 R CNN
+F 1 "Conn_02x05_Odd_Even" H 5250 5150 50  0000 R CNN
+F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 4900 5550 50  0001 C CNN
+F 3 "~" H 4900 5550 50  0001 C CNN
+	1    4900 5550
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J13
 U 1 1 609801A5
-P 4900 5350
-F 0 "J13" V 4950 5400 50  0000 R CNN
-F 1 "Conn_02x05_Odd_Even" H 5350 5050 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 4900 5350 50  0001 C CNN
-F 3 "~" H 4900 5350 50  0001 C CNN
-	1    4900 5350
+P 4050 5400
+F 0 "J13" V 4100 5450 50  0000 R CNN
+F 1 "Conn_02x05_Odd_Even" H 4500 5100 50  0000 R CNN
+F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 4050 5400 50  0001 C CNN
+F 3 "~" H 4050 5400 50  0001 C CNN
+	1    4050 5400
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J22
 U 1 1 6097E7FB
-P 4250 5350
-F 0 "J22" V 4300 5400 50  0000 R CNN
-F 1 "Conn_02x05_Odd_Even" H 4700 5050 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 4250 5350 50  0001 C CNN
-F 3 "~" H 4250 5350 50  0001 C CNN
-	1    4250 5350
+P 3400 5400
+F 0 "J22" V 3450 5450 50  0000 R CNN
+F 1 "Conn_02x05_Odd_Even" H 3850 5100 50  0000 R CNN
+F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 3400 5400 50  0001 C CNN
+F 3 "~" H 3400 5400 50  0001 C CNN
+	1    3400 5400
 	0    -1   -1   0   
 $EndComp
 $Comp
 L Connector_Generic:Conn_02x05_Odd_Even J21
 U 1 1 6097AD9A
-P 3600 5350
-F 0 "J21" V 3650 5400 50  0000 R CNN
-F 1 "Conn_02x05_Odd_Even" H 4050 5050 50  0000 R CNN
-F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 3600 5350 50  0001 C CNN
-F 3 "~" H 3600 5350 50  0001 C CNN
-	1    3600 5350
+P 2750 5400
+F 0 "J21" V 2800 5450 50  0000 R CNN
+F 1 "Conn_02x05_Odd_Even" H 3200 5100 50  0000 R CNN
+F 2 "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical" H 2750 5400 50  0001 C CNN
+F 3 "~" H 2750 5400 50  0001 C CNN
+	1    2750 5400
 	0    -1   -1   0   
 $EndComp
 Text Label 1300 1200 2    50   ~ 0
@@ -1408,4 +1408,142 @@ Text GLabel 9900 5650 2    50   Input ~ 0
 5V_MAIN1
 Wire Wire Line
 	9900 5650 9900 5700
+$Comp
+L Connector:Micro_SD_Card J?
+U 1 1 612055B5
+P 7800 4550
+AR Path="/609BFBB9/612055B5" Ref="J?"  Part="1" 
+AR Path="/60BD9EA1/612055B5" Ref="J?"  Part="1" 
+F 0 "J?" H 8100 4600 50  0000 C CNN
+F 1 "Micro_SD_Card_Connector" H 8100 4400 50  0000 C CNN
+F 2 "Tensile_Board:WM26501" H 8950 4850 50  0001 C CNN
+F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 7800 4550 50  0001 C CNN
+	1    7800 4550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR?
+U 1 1 612055BB
+P 6900 4550
+F 0 "#PWR?" H 6900 4400 50  0001 C CNN
+F 1 "+3.3V" V 6915 4678 50  0000 L CNN
+F 2 "" H 6900 4550 50  0001 C CNN
+F 3 "" H 6900 4550 50  0001 C CNN
+	1    6900 4550
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 612055C1
+P 6900 4750
+F 0 "#PWR?" H 6900 4500 50  0001 C CNN
+F 1 "GND" V 6905 4622 50  0000 R CNN
+F 2 "" H 6900 4750 50  0001 C CNN
+F 3 "" H 6900 4750 50  0001 C CNN
+	1    6900 4750
+	0    1    1    0   
+$EndComp
+NoConn ~ 8600 5150
+NoConn ~ 6900 4950
+NoConn ~ 6900 4250
+$Comp
+L Device:R_Small R?
+U 1 1 612055CA
+P 6400 4850
+F 0 "R?" V 6500 4850 50  0000 C CNN
+F 1 "240R" V 6300 4850 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6400 4850 50  0001 C CNN
+F 3 "~" H 6400 4850 50  0001 C CNN
+	1    6400 4850
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6200 4850 6300 4850
+Wire Wire Line
+	6500 4850 6900 4850
+Wire Wire Line
+	6200 4650 6900 4650
+Wire Wire Line
+	6200 4450 6900 4450
+Wire Wire Line
+	6200 4350 6900 4350
+Text Label 6200 4850 2    50   ~ 0
+P39
+Text Label 6200 4650 2    50   ~ 0
+P40
+Text Label 6200 4450 2    50   ~ 0
+P41
+Text Label 6200 4350 2    50   ~ 0
+P42
+Text Notes 5550 4000 0    129  ~ 0
+Data SD Card
+$Comp
+L Connector:Micro_SD_Card J?
+U 1 1 6120B790
+P 7800 5800
+AR Path="/609BFBB9/6120B790" Ref="J?"  Part="1" 
+AR Path="/60BD9EA1/6120B790" Ref="J?"  Part="1" 
+F 0 "J?" H 8100 5850 50  0000 C CNN
+F 1 "Micro_SD_Card_Socket" H 8100 5650 50  0000 C CNN
+F 2 "Tensile_Board:WM26501" H 8950 6100 50  0001 C CNN
+F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 7800 5800 50  0001 C CNN
+	1    7800 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3.3V #PWR?
+U 1 1 6120B796
+P 6900 5800
+F 0 "#PWR?" H 6900 5650 50  0001 C CNN
+F 1 "+3.3V" V 6915 5928 50  0000 L CNN
+F 2 "" H 6900 5800 50  0001 C CNN
+F 3 "" H 6900 5800 50  0001 C CNN
+	1    6900 5800
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 6120B79C
+P 6900 6000
+F 0 "#PWR?" H 6900 5750 50  0001 C CNN
+F 1 "GND" V 6905 5872 50  0000 R CNN
+F 2 "" H 6900 6000 50  0001 C CNN
+F 3 "" H 6900 6000 50  0001 C CNN
+	1    6900 6000
+	0    1    1    0   
+$EndComp
+NoConn ~ 8600 6400
+NoConn ~ 6900 6200
+NoConn ~ 6900 5500
+$Comp
+L Device:R_Small R?
+U 1 1 6120B7A5
+P 6400 6100
+F 0 "R?" V 6500 6100 50  0000 C CNN
+F 1 "240R" V 6300 6100 50  0000 C CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" H 6400 6100 50  0001 C CNN
+F 3 "~" H 6400 6100 50  0001 C CNN
+	1    6400 6100
+	0    -1   -1   0   
+$EndComp
+Wire Wire Line
+	6200 6100 6300 6100
+Wire Wire Line
+	6500 6100 6900 6100
+Wire Wire Line
+	6200 5900 6900 5900
+Wire Wire Line
+	6200 5700 6900 5700
+Wire Wire Line
+	6200 5600 6900 5600
+Text Label 6200 6100 2    50   ~ 0
+P39
+Text Label 6200 5900 2    50   ~ 0
+P40
+Text Label 6200 5700 2    50   ~ 0
+P41
+Text Label 6200 5600 2    50   ~ 0
+P42
+Wire Notes Line
+	5500 3750 5500 6550
 $EndSCHEMATC
