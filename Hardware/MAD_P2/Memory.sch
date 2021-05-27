@@ -47,14 +47,6 @@ F 3 "" H 5250 3550 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 NoConn ~ 6950 3950
-Text Label 4550 3150 2    50   ~ 0
-P60
-Text Label 4550 3250 2    50   ~ 0
-P59
-Text Label 4550 3450 2    50   ~ 0
-P61
-Text Label 4550 3650 2    50   ~ 0
-P58
 NoConn ~ 5250 3750
 NoConn ~ 5250 3050
 $Comp
@@ -79,8 +71,6 @@ F 3 "~" H 7100 5000 50  0001 C CNN
 	1    7100 5000
 	1    0    0    -1  
 $EndComp
-Text Label 7550 5000 0    50   ~ 0
-P61
 Wire Wire Line
 	7550 5000 7200 5000
 Wire Wire Line
@@ -150,10 +140,6 @@ Wire Wire Line
 	4500 5250 4600 5250
 Text Label 4900 5450 2    50   ~ 0
 P60
-Text Label 5900 5250 0    50   ~ 0
-P58
-Text Label 5900 5150 0    50   ~ 0
-P59
 $Comp
 L power:GND #PWR0148
 U 1 1 60B4148A
@@ -171,4 +157,18 @@ Text Notes 4750 4550 0    129  ~ 0
 Optional Boot SPI Flash
 Text Notes 5100 2450 0    129  ~ 0
 Boot SD Card
+Text GLabel 4550 3150 0    50   Input ~ 0
+P60
+Text GLabel 4550 3250 0    50   Input ~ 0
+P59
+Text GLabel 4550 3450 0    50   Input ~ 0
+P61
+Text GLabel 4550 3650 0    50   Input ~ 0
+P58
+Text GLabel 5900 5150 2    50   Input ~ 0
+P59
+Text GLabel 5900 5250 2    50   Input ~ 0
+P58
+Text GLabel 7550 5000 2    50   Input ~ 0
+P61
 $EndSCHEMATC

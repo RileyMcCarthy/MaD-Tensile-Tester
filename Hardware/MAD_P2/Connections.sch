@@ -77,10 +77,6 @@ Wire Wire Line
 	7250 1900 7300 1900
 Wire Wire Line
 	7250 1800 7300 1800
-Text Label 7300 1900 0    50   ~ 0
-P62
-Text Label 7300 1800 0    50   ~ 0
-P63
 $Comp
 L Device:R_Small R?
 U 1 1 60B441CB
@@ -116,8 +112,6 @@ Wire Wire Line
 	7700 2400 7700 2450
 Wire Wire Line
 	8150 1950 8150 2000
-Text Label 8150 1950 0    50   ~ 0
-RESET
 Wire Wire Line
 	7350 2200 6950 2200
 Connection ~ 7700 2200
@@ -343,10 +337,6 @@ Wire Wire Line
 	5350 1500 6050 1500
 Wire Wire Line
 	5350 1800 5350 1500
-Text GLabel 5350 2100 0    50   Input ~ 0
-D+
-Text GLabel 5350 2200 0    50   Input ~ 0
-D-
 Wire Wire Line
 	5050 1800 5350 1800
 $Comp
@@ -392,8 +382,6 @@ Wire Wire Line
 	3800 1450 3800 1550
 Text GLabel 3800 1450 1    50   Input ~ 0
 VBUS
-Text GLabel 3800 2450 2    50   Input ~ 0
-D-
 Wire Wire Line
 	3550 2650 3550 2600
 Connection ~ 3550 2650
@@ -404,8 +392,6 @@ Wire Wire Line
 Connection ~ 3550 2450
 Wire Wire Line
 	3550 2450 3600 2450
-Text GLabel 3800 2650 2    50   Input ~ 0
-D+
 NoConn ~ 3550 3000
 NoConn ~ 3550 3100
 NoConn ~ 2650 3400
@@ -560,67 +546,7 @@ F 3 "~" H 2450 7250 50  0001 C CNN
 	1    2450 7250
 	0    -1   -1   0   
 $EndComp
-Text Label 4250 5100 1    50   ~ 0
-P29
-Text Label 4150 5100 1    50   ~ 0
-P27
-Text Label 4050 5100 1    50   ~ 0
-P25
-Text Label 3950 5100 1    50   ~ 0
-P23
-Text Label 3850 5100 1    50   ~ 0
-P21
-Text Label 3600 5100 1    50   ~ 0
-P19
-Text Label 3500 5100 1    50   ~ 0
-P17
-Text Label 3400 5100 1    50   ~ 0
-P15
-Text Label 3300 5100 1    50   ~ 0
-P13
-Text Label 3200 5100 1    50   ~ 0
-P11
-Text Label 4250 5600 3    50   ~ 0
-P28
-Text Label 4150 5600 3    50   ~ 0
-P26
-Text Label 4050 5600 3    50   ~ 0
-P24
-Text Label 3950 5600 3    50   ~ 0
-P22
-Text Label 3850 5600 3    50   ~ 0
-P20
-Text Label 3600 5600 3    50   ~ 0
-P18
-Text Label 3500 5600 3    50   ~ 0
-P16
-Text Label 3400 5600 3    50   ~ 0
-P14
-Text Label 3300 5600 3    50   ~ 0
-P12
-Text Label 3200 5600 3    50   ~ 0
-P10
-Text Label 2950 5100 1    50   ~ 0
-P9
-Text Label 2850 5100 1    50   ~ 0
-P7
-Text Label 2750 5100 1    50   ~ 0
-P5
-Text Label 2950 5600 3    50   ~ 0
-P8
-Text Label 2850 5600 3    50   ~ 0
-P6
-Text Label 2750 5600 3    50   ~ 0
-P4
-Text Label 2650 5100 1    50   ~ 0
-P3
-Text Label 2650 5600 3    50   ~ 0
-P2
-Text Label 2550 5100 1    50   ~ 0
-P1
-Text Label 2550 5600 3    50   ~ 0
-P0
-Text Notes 4450 4800 2    50   ~ 0
+Text Notes 4450 4650 2    50   ~ 0
 Jumpers used for Tensile board v1 capatability
 Wire Wire Line
 	5100 5050 5100 5250
@@ -661,17 +587,6 @@ Wire Wire Line
 Wire Wire Line
 	4900 5950 4900 5750
 $Comp
-L Jumper:SolderJumper_2_Open JP13
-U 1 1 6098F74E
-P 4200 6100
-F 0 "JP13" V 4154 6168 50  0000 L CNN
-F 1 "J_P30" V 4245 6168 50  0000 L CNN
-F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4200 6100 50  0001 C CNN
-F 3 "~" H 4200 6100 50  0001 C CNN
-	1    4200 6100
-	0    1    1    0   
-$EndComp
-$Comp
 L Jumper:SolderJumper_2_Open JP14
 U 1 1 6098D6A7
 P 4550 6100
@@ -693,16 +608,6 @@ F 3 "~" H 4900 6100 50  0001 C CNN
 	1    4900 6100
 	0    1    1    0   
 $EndComp
-Text Label 5100 4750 1    50   ~ 0
-P34
-Text Label 4900 6250 3    50   ~ 0
-P33
-Text Label 4550 6250 3    50   ~ 0
-P32
-Text Label 4700 4750 1    50   ~ 0
-P31
-Text Label 4200 6250 3    50   ~ 0
-P30
 Wire Wire Line
 	4900 5250 5000 5250
 Connection ~ 4900 5250
@@ -777,74 +682,6 @@ F 3 "~" H 2750 5400 50  0001 C CNN
 	1    2750 5400
 	0    -1   -1   0   
 $EndComp
-Text Label 1300 1200 2    50   ~ 0
-P38
-Text Label 1300 1300 2    50   ~ 0
-P39
-Text Label 1300 1600 2    50   ~ 0
-P40
-Text Label 1300 1700 2    50   ~ 0
-P41
-Text Label 1300 1800 2    50   ~ 0
-P42
-Text Label 1300 1900 2    50   ~ 0
-P43
-Text Label 1300 2000 2    50   ~ 0
-P44
-Text Label 1300 2100 2    50   ~ 0
-P45
-Text Label 1300 2200 2    50   ~ 0
-P46
-Text Label 1300 2300 2    50   ~ 0
-P47
-Text Label 1300 2600 2    50   ~ 0
-P48
-Text Label 1300 2700 2    50   ~ 0
-P49
-Text Label 1300 2800 2    50   ~ 0
-P50
-Text Label 1300 2900 2    50   ~ 0
-P51
-Text Label 1300 3000 2    50   ~ 0
-P52
-Text Label 1300 3100 2    50   ~ 0
-P53
-Text Label 1300 3200 2    50   ~ 0
-P54
-Text Label 1300 3300 2    50   ~ 0
-P55
-Text Label 1300 3400 2    50   ~ 0
-V_16_19
-Text Label 1300 3500 2    50   ~ 0
-V_56_59
-Text Label 1300 3600 2    50   ~ 0
-P56
-Text Label 1300 3700 2    50   ~ 0
-P57
-Text Label 1300 3800 2    50   ~ 0
-P58
-Text Label 1300 3900 2    50   ~ 0
-P59
-Text Label 1300 4000 2    50   ~ 0
-P60
-Text Label 1300 4100 2    50   ~ 0
-P61
-Text Label 1300 4200 2    50   ~ 0
-P62
-Text Label 1300 4300 2    50   ~ 0
-P63
-Text Label 1300 2500 2    50   ~ 0
-V_48_51
-Text Label 1300 1500 2    50   ~ 0
-V_40_43
-Text Label 1300 1400 2    50   ~ 0
-V_32_35
-Text Label 1300 2400 2    50   ~ 0
-V_24_27
-Text Label 1300 4400 2    50   ~ 0
-V_8_11
-Text Label 1300 4500 2    50   ~ 0
-V_0_3
 Text GLabel 1300 4600 0    50   Input ~ 0
 RESET
 $Comp
@@ -884,82 +721,6 @@ Text GLabel 1300 5000 0    50   Input ~ 0
 VIN_MAIN
 Text GLabel 1300 5100 0    50   Input ~ 0
 VIN_MAIN
-Text Label 1800 1400 0    50   ~ 0
-P37
-Text Label 1800 1500 0    50   ~ 0
-P36
-Text Label 1800 1600 0    50   ~ 0
-P35
-Text Label 1800 1700 0    50   ~ 0
-P34
-Text Label 1800 1800 0    50   ~ 0
-P33
-Text Label 1800 1900 0    50   ~ 0
-P32
-Text Label 1800 2000 0    50   ~ 0
-P31
-Text Label 1800 2100 0    50   ~ 0
-P30
-Text Label 1800 2200 0    50   ~ 0
-P29
-Text Label 1800 2300 0    50   ~ 0
-P28
-Text Label 1800 2400 0    50   ~ 0
-P27
-Text Label 1800 2500 0    50   ~ 0
-P26
-Text Label 1800 2600 0    50   ~ 0
-P25
-Text Label 1800 2700 0    50   ~ 0
-P24
-Text Label 1800 2800 0    50   ~ 0
-P23
-Text Label 1800 2900 0    50   ~ 0
-P22
-Text Label 1800 3000 0    50   ~ 0
-P21
-Text Label 1800 3100 0    50   ~ 0
-P20
-Text Label 1800 3200 0    50   ~ 0
-P19
-Text Label 1800 3300 0    50   ~ 0
-P18
-Text Label 1800 3400 0    50   ~ 0
-P17
-Text Label 1800 3500 0    50   ~ 0
-P16
-Text Label 1800 3600 0    50   ~ 0
-P15
-Text Label 1800 3700 0    50   ~ 0
-P14
-Text Label 1800 3800 0    50   ~ 0
-P13
-Text Label 1800 3900 0    50   ~ 0
-P12
-Text Label 1800 4000 0    50   ~ 0
-P11
-Text Label 1800 4100 0    50   ~ 0
-P10
-Text Label 1800 4200 0    50   ~ 0
-P9
-Text Label 1800 4300 0    50   ~ 0
-P8
-Text Label 1800 4400 0    50   ~ 0
-P7
-Text Label 1800 4500 0    50   ~ 0
-P6
-Text Label 1800 4600 0    50   ~ 0
-P5
-Text Label 1800 4700 0    50   ~ 0
-P4
-Text Label 1800 4800 0    50   ~ 0
-P3
-Text Label 1800 4900 0    50   ~ 0
-P2
-Text Label 1800 5000 0    50   ~ 0
-P1
-Text Label 1800 5100 0    50   ~ 0
-P0
 NoConn ~ 1800 1300
 NoConn ~ 1800 1200
 $Comp
@@ -979,68 +740,6 @@ Wire Notes Line
 	2350 500  2350 6550
 Wire Notes Line
 	8750 500  8750 6500
-Text Label 2250 6950 1    50   ~ 0
-P35
-Text Label 2250 7450 3    50   ~ 0
-P34
-Text Label 2350 7450 3    50   ~ 0
-P36
-Text Label 2450 7450 3    50   ~ 0
-P38
-Text Label 2550 7450 3    50   ~ 0
-P40
-Text Label 2650 7450 3    50   ~ 0
-P42
-Text Label 3050 7450 3    50   ~ 0
-P44
-Text Label 3150 7450 3    50   ~ 0
-P46
-Text Label 3250 7450 3    50   ~ 0
-P48
-Text Label 3350 7450 3    50   ~ 0
-P50
-Text Label 3450 7450 3    50   ~ 0
-P52
-Text Label 3850 7450 3    50   ~ 0
-P54
-Text Label 3950 7450 3    50   ~ 0
-P56
-Text Label 4050 7450 3    50   ~ 0
-P58
-Text Label 4150 7450 3    50   ~ 0
-P60
-Text Label 4250 7450 3    50   ~ 0
-P62
-Text Label 4600 7450 3    50   ~ 0
-P64
-Text Label 2350 6950 1    50   ~ 0
-P37
-Text Label 2450 6950 1    50   ~ 0
-P39
-Text Label 2550 6950 1    50   ~ 0
-P41
-Text Label 2650 6950 1    50   ~ 0
-P43
-Text Label 3050 6950 1    50   ~ 0
-P45
-Text Label 3150 6950 1    50   ~ 0
-P47
-Text Label 3250 6950 1    50   ~ 0
-P49
-Text Label 3350 6950 1    50   ~ 0
-P51
-Text Label 3450 6950 1    50   ~ 0
-P53
-Text Label 3850 6950 1    50   ~ 0
-P55
-Text Label 3950 6950 1    50   ~ 0
-P57
-Text Label 4050 6950 1    50   ~ 0
-P59
-Text Label 4150 6950 1    50   ~ 0
-P61
-Text Label 4250 6950 1    50   ~ 0
-P63
 $Comp
 L power:GND #PWR0217
 U 1 1 60DCCC5E
@@ -1052,14 +751,6 @@ F 3 "" H 5050 7700 50  0001 C CNN
 	1    5050 7700
 	0    -1   -1   0   
 $EndComp
-Text Label 4600 6950 1    50   ~ 0
-V_0_3
-Text Label 4700 7450 3    50   ~ 0
-V_16_19
-Text Label 4700 6950 1    50   ~ 0
-V_32_35
-Text Label 4800 7450 3    50   ~ 0
-V_48_51
 $Comp
 L power:GND #PWR0218
 U 1 1 60DD69AB
@@ -1102,12 +793,6 @@ F 3 "" H 10000 1650 50  0001 C CNN
 	1    10000 1650
 	1    0    0    -1  
 $EndComp
-Text Label 9600 1150 1    50   ~ 0
-A01
-Text Label 9800 1650 3    50   ~ 0
-A02
-Text Label 10000 1150 1    50   ~ 0
-A03
 Wire Wire Line
 	9600 1650 9700 1650
 Wire Wire Line
@@ -1252,8 +937,6 @@ $EndComp
 Wire Notes Line
 	2350 3750 11200 3750
 NoConn ~ 9250 3900
-Text Label 9250 4100 2    50   ~ 0
-RESET
 $Comp
 L power:GND #PWR0236
 U 1 1 60ACF8EA
@@ -1353,22 +1036,6 @@ F 3 "" H 10600 4150 50  0001 C CNN
 	1    10600 4150
 	0    -1   -1   0   
 $EndComp
-Text Label 9400 5800 2    50   ~ 0
-P51
-Text Label 9900 5800 0    50   ~ 0
-P52
-Text Label 9400 5700 2    50   ~ 0
-P53
-Text Label 10600 4650 0    50   ~ 0
-P54
-Text Label 10600 4550 0    50   ~ 0
-P55
-Text Label 10600 6450 0    50   ~ 0
-P56
-Text Label 10600 6350 0    50   ~ 0
-P57
-Text Label 9400 5900 2    50   ~ 0
-RESET
 $Comp
 L power:GND #PWR0238
 U 1 1 60B28B51
@@ -1473,14 +1140,6 @@ Wire Wire Line
 	6200 4450 6900 4450
 Wire Wire Line
 	6200 4350 6900 4350
-Text Label 6200 4850 2    50   ~ 0
-P39
-Text Label 6200 4650 2    50   ~ 0
-P40
-Text Label 6200 4450 2    50   ~ 0
-P41
-Text Label 6200 4350 2    50   ~ 0
-P42
 Text Notes 5550 4000 0    129  ~ 0
 Data SD Card
 $Comp
@@ -1548,14 +1207,378 @@ Wire Wire Line
 	6200 5700 6900 5700
 Wire Wire Line
 	6200 5600 6900 5600
-Text Label 6200 6100 2    50   ~ 0
-P39
-Text Label 6200 5900 2    50   ~ 0
-P40
-Text Label 6200 5700 2    50   ~ 0
-P41
-Text Label 6200 5600 2    50   ~ 0
-P42
 Wire Notes Line
 	5500 3750 5500 6550
+Text GLabel 1800 5100 2    50   Input ~ 0
+P0
+Text GLabel 1800 5000 2    50   Input ~ 0
+P1
+Text GLabel 1800 4900 2    50   Input ~ 0
+P2
+Text GLabel 1800 4800 2    50   Input ~ 0
+P3
+Text GLabel 1800 4700 2    50   Input ~ 0
+P4
+Text GLabel 1800 4600 2    50   Input ~ 0
+P5
+Text GLabel 1800 4500 2    50   Input ~ 0
+P6
+Text GLabel 1800 4400 2    50   Input ~ 0
+P7
+Text GLabel 1800 4300 2    50   Input ~ 0
+P8
+Text GLabel 1800 4200 2    50   Input ~ 0
+P9
+Text GLabel 1800 4100 2    50   Input ~ 0
+P10
+Text GLabel 1800 4000 2    50   Input ~ 0
+P11
+Text GLabel 1800 3900 2    50   Input ~ 0
+P12
+Text GLabel 1800 3800 2    50   Input ~ 0
+P13
+Text GLabel 1800 3700 2    50   Input ~ 0
+P14
+Text GLabel 1800 3600 2    50   Input ~ 0
+P15
+Text GLabel 1800 3500 2    50   Input ~ 0
+P16
+Text GLabel 1800 3400 2    50   Input ~ 0
+P17
+Text GLabel 1800 3300 2    50   Input ~ 0
+P18
+Text GLabel 1800 3200 2    50   Input ~ 0
+P19
+Text GLabel 1800 3100 2    50   Input ~ 0
+P20
+Text GLabel 1800 3000 2    50   Input ~ 0
+P21
+Text GLabel 1800 2900 2    50   Input ~ 0
+P22
+Text GLabel 1800 2800 2    50   Input ~ 0
+P23
+Text GLabel 1800 2700 2    50   Input ~ 0
+P24
+Text GLabel 1800 2600 2    50   Input ~ 0
+P25
+Text GLabel 1800 2500 2    50   Input ~ 0
+P26
+Text GLabel 1800 2400 2    50   Input ~ 0
+P27
+Text GLabel 1800 2300 2    50   Input ~ 0
+P28
+Text GLabel 1800 2200 2    50   Input ~ 0
+P29
+Text GLabel 1800 2100 2    50   Input ~ 0
+P30
+Text GLabel 1800 2000 2    50   Input ~ 0
+P31
+Text GLabel 1800 1900 2    50   Input ~ 0
+P32
+Text GLabel 1800 1800 2    50   Input ~ 0
+P33
+Text GLabel 1800 1700 2    50   Input ~ 0
+P34
+Text GLabel 1800 1600 2    50   Input ~ 0
+P35
+Text GLabel 1800 1500 2    50   Input ~ 0
+P36
+Text GLabel 1800 1400 2    50   Input ~ 0
+P37
+Text GLabel 1300 1200 0    50   Input ~ 0
+P38
+Text GLabel 1300 1300 0    50   Input ~ 0
+P39
+Text GLabel 1300 1600 0    50   Input ~ 0
+P40
+Text GLabel 1300 1700 0    50   Input ~ 0
+P41
+Text GLabel 1300 1800 0    50   Input ~ 0
+P42
+Text GLabel 1300 1900 0    50   Input ~ 0
+P43
+Text GLabel 1300 2000 0    50   Input ~ 0
+P44
+Text GLabel 1300 2100 0    50   Input ~ 0
+P45
+Text GLabel 1300 2200 0    50   Input ~ 0
+P46
+Text GLabel 1300 2300 0    50   Input ~ 0
+P47
+Text GLabel 1300 2600 0    50   Input ~ 0
+P48
+Text GLabel 1300 2700 0    50   Input ~ 0
+P49
+Text GLabel 1300 2800 0    50   Input ~ 0
+P50
+Text GLabel 1300 2900 0    50   Input ~ 0
+P51
+Text GLabel 1300 3000 0    50   Input ~ 0
+P52
+Text GLabel 1300 3100 0    50   Input ~ 0
+P53
+Text GLabel 1300 3200 0    50   Input ~ 0
+P54
+Text GLabel 1300 3300 0    50   Input ~ 0
+P55
+Text GLabel 1300 3600 0    50   Input ~ 0
+P56
+Text GLabel 1300 3700 0    50   Input ~ 0
+P57
+Text GLabel 1300 3800 0    50   Input ~ 0
+P58
+Text GLabel 1300 3900 0    50   Input ~ 0
+P59
+Text GLabel 1300 4000 0    50   Input ~ 0
+P60
+Text GLabel 1300 4100 0    50   Input ~ 0
+P61
+Text GLabel 1300 4200 0    50   Input ~ 0
+P62
+Text GLabel 1300 4300 0    50   Input ~ 0
+P63
+Text GLabel 1300 4500 0    50   Input ~ 0
+V_0_3
+Text GLabel 1300 4400 0    50   Input ~ 0
+V_8_11
+Text GLabel 1300 2400 0    50   Input ~ 0
+V_24_27
+Text GLabel 1300 1400 0    50   Input ~ 0
+V_32_35
+Text GLabel 1300 2500 0    50   Input ~ 0
+V_48_51
+Text GLabel 1300 3500 0    50   Input ~ 0
+V_56_59
+Text GLabel 1300 3400 0    50   Input ~ 0
+V_16_19
+Text GLabel 1300 1500 0    50   Input ~ 0
+V_40_43
+Text GLabel 2550 5600 3    50   Input ~ 0
+P0
+Text GLabel 2550 5100 1    50   Input ~ 0
+P1
+Text GLabel 2650 5600 3    50   Input ~ 0
+P2
+Text GLabel 2650 5100 1    50   Input ~ 0
+P3
+Text GLabel 2750 5600 3    50   Input ~ 0
+P4
+Text GLabel 2750 5100 1    50   Input ~ 0
+P5
+Text GLabel 2850 5600 3    50   Input ~ 0
+P6
+Text GLabel 2850 5100 1    50   Input ~ 0
+P7
+Text GLabel 2950 5600 3    50   Input ~ 0
+P8
+Text GLabel 2950 5100 1    50   Input ~ 0
+P9
+Text GLabel 3200 5600 3    50   Input ~ 0
+P10
+Text GLabel 3200 5100 1    50   Input ~ 0
+P11
+Text GLabel 3300 5600 3    50   Input ~ 0
+P12
+Text GLabel 3300 5100 1    50   Input ~ 0
+P13
+Text GLabel 3400 5600 3    50   Input ~ 0
+P14
+Text GLabel 3400 5100 1    50   Input ~ 0
+P15
+Text GLabel 3500 5600 3    50   Input ~ 0
+P16
+Text GLabel 3500 5100 1    50   Input ~ 0
+P17
+Text GLabel 3600 5600 3    50   Input ~ 0
+P18
+Text GLabel 3600 5100 1    50   Input ~ 0
+P19
+Text GLabel 3850 5600 3    50   Input ~ 0
+P20
+Text GLabel 3850 5100 1    50   Input ~ 0
+P21
+Text GLabel 3950 5600 3    50   Input ~ 0
+P22
+Text GLabel 3950 5100 1    50   Input ~ 0
+P23
+Text GLabel 4050 5600 3    50   Input ~ 0
+P24
+Text GLabel 4050 5100 1    50   Input ~ 0
+P25
+Text GLabel 4150 5600 3    50   Input ~ 0
+P26
+Text GLabel 4150 5100 1    50   Input ~ 0
+P27
+Text GLabel 4250 5600 3    50   Input ~ 0
+P28
+Text GLabel 4250 5100 1    50   Input ~ 0
+P29
+Text GLabel 4200 6250 3    50   Input ~ 0
+P30
+Text GLabel 4700 4750 1    50   Input ~ 0
+P31
+Text GLabel 4550 6250 3    50   Input ~ 0
+P32
+Text GLabel 4900 6250 3    50   Input ~ 0
+P33
+Text GLabel 2250 7450 3    50   Input ~ 0
+P34
+Text GLabel 2250 6950 1    50   Input ~ 0
+P35
+Text GLabel 2350 7450 3    50   Input ~ 0
+P36
+Text GLabel 2350 6950 1    50   Input ~ 0
+P37
+Text GLabel 2450 7450 3    50   Input ~ 0
+P38
+Text GLabel 2450 6950 1    50   Input ~ 0
+P39
+Text GLabel 2550 7450 3    50   Input ~ 0
+P40
+Text GLabel 2550 6950 1    50   Input ~ 0
+P41
+Text GLabel 2650 7450 3    50   Input ~ 0
+P42
+Text GLabel 2650 6950 1    50   Input ~ 0
+P43
+Text GLabel 3050 7450 3    50   Input ~ 0
+P44
+Text GLabel 3050 6950 1    50   Input ~ 0
+P45
+Text GLabel 3150 7450 3    50   Input ~ 0
+P46
+Text GLabel 3150 6950 1    50   Input ~ 0
+P47
+Text GLabel 3250 7450 3    50   Input ~ 0
+P48
+Text GLabel 3250 6950 1    50   Input ~ 0
+P49
+Text GLabel 3350 7450 3    50   Input ~ 0
+P50
+Text GLabel 3350 6950 1    50   Input ~ 0
+P51
+Text GLabel 3450 7450 3    50   Input ~ 0
+P52
+Text GLabel 3450 6950 1    50   Input ~ 0
+P53
+Text GLabel 3850 7450 3    50   Input ~ 0
+P54
+Text GLabel 3850 6950 1    50   Input ~ 0
+P55
+Text GLabel 3950 7450 3    50   Input ~ 0
+P56
+Text GLabel 3950 6950 1    50   Input ~ 0
+P57
+Text GLabel 4050 7450 3    50   Input ~ 0
+P58
+Text GLabel 4050 6950 1    50   Input ~ 0
+P59
+Text GLabel 4150 7450 3    50   Input ~ 0
+P60
+Text GLabel 4150 6950 1    50   Input ~ 0
+P61
+Text GLabel 4250 7450 3    50   Input ~ 0
+P62
+Text GLabel 4250 6950 1    50   Input ~ 0
+P63
+Text GLabel 4600 6950 1    50   Input ~ 0
+V_0_3
+Text GLabel 2950 8850 3    50   Input ~ 0
+V_4_7
+Text GLabel 3050 8850 3    50   Input ~ 0
+V_8_11
+Text GLabel 3150 8850 3    50   Input ~ 0
+V_12_15
+Text GLabel 3350 8850 3    50   Input ~ 0
+V_20_23
+Text GLabel 4700 7450 3    50   Input ~ 0
+V_16_19
+Text GLabel 3450 8850 3    50   Input ~ 0
+V_24_27
+Text GLabel 3550 8850 3    50   Input ~ 0
+V_28_31
+Text GLabel 4700 6950 1    50   Input ~ 0
+V_32_35
+Text GLabel 3750 8850 3    50   Input ~ 0
+V_36_39
+Text GLabel 3850 8850 3    50   Input ~ 0
+V_40_43
+Text GLabel 3950 8850 3    50   Input ~ 0
+V_44_47
+Text GLabel 4800 7450 3    50   Input ~ 0
+V_48_51
+Text GLabel 4150 8850 3    50   Input ~ 0
+V_52_55
+Text GLabel 4250 8850 3    50   Input ~ 0
+V_56_59
+Text GLabel 4350 8850 3    50   Input ~ 0
+V_60_63
+NoConn ~ 4600 7450
+Text GLabel 5100 4750 1    50   Input ~ 0
+P34
+$Comp
+L Jumper:SolderJumper_2_Open JP13
+U 1 1 6098F74E
+P 4200 6100
+F 0 "JP13" V 4154 6168 50  0000 L CNN
+F 1 "J_P30" V 4245 6168 50  0000 L CNN
+F 2 "Jumper:SolderJumper-2_P1.3mm_Open_Pad1.0x1.5mm" H 4200 6100 50  0001 C CNN
+F 3 "~" H 4200 6100 50  0001 C CNN
+	1    4200 6100
+	0    1    1    0   
+$EndComp
+Text Label 3800 2450 0    50   ~ 0
+D-
+Text Label 3800 2650 0    50   ~ 0
+D+
+Text Label 5350 2100 2    50   ~ 0
+D+
+Text Label 5350 2200 2    50   ~ 0
+D-
+Text GLabel 7300 1800 2    50   Input ~ 0
+P63
+Text GLabel 7300 1900 2    50   Input ~ 0
+P62
+Text GLabel 8150 1950 1    50   Input ~ 0
+RESET
+Text GLabel 9600 1150 1    50   Input ~ 0
+AO1
+Text GLabel 10000 1150 1    50   Input ~ 0
+AO3
+Text GLabel 9800 1650 3    50   Input ~ 0
+AO2
+Text GLabel 9250 4100 0    50   Input ~ 0
+RESET
+Text GLabel 10600 4550 2    50   Input ~ 0
+P55
+Text GLabel 10600 4650 2    50   Input ~ 0
+P54
+Text GLabel 10600 6350 2    50   Input ~ 0
+P57
+Text GLabel 10600 6450 2    50   Input ~ 0
+P56
+Text GLabel 9900 5800 2    50   Input ~ 0
+P52
+Text GLabel 9400 5900 3    50   Input ~ 0
+RESET
+Text GLabel 9400 5800 0    50   Input ~ 0
+P51
+Text GLabel 9400 5700 0    50   Input ~ 0
+P53
+Text GLabel 6200 4350 0    50   Input ~ 0
+P42
+Text GLabel 6200 4450 0    50   Input ~ 0
+P41
+Text GLabel 6200 4650 0    50   Input ~ 0
+P40
+Text GLabel 6200 4850 0    50   Input ~ 0
+P39
+Text GLabel 6200 5600 0    50   Input ~ 0
+P42
+Text GLabel 6200 5700 0    50   Input ~ 0
+P41
+Text GLabel 6200 5900 0    50   Input ~ 0
+P40
+Text GLabel 6200 6100 0    50   Input ~ 0
+P39
 $EndSCHEMATC

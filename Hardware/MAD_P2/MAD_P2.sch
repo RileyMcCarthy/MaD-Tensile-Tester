@@ -24,68 +24,6 @@ F 3 "" H 3550 4150 50  0001 C CNN
 	1    3550 4150
 	1    0    0    -1  
 $EndComp
-Text Label 1900 2550 2    50   ~ 0
-P0
-Text Label 1900 2650 2    50   ~ 0
-P1
-Text Label 1900 2750 2    50   ~ 0
-P2
-Text Label 1900 2850 2    50   ~ 0
-P3
-Text Label 1900 2950 2    50   ~ 0
-P4
-Text Label 1900 3050 2    50   ~ 0
-P5
-Text Label 1900 3150 2    50   ~ 0
-P6
-Text Label 1900 3250 2    50   ~ 0
-P7
-Text Label 1900 3350 2    50   ~ 0
-P8
-Text Label 1900 3450 2    50   ~ 0
-P9
-Text Label 1900 3650 2    50   ~ 0
-P11
-Text Label 1900 3750 2    50   ~ 0
-P12
-Text Label 1900 3850 2    50   ~ 0
-P13
-Text Label 1900 3950 2    50   ~ 0
-P14
-Text Label 1900 4050 2    50   ~ 0
-P15
-Text Label 1900 4150 2    50   ~ 0
-P16
-Text Label 1900 4250 2    50   ~ 0
-P17
-Text Label 1900 4350 2    50   ~ 0
-P18
-Text Label 1900 4450 2    50   ~ 0
-P19
-Text Label 1900 4550 2    50   ~ 0
-P20
-Text Label 1900 4650 2    50   ~ 0
-P21
-Text Label 1900 4750 2    50   ~ 0
-P22
-Text Label 1900 4850 2    50   ~ 0
-P23
-Text Label 1900 4950 2    50   ~ 0
-P24
-Text Label 1900 5050 2    50   ~ 0
-P25
-Text Label 1900 5150 2    50   ~ 0
-P26
-Text Label 1900 5250 2    50   ~ 0
-P27
-Text Label 1900 5350 2    50   ~ 0
-P28
-Text Label 1900 5450 2    50   ~ 0
-P29
-Text Label 1900 5550 2    50   ~ 0
-P30
-Text Label 1900 5650 2    50   ~ 0
-P31
 $Comp
 L power:GND #PWR01
 U 1 1 60AAD525
@@ -100,102 +38,6 @@ $EndComp
 Wire Wire Line
 	2250 5800 2350 5800
 Connection ~ 2250 5800
-Text Label 3150 5800 3    50   ~ 0
-V_0_3
-Text Label 3250 5800 3    50   ~ 0
-V_4_7
-Text Label 3350 5800 3    50   ~ 0
-V_8_11
-Text Label 3450 5800 3    50   ~ 0
-V_12_15
-Text Label 3550 5800 3    50   ~ 0
-V_16_19
-Text Label 3650 5800 3    50   ~ 0
-V_20_23
-Text Label 3750 5800 3    50   ~ 0
-V_24_27
-Text Label 3850 5800 3    50   ~ 0
-V_28_31
-Text Label 3950 5800 3    50   ~ 0
-V_32_35
-Text Label 4050 5800 3    50   ~ 0
-V_36_39
-Text Label 4150 5800 3    50   ~ 0
-V_40_43
-Text Label 4250 5800 3    50   ~ 0
-V_44_47
-Text Label 4350 5800 3    50   ~ 0
-V_48_51
-Text Label 4450 5800 3    50   ~ 0
-V_52_55
-Text Label 4550 5800 3    50   ~ 0
-V_56_59
-Text Label 4650 5800 3    50   ~ 0
-V_60_63
-Text Label 5000 5650 0    50   ~ 0
-P32
-Text Label 5000 5550 0    50   ~ 0
-P33
-Text Label 5000 5450 0    50   ~ 0
-P34
-Text Label 5000 5350 0    50   ~ 0
-P35
-Text Label 5000 5250 0    50   ~ 0
-P36
-Text Label 5000 5150 0    50   ~ 0
-P37
-Text Label 5000 5050 0    50   ~ 0
-P38
-Text Label 5000 4950 0    50   ~ 0
-P39
-Text Label 5000 4850 0    50   ~ 0
-P40
-Text Label 5000 4750 0    50   ~ 0
-P41
-Text Label 5000 4650 0    50   ~ 0
-P42
-Text Label 5000 4550 0    50   ~ 0
-P43
-Text Label 5000 4450 0    50   ~ 0
-P44
-Text Label 5000 4350 0    50   ~ 0
-P45
-Text Label 5000 4250 0    50   ~ 0
-P46
-Text Label 5000 4150 0    50   ~ 0
-P47
-Text Label 5000 4050 0    50   ~ 0
-P48
-Text Label 5000 3950 0    50   ~ 0
-P49
-Text Label 5000 3850 0    50   ~ 0
-P50
-Text Label 5000 3750 0    50   ~ 0
-P51
-Text Label 5000 3650 0    50   ~ 0
-P52
-Text Label 5000 3550 0    50   ~ 0
-P53
-Text Label 5000 3450 0    50   ~ 0
-P54
-Text Label 5000 3350 0    50   ~ 0
-P55
-Text Label 5000 3250 0    50   ~ 0
-P56
-Text Label 5000 3150 0    50   ~ 0
-P57
-Text Label 5000 3050 0    50   ~ 0
-P58
-Text Label 5000 2950 0    50   ~ 0
-P59
-Text Label 5000 2850 0    50   ~ 0
-P60
-Text Label 5000 2750 0    50   ~ 0
-P61
-Text Label 5000 2650 0    50   ~ 0
-P62
-Text Label 5000 2550 0    50   ~ 0
-P63
 $Comp
 L power:+1V8 #PWR04
 U 1 1 60E4AF33
@@ -263,8 +105,6 @@ U 60F79100
 F0 "Power2" 50
 F1 "Power2.sch" 50
 $EndSheet
-Text Label 1900 3550 2    50   ~ 0
-P10
 $Comp
 L Device:Crystal_GND24_Small Y1
 U 1 1 60FD14C8
@@ -843,70 +683,6 @@ F 3 "~" H 9750 4300 50  0001 C CNN
 	1    9750 4300
 	1    0    0    -1  
 $EndComp
-Text Label 6950 3850 0    50   ~ 0
-V_0_3
-Text Label 6950 4200 0    50   ~ 0
-V_0_3
-Text Label 7350 3850 0    50   ~ 0
-V_4_7
-Text Label 7350 4200 0    50   ~ 0
-V_4_7
-Text Label 7750 3850 0    50   ~ 0
-V_8_11
-Text Label 7750 4200 0    50   ~ 0
-V_8_11
-Text Label 8150 3850 0    50   ~ 0
-V_12_15
-Text Label 8150 4200 0    50   ~ 0
-V_12_15
-Text Label 8550 3850 0    50   ~ 0
-V_16_19
-Text Label 8550 4200 0    50   ~ 0
-V_16_19
-Text Label 8950 3850 0    50   ~ 0
-V_20_23
-Text Label 8950 4200 0    50   ~ 0
-V_20_23
-Text Label 9350 3850 0    50   ~ 0
-V_24_27
-Text Label 9350 4200 0    50   ~ 0
-V_24_27
-Text Label 9750 3850 0    50   ~ 0
-V_28_31
-Text Label 9750 4200 0    50   ~ 0
-V_28_31
-Text Label 6950 4550 0    50   ~ 0
-V_32_35
-Text Label 6950 4900 0    50   ~ 0
-V_32_35
-Text Label 7350 4550 0    50   ~ 0
-V_36_39
-Text Label 7350 4900 0    50   ~ 0
-V_36_39
-Text Label 7750 4550 0    50   ~ 0
-V_40_43
-Text Label 7750 4900 0    50   ~ 0
-V_40_43
-Text Label 8150 4550 0    50   ~ 0
-V_44_47
-Text Label 8150 4900 0    50   ~ 0
-V_44_47
-Text Label 8550 4550 0    50   ~ 0
-V_48_51
-Text Label 8550 4900 0    50   ~ 0
-V_48_51
-Text Label 8950 4550 0    50   ~ 0
-V_52_55
-Text Label 8950 4900 0    50   ~ 0
-V_52_55
-Text Label 9350 4550 0    50   ~ 0
-V_56_59
-Text Label 9350 4900 0    50   ~ 0
-V_56_59
-Text Label 9750 4550 0    50   ~ 0
-V_60_63
-Text Label 9750 4900 0    50   ~ 0
-V_60_63
 $Comp
 L power:GND #PWR07
 U 1 1 6102BB4D
@@ -1308,12 +1084,8 @@ Wire Wire Line
 	2550 5800 2550 6350
 Wire Wire Line
 	2550 6350 2450 6350
-Text Label 2050 6350 2    50   ~ 0
-V_56_59
 Wire Wire Line
 	2250 6350 2050 6350
-Text Label 2550 5850 3    50   ~ 0
-RESET
 $Sheet
 S -2150 5150 1950 1000
 U 60BD9EA1
@@ -1339,8 +1111,6 @@ F 3 "" H 3600 6950 50  0001 C CNN
 	1    3600 6750
 	1    0    0    -1  
 $EndComp
-Text Label 3400 6750 2    50   ~ 0
-RESET
 $Comp
 L power:GND #PWR0101
 U 1 1 6123970E
@@ -1352,4 +1122,290 @@ F 3 "" H 3800 6750 50  0001 C CNN
 	1    3800 6750
 	0    -1   -1   0   
 $EndComp
+Text GLabel 1900 2550 0    50   Input ~ 0
+P0
+Text GLabel 1900 2650 0    50   Input ~ 0
+P1
+Text GLabel 1900 2750 0    50   Input ~ 0
+P2
+Text GLabel 1900 2850 0    50   Input ~ 0
+P3
+Text GLabel 1900 2950 0    50   Input ~ 0
+P4
+Text GLabel 1900 3050 0    50   Input ~ 0
+P5
+Text GLabel 1900 3150 0    50   Input ~ 0
+P6
+Text GLabel 1900 3250 0    50   Input ~ 0
+P7
+Text GLabel 1900 3350 0    50   Input ~ 0
+P8
+Text GLabel 1900 3450 0    50   Input ~ 0
+P9
+Text GLabel 1900 3550 0    50   Input ~ 0
+P10
+Text GLabel 1900 3650 0    50   Input ~ 0
+P11
+Text GLabel 1900 3750 0    50   Input ~ 0
+P12
+Text GLabel 1900 3850 0    50   Input ~ 0
+P13
+Text GLabel 1900 3950 0    50   Input ~ 0
+P14
+Text GLabel 1900 4050 0    50   Input ~ 0
+P15
+Text GLabel 1900 4150 0    50   Input ~ 0
+P16
+Text GLabel 1900 4250 0    50   Input ~ 0
+P17
+Text GLabel 1900 4350 0    50   Input ~ 0
+P18
+Text GLabel 1900 4450 0    50   Input ~ 0
+P19
+Text GLabel 1900 4550 0    50   Input ~ 0
+P20
+Text GLabel 1900 4650 0    50   Input ~ 0
+P21
+Text GLabel 1900 4750 0    50   Input ~ 0
+P22
+Text GLabel 1900 4850 0    50   Input ~ 0
+P23
+Text GLabel 1900 4950 0    50   Input ~ 0
+P24
+Text GLabel 1900 5050 0    50   Input ~ 0
+P25
+Text GLabel 1900 5150 0    50   Input ~ 0
+P26
+Text GLabel 1900 5250 0    50   Input ~ 0
+P27
+Text GLabel 1900 5350 0    50   Input ~ 0
+P28
+Text GLabel 1900 5450 0    50   Input ~ 0
+P29
+Text GLabel 1900 5550 0    50   Input ~ 0
+P30
+Text GLabel 1900 5650 0    50   Input ~ 0
+P31
+Text GLabel 5000 5650 2    50   Input ~ 0
+P32
+Text GLabel 5000 5550 2    50   Input ~ 0
+P33
+Text GLabel 5000 5450 2    50   Input ~ 0
+P34
+Text GLabel 5000 5350 2    50   Input ~ 0
+P35
+Text GLabel 5000 5250 2    50   Input ~ 0
+P36
+Text GLabel 5000 5150 2    50   Input ~ 0
+P37
+Text GLabel 5000 5050 2    50   Input ~ 0
+P38
+Text GLabel 5000 4950 2    50   Input ~ 0
+P39
+Text GLabel 5000 4850 2    50   Input ~ 0
+P40
+Text GLabel 5000 4750 2    50   Input ~ 0
+P41
+Text GLabel 5000 4650 2    50   Input ~ 0
+P42
+Text GLabel 5000 4550 2    50   Input ~ 0
+P43
+Text GLabel 5000 4450 2    50   Input ~ 0
+P44
+Text GLabel 5000 4350 2    50   Input ~ 0
+P45
+Text GLabel 5000 4250 2    50   Input ~ 0
+P46
+Text GLabel 5000 4150 2    50   Input ~ 0
+P47
+Text GLabel 5000 4050 2    50   Input ~ 0
+P48
+Text GLabel 5000 3950 2    50   Input ~ 0
+P49
+Text GLabel 5000 3850 2    50   Input ~ 0
+P50
+Text GLabel 5000 3750 2    50   Input ~ 0
+P51
+Text GLabel 5000 3650 2    50   Input ~ 0
+P52
+Text GLabel 5000 3550 2    50   Input ~ 0
+P53
+Text GLabel 5000 3450 2    50   Input ~ 0
+P54
+Text GLabel 5000 3350 2    50   Input ~ 0
+P55
+Text GLabel 5000 3250 2    50   Input ~ 0
+P56
+Text GLabel 5000 3150 2    50   Input ~ 0
+P57
+Text GLabel 5000 3050 2    50   Input ~ 0
+P58
+Text GLabel 5000 2950 2    50   Input ~ 0
+P59
+Text GLabel 5000 2850 2    50   Input ~ 0
+P60
+Text GLabel 5000 2750 2    50   Input ~ 0
+P61
+Text GLabel 5000 2650 2    50   Input ~ 0
+P62
+Text GLabel 5000 2550 2    50   Input ~ 0
+P63
+Text GLabel 3150 5800 3    50   Input ~ 0
+V_0_3
+Text GLabel 3250 5800 3    50   Input ~ 0
+V_4_7
+Text GLabel 3350 5800 3    50   Input ~ 0
+V_8_11
+Text GLabel 3450 5800 3    50   Input ~ 0
+V_12_15
+Text GLabel 3650 5800 3    50   Input ~ 0
+V_20_23
+Text GLabel 3550 5800 3    50   Input ~ 0
+V_16_19
+Text GLabel 3750 5800 3    50   Input ~ 0
+V_24_27
+Text GLabel 3850 5800 3    50   Input ~ 0
+V_28_31
+Text GLabel 3950 5800 3    50   Input ~ 0
+V_32_35
+Text GLabel 4050 5800 3    50   Input ~ 0
+V_36_39
+Text GLabel 4150 5800 3    50   Input ~ 0
+V_40_43
+Text GLabel 4250 5800 3    50   Input ~ 0
+V_44_47
+Text GLabel 4350 5800 3    50   Input ~ 0
+V_48_51
+Text GLabel 4450 5800 3    50   Input ~ 0
+V_52_55
+Text GLabel 4550 5800 3    50   Input ~ 0
+V_56_59
+Text GLabel 4650 5800 3    50   Input ~ 0
+V_60_63
+Text GLabel 6950 3850 0    50   Input ~ 0
+V_0_3
+Text GLabel 6950 4200 0    50   Input ~ 0
+V_0_3
+Text GLabel 7350 3800 0    50   Input ~ 0
+V_4_7
+Text GLabel 7350 4150 0    50   Input ~ 0
+V_4_7
+Text GLabel 7750 3800 0    50   Input ~ 0
+V_8_11
+Text GLabel 7750 4150 0    50   Input ~ 0
+V_8_11
+Text GLabel 8150 3800 0    50   Input ~ 0
+V_12_15
+Text GLabel 8150 4150 0    50   Input ~ 0
+V_12_15
+Text GLabel 8550 3800 0    50   Input ~ 0
+V_16_19
+Text GLabel 8550 4150 0    50   Input ~ 0
+V_16_19
+Text GLabel 8950 3800 0    50   Input ~ 0
+V_20_23
+Text GLabel 8950 4150 0    50   Input ~ 0
+V_20_23
+Text GLabel 9350 3800 0    50   Input ~ 0
+V_24_27
+Text GLabel 9350 4150 0    50   Input ~ 0
+V_24_27
+Text GLabel 9750 3800 0    50   Input ~ 0
+V_28_31
+Text GLabel 9750 4150 0    50   Input ~ 0
+V_28_31
+Wire Wire Line
+	9750 4150 9750 4200
+Wire Wire Line
+	9750 3800 9750 3850
+Wire Wire Line
+	9350 3800 9350 3850
+Wire Wire Line
+	9350 4150 9350 4200
+Wire Wire Line
+	8950 4150 8950 4200
+Wire Wire Line
+	8950 3800 8950 3850
+Wire Wire Line
+	8550 3800 8550 3850
+Wire Wire Line
+	8550 4150 8550 4200
+Wire Wire Line
+	8150 4200 8150 4150
+Wire Wire Line
+	8150 3850 8150 3800
+Wire Wire Line
+	7750 4200 7750 4150
+Wire Wire Line
+	7750 3850 7750 3800
+Wire Wire Line
+	7350 4200 7350 4150
+Wire Wire Line
+	7350 3850 7350 3800
+Text GLabel 6950 4550 0    50   Input ~ 0
+V_32_35
+Text GLabel 6950 4900 0    50   Input ~ 0
+V_32_35
+Text GLabel 7350 4500 0    50   Input ~ 0
+V_36_39
+Text GLabel 7350 4850 0    50   Input ~ 0
+V_36_39
+Text GLabel 7750 4500 0    50   Input ~ 0
+V_40_43
+Text GLabel 7750 4850 0    50   Input ~ 0
+V_40_43
+Text GLabel 8150 4500 0    50   Input ~ 0
+V_44_47
+Text GLabel 8150 4850 0    50   Input ~ 0
+V_44_47
+Text GLabel 8550 4500 0    50   Input ~ 0
+V_48_51
+Text GLabel 8550 4850 0    50   Input ~ 0
+V_48_51
+Text GLabel 8950 4500 0    50   Input ~ 0
+V_52_55
+Text GLabel 8950 4850 0    50   Input ~ 0
+V_52_55
+Text GLabel 9350 4500 0    50   Input ~ 0
+V_56_59
+Text GLabel 9350 4850 0    50   Input ~ 0
+V_56_59
+Text GLabel 9750 4500 0    50   Input ~ 0
+V_60_63
+Text GLabel 9750 4850 0    50   Input ~ 0
+V_60_63
+Wire Wire Line
+	9750 4500 9750 4550
+Wire Wire Line
+	9750 4850 9750 4900
+Wire Wire Line
+	9350 4850 9350 4900
+Wire Wire Line
+	9350 4500 9350 4550
+Wire Wire Line
+	8950 4500 8950 4550
+Wire Wire Line
+	8950 4850 8950 4900
+Wire Wire Line
+	8550 4900 8550 4850
+Wire Wire Line
+	8550 4550 8550 4500
+Wire Wire Line
+	8150 4900 8150 4850
+Wire Wire Line
+	8150 4500 8150 4550
+Wire Wire Line
+	7750 4500 7750 4550
+Wire Wire Line
+	7350 4500 7350 4550
+Wire Wire Line
+	7350 4850 7350 4900
+Wire Wire Line
+	7750 4850 7750 4900
+Text GLabel 2050 6350 0    50   Input ~ 0
+V_56_59
+Text GLabel 2550 6350 3    50   Input ~ 0
+RESET
+Text GLabel 3400 6750 0    50   Input ~ 0
+RESET
 $EndSCHEMATC

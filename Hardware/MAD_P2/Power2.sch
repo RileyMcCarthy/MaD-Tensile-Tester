@@ -360,27 +360,6 @@ Connection ~ 3600 2300
 Wire Wire Line
 	3600 2300 4050 2300
 Wire Wire Line
-	5600 2750 5600 2600
-Wire Wire Line
-	5600 2750 5750 2750
-Connection ~ 5600 2750
-Wire Wire Line
-	5600 2600 5750 2600
-Wire Wire Line
-	5600 2600 5600 2450
-Wire Wire Line
-	5600 2450 5750 2450
-Connection ~ 5600 2600
-Wire Wire Line
-	5600 2450 5600 2300
-Wire Wire Line
-	5600 2300 5750 2300
-Connection ~ 5600 2450
-Text Label 5750 2600 0    50   ~ 0
-V_24_27
-Text Label 5750 2750 0    50   ~ 0
-V_28_31
-Wire Wire Line
 	3250 1800 3250 2300
 Wire Wire Line
 	2750 1800 3250 1800
@@ -407,50 +386,6 @@ Wire Wire Line
 Wire Wire Line
 	5600 1500 5750 1500
 Connection ~ 5600 1650
-Wire Wire Line
-	5600 3350 5600 3200
-Wire Wire Line
-	5600 3350 5750 3350
-Wire Wire Line
-	5600 3200 5750 3200
-Wire Wire Line
-	5600 3200 5600 3050
-Wire Wire Line
-	5600 3050 5750 3050
-Connection ~ 5600 3200
-Wire Wire Line
-	5600 3050 5600 2900
-Wire Wire Line
-	5600 2900 5750 2900
-Connection ~ 5600 3050
-Text Label 5750 2450 0    50   ~ 0
-V_20_23
-Text Label 5750 2300 0    50   ~ 0
-V_16_19
-Text Label 5750 1350 0    50   ~ 0
-V_12_15
-Text Label 5750 1200 0    50   ~ 0
-V_8_11
-Text Label 5750 1050 0    50   ~ 0
-V_4_7
-Text Label 5750 900  0    50   ~ 0
-V_0_3
-Text Label 5750 1500 0    50   ~ 0
-V_32_35
-Text Label 5750 1650 0    50   ~ 0
-V_36_39
-Text Label 5750 1800 0    50   ~ 0
-V_40_43
-Text Label 5750 1950 0    50   ~ 0
-V_44_47
-Text Label 5750 2900 0    50   ~ 0
-V_48_51
-Text Label 5750 3050 0    50   ~ 0
-V_52_55
-Text Label 5750 3200 0    50   ~ 0
-V_56_59
-Text Label 5750 3350 0    50   ~ 0
-V_60_63
 Wire Wire Line
 	4850 1350 5600 1350
 $Comp
@@ -792,14 +727,10 @@ Wire Notes Line
 Wire Notes Line
 	6950 500  6950 7800
 Wire Wire Line
-	5600 2900 5600 2750
-Connection ~ 5600 2900
-Wire Wire Line
 	5600 1500 5600 1350
 Connection ~ 5600 1500
 Wire Wire Line
 	4850 2300 5600 2300
-Connection ~ 5600 2300
 Text GLabel 1100 3950 0    50   Input ~ 0
 VIN_MAIN
 Wire Wire Line
@@ -2514,4 +2445,73 @@ Text Notes 550  6900 0    118  ~ 0
 Power Indication\n LEDs
 Wire Notes Line
 	500  6450 6950 6450
+Text GLabel 5750 900  2    50   Input ~ 0
+V_0_3
+Text GLabel 5750 1050 2    50   Input ~ 0
+V_4_7
+Text GLabel 5750 1200 2    50   Input ~ 0
+V_8_11
+Text GLabel 5750 1350 2    50   Input ~ 0
+V_12_15
+Text GLabel 5750 1650 2    50   Input ~ 0
+V_20_23
+Text GLabel 5750 1500 2    50   Input ~ 0
+V_16_19
+Text GLabel 5750 1800 2    50   Input ~ 0
+V_24_27
+Text GLabel 5750 1950 2    50   Input ~ 0
+V_28_31
+Text GLabel 5750 3350 2    50   Input ~ 0
+V_60_63
+Text GLabel 5750 3200 2    50   Input ~ 0
+V_56_59
+Text GLabel 5750 3050 2    50   Input ~ 0
+V_52_55
+Text GLabel 5750 2900 2    50   Input ~ 0
+V_48_51
+Text GLabel 5750 2750 2    50   Input ~ 0
+V_44_47
+Text GLabel 5750 2600 2    50   Input ~ 0
+V_40_43
+Text GLabel 5750 2450 2    50   Input ~ 0
+V_36_39
+Text GLabel 5750 2300 2    50   Input ~ 0
+V_32_35
+Connection ~ 5600 2900
+Wire Wire Line
+	5600 2900 5750 2900
+Wire Wire Line
+	5600 3050 5600 2900
+Connection ~ 5600 3050
+Wire Wire Line
+	5600 3050 5750 3050
+Wire Wire Line
+	5600 3200 5600 3050
+Wire Wire Line
+	5600 3350 5600 3200
+Connection ~ 5600 3200
+Wire Wire Line
+	5600 3200 5750 3200
+Wire Wire Line
+	5600 3350 5750 3350
+Connection ~ 5600 2300
+Wire Wire Line
+	5600 2300 5750 2300
+Wire Wire Line
+	5600 2450 5600 2300
+Connection ~ 5600 2450
+Wire Wire Line
+	5600 2450 5750 2450
+Wire Wire Line
+	5600 2600 5600 2450
+Connection ~ 5600 2600
+Wire Wire Line
+	5600 2600 5750 2600
+Wire Wire Line
+	5600 2900 5600 2750
+Wire Wire Line
+	5600 2750 5600 2600
+Connection ~ 5600 2750
+Wire Wire Line
+	5600 2750 5750 2750
 $EndSCHEMATC

@@ -376,10 +376,6 @@ F 3 "~" H 3100 2200 50  0001 C CNN
 	1    2900 2200
 	0    1    1    0   
 $EndComp
-Text Label 2900 2100 0    50   ~ 0
-P35
-Text Label 2900 1900 0    50   ~ 0
-P36
 Text Notes 800  850  0    129  ~ 0
 WIFI
 $Comp
@@ -417,10 +413,6 @@ F 3 "" H 2250 4950 50  0001 C CNN
 $EndComp
 NoConn ~ 2750 4650
 NoConn ~ 1750 4750
-Text Label 1750 4450 2    50   ~ 0
-P37
-Text Label 1750 4350 2    50   ~ 0
-P38
 NoConn ~ 2750 4350
 $Comp
 L Device:Battery_Cell BT1
@@ -503,14 +495,6 @@ Wire Notes Line
 	4450 3400 500  3400
 Wire Notes Line
 	4450 500  4450 7750
-Text Label 6900 3300 0    50   ~ 0
-P43
-Text Label 6900 3100 0    50   ~ 0
-P44
-Text Label 6900 3200 0    50   ~ 0
-P45
-Text Label 7850 3400 0    50   ~ 0
-P46
 $Comp
 L Device:Jumper_NO_Small JP20
 U 1 1 60C2C3E3
@@ -773,8 +757,6 @@ F 3 "" H 7650 3000 50  0001 C CNN
 	1    7650 3000
 	0    -1   -1   0   
 $EndComp
-Text Label 7450 3250 3    50   ~ 0
-P47
 Wire Wire Line
 	6900 3000 7450 3000
 Wire Wire Line
@@ -1455,12 +1437,6 @@ F 3 "" H 2300 6550 50  0001 C CNN
 	1    2300 6550
 	0    -1   -1   0   
 $EndComp
-Text Label 2050 7250 0    50   ~ 0
-P48
-Text Label 2050 7150 0    50   ~ 0
-P49
-Text Label 1300 7250 2    50   ~ 0
-P50
 $Comp
 L power:GND #PWR0241
 U 1 1 60CE76FB
@@ -1492,12 +1468,6 @@ Text GLabel 1300 6850 0    50   Input ~ 0
 3.3V_ADC
 Text GLabel 1300 6650 0    50   Input ~ 0
 5V_ADC
-Text Label 1250 7050 2    50   ~ 0
-A03
-Text Label 2050 7050 0    50   ~ 0
-A02
-Text Label 2050 6750 0    50   ~ 0
-A01
 $Comp
 L power:GND #PWR0243
 U 1 1 60CE770F
@@ -1857,8 +1827,6 @@ Connection ~ 4950 6250
 Wire Wire Line
 	5600 6250 5750 6250
 Connection ~ 5600 6250
-Text Label 4850 6250 2    50   ~ 0
-P51
 Text GLabel 5750 6250 2    50   Input ~ 0
 HS_1
 $Comp
@@ -1930,8 +1898,6 @@ Connection ~ 6300 6250
 Wire Wire Line
 	6950 6250 7100 6250
 Connection ~ 6950 6250
-Text Label 6200 6250 2    50   ~ 0
-P52
 Text GLabel 7100 6250 2    50   Input ~ 0
 HS_2
 $Comp
@@ -2003,8 +1969,6 @@ Connection ~ 7700 6250
 Wire Wire Line
 	8350 6250 8500 6250
 Connection ~ 8350 6250
-Text Label 7600 6250 2    50   ~ 0
-P53
 Text GLabel 8500 6250 2    50   Input ~ 0
 HS_3
 $Comp
@@ -2076,8 +2040,6 @@ Connection ~ 9100 6250
 Wire Wire Line
 	9750 6250 9900 6250
 Connection ~ 9750 6250
-Text Label 9000 6250 2    50   ~ 0
-P54
 Text GLabel 9900 6250 2    50   Input ~ 0
 HS_4
 $Comp
@@ -2177,6 +2139,48 @@ Wire Wire Line
 	2050 6650 2150 6650
 Wire Wire Line
 	2250 6550 2300 6550
+Text GLabel 2900 1900 2    50   Input ~ 0
+P36
+Text GLabel 3050 2100 2    50   Input ~ 0
+P35
 Wire Wire Line
-	1250 7050 1300 7050
+	3050 2100 2900 2100
+Text GLabel 6900 3100 2    50   Input ~ 0
+P44
+Text GLabel 6900 3200 2    50   Input ~ 0
+P45
+Text GLabel 6900 3300 2    50   Input ~ 0
+P43
+Text GLabel 7400 3250 0    50   Input ~ 0
+P47
+Wire Wire Line
+	7400 3250 7450 3250
+Text GLabel 8000 3400 2    50   Input ~ 0
+P46
+Wire Wire Line
+	8000 3400 7850 3400
+Text GLabel 1750 4350 0    50   Input ~ 0
+P38
+Text GLabel 1750 4450 0    50   Input ~ 0
+P37
+Text GLabel 1300 7050 0    50   Input ~ 0
+AO3
+Text GLabel 1300 7250 0    50   Input ~ 0
+P50
+Text GLabel 2050 7250 2    50   Input ~ 0
+P48
+Text GLabel 2050 7150 2    50   Input ~ 0
+P49
+Text GLabel 2050 7050 2    50   Input ~ 0
+AO2
+Text GLabel 2050 6750 2    50   Input ~ 0
+AO1
+Text GLabel 4850 6250 0    50   Input ~ 0
+P51
+Text GLabel 6200 6250 0    50   Input ~ 0
+P52
+Text GLabel 7600 6250 0    50   Input ~ 0
+P53
+Text GLabel 9000 6250 0    50   Input ~ 0
+P54
 $EndSCHEMATC
