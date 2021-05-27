@@ -794,8 +794,6 @@ F 3 "" H 10000 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9600 1650 9700 1650
-Wire Wire Line
 	9900 1650 10000 1650
 Connection ~ 10000 1650
 $Comp
@@ -1581,4 +1579,6 @@ Text GLabel 6200 5900 0    50   Input ~ 0
 P40
 Text GLabel 6200 6100 0    50   Input ~ 0
 P39
+Text GLabel 9700 1650 3    50   Input ~ 0
+5V_ADC
 $EndSCHEMATC
