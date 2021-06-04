@@ -1095,7 +1095,7 @@ F 3 "~" H 9900 1550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 9700 1550 0    50   Input ~ 0
-VIN
+VIN_L1
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E211AB
@@ -1184,7 +1184,7 @@ F 3 "~" H 9850 3850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 9650 3850 0    50   Input ~ 0
-VIN
+VIN_L2
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E31F9F
@@ -1273,7 +1273,7 @@ F 3 "~" H 7800 4850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 7600 4850 0    50   Input ~ 0
-VIN
+VIN_L3
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E41F8F
@@ -1362,7 +1362,7 @@ F 3 "~" H 9850 2650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 9650 2650 0    50   Input ~ 0
-VIN
+VIN_L1
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E4A178
@@ -1451,7 +1451,7 @@ F 3 "~" H 7850 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 7650 2400 0    50   Input ~ 0
-VIN
+VIN_L1
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E5AEEF
@@ -1540,7 +1540,7 @@ F 3 "~" H 7800 3650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 7600 3650 0    50   Input ~ 0
-VIN
+VIN_L2
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E6D90D
@@ -1629,7 +1629,7 @@ F 3 "~" H 9850 5050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 9650 5050 0    50   Input ~ 0
-VIN
+VIN_L2
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E75D21
@@ -1718,7 +1718,7 @@ F 3 "~" H 9850 6250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 9650 6250 0    50   Input ~ 0
-VIN
+VIN_L3
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E7E334
@@ -1807,7 +1807,7 @@ F 3 "~" H 7800 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Text GLabel 7600 5950 0    50   Input ~ 0
-VIN
+VIN_L3
 $Comp
 L Connector_Generic:Conn_01x02 J?
 U 1 1 60E9137C
@@ -2310,7 +2310,7 @@ $EndComp
 Text GLabel 5500 7100 1    50   Input ~ 0
 +5V_2
 Text GLabel 5850 7100 1    50   Input ~ 0
-+3.3V_2
++3.3V_3
 $Comp
 L Device:LED_Small D?
 U 1 1 60FC8E6E
@@ -2396,7 +2396,7 @@ F 3 "~" V 6200 7450 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 Text GLabel 6200 7100 1    50   Input ~ 0
-+5V_2
++5V_3
 Wire Wire Line
 	6650 7100 6650 7150
 $Comp

@@ -1481,36 +1481,12 @@ Text GLabel 4250 6950 1    50   Input ~ 0
 P63
 Text GLabel 4600 6950 1    50   Input ~ 0
 V_0_3
-Text GLabel 2950 8850 3    50   Input ~ 0
-V_4_7
-Text GLabel 3050 8850 3    50   Input ~ 0
-V_8_11
-Text GLabel 3150 8850 3    50   Input ~ 0
-V_12_15
-Text GLabel 3350 8850 3    50   Input ~ 0
-V_20_23
 Text GLabel 4700 7450 3    50   Input ~ 0
 V_16_19
-Text GLabel 3450 8850 3    50   Input ~ 0
-V_24_27
-Text GLabel 3550 8850 3    50   Input ~ 0
-V_28_31
 Text GLabel 4700 6950 1    50   Input ~ 0
 V_32_35
-Text GLabel 3750 8850 3    50   Input ~ 0
-V_36_39
-Text GLabel 3850 8850 3    50   Input ~ 0
-V_40_43
-Text GLabel 3950 8850 3    50   Input ~ 0
-V_44_47
 Text GLabel 4800 7450 3    50   Input ~ 0
 V_48_51
-Text GLabel 4150 8850 3    50   Input ~ 0
-V_52_55
-Text GLabel 4250 8850 3    50   Input ~ 0
-V_56_59
-Text GLabel 4350 8850 3    50   Input ~ 0
-V_60_63
 NoConn ~ 4600 7450
 Text GLabel 5100 4750 1    50   Input ~ 0
 P34
