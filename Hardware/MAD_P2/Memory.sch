@@ -138,8 +138,6 @@ FLASH_CS
 Connection ~ 4600 5250
 Wire Wire Line
 	4500 5250 4600 5250
-Text Label 4900 5450 2    50   ~ 0
-P60
 $Comp
 L power:GND #PWR0148
 U 1 1 60B4148A
@@ -171,4 +169,6 @@ Text GLabel 5900 5250 2    50   Input ~ 0
 P58
 Text GLabel 7550 5000 2    50   Input ~ 0
 P61
+Text GLabel 4900 5450 0    50   Input ~ 0
+P60
 $EndSCHEMATC

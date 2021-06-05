@@ -2183,4 +2183,6 @@ Text GLabel 7600 6250 0    50   Input ~ 0
 P53
 Text GLabel 9000 6250 0    50   Input ~ 0
 P54
+Text GLabel 1300 6750 0    50   Input ~ 0
+AO0
 $EndSCHEMATC

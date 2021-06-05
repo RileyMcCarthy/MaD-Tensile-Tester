@@ -782,20 +782,17 @@ Text GLabel 9600 1650 3    50   Input ~ 0
 $Comp
 L power:GND #PWR?
 U 1 1 60DE4CD9
-P 10000 1650
+P 10000 1800
 AR Path="/609BFBB9/60DE4CD9" Ref="#PWR?"  Part="1" 
 AR Path="/60C11A52/60DE4CD9" Ref="#PWR?"  Part="1" 
 AR Path="/60BD9EA1/60DE4CD9" Ref="#PWR0219"  Part="1" 
-F 0 "#PWR0219" H 10000 1400 50  0001 C CNN
-F 1 "GND" H 10005 1477 50  0000 C CNN
-F 2 "" H 10000 1650 50  0001 C CNN
-F 3 "" H 10000 1650 50  0001 C CNN
-	1    10000 1650
+F 0 "#PWR0219" H 10000 1550 50  0001 C CNN
+F 1 "GND" H 10005 1627 50  0000 C CNN
+F 2 "" H 10000 1800 50  0001 C CNN
+F 3 "" H 10000 1800 50  0001 C CNN
+	1    10000 1800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	9900 1650 10000 1650
-Connection ~ 10000 1650
 $Comp
 L power:GND #PWR?
 U 1 1 60DE4CE5
@@ -1515,11 +1512,11 @@ Text GLabel 7300 1900 2    50   Input ~ 0
 P62
 Text GLabel 8150 1950 1    50   Input ~ 0
 RESET
-Text GLabel 9600 1150 1    50   Input ~ 0
+Text GLabel 9800 1650 3    50   Input ~ 0
 AO1
 Text GLabel 10000 1150 1    50   Input ~ 0
 AO3
-Text GLabel 9800 1650 3    50   Input ~ 0
+Text GLabel 9900 1650 3    50   Input ~ 0
 AO2
 Text GLabel 9250 4100 0    50   Input ~ 0
 RESET
@@ -1557,4 +1554,8 @@ Text GLabel 6200 6100 0    50   Input ~ 0
 P39
 Text GLabel 9700 1650 3    50   Input ~ 0
 5V_ADC
+Text GLabel 9600 1150 1    50   Input ~ 0
+AO0
+Wire Wire Line
+	10000 1650 10000 1800
 $EndSCHEMATC

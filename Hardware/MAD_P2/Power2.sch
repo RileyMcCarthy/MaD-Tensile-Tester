@@ -2439,8 +2439,6 @@ F 3 "~" V 6650 7450 50  0001 C CNN
 	1    6650 7450
 	0    -1   -1   0   
 $EndComp
-Text Label 6650 7100 1    50   ~ 0
-P55
 Text Notes 550  6900 0    118  ~ 0
 Power Indication\n LEDs
 Wire Notes Line
@@ -2514,4 +2512,6 @@ Wire Wire Line
 Connection ~ 5600 2750
 Wire Wire Line
 	5600 2750 5750 2750
+Text GLabel 6650 7100 1    50   Input ~ 0
+P55
 $EndSCHEMATC
