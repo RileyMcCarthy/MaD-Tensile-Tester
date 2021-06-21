@@ -4,19 +4,19 @@
     fortyfive_degree
   )
   (autoroute_settings
-    (fanout off)
-    (autoroute on)
+    (fanout on)
+    (eu.mihosoft.freerouting.autoroute on)
     (postroute on)
     (vias on)
-    (via_costs 40)
+    (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 111)
+    (start_pass_no 360)
     (layer_rule F.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 1.8)
-      (against_preferred_direction_trace_costs 3.0)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.8)
     )
     (layer_rule In1.Cu
       (active on)
@@ -25,16 +25,16 @@
       (against_preferred_direction_trace_costs 1.8)
     )
     (layer_rule In2.Cu
-      (active on)
-      (preferred_direction vertical)
-      (preferred_direction_trace_costs 6.0)
-      (against_preferred_direction_trace_costs 8.0)
+      (active off)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.8)
     )
     (layer_rule B.Cu
       (active on)
       (preferred_direction vertical)
-      (preferred_direction_trace_costs 1.8)
-      (against_preferred_direction_trace_costs 2.6)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.8)
     )
   )
   (rule
@@ -71,17 +71,18 @@
     "kicad_default" "Via[0-3]_800:400_um-kicad_default"
   )
   (class default
+    "@:no_net_0"
     (clearance_class default)
     (via_rule default)
     (rule
       (width 250.0)
     )
     (circuit 
-      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
+      (use_layer F.Cu In1.Cu B.Cu)
     )
   )
   (class "kicad_default"
-    GND "3.3V_ADC" +1V8 "Net-(BT1-Pad1)" "VIN_L1" "VIN_L2" +5V "+5V_3"
+    GND "3.3V_ADC" "Net-(BT1-Pad1)" +1V8 "VIN_L1" "VIN_L2" +5V "+5V_3"
     "+5V_1" "+5V_2" "+3.3V_3" "+3.3V_1" "+3.3V_2" "Net-(C70-Pad1)" +3V3 "VIN_IO"
     "Net-(C78-Pad1)" "Net-(C90-Pad1)" "VIN_ADC" "5V_ADC" VBUS "Net-(C104-Pad1)" "Net-(C107-Pad1)" "Net-(C107-Pad2)"
     "Net-(C113-Pad2)" A1+ "A1-" A2+ "A2-" A3+ "A3-" A4+
@@ -123,7 +124,7 @@
       (width 250.0)
     )
     (circuit 
-      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
+      (use_layer F.Cu In1.Cu B.Cu)
     )
   )
 )
