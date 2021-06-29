@@ -1558,7 +1558,6 @@ Text GLabel 4700 6950 1    50   Input ~ 0
 V_32_35
 Text GLabel 4800 7450 3    50   Input ~ 0
 V_48_51
-NoConn ~ 4600 7450
 Text GLabel 5100 4750 1    50   Input ~ 0
 P34
 $Comp
@@ -1633,4 +1632,48 @@ Text GLabel 9600 1150 1    50   Input ~ 0
 AO0
 Wire Wire Line
 	10000 1650 10000 1800
+$Comp
+L Connector_Generic:Conn_01x06 J34
+U 1 1 60E2D1E3
+P 4600 3050
+F 0 "J34" H 4680 3042 50  0000 L CNN
+F 1 "FTDI 1x6" H 4680 2951 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 4600 3050 50  0001 C CNN
+F 3 "~" H 4600 3050 50  0001 C CNN
+	1    4600 3050
+	1    0    0    -1  
+$EndComp
+Text GLabel 4400 2850 0    50   Input ~ 0
+RESET
+Text GLabel 4400 2950 0    50   Input ~ 0
+P62
+Text GLabel 4400 3050 0    50   Input ~ 0
+P63
+Text GLabel 4400 3150 0    50   Input ~ 0
+VBUS
+NoConn ~ 4400 3250
+$Comp
+L power:GND #PWR?
+U 1 1 60E38545
+P 4400 3350
+AR Path="/60B76FA1/60E38545" Ref="#PWR?"  Part="1" 
+AR Path="/60BD9EA1/60E38545" Ref="#PWR0257"  Part="1" 
+F 0 "#PWR0257" H 4400 3100 50  0001 C CNN
+F 1 "GND" V 4405 3222 50  0000 R CNN
+F 2 "" H 4400 3350 50  0001 C CNN
+F 3 "" H 4400 3350 50  0001 C CNN
+	1    4400 3350
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR0258
+U 1 1 60E47354
+P 4600 7450
+F 0 "#PWR0258" H 4600 7200 50  0001 C CNN
+F 1 "GND" H 4605 7277 50  0000 C CNN
+F 2 "" H 4600 7450 50  0001 C CNN
+F 3 "" H 4600 7450 50  0001 C CNN
+	1    4600 7450
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
