@@ -1,0 +1,39 @@
+make.exe all --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware'
+VAR="bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o "
+VAR="-I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial"
+VAR="Librarys/NavKey/i2cNavKey.c Librarys/RA8876/RA8876.c  Librarys/MCP23017/MCP23017.c  Librarys/DS3231/DS3231.c Librarys/ForceGauge/ForceGauge.c Librarys/DYN4/DYN4.c Librarys/Encoder/Encoder.c Librarys/JSON/JSON.c  src/Elements/Clock.c src/Main/MaD.c src/Main/Motion.c src/Main/main.c"
+mkdir bin
+del /s /q bin\*
+cls
+mkdir bin\Librarys\NavKey
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/NavKey/i2cNavKey.o Librarys/NavKey/i2cNavKey.c
+mkdir bin\Librarys\RA8876
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/RA8876/RA8876.o Librarys/RA8876/RA8876.c
+mkdir bin\Librarys\MCP23017
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/MCP23017/MCP23017.o Librarys/MCP23017/MCP23017.c
+mkdir bin\Librarys\DS3231
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/DS3231/DS3231.o Librarys/DS3231/DS3231.c
+mkdir bin\Librarys\ForceGauge
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/ForceGauge/ForceGauge.o Librarys/ForceGauge/ForceGauge.c
+ 
+mkdir bin\Librarys\DYN4
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/DYN4/DYN4.o Librarys/DYN4/DYN4.c
+mkdir bin\Librarys\Encoder
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/Encoder/Encoder.o Librarys/Encoder/Encoder.c
+ 
+mkdir bin\Librarys\JSON
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/Librarys/JSON/JSON.o Librarys/JSON/JSON.c
+ 
+mkdir bin\src\Elements
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/src/Elements/Clock.o src/Elements/Clock.c
+mkdir bin\src\Main
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/src/Main/MaD.o src/Main/MaD.c
+mkdir bin\src\Main
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/src/Main/Motion.o src/Main/Motion.c
+mkdir bin\src\Main
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -c -o bin/src/Main/main.o src/Main/main.c
+flexcc -2 -O2 -Wall  -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o  -o bin/MAD.binary
+loadp2 -p COM5 -b230400 -t -k -v bin\MAD.binary
+make: Leaving directory 'c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware'
+ 

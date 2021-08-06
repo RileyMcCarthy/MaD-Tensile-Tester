@@ -1,47 +1,24 @@
 #ifndef MCP23017_H
 #define MCP23017_H
 
-#include "propeller.h"
-#include "simplei2c.h"
+#include "simpletools.h"
 
-// registers
-#define REG_IODIRA 0x00 // Direction Register A
-#define REG_IPOLA 0x02  // Polarity Register A
-#define REG_GPPUA 0x0C  // Pull-up Register A
-#define REG_GPIOA 0x12  // I/O Register A
-#define REG_OLATA 0x14  // Output latch register A
-
-#define REG_IODIRB 0x01 // Direction Register B
-#define REG_IPOLB 0x03  // Polarity Register B
-#define REG_GPPUB 0x0D  // Pull-up Register B
-#define REG_GPIOB 0x13  // I/O Register B
-#define REG_OLATB 0x15  // Output latch register B
-
-class MCP23017
+typedef struct MCP23017_t
 {
-private:
     int sda, scl;
     i2c bus;
     uint8_t writeAddr, readAddr;
+} MCP23017;
 
-public:
-    uint8_t readRegister(uint8_t addr);
-    void writeRegister(uint8_t addr, uint8_t value);
-    void begin(uint8_t addr, int sda, int scl);
+void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
 
-    void dira(uint8_t mask);
-    uint8_t dira();
-    void dirb(uint8_t mask);
-    uint8_t dirb();
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction);
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin);
 
-    void outa(uint8_t mask);
-    uint8_t outa();
-    void outb(uint8_t mask);
-    uint8_t outb();
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t output);
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin);
 
-    void pula(uint8_t mask);
-    uint8_t pula();
-    void pulb(uint8_t mask);
-    uint8_t pulb();
-};
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t output);
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin);
+
 #endif

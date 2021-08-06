@@ -1,5 +1,4 @@
-#include "simpletools.h"
-#include "EncoderAPI.h" // Quad Encoder
+#include "Encoder.h" // Quad Encoder
 
 /**
  * @brief Uses magic to start the cog in encoder_spin

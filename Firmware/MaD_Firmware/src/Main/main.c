@@ -3,18 +3,14 @@
 /**
  * @brief Main method that is called on program startup.
  * Begins MaD Board instance
- * 
- * @return int 
+ *
+ * @return int
  */
 
-/**
- * @brief Global instance of MaD Board object
- * 
- */
-static MAD mad;
 int main()
 {
-    mad.begin();
+    mad_begin();
     while (1)
         ;
+    return 0;
 }

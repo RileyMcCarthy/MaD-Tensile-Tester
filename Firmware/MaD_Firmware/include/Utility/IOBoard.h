@@ -13,9 +13,6 @@
 #define SD_CLK 6  //Data SD card clock
 #define SD_DAT0 7 //Data SD card data 0
 
-#define RTC_SCL 0  //clock for real time clock and IO expander I2C (Output)
-#define RTC_SDA 26 //data for real time clock and IO expander I2C (Input/Output)
-
 #define I2C_SCL 28 //clock for general I2C (Output)
 #define I2C_SDA 29 //data for general I2C (Input/Output)
 
@@ -37,37 +34,5 @@
 #define CHARGE_PUMP_OUT 1
 #define DISTANCE_LIMIT_MAX 1
 #define DISTANCE_LIMIT_MIN 2
-
-/**
- * @brief Configures MCP23017 (GPIO Expander)
- * 
- * @param gpio Pointer to MCP23017 (GPIO Expander) instance
- */
-static void gpioConfig(MCP23017 *gpio)
-{
-    gpio->begin(GPIO_ADDR, GPIO_SDA, GPIO_SCL); // use default address 0
-    gpio->dira(GPIO_DIR_MASKA);
-    gpio->dirb(GPIO_DIR_MASKB);
-}
-
-/**
- * @brief Gets input from specified input
- * 
- * @param gpio Pointer to MCP23017 instance
- * @param pin Pin to get input from
- * @return uint8_t Pin status: 0 = LOW, 1 = HIGH
- */
-static uint8_t gpi(MCP23017 *gpio, int pin)
-{
-    if (pin >= 9 && pin <= 12) //reg a
-    {
-        return (gpio->outa() & (1 << (pin - 9))) >> (pin - 9);
-    }
-    else if (pin >= 1 && pin <= 8) //reg b
-    {
-        return (gpio->outb() & (1 << (pin - 1))) >> (pin - 1);
-    }
-    return NULL;
-}
 
 #endif

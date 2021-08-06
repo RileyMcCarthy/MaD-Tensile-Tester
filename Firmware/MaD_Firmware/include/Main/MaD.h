@@ -8,14 +8,10 @@
 #include "DS3231.h"
 #include "State.h"
 #include "Style.h"
-#include "Ra8876_Lite.h"
+#include "RA8876.h"
 #include "i2cNavKey.h"
 #include "ForceGauge.h"
 #include "DYN4.h"
-#include "NavigationPage.h"
-#include "StatusPage.h"
-#include "ManualPage.h"
-#include "AutomaticPage.h"
 
 #define GT9271_INT 7     //SPI Interrupt pin
 #define CLK 28           //SPI Clock Pin
@@ -29,20 +25,12 @@
 #define MAD_CD_DI 24  //SD Data In
 #define MAD_CD_CS 25  //SD Chip Select
 
+#define MAD_DS3231_SCL 38 //RTC clock pin (Output)
+#define MAD_DS3231_SDA 37 //RTC data pin (bi-directional)
 /**
  * @brief Main class responsible for initializing and starting components
  * 
  */
-class MAD
-{
-public:
-    void begin();
-
-private:
-    Error startDisplay();
-
-    //utility objects
-    Ra8876_Lite display;
-    Clock clock;
-};
+void mad_begin();
+Error startDisplay();
 #endif

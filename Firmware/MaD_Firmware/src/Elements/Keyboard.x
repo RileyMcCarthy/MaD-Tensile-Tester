@@ -2,6 +2,57 @@
 #include "Images.h"
 #define BUTTONCOUNT 47
 
+enum keys
+{
+    key_0,
+    key_1,
+    key_2,
+    key_3,
+    key_4,
+    key_5,
+    key_6,
+    key_7,
+    key_8,
+    key_9,
+    key_tab,
+    key_q,
+    key_w,
+    key_e,
+    key_r,
+    key_t,
+    key_y,
+    key_u,
+    key_i,
+    key_o,
+    key_p,
+    key_caps,
+    key_a,
+    key_s,
+    key_d,
+    key_f,
+    key_g,
+    key_h,
+    key_j,
+    key_k,
+    key_l,
+    key_del,
+    key_shift,
+    key_z,
+    key_x,
+    key_c,
+    key_v,
+    key_b,
+    key_n,
+    key_m,
+    key_comma,
+    key_period,
+    key_cancel,
+    key_left,
+    key_space,
+    key_right,
+    key_submit
+};
+
 /**
  * @brief Keyboard page, renders a keyboard to get user input.
  * 
@@ -11,8 +62,9 @@
  * @brief Update page from button inputs
  * 
  * @param key The Button that was pressed
+ * @returns if submit was pressed
  */
-void Keyboard::checkButtons(Button *keys)
+static bool check_buttons(Button *keys, char *buffer)
 {
     if (display->checkButtons(keys, BUTTONCOUNT) > 0)
     {
@@ -150,7 +202,7 @@ void Keyboard::checkButtons(Button *keys)
                     break;
                 case key_cancel:
                     buffer = NULL;
-                    complete = true;
+                    return true;
                     break;
                 case key_left:
                     break;
@@ -160,7 +212,7 @@ void Keyboard::checkButtons(Button *keys)
                 case key_right:
                     break;
                 case key_submit:
-                    complete = true;
+                    return true;
                     break;
                 default:
                     break;
@@ -168,6 +220,7 @@ void Keyboard::checkButtons(Button *keys)
             }
         }
     }
+    return false;
 }
 
 /**
@@ -198,11 +251,9 @@ static Button createKey(int name, int xmin, int ymin, float keySize)
  * 
  * @param input String buffer for user input
  */
-void Keyboard::getKeyboardInput(Ra8876_Lite *the_display, char *input)
+void keyboard_get_input(Display *display, char *input)
 {
-    display = the_display;
-    complete = false;
-    buffer = input;
+    char *buffer = input;
     strcpy(buffer, "");
     int width = 1026;
     int height = 284;
@@ -270,13 +321,13 @@ void Keyboard::getKeyboardInput(Ra8876_Lite *the_display, char *input)
     keys[44] = createKey(key_space, startx + 256, starty + 216, 6.25);
     keys[45] = createKey(key_right, startx + 607, starty + 216, 1.25);
     keys[46] = createKey(key_submit, startx + 702, starty + 216, 2);
-    complete = false;
+    bool complete = false;
     while (!complete)
     {
-        checkButtons(keys);
+        complete = checkButtons(keys, buffer);
         display->drawSquareFill(startx, starty - 32, startx + width, starty, COLOR65K_GRAYSCALE30);
         display->textColor(COLOR65K_WHITE, COLOR65K_GRAYSCALE30);
         display->putString(SCREEN_WIDTH / 2 - strlen(buffer) * 16, starty - 32, buffer);
-        pause(100);
+        _waitms(100);
     }
 }

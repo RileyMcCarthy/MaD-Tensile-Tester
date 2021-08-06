@@ -6,6 +6,10 @@
 #define STATUS_MOTORBUSY 0x05
 #define STATUS_JP3STATUS 0x06
 
+#define READ_DRIVE_STATUS 0x09
+#define IS_STATUS 0x19
+
+
 /**
  * @brief Begin communication with the servo controller
  * 
@@ -20,8 +24,8 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
     dyn4->device_id = new_device_id & 0x7F;
     uart_start(&(dyn4->serial), 14, 12, 2, 38400);
 
-    DYN4Status status;
-    Error ret = getStatus(dyn4, &status);
+    DYN4_Status status;
+    Error ret = dyn4_get_status(dyn4, &status);
 
     //start encoder
     dyn4->encoder.Totenc = 1; // Number of encoders
@@ -45,11 +49,11 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
  * @param status the address status struct that will contain the updated status
  * @return Error: DYN4_NOT_RESPONDING if communications fail, SUCCESS otherwise.
  */
-Error getStatus(DYN4 *dyn4, DYN4Status *status)
+Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
 {
     dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
     uint8_t *statusReg;
-    if (readCommand(dyn4, IS_STATUS, statusReg) == -1)
+    if (dyn4_read_command(dyn4, IS_STATUS, statusReg) == -1)
     {
         return DYN4_NOT_RESPONDING;
     }
@@ -66,11 +70,11 @@ Error getStatus(DYN4 *dyn4, DYN4Status *status)
  * @brief Read incomming command from servo.
  * @todo if sending command then reading command in seperate functions is too slow, combine them.
  * @param dyn4 the servo to read command from
- * @param readCommand the command the statement read should contain
+ * @param dyn4_read_command the command the statement read should contain
  * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE) 
  * @return int number of bytes recieved
  */
-int readCommand(DYN4 *dyn4, int readCommand, uint8_t *returnData)
+int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t *returnData)
 {
     uint8_t byte;
     uart_read(&(dyn4->serial), 1, &byte);
@@ -121,7 +125,7 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
     }
 
     int package_size = 4 + n;
-    uint8_t bytes[package_size];
+    uint8_t *bytes = malloc(sizeof(uint8_t) * package_size);
     bytes[package_size - 1] = dyn4->device_id;
     bytes[package_size - 2] = 0x80 + (n << 5) + command; //0x80 is because the first bit is always 1
 
@@ -138,4 +142,5 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
     uart_write(&(dyn4->serial), bytes[2]);
     uart_write(&(dyn4->serial), bytes[1]);
     uart_write(&(dyn4->serial), bytes[0]);
+    free(bytes);
 }

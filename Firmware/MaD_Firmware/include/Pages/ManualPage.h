@@ -11,21 +11,16 @@
  * @brief Runs the UI for manually controlling the machine
  * 
  */
-class ManualPage
-{
-public:
-    void run(Ra8876_Lite *the_display, Motion_Cog *motionCog);
-    void checkButtons(Button *buttons);
 
-private:
+typedef struct ManualPage_t
+{
     bool complete;
-    Ra8876_Lite *display;
-    enum button_names
-    {
-        BUTTON_MOTION_MODE,
-        BUTTON_CONDITION,
-        BUTTON_NAVIGATION
-    };
-};
+    Display *display;
+    Button *buttons;
+} ManualPage;
+
+ManualPage *ManualPage_Create(Display *display);
+void ManualPage_Destroy(ManualPage *page);
+void ManualPage_run(ManualPage *page);
 
 #endif

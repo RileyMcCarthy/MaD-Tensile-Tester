@@ -7,6 +7,9 @@
         "propeller.h": "c",
         "*.cogc": "c",
         "forcegauge.h": "c",
-        "type_traits": "cpp"
-    }
+        "type_traits": "cpp",
+        "json.h": "c",
+        "stddef.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

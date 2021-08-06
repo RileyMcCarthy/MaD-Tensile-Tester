@@ -2,24 +2,9 @@
 #define DS3231_H
 #include "simpletools.h"
 #include "Error.h"
+#include "stdbool.h"
 
-#define REG_SECONDS 0x00    //Second register
-#define REG_MINUTES 0x01    //Minute register
-#define REG_HOURS 0x02  //Hour register
-#define REG_DAY 0x04    //Day register
-#define REG_MONTHS 0x05 //Month register
-#define REG_YEARS 0x06  //Year register
-#define REG_CONTROL 0x0E    //Control register
-#define REG_STATUS 0x0F //Status register
-
-#define STATUS_RST 0x80 //Clock reset status bit
-
-#define SET_PM 0x20 //Control AM/PM set bit
-#define SET_12HOUR 0x40 //Control 12/24 set bit
-
-#define ADDR 0x68
-
-typedef struct time_st
+typedef struct time_st //@todo replace with time library
 {
     uint8_t second;
     uint8_t minute;
@@ -30,27 +15,22 @@ typedef struct time_st
     bool am;
 } Time;
 
-
 /**
  * @brief Real Time Clock IC Interface
  * 
  */
-class DS3231
+
+typedef struct DS3231_t
 {
-public:
-    Error begin(int scl, int sda);
-    Error updateTime();
-    Error setTime(Time *time);
-    Time time;
-
-private:
-    int sda, scl;
-    i2c *rtc_bus;
+    i2c bus;
     uint8_t writeAddr, readAddr;
+    Time time;
+} DS3231;
 
-    uint8_t readRegister(uint8_t addr);
-    bool writeRegister(uint8_t addr, uint8_t value);
-    uint8_t dectobcd(const uint8_t val);
-    uint8_t bcdtodec(const uint8_t val);
-};
+DS3231 *ds3231_create();
+void ds3231_destroy(DS3231 *ds3231);
+
+Error ds3231_begin(DS3231 *ds3231, int scl, int sda);
+Error ds3231_update_time(DS3231 *ds3231);
+Error ds3231_set_time(DS3231 *ds3231, Time *time);
 #endif

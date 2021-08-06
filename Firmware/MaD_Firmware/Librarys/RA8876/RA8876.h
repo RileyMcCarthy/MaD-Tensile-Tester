@@ -10,17 +10,10 @@ Version   : v1.0
 #ifndef Ra8876_Lite_H
 #define Ra8876_Lite_H
 
-typedef signed char rs8;
-typedef signed short rs16;
-typedef signed long rs32;
-typedef unsigned char ru8;
-typedef unsigned short ru16;
-typedef unsigned long ru32;
-
 #include "simpletools.h"
-#include "SPI_Fast.h"
-#include "libpropeller/sd/sd.h"
 #include "Error.h"
+#include "stdbool.h"
+#include "stdint.h"
 
 #define RA8876_SPI_CMDWRITE 0x00
 #define RA8876_SPI_DATAWRITE 0x80
@@ -90,60 +83,6 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define WP4_ADDR 1024 * 600 * 2 * 3
 #define WP5_ADDR 1024 * 600 * 2 * 4
 #define WP6_ADDR 1024 * 600 * 2 * 5
-
-#define COLOR65K_BLACK 0x0000
-#define COLOR65K_WHITE 0xffff
-#define COLOR65K_RED 0xf800
-#define COLOR65K_LIGHTRED 0xfc10
-#define COLOR65K_DARKRED 0x8000
-#define COLOR65K_GREEN 0x07e0
-#define COLOR65K_LIGHTGREEN 0x87f0
-#define COLOR65K_DARKGREEN 0x0400
-#define COLOR65K_BLUE 0x001f
-#define COLOR65K_BLUE2 0x051f
-#define COLOR65K_LIGHTBLUE 0x841f
-#define COLOR65K_DARKBLUE 0x0010
-#define COLOR65K_YELLOW 0xffe0
-#define COLOR65K_LIGHTYELLOW 0xfff0
-#define COLOR65K_DARKYELLOW 0x8400
-#define COLOR65K_CYAN 0x07ff
-#define COLOR65K_LIGHTCYAN 0x87ff
-#define COLOR65K_DARKCYAN 0x0410
-#define COLOR65K_MAGENTA 0xf81f
-#define COLOR65K_LIGHTMAGENTA 0xfc1f
-#define COLOR65K_DARKMAGENTA 0x8010
-#define COLOR65K_BROWN 0xA145
-
-#define COLOR65K_GRAYSCALE1 2113
-#define COLOR65K_GRAYSCALE2 2113 * 2
-#define COLOR65K_GRAYSCALE3 2113 * 3
-#define COLOR65K_GRAYSCALE4 2113 * 4
-#define COLOR65K_GRAYSCALE5 2113 * 5
-#define COLOR65K_GRAYSCALE6 2113 * 6
-#define COLOR65K_GRAYSCALE7 2113 * 7
-#define COLOR65K_GRAYSCALE8 2113 * 8
-#define COLOR65K_GRAYSCALE9 2113 * 9
-#define COLOR65K_GRAYSCALE10 2113 * 10
-#define COLOR65K_GRAYSCALE11 2113 * 11
-#define COLOR65K_GRAYSCALE12 2113 * 12
-#define COLOR65K_GRAYSCALE13 2113 * 13
-#define COLOR65K_GRAYSCALE14 2113 * 14
-#define COLOR65K_GRAYSCALE15 2113 * 15
-#define COLOR65K_GRAYSCALE16 2113 * 16
-#define COLOR65K_GRAYSCALE17 2113 * 17
-#define COLOR65K_GRAYSCALE18 2113 * 18
-#define COLOR65K_GRAYSCALE19 2113 * 19
-#define COLOR65K_GRAYSCALE20 2113 * 20
-#define COLOR65K_GRAYSCALE21 2113 * 21
-#define COLOR65K_GRAYSCALE22 2113 * 22
-#define COLOR65K_GRAYSCALE23 2113 * 23
-#define COLOR65K_GRAYSCALE24 2113 * 24
-#define COLOR65K_GRAYSCALE25 2113 * 25
-#define COLOR65K_GRAYSCALE26 2113 * 26
-#define COLOR65K_GRAYSCALE27 2113 * 27
-#define COLOR65K_GRAYSCALE28 2113 * 28
-#define COLOR65K_GRAYSCALE29 2113 * 29
-#define COLOR65K_GRAYSCALE30 2113 * 30
 
 #define STRING_LINE1 0
 #define STRING_LINE2 32
@@ -632,22 +571,6 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_SELECT_8859_4 2
 #define RA8876_SELECT_8859_5 3
 
-#define RA8876_CCR1 0xCD
-#define RA8876_TEXT_FULL_ALIGN_DISABLE 0
-#define RA8876_TEXT_FULL_ALIGN_ENABLE 1
-#define RA8876_TEXT_CHROMA_KEY_DISABLE 0
-#define RA8876_TEXT_CHROMA_KEY_ENABLE 1
-#define RA8876_TEXT_NO_ROTATION 0
-#define RA8876_TEXT_ROTATION 1
-#define RA8876_TEXT_WIDTH_ENLARGEMENT_X1 0
-#define RA8876_TEXT_WIDTH_ENLARGEMENT_X2 1
-#define RA8876_TEXT_WIDTH_ENLARGEMENT_X3 2
-#define RA8876_TEXT_WIDTH_ENLARGEMENT_X4 3
-#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X1 0
-#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X2 1
-#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X3 2
-#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X4 3
-
 #define RA8876_GTFNT_SEL 0xCE
 #define RA8876_GT21L16T1W 0
 #define RA8876_GT30L16U2W 1
@@ -784,49 +707,92 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_KSDR1 0xFE
 #define RA8876_KSDR2 0xFF
 
-static unsigned char GTP_CFG_DATA[] =
-    {
+#define COLOR65K_BLACK 0x0000
+#define COLOR65K_WHITE 0xffff
+#define COLOR65K_RED 0xf800
+#define COLOR65K_LIGHTRED 0xfc10
+#define COLOR65K_DARKRED 0x8000
+#define COLOR65K_GREEN 0x07e0
+#define COLOR65K_LIGHTGREEN 0x87f0
+#define COLOR65K_DARKGREEN 0x0400
+#define COLOR65K_BLUE 0x001f
+#define COLOR65K_BLUE2 0x051f
+#define COLOR65K_LIGHTBLUE 0x841f
+#define COLOR65K_DARKBLUE 0x0010
+#define COLOR65K_YELLOW 0xffe0
+#define COLOR65K_LIGHTYELLOW 0xfff0
+#define COLOR65K_DARKYELLOW 0x8400
+#define COLOR65K_CYAN 0x07ff
+#define COLOR65K_LIGHTCYAN 0x87ff
+#define COLOR65K_DARKCYAN 0x0410
+#define COLOR65K_MAGENTA 0xf81f
+#define COLOR65K_LIGHTMAGENTA 0xfc1f
+#define COLOR65K_DARKMAGENTA 0x8010
+#define COLOR65K_BROWN 0xA145
 
-        0x63, 0x00, 0x04, 0x58, 0x02, 0x0A, 0x3D, 0x00,
-        0x01, 0x08, 0x28, 0x0F, 0x50, 0x32, 0x03, 0x05,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17,
-        0x19, 0x1D, 0x14, 0x90, 0x2F, 0x89, 0x23, 0x25,
-        0xD3, 0x07, 0x00, 0x00, 0x00, 0x02, 0x03, 0x1D,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x19, 0x32, 0x94, 0xD5, 0x02,
-        0x07, 0x00, 0x00, 0x04, 0xA2, 0x1A, 0x00, 0x90,
-        0x1E, 0x00, 0x80, 0x23, 0x00, 0x73, 0x28, 0x00,
-        0x68, 0x2E, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x16, 0x15, 0x14, 0x11, 0x10, 0x0F, 0x0E, 0x0D,
-        0x0C, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x01,
-        0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x28,
-        0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20,
-        0x1F, 0x1E, 0x1C, 0x1B, 0x19, 0x14, 0x13, 0x12,
-        0x11, 0x10, 0x0F, 0x0E, 0x0D, 0x0C, 0x0A, 0x08,
-        0x07, 0x06, 0x04, 0x02, 0x00, 0xFF, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x71, 0x01
+#define COLOR65K_GRAYSCALE1 2113
+#define COLOR65K_GRAYSCALE2 2113 * 2
+#define COLOR65K_GRAYSCALE3 2113 * 3
+#define COLOR65K_GRAYSCALE4 2113 * 4
+#define COLOR65K_GRAYSCALE5 2113 * 5
+#define COLOR65K_GRAYSCALE6 2113 * 6
+#define COLOR65K_GRAYSCALE7 2113 * 7
+#define COLOR65K_GRAYSCALE8 2113 * 8
+#define COLOR65K_GRAYSCALE9 2113 * 9
+#define COLOR65K_GRAYSCALE10 2113 * 10
+#define COLOR65K_GRAYSCALE11 2113 * 11
+#define COLOR65K_GRAYSCALE12 2113 * 12
+#define COLOR65K_GRAYSCALE13 2113 * 13
+#define COLOR65K_GRAYSCALE14 2113 * 14
+#define COLOR65K_GRAYSCALE15 2113 * 15
+#define COLOR65K_GRAYSCALE16 2113 * 16
+#define COLOR65K_GRAYSCALE17 2113 * 17
+#define COLOR65K_GRAYSCALE18 2113 * 18
+#define COLOR65K_GRAYSCALE19 2113 * 19
+#define COLOR65K_GRAYSCALE20 2113 * 20
+#define COLOR65K_GRAYSCALE21 2113 * 21
+#define COLOR65K_GRAYSCALE22 2113 * 22
+#define COLOR65K_GRAYSCALE23 2113 * 23
+#define COLOR65K_GRAYSCALE24 2113 * 24
+#define COLOR65K_GRAYSCALE25 2113 * 25
+#define COLOR65K_GRAYSCALE26 2113 * 26
+#define COLOR65K_GRAYSCALE27 2113 * 27
+#define COLOR65K_GRAYSCALE28 2113 * 28
+#define COLOR65K_GRAYSCALE29 2113 * 29
+#define COLOR65K_GRAYSCALE30 2113 * 30
 
-};
-struct TouchLocation
+#define RA8876_CCR1 0xCD
+#define RA8876_TEXT_FULL_ALIGN_DISABLE 0
+#define RA8876_TEXT_FULL_ALIGN_ENABLE 1
+#define RA8876_TEXT_CHROMA_KEY_DISABLE 0
+#define RA8876_TEXT_CHROMA_KEY_ENABLE 1
+#define RA8876_TEXT_NO_ROTATION 0
+#define RA8876_TEXT_ROTATION 1
+#define RA8876_TEXT_WIDTH_ENLARGEMENT_X1 0
+#define RA8876_TEXT_WIDTH_ENLARGEMENT_X2 1
+#define RA8876_TEXT_WIDTH_ENLARGEMENT_X3 2
+#define RA8876_TEXT_WIDTH_ENLARGEMENT_X4 3
+#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X1 0
+#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X2 1
+#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X3 2
+#define RA8876_TEXT_HEIGHT_ENLARGEMENT_X4 3
+
+typedef struct TouchLocation_s
 {
     uint16_t x;
     uint16_t y;
-};
-struct Button
+} TouchLocation;
+
+typedef struct Button_s
 {
-    int lastPress;
+    unsigned int lastPress;
     bool pressed;
     uint16_t xmin, xmax;
     uint16_t ymin, ymax;
     int name; //use enumeration
-};
-struct Image
+} Button;
+
+typedef struct Image_s
 {
     char name[13];
     int page;
@@ -835,167 +801,144 @@ struct Image
     int width;
     int height;
     int backgroundColor;
-};
-/*Example Functions*/
-void runDisplay();
-void runDisplayTouch();
-void DrawImageTest();
-class Ra8876_Lite
+} Image;
+
+typedef struct RA8876_s
 {
-private:
-    int _xnscs, _xnreset, mosi, miso, sck, _clk, _data, _GT9271_INT, _backlight;
-    int i2c_addr, i2c_addr_write, i2c_addr_read;
-    int _xnscs_mask, _xnreset_mask, _GT9271_INT_mask, _clk_mask, _backlight_mask;
+    int xnscs, reset;
+    int spi_mosi, spi_miso, spi_clk;
+    int i2c_addr_write, i2c_addr_read;
+    int reset_mask;
     i2c bus;
-    SPI_Bus spi_bus;
+} Display;
 
-public:
-    Error begin(int xnscs, int xnreset, int clk, int data, int GT9271_INT, int backlight);
+Error display_begin(Display *display, int xnscs, int xnreset, int clk, int data, int GT9271_INT, int backlight);
 
-    Error ra8876Initialize(void);
-    bool ra8876PllInitial(void);
-    bool ra8876SdramInitial(void);
+/*SD Card*/
+//void loadImage(Image image, libpropeller::SD *sd);
+void display_bte_memory_copy_image(Display *display, Image image, int xpos, int ypos);
 
-    /*SD Card*/
-    void loadImage(Image image, libpropeller::SD *sd);
-    void bteMemoryCopyImage(Image image, int xpos, int ypos);
+/*Touch*/
+int display_update_buttons(Display *display, Button *buttons, const int amount);
 
-    /*Touch*/
-    uint8_t gt9271_Send_Cfg(uint8_t *buf, uint16_t cfg_len);
-    void writeGT9271TouchRegister(uint16_t regAddr, uint8_t *val, uint16_t cnt);
-    uint8_t readGT9271TouchAddr(uint16_t regAddr, uint8_t *pBuf, uint8_t len);
-    uint8_t readGT9271TouchLocation(TouchLocation *pLoc, uint8_t num);
-    int checkButtons(Button *buttons, const int amount);
+void display_on(Display *display, bool on);
+void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height);
+void display_lcd_horizontal_non_display(Display *display, uint16_t numbers);
+void display_lcd_hsync_start_position(Display *display, uint16_t numbers);
+void display_lcd_hsync_pulse_width(Display *display, uint16_t numbers);
+void display_lcd_vertical_non_display(Display *display, uint16_t numbers);
+void display_lcd_vsync_start_position(Display *display, uint16_t numbers);
+void display_lcd_vsync_pulse_width(Display *display, uint16_t numbers);
+void display_image_start_address(Display *display, uint32_t addr);
+void display_image_width(Display *display, uint16_t width);
+void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0);
+void display_canvas_image_start_address(Display *display, uint32_t addr);
+void display_canvas_image_width(Display *display, uint16_t width);
+void display_active_window_xy(Display *display, uint16_t x0, uint16_t y0);
+void display_active_window_wh(Display *display, uint16_t width, uint16_t height);
 
-    /*access*/
-    void lcdRegWrite(ru8 reg);
-    void lcdDataWrite(ru8 data);
-    ru8 lcdDataRead(void);
-    ru8 lcdStatusRead(void);
-    void lcdRegDataWrite(ru8 reg, ru8 data);
-    ru8 lcdRegDataRead(ru8 reg);
-    void lcdDataWrite16bbp(ru16 data);
+void display_ram_access_prepare(Display *display, Display *display);
+void display_fore_ground_color_16bpp(Display *display, uint16_t color);
+void display_back_ground_color_16bpp(Display *display, uint16_t color);
 
-    /*Staus*/
-    void checkWriteFifoNotFull(void);
-    void checkWriteFifoEmpty(void);
-    void checkReadFifoNotFull(void);
-    void checkReadFifoFull(void);
-    void checkReadFifoNotEmpty(void);
-    void check2dBusy(void);
-    bool checkSdramReady(void);
-    ru8 powerSavingStatus(void);
-    bool checkIcReady(void); //
+/*graphic function*/
+void display_graphic_mode(Display *display, bool on);
+void display_set_pixel_cursor(Display *display, uint16_t x, uint16_t y);
+void display_put_pixel_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t color);
+void display_put_picture_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char *data);
 
-    void displayOn(bool on);
-    void lcdHorizontalWidthVerticalHeight(ru16 width, ru16 height);
-    void lcdHorizontalNonDisplay(ru16 numbers);
-    void lcdHsyncStartPosition(ru16 numbers);
-    void lcdHsyncPulseWidth(ru16 numbers);
-    void lcdVerticalNonDisplay(ru16 numbers);
-    void lcdVsyncStartPosition(ru16 numbers);
-    void lcdVsyncPulseWidth(ru16 numbers);
-    void displayImageStartAddress(ru32 addr);
-    void displayImageWidth(ru16 width);
-    void displayWindowStartXY(ru16 x0, ru16 y0);
-    void canvasImageStartAddress(ru32 addr);
-    void canvasImageWidth(ru16 width);
-    void activeWindowXY(ru16 x0, ru16 y0);
-    void activeWindowWH(ru16 width, ru16 height);
+/*text function*/
+void display_text_mode(Display *display, bool on);
+void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color);
+void display_set_text_cursor(Display *display, uint16_t x, uint16_t y);
+void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select);                   //cch
+void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge); //cdh
 
-    void bte_Source0_MemoryStartAddr(ru32 addr);
-    void bte_Source0_ImageWidth(ru16 width);
-    void bte_Source0_WindowStartXY(ru16 x0, ru16 y0);
-    void bte_Source1_MemoryStartAddr(ru32 addr);
-    void bte_Source1_ImageWidth(ru16 width);
-    void bte_Source1_WindowStartXY(ru16 x0, ru16 y0);
-    void bte_DestinationMemoryStartAddr(ru32 addr);
-    void bte_DestinationImageWidth(ru16 width);
-    void bte_DestinationWindowStartXY(ru16 x0, ru16 y0);
-    void bte_WindowSize(ru16 width, ru16 height);
+void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width); //b7h,bbh,ceh,cfh
 
-    /*PWM function*/
-    void pwm_Prescaler(ru8 prescaler);
-    void pwm_ClockMuxReg(ru8 pwm1_clk_div, ru8 pwm0_clk_div, ru8 xpwm1_ctrl, ru8 xpwm0_ctrl);
-    void pwm_Configuration(ru8 pwm1_inverter, ru8 pwm1_auto_reload, ru8 pwm1_start, ru8 pwm0_dead_zone, ru8 pwm0_inverter, ru8 pwm0_auto_reload, ru8 pwm0_start);
+void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str);
 
-    void pwm0_ClocksPerPeriod(ru16 clocks_per_period);
-    void pwm0_Duty(ru16 duty);
-    void pwm1_ClocksPerPeriod(ru16 clocks_per_period);
-    void pwm1_Duty(ru16 duty);
+/*draw function*/
+void display_draw_line(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_triangle(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void display_draw_triangle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void display_draw_circle(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+void display_draw_circle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_ellipse_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
 
-    void ramAccessPrepare(void);
-    void foreGroundColor16bpp(ru16 color);
-    void backGroundColor16bpp(ru16 color);
+/*BTE function*/
+void display_bte_memory_copy(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t des_addr, uint16_t des_image_width,
+                             uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height);
+void display_bte_memory_copy_with_rop(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y,
+                                      uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint8_t rop_code);
+void display_bte_memory_copy_with_chroma_key(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+                                             uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint16_t chromakey_color);
+void display_bte_mpu_write_with_rop(Display *display, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y, uint32_t des_addr, uint16_t des_image_width,
+                                    uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint8_t rop_code);
+void display_bte_mpu_write_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
+void display_bte_mpu_write_color_expansion(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
+void display_bte_mpu_write_color_expansion_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y,
+                                                           uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
 
-    /*graphic function*/
-    void graphicMode(bool on);
-    void setPixelCursor(ru16 x, ru16 y);
-    void putPixel_16bpp(ru16 x, ru16 y, ru16 color);
-    void putPicture_16bpp(ru16 x, ru16 y, ru16 width, ru16 height);
-    void putPicture_16bpp(ru16 x, ru16 y, ru16 width, ru16 height, const unsigned char *data);
-    void putPicture_16bpp(ru16 x, ru16 y, ru16 width, ru16 height, const unsigned short *data);
+void display_bte_pattern_fill(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height);
+void display_bte_pattern_fill_with_chroma_key(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+                                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
 
-    /*text function*/
-    void textMode(bool on);
-    void textColor(ru16 foreground_color, ru16 background_color);
-    void setTextCursor(ru16 x, ru16 y);
-    void setTextParameter1(ru8 source_select, ru8 size_select, ru8 iso_select);               //cch
-    void setTextParameter2(ru8 align, ru8 chroma_key, ru8 width_enlarge, ru8 height_enlarge); //cdh
+Error display_initialize(Display *display);
+bool display_pll_initial(Display *display);
+bool display_sdram_initial(Display *display);
 
-    void genitopCharacterRomParameter(ru8 scs_select, ru8 clk_div, ru8 rom_select, ru8 character_select, ru8 gt_width); //b7h,bbh,ceh,cfh
+/*Touch*/
+uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len);
+void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt);
+uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
+uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
 
-    void putString(const ru16 x0, const ru16 y0, const char *str);
-    void putDec(ru16 x0, ru16 y0, rs32 vaule, ru8 len, const char *flag);
-    void putFloat(ru16 x0, ru16 y0, double vaule, ru8 len, ru8 precision, const char *flag);
-    void putHex(ru16 x0, ru16 y0, ru32 vaule, ru8 len, const char *flag);
+/*access*/
+void lcdRegWrite(Display *display, uint8_t reg);
+void lcdDataWrite(Display *display, uint8_t data);
+uint8_t lcdDataRead(Display *display);
+uint8_t lcdStatusRead(Display *display);
+void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data);
+uint8_t lcdRegDataRead(Display *display, uint8_t reg);
+void lcdDataWrite16bbp(Display *display, uint16_t data);
 
-    /*draw function*/
-    void drawLine(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 color);
-    void drawSquare(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 color);
-    void drawSquareFill(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 color);
-    void drawCircleSquare(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 xr, ru16 yr, ru16 color);
-    void drawCircleSquareFill(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 xr, ru16 yr, ru16 color);
-    void drawTriangle(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 x2, ru16 y2, ru16 color);
-    void drawTriangleFill(ru16 x0, ru16 y0, ru16 x1, ru16 y1, ru16 x2, ru16 y2, ru16 color);
-    void drawCircle(ru16 x0, ru16 y0, ru16 r, ru16 color);
-    void drawCircleFill(ru16 x0, ru16 y0, ru16 r, ru16 color);
-    void drawEllipse(ru16 x0, ru16 y0, ru16 xr, ru16 yr, ru16 color);
-    void drawEllipseFill(ru16 x0, ru16 y0, ru16 xr, ru16 yr, ru16 color);
+/*Staus*/
+void checkWriteFifoNotFull(Display *display);
+void checkWriteFifoEmpty(Display *display);
+void checkReadFifoNotFull(Display *display);
+void checkReadFifoFull(Display *display);
+void checkReadFifoNotEmpty(Display *display);
+void check2dBusy(Display *display);
+bool checkSdramReady(Display *display);
+uint8_t powerSavingStatus(Display *display);
+bool checkIcReady(Display *display);
 
-    /*BTE function*/
-    void bteMemoryCopy(ru32 s0_addr, ru16 s0_image_width, ru16 s0_x, ru16 s0_y, ru32 des_addr, ru16 des_image_width,
-                       ru16 des_x, ru16 des_y, ru16 copy_width, ru16 copy_height);
-    void bteMemoryCopyWithROP(ru32 s0_addr, ru16 s0_image_width, ru16 s0_x, ru16 s0_y, ru32 s1_addr, ru16 s1_image_width, ru16 s1_x, ru16 s1_y,
-                              ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 copy_width, ru16 copy_height, ru8 rop_code);
-    void bteMemoryCopyWithChromaKey(ru32 s0_addr, ru16 s0_image_width, ru16 s0_x, ru16 s0_y,
-                                    ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 copy_width, ru16 copy_height, ru16 chromakey_color);
-    void bteMpuWriteWithROP(ru32 s1_addr, ru16 s1_image_width, ru16 s1_x, ru16 s1_y, ru32 des_addr, ru16 des_image_width,
-                            ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru8 rop_code, const unsigned char *data);
-    void bteMpuWriteWithROP(ru32 s1_addr, ru16 s1_image_width, ru16 s1_x, ru16 s1_y, ru32 des_addr, ru16 des_image_width,
-                            ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru8 rop_code, const unsigned short *data);
-    void bteMpuWriteWithROP(ru32 s1_addr, ru16 s1_image_width, ru16 s1_x, ru16 s1_y, ru32 des_addr, ru16 des_image_width,
-                            ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru8 rop_code);
-    void bteMpuWriteWithChromaKey(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 chromakey_color,
-                                  const unsigned char *data);
-    void bteMpuWriteWithChromaKey(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 chromakey_color,
-                                  const unsigned short *data);
-    void bteMpuWriteWithChromaKey(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 chromakey_color);
-    void bteMpuWriteColorExpansion(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 foreground_color, ru16 background_color, const unsigned char *data);
-    void bteMpuWriteColorExpansion(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 foreground_color, ru16 background_color);
-    void bteMpuWriteColorExpansionWithChromaKey(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height,
-                                                ru16 foreground_color, ru16 background_color, const unsigned char *data);
-    void bteMpuWriteColorExpansionWithChromaKey(ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y,
-                                                ru16 width, ru16 height, ru16 foreground_color, ru16 background_color);
+void bte_Source0_MemoryStartAddr(Display *display, uint32_t addr);
+void bte_Source0_ImageWidth(Display *display, uint16_t width);
+void bte_Source0_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_Source1_MemoryStartAddr(Display *display, uint32_t addr);
+void bte_Source1_ImageWidth(Display *display, uint16_t width);
+void bte_Source1_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_DestinationMemoryStartAddr(Display *display, uint32_t addr);
+void bte_DestinationImageWidth(Display *display, uint16_t width);
+void bte_DestinationWindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_WindowSize(Display *display, uint16_t width, uint16_t height);
 
-    void btePatternFill(ru8 p8x8or16x16, ru32 s0_addr, ru16 s0_image_width, ru16 s0_x, ru16 s0_y,
-                        ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height);
-    void btePatternFillWithChromaKey(ru8 p8x8or16x16, ru32 s0_addr, ru16 s0_image_width, ru16 s0_x, ru16 s0_y,
-                                     ru32 des_addr, ru16 des_image_width, ru16 des_x, ru16 des_y, ru16 width, ru16 height, ru16 chromakey_color);
+/*PWM function*/
+void pwm_Prescaler(Display *display, uint8_t prescaler);
+void pwm_ClockMuxReg(Display *display, uint8_t pwm1_clk_div, uint8_t pwm0_clk_div, uint8_t xpwm1_ctrl, uint8_t xpwm0_ctrl);
+void pwm_Configuration(Display *display, uint8_t pwm1_inverter, uint8_t pwm1_auto_reload, uint8_t pwm1_start, uint8_t pwm0_dead_zone, uint8_t pwm0_inverter, uint8_t pwm0_auto_reload, uint8_t pwm0_start);
 
-    /*DMA function*/
-    void setSerialFlash4BytesMode(ru8 scs_select);
-    void dma_24bitAddressBlockMode(ru8 scs_selct, ru8 clk_div, ru16 x0, ru16 y0, ru16 width, ru16 height, ru16 picture_width, ru32 addr);
-    void dma_32bitAddressBlockMode(ru8 scs_selct, ru8 clk_div, ru16 x0, ru16 y0, ru16 width, ru16 height, ru16 picture_width, ru32 addr);
-};
+void pwm0_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+void pwm0_Duty(Display *display, uint16_t duty);
+void pwm1_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+void pwm1_Duty(Display *display, uint16_t duty);
 #endif

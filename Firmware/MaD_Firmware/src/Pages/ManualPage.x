@@ -3,6 +3,16 @@
 
 #define BUTTONCOUNT 3
 
+enum button_names
+{
+    BUTTON_MOTION_MODE,
+    BUTTON_CONDITION,
+    BUTTON_NAVIGATION
+};
+
+/* Private Function Declarations */
+void checkButtons(ManualPage *page);
+
 /**
  * @brief Manual page contains information and controls for running in manual mode
  * 
@@ -13,7 +23,7 @@
  * 
  * @param b Button that was pressed
  */
-void ManualPage::checkButtons(Button *buttons)
+static void checkButtons(ManualPage *page)
 {
     display->checkButtons(buttons, BUTTONCOUNT);
     for (int i = 0; i < BUTTONCOUNT; i++)
@@ -38,57 +48,68 @@ void ManualPage::checkButtons(Button *buttons)
     }
 }
 
+ManualPage *ManualPage_create(Display *display)
+{
+    ManualPage *page = (ManualPage *)malloc(sizeof(ManualPage));
+    page->display = display;
+    page->complete = false;
+    return page;
+}
+
+void ManualPage_destroy(ManualPage *page)
+{
+    free(page);
+}
+
 /**
  * @brief Starts manual page
  * 
  */
-void ManualPage::run(Ra8876_Lite *the_display, Motion_Cog *motionCog)
+void ManualPage_run(ManualPage *page)
 {
     printf("Manual page running\n");
-    display = the_display;
-    complete = false;
-    display->drawSquareFill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
-    display->textColor(MAINTEXTCOLOR, BACKCOLOR);
+    page->display->drawSquareFill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
+    page->display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    page->display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
+    page->display->textColor(MAINTEXTCOLOR, BACKCOLOR);
 
     //connect motor
     printf("loaded dyn4\n");
     //Setup NavKey
     i2cNavKey navkey(0b0010010);
-    navkey.pins(28, 29);
-    navkey.reset();
-    navkey.begin(i2cNavKey::INT_DATA | i2cNavKey::WRAP_ENABLE | i2cNavKey::DIRE_RIGHT | i2cNavKey::IPUP_ENABLE);
+    NavKey *navkey = NavKey_create(28, 29, 0b0010010);
+    NavKey_begin(navkey, i2cNavKey::INT_DATA | i2cNavKey::WRAP_ENABLE | i2cNavKey::DIRE_RIGHT | i2cNavKey::IPUP_ENABLE);
+    NavKey_reset(navkey);
 
-    navkey.writeCounter((int32_t)0);  /* Reset the counter value */
-    navkey.writeMax((int32_t)10000);  /* Set the maximum threshold*/
-    navkey.writeMin((int32_t)-10000); /* Set the minimum threshold */
-    navkey.writeStep((int32_t)100);   /* Set the step to 1*/
+    writeCounter(navkey, (int32_t)0);  /* Reset the counter value */
+    writeMax(navkey, (int32_t)10000);  /* Set the maximum threshold*/
+    writeMin(navkey, (int32_t)-10000); /* Set the minimum threshold */
+    writeStep(navkey, (int32_t)100);   /* Set the step to 1*/
 
-    navkey.writeDoublePushPeriod(30); /*Set a period for the double push of 300ms */
+    writeDoublePushPeriod(navkey, 30); /*Set a period for the double push of 300ms */
 
     char buf[50];
     strcpy(buf, "Manual");
     int titlex = SCREEN_WIDTH / 2 - strlen(buf) * 16;
     int titley = 10;
-    display->putString(titlex, titley, buf);
+    putString(navkey->display, titlex, titley, buf);
 
-    display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    setTextParameter1(navkey->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    setTextParameter2(navkey->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    display->textColor(MAINTEXTCOLOR, BACKCOLOR);
+    textColor(navkey->display, MAINTEXTCOLOR, BACKCOLOR);
     strcpy(buf, "Information");
     titley = 120;
     titlex = SCREEN_WIDTH / 6 - strlen(buf) * 8;
-    display->putString(titlex, titley, buf);
-    display->drawLine(titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
+    putString(navkey->display, titlex, titley, buf);
+    drawLine(navkey->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
 
-    display->textColor(MAINTEXTCOLOR, BACKCOLOR);
+    textColor(navkey->display, MAINTEXTCOLOR, BACKCOLOR);
     strcpy(buf, "Control");
     titley = 300;
     titlex = SCREEN_WIDTH / 6 - strlen(buf) * 8;
-    display->putString(titlex, titley, buf);
-    display->drawLine(titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
+    putString(navkey->display, titlex, titley, buf);
+    drawLine(navkey->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
     printf("creating buttons\n");
     Button buttons[BUTTONCOUNT];
     buttons[0].name = BUTTON_MOTION_MODE;
@@ -115,9 +136,9 @@ void ManualPage::run(Ra8876_Lite *the_display, Motion_Cog *motionCog)
     buttons[2].pressed = false;
     buttons[2].lastPress = 0;
 
-    display->drawSquareFill(buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
-    display->drawSquareFill(buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    display->bteMemoryCopyImage(navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
+    drawSquareFill(navkey->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
+    drawSquareFill(navkey->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
+    bteMemoryCopyImage(navkey->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     bool initialRender = true;
     printf("Manual page finished laoding\n");
     struct MachineState_t previousState;
@@ -127,8 +148,8 @@ void ManualPage::run(Ra8876_Lite *the_display, Motion_Cog *motionCog)
         navkey.updateStatus();
         checkButtons(buttons);
 
-        display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
-        display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+        setTextParameter1(navkey->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
+        setTextParameter2(navkey->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
         int textcolor = 0;
         int backcolor = 0;
         int bordercolor = 0;
