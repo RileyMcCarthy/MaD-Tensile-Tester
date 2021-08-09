@@ -3,8 +3,8 @@
 
  TARGET = MAD.binary
  BIN = bin
- INCLUDE = include/Utility include/Elements include/Pages include/Main Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial
- SOURCEDIR = Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial src/Elements src/Main
+ INCLUDE = include/Utility include/Elements include/Pages include/Main Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial Librarys/MotionPlanning
+ SOURCEDIR = Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial src/Elements src/Main Librarys/MotionPlanning
  BIN_DIR := $(addprefix $(BIN)/, $(INCLUDE))
  SOURCE = $(foreach dir,$(SOURCEDIR),$(wildcard $(dir)/*.c))
  SOURCE_CPP = $(foreach dir,$(SOURCEDIR),$(wildcard $(dir)/*.cpp))

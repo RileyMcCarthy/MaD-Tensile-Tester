@@ -1,15 +1,18 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
-VAR="bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o "
-VAR="-I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial"
-VAR="Librarys/NavKey/i2cNavKey.c Librarys/RA8876/RA8876.c  Librarys/MCP23017/MCP23017.c  Librarys/DS3231/DS3231.c Librarys/ForceGauge/ForceGauge.c Librarys/DYN4/DYN4.c Librarys/Encoder/Encoder.c Librarys/JSON/JSON.c  src/Elements/Clock.c src/Main/MaD.c src/Main/Motion.c src/Main/main.c"
+VAR="bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o bin/Librarys/MotionPlanning/MotionPlanning.o "
+VAR="-I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -I Librarys/MotionPlanning"
+ 
+VAR="Librarys/NavKey/i2cNavKey.c Librarys/RA8876/RA8876.c  Librarys/MCP23017/MCP23017.c  Librarys/DS3231/DS3231.c Librarys/ForceGauge/ForceGauge.c Librarys/DYN4/DYN4.c Librarys/Encoder/Encoder.c Librarys/JSON/JSON.c  src/Elements/Clock.c src/Main/MaD.c src/Main/Motion.c src/Main/main.c Librarys/MotionPlanning/MotionPlanning.c"
+ 
 # GNU Make 4.3
 # Built for Windows32
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
+ 
 
-# Make data base, printed on Thu Aug 05 18:32:56 2021
+# Make data base, printed on Fri Aug 06 18:22:30 2021
 
 # Variables
 
@@ -78,7 +81,7 @@ ONEDRIVE = C:\Users\Riley McCarthy\OneDrive
 # environment
 INTELLIJ IDEA COMMUNITY EDITION = C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.4\bin;
 # makefile (from 'makefile', line 7)
-SOURCEDIR = Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial src/Elements src/Main
+SOURCEDIR = Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial src/Elements src/Main Librarys/MotionPlanning
 # makefile
 CURDIR := c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware
 # environment
@@ -116,7 +119,8 @@ SW_SIM_TEMP = C:\ProgramData\SOLIDWORKS\SW_net_sim_temp\
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # makefile (from 'makefile', line 6)
-INCLUDE = include/Utility include/Elements include/Pages include/Main Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial
+INCLUDE = include/Utility include/Elements include/Pages include/Main Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Lib 
+rarys/DYN4 Librarys/Encoder Librarys/JSON Librarys/Serial Librarys/MotionPlanning
 # default
 MAKE_HOST := Windows32
 # environment
@@ -166,7 +170,7 @@ COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
 # automatic
 ?F = $(notdir $?)
 # makefile (from 'makefile', line 14)
-INC := -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial
+INC := -I include/Utility -I include/Elements -I include/Pages -I include/Main -I Librarys/NavKey -I Librarys/RA8876 -I Librarys/IOBoard -I Librarys/MCP23017 -I Librarys/SPI -I Librarys/DS3231 -I Librarys/ForceGauge -I Librarys/DYN4 -I Librarys/Encoder -I Librarys/JSON -I Librarys/Serial -I Librarys/MotionPlanning
 # environment
 PROGRAMW6432 = C:\Program Files
 # environment
@@ -178,7 +182,7 @@ PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # makefile (from 'makefile', line 13)
-OBJECTS := bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o 
+OBJECTS := bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o bin/Librarys/MotionPlanning/MotionPlanning.o 
 # environment
 USERDOMAIN = DESKTOP-JNUL46K
 # 'override' directive
@@ -186,14 +190,15 @@ GNUMAKEFLAGS :=
 # environment
 OS = Windows_NT
 # environment
-PLATFORMIO_PATH = C:\.platformio\python3;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Java\jdk-11.0.4\bin;C:\Users\Riley McCarthy\Documents\apache-ant-1.10.7\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\MATLAB\R2018a\runtime\win64;C:\Program Files\MATLAB\R2018a\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\SimpleIDE\propeller-gcc\bin;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\flexprop\bin;C:\Program Files\CMake\bin;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\atom\bin;C:\Program Files\Java\jdk-12.0.2\bin\;C:\Android\platform-tools;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.4\bin;;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Riley McCarthy\.dotnet\tools;C:\Users\Riley McCarthy\AppData\Roaming\npm;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Java\jdk-11.0.4\bin;C:\Users\Riley McCarthy\Documents\apache-ant-1.10.7\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\MATLAB\R2018a\runtime\win64;C:\Program Files\MATLAB\R2018a\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\SimpleIDE\propeller-gcc\bin;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\flexprop\bin;C:\Program Files\CMake\bin;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\atom\bin;C:\Program Files\Java\jdk-12.0.2\bin\;C:\Android\platform-tools;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.4\bin;;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Riley McCarthy\.dotnet\tools;C:\Users\Riley McCarthy\AppData\Roaming\npm
+PLATFORMIO_PATH = C:\.platformio\penv\Scripts;C:\.platformio\penv;C:\.platformio\python3;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Java\jdk-11.0.4\bin;C:\Users\Riley McCarthy\Documents\apache-ant-1.10.7\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\MATLAB\R2018a\runtime\win64;C:\Program Files\MATLAB\R2018a\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\SimpleIDE\propeller-gcc\bin;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\flexprop\bin;C:\Program Files\CMake\bin;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\atom\bin;C:\Program Files\Java\jdk-12.0.2\bin\;C:\Android\platform-tools;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.4\bin;;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Riley McCarthy\.dotnet\tools;C:\Users\Riley McCarthy\AppData\Roaming\npm;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Java\jdk-11.0.4\bin;C:\Users\Riley McCarthy\Documents\apache-ant-1.10.7\bin;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\MATLAB\R2018a\runtime\win64;C:\Program Files\MATLAB\R2018a\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files (x86)\SimpleIDE\propeller-gcc\bin;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\flexprop\bin;C:\Program Files\CMake\bin;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\atom\bin;C:\Program Files\Java\jdk-12.0.2\bin\;C:\Android\platform-tools;;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.2.4\bin;;C:\Users\Riley McCarthy\AppData\Local\Microsoft\WindowsApps;C:\Users\Riley McCarthy\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Riley McCarthy\.dotnet\tools;C:\Users\Riley McCarthy\AppData\Roaming\npm
 # makefile
 .DEFAULT_GOAL := all
 # makefile (from 'makefile', line 9)
 SOURCE = $(foreach dir,$(SOURCEDIR),$(wildcard $(dir)/*.c))
 # default
 MAKE_VERSION := 4.3
-# environment
+# env 
+ironment
 LCCDIR = C:\Program Files (x86)\Catalina_4.6
 # environment
 PROGRAMFILES(X86) = C:\Program Files (x86)
@@ -222,7 +227,7 @@ PLATFORMIO_IDE = 2.3.2
 # environment
 COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
 # makefile (from 'makefile', line 8)
-BIN_DIR := bin/include/Utility bin/include/Elements bin/include/Pages bin/include/Main bin/Librarys/NavKey bin/Librarys/RA8876 bin/Librarys/IOBoard bin/Librarys/MCP23017 bin/Librarys/SPI bin/Librarys/DS3231 bin/Librarys/ForceGauge bin/Librarys/DYN4 bin/Librarys/Encoder bin/Librarys/JSON bin/Librarys/Serial
+BIN_DIR := bin/include/Utility bin/include/Elements bin/include/Pages bin/include/Main bin/Librarys/NavKey bin/Librarys/RA8876 bin/Librarys/IOBoard bin/Librarys/MCP23017 bin/Librarys/SPI bin/Librarys/DS3231 bin/Librarys/ForceGauge bin/Librarys/DYN4 bin/Librarys/Encoder bin/Librarys/JSON bin/Librarys/Serial bin/Librarys/MotionPlanning
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
@@ -251,7 +256,8 @@ PROCESSOR_REVISION = 9e0a
 CC = flexcc
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 158 Stepping 10, GenuineIntel
-# variable set hash-table stats:
+# variable set ha 
+sh-table stats:
 # Load=119/1024=12%, Rehash=0, Collisions=12/171=7%
 
 # Pattern-specific Variable Values
@@ -272,10 +278,11 @@ PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 158 Stepping 10, GenuineIntel
 # src/Elements (key c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Elements, mtime 1628041204): 4 files, no impossibilities.
 # Librarys/SPI: could not be stat'd.
 # Librarys/MCP23017 (key c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MCP23017, mtime 1627525449): 4 files, no impossibilities.
+# Librarys/MotionPlanning (key c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning, mtime 1628285667): 5 files, no impossibilities.
 # Librarys/ForceGauge (key c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/ForceGauge, mtime 1627526387): 4 files, no impossibilities.
 # Librarys/Encoder (key c:/Users/Riley McCarthy/Documents/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/Encoder, mtime 1627518259): 5 files, no impossibilities.
 
-# 53 files, no impossibilities in 14 directories.
+# 58 files, no impossibilities in 15 directories.
 
 # Implicit Rules
 
@@ -307,7 +314,8 @@ bin/Librarys/ForceGauge/ForceGauge.o:
 # Not a target:
 bin/src/Elements/Clock.o:
 #  Implicit rule search has not been done.
-#  Modification time never checked.
+#  Modification time never check 
+ed.
 #  File has not been updated.
 
 # Not a target:
@@ -350,6 +358,12 @@ clean:
 #  recipe to execute (from 'makefile', line 42):
 	-mkdir $(BIN)
 	del /s /q $(subst /,\,$(BIN))\*
+
+# Not a target:
+bin/Librarys/MotionPlanning/MotionPlanning.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 bin/Librarys/NavKey/i2cNavKey.o:
@@ -416,7 +430,7 @@ run:
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2021-08-03 18:39:43
+#  Last modified 2021-08-06 18:22:05
 #  File has been updated.
 #  Successfully updated.
 
@@ -426,7 +440,8 @@ bin/Librarys/Encoder/Encoder.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-bin/MAD.binary: bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o
+bin/MAD.binary: bin/Librarys/NavKey/i2cNavKey.o bin/Librarys/ 
+RA8876/RA8876.o bin/Librarys/MCP23017/MCP23017.o bin/Librarys/DS3231/DS3231.o bin/Librarys/ForceGauge/ForceGauge.o bin/Librarys/DYN4/DYN4.o bin/Librarys/Encoder/Encoder.o bin/Librarys/JSON/JSON.o bin/src/Elements/Clock.o bin/src/Main/MaD.o bin/src/Main/Motion.o bin/src/Main/main.o bin/Librarys/MotionPlanning/MotionPlanning.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -451,19 +466,19 @@ bin/Librarys/DS3231/DS3231.o:
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=21/1024=2%, Rehash=0, Collisions=0/56=0%
+# Load=22/1024=2%, Rehash=0, Collisions=0/58=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 69 / storage = 896 B / avg = 12 B
-# current buf: size = 8174 B / used = 896 B / count = 69 / avg = 12 B
+# strcache buffers: 1 (0) / strings = 74 / storage = 1016 B / avg = 13 B
+# current buf: size = 8174 B / used = 1016 B / count = 74 / avg = 13 B
 
-# strcache performance: lookups = 110 / hit rate = 37%
+# strcache performance: lookups = 117 / hit rate = 36%
 # hash-table stats:
-# Load=69/8192=1%, Rehash=0, Collisions=0/110=0%
-# Finished Make data base on Thu Aug 05 18:32:56 2021
+# Load=74/8192=1%, Rehash=0, Collisions=0/117=0%
+# Finished Make data base on Fri Aug 06 18:22:30 2021
 
  

@@ -209,6 +209,17 @@ static MachinePerformance *get_machine_performance()
     return performance;
 }
 
+static MotionSet *get_motion_set()
+{
+    MotionSet *set = (MotionSet *)malloc(sizeof(MotionSet));
+    set->name = NULL;
+    set->number = 0;
+    set->type = NULL;
+    set->executions = 0;
+    set->quartets = NULL;
+    return set;
+}
+
 static char *machine_configuration_to_json(MachineConfiguration *configuration)
 {
     char *json;
@@ -306,24 +317,51 @@ MachineProfile *get_machine_profile()
     return settings;
 }
 
-void free_machine_settings(MachineProfile *settings)
+MotionProfile *get_motion_profile()
 {
-    if (settings != NULL)
-    {
-        if (settings->name != NULL)
-        {
-            free(settings->name);
-        }
-        if (settings->configuration != NULL)
-        {
-            free_machine_configuration(settings->configuration);
-        }
-        if (settings->performance != NULL)
-        {
-            free_machine_performance(settings->performance);
-        }
-        free(settings);
-    }
+    MotionProfile *motion = (MotionProfile *)malloc(sizeof(MotionProfile));
+    motion->name = NULL;
+    motion->number = 0;
+    motion->sets = NULL;
+    return motion;
+}
+
+SampleProfile *get_sample_profile()
+{
+    SampleProfile *sample = (SampleProfile *)malloc(sizeof(SampleProfile));
+    sample->name = NULL;
+    sample->number = 0;
+    sample->length = 0.0;
+    sample->stretchMax = 0.0;
+    sample->maxVelocity = 0.0;
+    sample->maxAcceleration = 0.0;
+    sample->maxJerk = 0.0;
+    sample->maxForceTensile = 0.0;
+    sample->maxForceCompression = 0.0;
+    return sample;
+}
+
+TestProfile *get_test_profile()
+{
+    TestProfile *test = (TestProfile *)malloc(sizeof(TestProfile));
+    test->name = NULL;
+    test->machineProfileFileName = NULL;
+    test->sampleProfileFileName = NULL;
+    test->sampleSerialNumber = 0;
+    return test;
+}
+
+MotionQuartet *get_motion_quartet()
+{
+    MotionQuartet *quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
+    quartet->name = NULL;
+    quartet->type = NULL;
+    quartet->distance = 0.0;
+    quartet->velocity = 0.0;
+    quartet->acceleration = 0.0;
+    quartet->jerk = 0.0;
+    quartet->dwell = 0.0;
+    return quartet;
 }
 
 char *machine_profile_to_json(MachineProfile *settings)
@@ -347,6 +385,93 @@ char *machine_profile_to_json(MachineProfile *settings)
     return json;
 }
 
+char *sample_profile_to_json(SampleProfile *sample)
+{
+    char *json;
+    int size = 5; //{}\0, 3 chars plus interior
+    char *nameJSON = string_to_json("Name", sample->name);
+    size += strlen(nameJSON) + 2;
+    char *numberJSON = int_to_json("Number", sample->number);
+    size += strlen(numberJSON) + 2;
+    char *lengthJSON = float_to_json("Length", sample->length);
+    size += strlen(lengthJSON) + 2;
+    char *stretchMaxJSON = float_to_json("Stretch Max", sample->stretchMax);
+    size += strlen(stretchMaxJSON) + 2;
+    char *maxVelocityJSON = float_to_json("Max Velocity", sample->maxVelocity);
+    size += strlen(maxVelocityJSON) + 2;
+    char *maxAccelerationJSON = float_to_json("Max Acceleration", sample->maxAcceleration);
+    size += strlen(maxAccelerationJSON) + 2;
+    char *maxJerkJSON = float_to_json("Max Jerk", sample->maxJerk);
+    size += strlen(maxJerkJSON) + 2;
+    char *maxForceTensileJSON = float_to_json("Max Force Tensile", sample->maxForceTensile);
+    size += strlen(maxForceTensileJSON) + 2;
+    char *maxForceCompressionJSON = float_to_json("Max Force Compression", sample->maxForceCompression);
+    size += strlen(maxForceCompressionJSON) + 2;
+    json = (char *)malloc(sizeof(char) * size);
+    sprintf(json, "{%s,%s,%s,%s,%s,%s,%s,%s,%s}", nameJSON, numberJSON, lengthJSON, stretchMaxJSON, maxVelocityJSON, maxAccelerationJSON, maxJerkJSON, maxForceTensileJSON, maxForceCompressionJSON);
+    free(nameJSON);
+    free(numberJSON);
+    free(lengthJSON);
+    free(stretchMaxJSON);
+    free(maxVelocityJSON);
+    free(maxAccelerationJSON);
+    free(maxJerkJSON);
+    free(maxForceTensileJSON);
+    free(maxForceCompressionJSON);
+    return json;
+}
+
+char *motion_quartet_to_json(MotionQuartet *quartet)
+{
+    char *json;
+    int size = 5; //{}\0, 3 chars plus interior
+    char *nameJSON = string_to_json("Name", quartet->name);
+    size += strlen(nameJSON) + 2;
+    char *typeJSON = string_to_json("Type", quartet->type);
+    size += strlen(typeJSON) + 2;
+    char *distanceJSON = float_to_json("Distance", quartet->distance);
+    size += strlen(distanceJSON) + 2;
+    char *velocityJSON = float_to_json("Velocity", quartet->velocity);
+    size += strlen(velocityJSON) + 2;
+    char *accelerationJSON = float_to_json("Acceleration", quartet->acceleration);
+    size += strlen(accelerationJSON) + 2;
+    char *jerkJSON = float_to_json("Jerk", quartet->jerk);
+    size += strlen(jerkJSON) + 2;
+    char *dwellJSON = float_to_json("Dwell", quartet->dwell);
+    size += strlen(dwellJSON) + 2;
+    json = (char *)malloc(sizeof(char) * size);
+    sprintf(json, "{%s,%s,%s,%s,%s,%s,%s}", nameJSON, typeJSON, distanceJSON, velocityJSON, accelerationJSON, jerkJSON, dwellJSON);
+    free(nameJSON);
+    free(typeJSON);
+    free(distanceJSON);
+    free(velocityJSON);
+    free(accelerationJSON);
+    free(jerkJSON);
+    free(dwellJSON);
+    return json;
+}
+
+char *test_profile_to_json(TestProfile *test)
+{
+    char *json;
+    int size = 5; //{}\0, 3 chars plus interior
+    char *nameJSON = string_to_json("Name", test->name);
+    size += strlen(nameJSON) + 2;
+    char *machineProfileFileNameJSON = string_to_json("Machine Profile File Name", test->machineProfileFileName);
+    size += strlen(machineProfileFileNameJSON) + 2;
+    char *sampleProfileFileNameJSON = string_to_json("Sample Profile File Name", test->sampleProfileFileName);
+    size += strlen(sampleProfileFileNameJSON) + 2;
+    char *sampleSerialNumberJSON = int_to_json("Sample Serial Number", test->sampleSerialNumber);
+    size += strlen(sampleSerialNumberJSON) + 2;
+    json = (char *)malloc(sizeof(char) * size);
+    sprintf(json, "{%s,%s,%s,%s}", nameJSON, machineProfileFileNameJSON, sampleProfileFileNameJSON, sampleSerialNumberJSON);
+    free(nameJSON);
+    free(machineProfileFileNameJSON);
+    free(sampleProfileFileNameJSON);
+    free(sampleSerialNumberJSON);
+    return json;
+}
+
 /**
  * @brief Converts JSON string to a MachineProfile structure.
  * 
@@ -356,10 +481,116 @@ char *machine_profile_to_json(MachineProfile *settings)
 MachineProfile *json_to_machine_profile(char *json)
 {
     MachineProfile *settings = get_machine_profile();
-    int temp = json_property_to_int(json, "Number");
     settings->name = json_property_to_string(json, "Name");
     settings->number = json_property_to_int(json, "Number");
     json_to_machine_configuration(json, settings->configuration);
     json_to_machine_performance(json, settings->performance);
     return settings;
+}
+
+SampleProfile *json_to_sample_profile(char *json)
+{
+    SampleProfile *sample = get_sample_profile();
+    sample->name = json_property_to_string(json, "Name");
+    sample->number = json_property_to_int(json, "Number");
+    sample->length = json_property_to_float(json, "Length");
+    sample->stretchMax = json_property_to_float(json, "Stretch Max");
+    sample->maxVelocity = json_property_to_float(json, "Max Velocity");
+    sample->maxAcceleration = json_property_to_float(json, "Max Acceleration");
+    sample->maxJerk = json_property_to_float(json, "Max Jerk");
+    sample->maxForceTensile = json_property_to_float(json, "Max Force Tensile");
+    sample->maxForceCompression = json_property_to_float(json, "Max Force Compression");
+    return sample;
+}
+
+TestProfile *json_to_test_profile(char *json)
+{
+    TestProfile *test = get_test_profile();
+    test->name = json_property_to_string(json, "Name");
+    test->machineProfileFileName = json_property_to_string(json, "Machine Profile File Name");
+    test->sampleProfileFileName = json_property_to_string(json, "Sample Profile File Name");
+    test->sampleSerialNumber = json_property_to_int(json, "Sample Serial Number");
+    return test;
+}
+
+MotionQuartet *json_to_motion_quartet(char *json)
+{
+    MotionQuartet *quartet = get_motion_quartet();
+    quartet->name = json_property_to_string(json, "Name");
+    quartet->type = json_property_to_string(json, "Type");
+    quartet->distance = json_property_to_float(json, "Distance");
+    quartet->velocity = json_property_to_float(json, "Velocity");
+    quartet->acceleration = json_property_to_float(json, "Acceleration");
+    quartet->jerk = json_property_to_float(json, "Jerk");
+    quartet->dwell = json_property_to_float(json, "Dwell");
+    return quartet;
+}
+
+void free_machine_profile(MachineProfile *settings)
+{
+    if (settings != NULL)
+    {
+        if (settings->name != NULL)
+        {
+            free(settings->name);
+        }
+        if (settings->configuration != NULL)
+        {
+            free_machine_configuration(settings->configuration);
+        }
+        if (settings->performance != NULL)
+        {
+            free_machine_performance(settings->performance);
+        }
+        free(settings);
+    }
+}
+
+void free_sample_profile(SampleProfile *sample)
+{
+    if (sample != NULL)
+    {
+        if (sample->name != NULL)
+        {
+            free(sample->name);
+        }
+    }
+    free(sample);
+}
+
+void free_test_profile(TestProfile *test)
+{
+    if (test != NULL)
+    {
+        if (test->name != NULL)
+        {
+            free(test->name);
+        }
+        if (test->machineProfileFileName != NULL)
+        {
+            free(test->machineProfileFileName);
+        }
+        if (test->sampleProfileFileName != NULL)
+        {
+            free(test->sampleProfileFileName);
+        }
+    }
+    free(test);
+}
+
+void free_motion_quartet(MotionQuartet *quartet)
+{
+    if (quartet != NULL)
+    {
+        if (quartet->name != NULL)
+        {
+            free(quartet->name);
+        }
+
+        if (quartet->type != NULL)
+        {
+            free(quartet->type);
+        }
+    }
+    free(quartet);
 }
