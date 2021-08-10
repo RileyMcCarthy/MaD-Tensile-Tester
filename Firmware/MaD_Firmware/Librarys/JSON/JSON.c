@@ -123,12 +123,35 @@ static char *json_to_object_json(char *json, char *objectName)
     char *strStart = strstr(json, pattern) + strlen(pattern);
 
     //Find end of object string
-    char *strEnd = strstr(strStart, "}");
+    int length = strlen(strStart);
+    int count = 1;
+    int position = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (strStart[i] == '{')
+        {
+            count++;
+        }
+        else if (strStart[i] == '}')
+        {
+            count--;
+        }
+        if (count == 0)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    if (position == 0)
+    {
+        printf("Error: Object not found in json string\n");
+        return NULL;
+    }
 
     //Make copy of string to return
-    int objectStringLength = strlen(strStart) - strlen(strEnd);
-    char *objectString = (char *)malloc(sizeof(char) * (objectStringLength + 1));
-    strncpy(objectString, strStart, objectStringLength);
+    char *objectString = (char *)malloc(sizeof(char) * (position + 1));
+    strncpy(objectString, strStart, position);
 
     //free
     free(pattern);
@@ -136,48 +159,7 @@ static char *json_to_object_json(char *json, char *objectName)
     return objectString;
 }
 
-/**
- * @brief Constructs a MachineConfiguration structure from a JSON string.
- * 
- * @param json A JSON string containing a machine configuration.
- */
-
-static void json_to_machine_configuration(char *json, MachineConfiguration *configuration)
-{
-    //Determine size of pattern string and create it
-    char *name = "Configuration";
-    char *configurationJSON = json_to_object_json(json, name);
-    configuration->motorType = json_property_to_string(configurationJSON, "Motor Type");
-    configuration->maxMotorRPM = json_property_to_float(configurationJSON, "Max Motor RPM");
-    configuration->maxMotorTorque = json_property_to_float(configurationJSON, "Max Motor Torque");
-    configuration->gearDiameter = json_property_to_float(configurationJSON, "Gear Diameter");
-    configuration->gearPitch = json_property_to_float(configurationJSON, "Gear Pitch");
-    configuration->systemIntertia = json_property_to_float(configurationJSON, "System Intertia");
-    configuration->staticTorque = json_property_to_float(configurationJSON, "Static Torque");
-    configuration->load = json_property_to_float(configurationJSON, "Load");
-    configuration->positionEncoderType = json_property_to_string(configurationJSON, "Position Encoder Type");
-    configuration->positionEncoderScaleFactor = json_property_to_int(configurationJSON, "Position Encoder Scale Factor");
-}
-
-/**
- * @brief Constructs a MachinePerformance structure from a JSON string.
- * 
- * @param json A JSON string containing a machine performance.
- */
-
-static void json_to_machine_performance(char *json, MachinePerformance *performance)
-{
-    //Determine size of pattern string and create it
-    char *name = "Performance";
-    char *performanceJSON = json_to_object_json(json, name);
-    performance->minPosition = json_property_to_float(performanceJSON, "Position Minimum");
-    performance->maxPosition = json_property_to_float(performanceJSON, "Position Maximum");
-    performance->maxVelocity = json_property_to_float(performanceJSON, "Velocity Maximum");
-    performance->maxAcceleration = json_property_to_float(performanceJSON, "Acceleration Maximum");
-    performance->maxForceTensile = json_property_to_float(performanceJSON, "Force Tensile Maximum");
-    performance->maxForceCompression = json_property_to_float(performanceJSON, "Force Compression Maximum");
-    performance->forceGaugeNeutralOffset = json_property_to_float(performanceJSON, "Force gauge Neutral Offset");
-}
+/**Structure Initialization Functions*/
 
 static MachineConfiguration *get_machine_configuration()
 {
@@ -219,6 +201,67 @@ static MotionSet *get_motion_set()
     set->quartets = NULL;
     return set;
 }
+
+/**Json to structure functions**/
+
+/**
+ * @brief Constructs a MachineConfiguration structure from a JSON string.
+ * 
+ * @param json A JSON string containing a machine configuration.
+ */
+
+static void json_to_machine_configuration(char *json, MachineConfiguration *configuration)
+{
+    //Determine size of pattern string and create it
+    char *name = "Configuration";
+    char *configurationJSON = json_to_object_json(json, name);
+    printf("configuration JSON Parsed:%s\n", configurationJSON);
+    if (configurationJSON == NULL)
+    {
+        printf("Error: Configuration not found in json string\n");
+    }
+    configuration->motorType = json_property_to_string(configurationJSON, "Motor Type");
+    configuration->maxMotorRPM = json_property_to_float(configurationJSON, "Max Motor RPM");
+    configuration->maxMotorTorque = json_property_to_float(configurationJSON, "Max Motor Torque");
+    configuration->gearDiameter = json_property_to_float(configurationJSON, "Gear Diameter");
+    configuration->gearPitch = json_property_to_float(configurationJSON, "Gear Pitch");
+    configuration->systemIntertia = json_property_to_float(configurationJSON, "System Intertia");
+    configuration->staticTorque = json_property_to_float(configurationJSON, "Static Torque");
+    configuration->load = json_property_to_float(configurationJSON, "Load");
+    configuration->positionEncoderType = json_property_to_string(configurationJSON, "Position Encoder Type");
+    configuration->positionEncoderScaleFactor = json_property_to_int(configurationJSON, "Position Encoder Scale Factor");
+}
+
+/**
+ * @brief Constructs a MachinePerformance structure from a JSON string.
+ * 
+ * @param json A JSON string containing a machine performance.
+ */
+
+static void json_to_machine_performance(char *json, MachinePerformance *performance)
+{
+    //Determine size of pattern string and create it
+    char *name = "Performance";
+    char *performanceJSON = json_to_object_json(json, name);
+    performance->minPosition = json_property_to_float(performanceJSON, "Position Minimum");
+    performance->maxPosition = json_property_to_float(performanceJSON, "Position Maximum");
+    performance->maxVelocity = json_property_to_float(performanceJSON, "Velocity Maximum");
+    performance->maxAcceleration = json_property_to_float(performanceJSON, "Acceleration Maximum");
+    performance->maxForceTensile = json_property_to_float(performanceJSON, "Force Tensile Maximum");
+    performance->maxForceCompression = json_property_to_float(performanceJSON, "Force Compression Maximum");
+    performance->forceGaugeNeutralOffset = json_property_to_float(performanceJSON, "Force gauge Neutral Offset");
+}
+
+static void json_to_motion_set(char *json, MotionSet *set)
+{
+    //Determine size of pattern string and create it
+    char *name = "Motion Set";
+    char *motionSetJSON = json_to_object_json(json, name);
+    //need to implement a way of parsing array of motion sets
+    //"Motion Sets": [{name, number, type, executions, quartets}, {name, number, type, executions, quartets}]
+}
+
+/**Structure to JSON Functions**/
 
 static char *machine_configuration_to_json(MachineConfiguration *configuration)
 {
@@ -263,6 +306,7 @@ static char *machine_configuration_to_json(MachineConfiguration *configuration)
     free(forceGaugeJSON);
     return json;
 }
+
 static char *machine_performance_to_json(MachinePerformance *performance)
 {
     char *json;
@@ -306,7 +350,11 @@ static void free_machine_performance(MachinePerformance *performance)
 {
     free(performance);
 }
+
 /*Public Functions*/
+
+/**Initialation Functions**/
+
 MachineProfile *get_machine_profile()
 {
     MachineProfile *settings = (MachineProfile *)malloc(sizeof(MachineProfile));
