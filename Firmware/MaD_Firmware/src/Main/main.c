@@ -1,4 +1,8 @@
 #include "MaD.h"
+enum
+{
+    HEAPSIZE = 32768
+};
 
 /**
  * @brief Main method that is called on program startup.

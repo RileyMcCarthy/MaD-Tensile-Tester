@@ -1,7 +1,9 @@
 #include "MaD.h"
 #include "JSON.h"
 #include "MotionPlanning.h"
-
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 static void test_JSON_MachineProfile()
 {
   MachineProfile *profile = get_machine_profile();
@@ -39,12 +41,12 @@ static void test_JSON_MachineProfile()
 
   //Profile Struct to JSON
   char *json = machine_profile_to_json(profile);
-
+  printf("Machine Profile JSON:%s\n\n", json);
   //Create JSON using JSON to validate conversion process
   MachineProfile *profile_validate = json_to_machine_profile(json);
   char *json_validate = machine_profile_to_json(profile_validate);
 
-  printf("\n\nvalidation_json:%s\n", json_validate);
+  printf("Machine Profile Validation Json:%s\n\n", json_validate);
   if (strcmp(json, json_validate) == 0)
   {
     printf("Machine Profile JSON Validation Successful\n");
@@ -53,6 +55,7 @@ static void test_JSON_MachineProfile()
   {
     printf("Machine Profile JSON Validation Failed\n");
   }
+  printf("---------------------------------------------------\n\n");
 
   //Free memory
   free(json);
@@ -81,12 +84,12 @@ static void test_json_sample_profile()
 
   //Profile Struct to JSON
   char *json = sample_profile_to_json(profile);
-  printf("\n\njson:%s\n", json);
+  printf("Sample Profile JSON:%s\n\n", json);
 
   //Create JSON using JSON to validate conversion process
   SampleProfile *profile_validate = json_to_sample_profile(json);
   char *json_validate = sample_profile_to_json(profile_validate);
-  printf("\n\nvalidation_json:%s\n", json_validate);
+  printf("Sample Profile Validation Json:%s\n\n", json_validate);
 
   //Make sure the JSON is the same
   if (strcmp(json, json_validate) == 0)
@@ -97,7 +100,7 @@ static void test_json_sample_profile()
   {
     printf("Sample Profile JSON Validation Failed\n");
   }
-
+  printf("---------------------------------------------------\n\n");
   //free memory
   free(json);
   free(json_validate);
@@ -124,12 +127,12 @@ static void test_json_test_profile()
 
   //Profile Struct to JSON
   char *json = test_profile_to_json(profile);
-  printf("\n\njson:%s\n", json);
+  printf("Test Profile JSON:%s\n\n", json);
 
   //Create JSON using JSON to validate conversion process
   TestProfile *profile_validate = json_to_test_profile(json);
   char *json_validate = test_profile_to_json(profile_validate);
-  printf("\n\nvalidation_json:%s\n", json_validate);
+  printf("Test Profile Validation Json:%s\n\n", json_validate);
 
   //Make sure the JSON is the same
   if (strcmp(json, json_validate) == 0)
@@ -140,7 +143,7 @@ static void test_json_test_profile()
   {
     printf("Test Profile JSON Validation Failed\n");
   }
-
+  printf("---------------------------------------------------\n\n");
   //free memory
   free_test_profile(profile);
   free_test_profile(profile_validate);
@@ -168,14 +171,12 @@ static void test_json_motion_quartet()
 
   //Profile Struct to JSON
   char *json = motion_quartet_to_json(profile);
-  printf("\n\nmotion_quartet_json:%s\n", json);
+  printf("Motion Quartet JSON:%s\n\n", json);
 
   //Create JSON using JSON to validate conversion process
   MotionQuartet *profile_validate = json_to_motion_quartet(json);
-  printf("property:%d\n", profile_validate->dwell);
   char *json_validate = motion_quartet_to_json(profile_validate);
-  printf("\n\nmotion_quartet_validation_json:%s\n", json_validate);
-
+  printf("Motion Quartet Validation Json:%s\n\n", json_validate);
   //Make sure the JSON is the same
   if (strcmp(json, json_validate) == 0)
   {
@@ -185,7 +186,7 @@ static void test_json_motion_quartet()
   {
     printf("Motion Quartet JSON Validation Failed\n");
   }
-
+  printf("---------------------------------------------------\n\n");
   //free memory
   free(json);
   free(json_validate);
@@ -258,12 +259,11 @@ static void test_json_motion_profile()
 
   //Profile Struct to JSON
   char *json = motion_profile_to_json(profile);
-  printf("\n\nmotion_profile_json:%s\n", json);
-
+  printf("Motion Profile JSON:%s\n\n", json);
   //Create JSON using JSON to validate conversion process
   MotionProfile *profile_validate = json_to_motion_profile(json);
   char *json_validate = motion_profile_to_json(profile_validate);
-  printf("\n\nmotion_profile_validation_json:%s\n", json_validate);
+  printf("Motion Profile Validation Json:%s\n\n", json_validate);
 
   //Make sure the JSON is the same
   if (strcmp(json, json_validate) == 0)
@@ -274,7 +274,7 @@ static void test_json_motion_profile()
   {
     printf("Motion Profile JSON Validation Failed\n");
   }
-
+  printf("---------------------------------------------------\n\n");
   //free memory
   free(json);
   free(json_validate);
@@ -285,10 +285,10 @@ static void test_json_motion_profile()
 static void test_JSON()
 {
   //@todo When all tests run, issues occur with the JSON validation. I think i have memory leaks
-  //test_JSON_MachineProfile();
-  //test_json_sample_profile();
-  // test_json_test_profile();
-  /// test_json_motion_quartet();
+  test_JSON_MachineProfile();
+  test_json_sample_profile();
+  test_json_test_profile();
+  test_json_motion_quartet();
   test_json_motion_profile();
 }
 
@@ -306,6 +306,9 @@ void mad_begin()
   printf("Starting...\n");
   //test_motion_planning();
   test_JSON();
+#ifdef __MEMORY_CHECK__
+  report_mem_leak();
+#endif
   while (1)
     ;
   /*while (1)

@@ -9,7 +9,8 @@
         "forcegauge.h": "c",
         "type_traits": "cpp",
         "json.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "leak_detector_c.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

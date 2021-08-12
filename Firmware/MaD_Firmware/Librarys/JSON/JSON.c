@@ -107,7 +107,6 @@ static float json_property_to_float(char *json, char *name)
     int valueLength = strlen(strStart) - strlen(strEnd);
     char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
     strncpy(propertyValueString, strStart, valueLength);
-    printf("property(%s):%s\n", name, propertyValueString);
 
     //Convert string to float
     float propertyValue = atof(propertyValueString);
@@ -588,7 +587,6 @@ char *motion_profile_to_json(MotionProfile *motion)
     for (int i = 0; i < motion->setCount; i++)
     {
         strcat(setJSON, setJSONS[i]);
-        printf("json:%s\n", setJSONS[i]);
         free(setJSONS[i]);
         if (i < motion->setCount - 1)
         {
@@ -603,7 +601,6 @@ char *motion_profile_to_json(MotionProfile *motion)
     free(nameJSON);
     free(numberJSON);
     free(setJSON);
-    printf("json:%s\n", json);
     return json;
 }
 
@@ -805,7 +802,6 @@ TestProfile *json_to_test_profile(char *json)
 
 MotionQuartet *json_to_motion_quartet(char *json)
 {
-    printf("json:%s\n", json);
     MotionQuartet *quartet = get_motion_quartet();
     quartet->name = json_property_to_string(json, "Name");
     quartet->type = json_property_to_string(json, "Type");
