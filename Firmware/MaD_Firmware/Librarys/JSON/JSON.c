@@ -43,7 +43,9 @@ static char *json_property_to_string(char *json, char *name)
     char *strStart = strstr(json, pattern) + strlen(pattern);
 
     //Find end of value string
-    char *strEnd = strstr(strStart, "\",");
+    char *strEnd1 = strstr(strStart, "\",");
+    char *strEnd2 = strstr(strStart, "\"}");
+    char *strEnd = strlen(strEnd1) > strlen(strEnd2) ? strEnd1 : strEnd2;
 
     //Make copy of string to return
     int valueLength = strlen(strStart) - strlen(strEnd);
@@ -67,7 +69,9 @@ static int json_property_to_int(char *json, char *name)
     char *strStart = strstr(json, pattern) + strlen(pattern);
 
     //Find end of value string
-    char *strEnd = strstr(strStart, ",");
+    char *strEnd1 = strchr(strStart, ',');
+    char *strEnd2 = strchr(strStart, '}');
+    char *strEnd = strlen(strEnd1) > strlen(strEnd2) ? strEnd1 : strEnd2;
 
     //Make copy of string to convert
     int valueLength = strlen(strStart) - strlen(strEnd);
@@ -95,12 +99,15 @@ static float json_property_to_float(char *json, char *name)
     char *strStart = strstr(json, pattern) + strlen(pattern);
 
     //Find end of value string
-    char *strEnd = strstr(strStart, ",");
+    char *strEnd1 = strchr(strStart, ',');
+    char *strEnd2 = strchr(strStart, '}');
+    char *strEnd = strlen(strEnd1) > strlen(strEnd2) ? strEnd1 : strEnd2;
 
     //Make copy of string to convert
     int valueLength = strlen(strStart) - strlen(strEnd);
     char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
     strncpy(propertyValueString, strStart, valueLength);
+    printf("property(%s):%s\n", name, propertyValueString);
 
     //Convert string to float
     float propertyValue = atof(propertyValueString);
@@ -112,19 +119,129 @@ static float json_property_to_float(char *json, char *name)
     return propertyValue;
 }
 
-static char *json_to_object_json(char *json, char *objectName)
+static int json_property_to_string_array(char *json, char *name, char ***stringArrayPtr)
+{
+    char **stringArray;
+    //Determine size of pattern string and create it
+    int size = strlen(name) + 6; // "":{\0, 6 chars plus interior
+    char *pattern = (char *)malloc(sizeof(char) * size);
+    sprintf(pattern, "\"%s\":[", name);
+    //Find first index of pattern string in json, add strlen of pattern to get first character of object string
+    char *strStart = strstr(json, pattern) + strlen(pattern);
+
+    //Find end of object string
+    char *strEnd = strchr(strStart, ']') + 1;
+    int length = strlen(strStart) - strlen(strEnd);
+    int stringCount = 0;
+    int cursor = 0;
+    stringArray = NULL;
+    for (int i = 0; i < length; i++)
+    {
+        if (strStart[i] == ',' || strStart[i] == ']')
+        {
+            stringCount++;
+            if (stringArray == NULL)
+            {
+                stringArray = (char **)malloc(sizeof(char *) * stringCount);
+            }
+            else
+            {
+                stringArray = (char **)realloc(stringArray, sizeof(char *) * stringCount);
+            }
+            stringArray[stringCount - 1] = (char *)malloc(sizeof(char) * (i - cursor + 1));
+            strncpy(stringArray[stringCount - 1], strStart + cursor + 1, i - cursor - 2);
+            cursor = i + 1;
+        }
+    }
+    free(pattern);
+    *stringArrayPtr = stringArray;
+    return stringCount;
+}
+
+static int json_property_to_object_json_array(char *json, char *objectName, char ***objectArrayPtr)
 {
     //Determine size of pattern string and create it
     int size = strlen(objectName) + 6; // "":{\0, 6 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
-    sprintf(pattern, "\"%s\":{", objectName);
+    sprintf(pattern, "\"%s\":", objectName);
+    //Find first index of pattern string in json, add strlen of pattern to get first character of object string
+    char *strStart = strstr(json, pattern) + strlen(pattern);
+    //Find end of object string
+    int length = strlen(strStart);
+    int count = 0;
+    int position = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (strStart[i] == '[')
+        {
+            count++;
+        }
+        else if (strStart[i] == ']')
+        {
+            count--;
+        }
+        if (count == 0)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    if (position == 0)
+    {
+        printf("Error: Object not found in json string\n");
+        return NULL;
+    }
+
+    int count = 0;
+    int cursor = 1;
+    int objectCount = 0;
+    char **objectArray = NULL;
+    for (int i = 1; i < position; i++)
+    {
+        if (strStart[i] == '{')
+        {
+            count++;
+        }
+        else if (strStart[i] == '}')
+        {
+            count--;
+        }
+        if (count == 0)
+        {
+            i++;
+            objectCount++;
+            if (objectArray == NULL)
+            {
+                objectArray = (char **)malloc(sizeof(char *) * objectCount);
+            }
+            else
+            {
+                objectArray = (char **)realloc(objectArray, sizeof(char *) * objectCount);
+            }
+            objectArray[objectCount - 1] = (char *)malloc(sizeof(char) * (i - cursor + 1));
+            strncpy(objectArray[objectCount - 1], strStart + cursor, i - cursor);
+            cursor = i + 1;
+        }
+    }
+    *objectArrayPtr = objectArray;
+    free(pattern);
+    return objectCount;
+}
+
+static char *json_property_to_object_json(char *json, char *objectName)
+{
+    //Determine size of pattern string and create it
+    int size = strlen(objectName) + 6; // "":{\0, 6 chars plus interior
+    char *pattern = (char *)malloc(sizeof(char) * size);
+    sprintf(pattern, "\"%s\":", objectName);
 
     //Find first index of pattern string in json, add strlen of pattern to get first character of object string
     char *strStart = strstr(json, pattern) + strlen(pattern);
 
     //Find end of object string
     int length = strlen(strStart);
-    int count = 1;
+    int count = 0;
     int position = 0;
     for (int i = 0; i < length; i++)
     {
@@ -191,13 +308,14 @@ static MachinePerformance *get_machine_performance()
     return performance;
 }
 
-static MotionSet *get_motion_set()
+MotionSet *get_motion_set()
 {
     MotionSet *set = (MotionSet *)malloc(sizeof(MotionSet));
     set->name = NULL;
     set->number = 0;
     set->type = NULL;
     set->executions = 0;
+    set->quartetCount = 0;
     set->quartets = NULL;
     return set;
 }
@@ -212,24 +330,16 @@ static MotionSet *get_motion_set()
 
 static void json_to_machine_configuration(char *json, MachineConfiguration *configuration)
 {
-    //Determine size of pattern string and create it
-    char *name = "Configuration";
-    char *configurationJSON = json_to_object_json(json, name);
-    printf("configuration JSON Parsed:%s\n", configurationJSON);
-    if (configurationJSON == NULL)
-    {
-        printf("Error: Configuration not found in json string\n");
-    }
-    configuration->motorType = json_property_to_string(configurationJSON, "Motor Type");
-    configuration->maxMotorRPM = json_property_to_float(configurationJSON, "Max Motor RPM");
-    configuration->maxMotorTorque = json_property_to_float(configurationJSON, "Max Motor Torque");
-    configuration->gearDiameter = json_property_to_float(configurationJSON, "Gear Diameter");
-    configuration->gearPitch = json_property_to_float(configurationJSON, "Gear Pitch");
-    configuration->systemIntertia = json_property_to_float(configurationJSON, "System Intertia");
-    configuration->staticTorque = json_property_to_float(configurationJSON, "Static Torque");
-    configuration->load = json_property_to_float(configurationJSON, "Load");
-    configuration->positionEncoderType = json_property_to_string(configurationJSON, "Position Encoder Type");
-    configuration->positionEncoderScaleFactor = json_property_to_int(configurationJSON, "Position Encoder Scale Factor");
+    configuration->motorType = json_property_to_string(json, "Motor Type");
+    configuration->maxMotorRPM = json_property_to_float(json, "Max Motor RPM");
+    configuration->maxMotorTorque = json_property_to_float(json, "Max Motor Torque");
+    configuration->gearDiameter = json_property_to_float(json, "Gear Diameter");
+    configuration->gearPitch = json_property_to_float(json, "Gear Pitch");
+    configuration->systemIntertia = json_property_to_float(json, "System Intertia");
+    configuration->staticTorque = json_property_to_float(json, "Static Torque");
+    configuration->load = json_property_to_float(json, "Load");
+    configuration->positionEncoderType = json_property_to_string(json, "Position Encoder Type");
+    configuration->positionEncoderScaleFactor = json_property_to_int(json, "Position Encoder Scale Factor");
 }
 
 /**
@@ -240,25 +350,25 @@ static void json_to_machine_configuration(char *json, MachineConfiguration *conf
 
 static void json_to_machine_performance(char *json, MachinePerformance *performance)
 {
-    //Determine size of pattern string and create it
-    char *name = "Performance";
-    char *performanceJSON = json_to_object_json(json, name);
-    performance->minPosition = json_property_to_float(performanceJSON, "Position Minimum");
-    performance->maxPosition = json_property_to_float(performanceJSON, "Position Maximum");
-    performance->maxVelocity = json_property_to_float(performanceJSON, "Velocity Maximum");
-    performance->maxAcceleration = json_property_to_float(performanceJSON, "Acceleration Maximum");
-    performance->maxForceTensile = json_property_to_float(performanceJSON, "Force Tensile Maximum");
-    performance->maxForceCompression = json_property_to_float(performanceJSON, "Force Compression Maximum");
-    performance->forceGaugeNeutralOffset = json_property_to_float(performanceJSON, "Force gauge Neutral Offset");
+    performance->minPosition = json_property_to_float(json, "Position Minimum");
+    performance->maxPosition = json_property_to_float(json, "Position Maximum");
+    performance->maxVelocity = json_property_to_float(json, "Velocity Maximum");
+    performance->maxAcceleration = json_property_to_float(json, "Acceleration Maximum");
+    performance->maxForceTensile = json_property_to_float(json, "Force Tensile Maximum");
+    performance->maxForceCompression = json_property_to_float(json, "Force Compression Maximum");
+    performance->forceGaugeNeutralOffset = json_property_to_float(json, "Force gauge Neutral Offset");
 }
 
-static void json_to_motion_set(char *json, MotionSet *set)
+static MotionSet *json_to_motion_set(char *json)
 {
-    //Determine size of pattern string and create it
-    char *name = "Motion Set";
-    char *motionSetJSON = json_to_object_json(json, name);
-    //need to implement a way of parsing array of motion sets
-    //"Motion Sets": [{name, number, type, executions, quartets}, {name, number, type, executions, quartets}]
+
+    MotionSet *set = get_motion_set();
+    set->name = json_property_to_string(json, "Name");
+    set->number = json_property_to_int(json, "Number");
+    set->type = json_property_to_string(json, "Type");
+    set->executions = json_property_to_int(json, "Executions");
+    set->quartetCount = json_property_to_string_array(json, "Quartets", &(set->quartets));
+    return set;
 }
 
 /**Structure to JSON Functions**/
@@ -351,6 +461,30 @@ static void free_machine_performance(MachinePerformance *performance)
     free(performance);
 }
 
+static void free_motion_set(MotionSet *set)
+{
+    if (set != NULL)
+    {
+        if (set->name != NULL)
+        {
+            free(set->name);
+        }
+        if (set->type != NULL)
+        {
+            free(set->type);
+        }
+        if (set->quartets != NULL)
+        {
+            for (int i = 0; i < set->quartetCount; i++)
+            {
+                free_motion_quartet(set->quartets[i]);
+            }
+            free(set->quartets);
+        }
+        free(set);
+    }
+}
+
 /*Public Functions*/
 
 /**Initialation Functions**/
@@ -370,6 +504,7 @@ MotionProfile *get_motion_profile()
     MotionProfile *motion = (MotionProfile *)malloc(sizeof(MotionProfile));
     motion->name = NULL;
     motion->number = 0;
+    motion->setCount = 0;
     motion->sets = NULL;
     return motion;
 }
@@ -430,6 +565,45 @@ char *machine_profile_to_json(MachineProfile *settings)
     free(numberJSON);
     free(configurationJSON);
     free(performanceJSON);
+    return json;
+}
+
+char *motion_profile_to_json(MotionProfile *motion)
+{
+    char *json;
+    int size = 5; //{}\0, 3 chars plus interior
+    char *nameJSON = string_to_json("Name", motion->name);
+    size += strlen(nameJSON) + 2;
+    char *numberJSON = int_to_json("Number", motion->number);
+    size += strlen(numberJSON) + 2;
+    char **setJSONS = (char **)malloc(sizeof(char *) * motion->setCount);
+    int setJSONSize = 20; //\"Motion Sets\":[, 3 chars plus interior
+    for (int i = 0; i < motion->setCount; i++)
+    {
+        setJSONS[i] = motion_set_to_json(motion->sets[i]);
+        setJSONSize += strlen(setJSONS[i]) + 2;
+    }
+    char *setJSON = malloc(sizeof(char) * setJSONSize);
+    strcpy(setJSON, "\"Motion Sets\":[");
+    for (int i = 0; i < motion->setCount; i++)
+    {
+        strcat(setJSON, setJSONS[i]);
+        printf("json:%s\n", setJSONS[i]);
+        free(setJSONS[i]);
+        if (i < motion->setCount - 1)
+        {
+            strcat(setJSON, ",");
+        }
+    }
+    free(setJSONS);
+    strcat(setJSON, "]");
+    size += strlen(setJSON) + 2;
+    json = (char *)malloc(sizeof(char) * size);
+    sprintf(json, "{%s,%s,%s}", nameJSON, numberJSON, setJSON);
+    free(nameJSON);
+    free(numberJSON);
+    free(setJSON);
+    printf("json:%s\n", json);
     return json;
 }
 
@@ -520,6 +694,45 @@ char *test_profile_to_json(TestProfile *test)
     return json;
 }
 
+char *motion_set_to_json(MotionSet *set)
+{
+    char *json;
+    int size = 20; //"Motion Set":{}\0, 19 chars plus interior
+    char *nameJSON = string_to_json("Name", set->name);
+    size += strlen(nameJSON) + 2;
+    char *numberJSON = int_to_json("Number", set->number);
+    size += strlen(numberJSON) + 2;
+    char *typeJSON = string_to_json("Type", set->type);
+    size += strlen(typeJSON) + 2;
+    char *executionJSON = int_to_json("Executions", set->executions);
+    size += strlen(executionJSON) + 2;
+    char *quartetJSON = malloc(sizeof(char) * (strlen("Quartets:[") + 4));
+    strcpy(quartetJSON, "\"Quartets\":["); //@todo: turn this into string_array_to_json
+    for (int i = 0; i < set->quartetCount; i++)
+    {
+        quartetJSON = (char *)realloc(quartetJSON, sizeof(char) * (strlen(quartetJSON) + strlen(set->quartets[i]) + 5));
+        strcat(quartetJSON, "\"");
+        strcat(quartetJSON, set->quartets[i]);
+        strcat(quartetJSON, "\"");
+        if (i < set->quartetCount - 1)
+        {
+            strcat(quartetJSON, ",");
+        }
+    }
+    strcat(quartetJSON, "]");
+    size += strlen(quartetJSON) + 2;
+
+    json = (char *)malloc(sizeof(char) * size);
+    sprintf(json, "{%s,%s,%s,%s,%s}", nameJSON, numberJSON, typeJSON, executionJSON, quartetJSON);
+
+    free(nameJSON);
+    free(numberJSON);
+    free(typeJSON);
+    free(executionJSON);
+    free(quartetJSON);
+    return json;
+}
+
 /**
  * @brief Converts JSON string to a MachineProfile structure.
  * 
@@ -531,9 +744,38 @@ MachineProfile *json_to_machine_profile(char *json)
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(json, "Name");
     settings->number = json_property_to_int(json, "Number");
-    json_to_machine_configuration(json, settings->configuration);
-    json_to_machine_performance(json, settings->performance);
+    //Determine size of pattern string and create it
+    char *configurationJSON = json_property_to_object_json(json, "Configuration");
+    if (configurationJSON == NULL)
+    {
+        printf("Error: Configuration not found in json string\n");
+    }
+    free(configurationJSON);
+    json_to_machine_configuration(configurationJSON, settings->configuration);
+
+    char *performanceJSON = json_property_to_object_json(json, "Performance");
+    if (performanceJSON == NULL)
+    {
+        printf("Error: Performance not found in json string\n");
+    }
+    json_to_machine_performance(performanceJSON, settings->performance);
+    free(performanceJSON);
     return settings;
+}
+
+MotionProfile *json_to_motion_profile(char *json)
+{
+    MotionProfile *profile = get_motion_profile();
+    profile->name = json_property_to_string(json, "Name");
+    profile->number = json_property_to_int(json, "Number");
+    char **setJSONArray;
+    profile->setCount = json_property_to_object_json_array(json, "Motion Sets", &setJSONArray);
+    profile->sets = (MotionSet *)malloc(sizeof(MotionSet) * profile->setCount);
+    for (int i = 0; i < profile->setCount; i++)
+    {
+        profile->sets[i] = json_to_motion_set(setJSONArray[i]);
+    }
+    return profile;
 }
 
 SampleProfile *json_to_sample_profile(char *json)
@@ -563,6 +805,7 @@ TestProfile *json_to_test_profile(char *json)
 
 MotionQuartet *json_to_motion_quartet(char *json)
 {
+    printf("json:%s\n", json);
     MotionQuartet *quartet = get_motion_quartet();
     quartet->name = json_property_to_string(json, "Name");
     quartet->type = json_property_to_string(json, "Type");
@@ -641,4 +884,24 @@ void free_motion_quartet(MotionQuartet *quartet)
         }
     }
     free(quartet);
+}
+
+void free_motion_profile(MotionProfile *profile)
+{
+    if (profile != NULL)
+    {
+        if (profile->name != NULL)
+        {
+            free(profile->name);
+        }
+        if (profile->sets != NULL)
+        {
+            for (int i = 0; i < profile->setCount; i++)
+            {
+                free_motion_set(profile->sets[i]);
+            }
+            free(profile->sets);
+        }
+        free(profile);
+    }
 }

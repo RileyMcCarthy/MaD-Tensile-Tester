@@ -144,6 +144,8 @@ static void test_json_test_profile()
   //free memory
   free_test_profile(profile);
   free_test_profile(profile_validate);
+  free(json);
+  free(json_validate);
 }
 
 static void test_json_motion_quartet()
@@ -170,7 +172,7 @@ static void test_json_motion_quartet()
 
   //Create JSON using JSON to validate conversion process
   MotionQuartet *profile_validate = json_to_motion_quartet(json);
-  printf("property:%s\n", profile_validate->name);
+  printf("property:%d\n", profile_validate->dwell);
   char *json_validate = motion_quartet_to_json(profile_validate);
   printf("\n\nmotion_quartet_validation_json:%s\n", json_validate);
 
@@ -191,13 +193,103 @@ static void test_json_motion_quartet()
   free_motion_quartet(profile_validate);
 }
 
+static void test_json_motion_profile()
+{
+  //Get motion profile structure
+  MotionProfile *profile = get_motion_profile();
+
+  //Populate structure
+  char *profileName = "motion_profile_name";
+  profile->name = (char *)malloc(strlen(profileName) + 1);
+  strcpy(profile->name, profileName);
+  profile->number = 2;
+  profile->setCount = 2;
+  profile->sets = malloc(sizeof(MotionSet) * profile->setCount);
+
+  //Get motion set structure
+  MotionSet *set = get_motion_set();
+
+  //Populate structure
+  char *profileName = "motion_set_profile_name";
+  set->name = (char *)malloc(strlen(profileName) + 1);
+  strcpy(set->name, profileName);
+  set->number = 3;
+  char *profileType = "motion_set_profile_type";
+  set->type = (char *)malloc(strlen(profileType) + 1);
+  strcpy(set->type, profileType);
+  set->executions = 5;
+  set->quartetCount = 3;
+  set->quartets = (MotionQuartet **)malloc(sizeof(MotionQuartet *) * set->quartetCount);
+  char *quartet1File = "quartet1_file_name.quartet";
+  char *quartet2File = "quartet2_file_name.quartet";
+  char *quartet3File = "quartet3_file_name.quartet";
+
+  set->quartets[0] = malloc(sizeof(char) * (strlen(quartet1File) + 1));
+  strcpy(set->quartets[0], quartet1File);
+  set->quartets[1] = malloc(sizeof(char) * (strlen(quartet2File) + 1));
+  strcpy(set->quartets[1], quartet2File);
+  set->quartets[2] = malloc(sizeof(char) * (strlen(quartet3File) + 1));
+  strcpy(set->quartets[2], quartet3File);
+
+  //Create another set structure
+  MotionSet *set2 = get_motion_set();
+  profileName = "motion_set_profile_name2";
+  set2->name = (char *)malloc(strlen(profileName) + 1);
+  strcpy(set2->name, profileName);
+  set2->number = 4;
+  profileType = "motion_set_profile_type2";
+  set2->type = (char *)malloc(strlen(profileType) + 1);
+  strcpy(set2->type, profileType);
+  set2->executions = 6;
+  set2->quartetCount = 3;
+  set2->quartets = (MotionQuartet **)malloc(sizeof(MotionQuartet *) * set2->quartetCount);
+  quartet1File = "quartet1_file_name2.quartet";
+  quartet2File = "quartet2_file_name2.quartet";
+  quartet3File = "quartet3_file_name2.quartet";
+  set2->quartets[0] = malloc(sizeof(char) * (strlen(quartet1File) + 1));
+  strcpy(set2->quartets[0], quartet1File);
+  set2->quartets[1] = malloc(sizeof(char) * (strlen(quartet2File) + 1));
+  strcpy(set2->quartets[1], quartet2File);
+  set2->quartets[2] = malloc(sizeof(char) * (strlen(quartet3File) + 1));
+  strcpy(set2->quartets[2], quartet3File);
+
+  profile->sets[0] = set;
+  profile->sets[1] = set2;
+
+  //Profile Struct to JSON
+  char *json = motion_profile_to_json(profile);
+  printf("\n\nmotion_profile_json:%s\n", json);
+
+  //Create JSON using JSON to validate conversion process
+  MotionProfile *profile_validate = json_to_motion_profile(json);
+  char *json_validate = motion_profile_to_json(profile_validate);
+  printf("\n\nmotion_profile_validation_json:%s\n", json_validate);
+
+  //Make sure the JSON is the same
+  if (strcmp(json, json_validate) == 0)
+  {
+    printf("Motion Profile JSON Validation Successful\n");
+  }
+  else
+  {
+    printf("Motion Profile JSON Validation Failed\n");
+  }
+
+  //free memory
+  free(json);
+  free(json_validate);
+  free_motion_profile(profile);
+  free_motion_profile(profile_validate);
+}
+
 static void test_JSON()
 {
   //@todo When all tests run, issues occur with the JSON validation. I think i have memory leaks
-  test_JSON_MachineProfile();
-  test_json_sample_profile();
-  test_json_test_profile();
-  test_json_motion_quartet();
+  //test_JSON_MachineProfile();
+  //test_json_sample_profile();
+  // test_json_test_profile();
+  /// test_json_motion_quartet();
+  test_json_motion_profile();
 }
 
 static void test_motion_planning()
