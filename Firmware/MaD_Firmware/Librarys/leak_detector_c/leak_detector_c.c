@@ -3,6 +3,7 @@
 #include "leak_detector_c.h"
 
 #undef malloc
+#undef realloc
 #undef calloc
 #undef free
 
@@ -48,9 +49,9 @@ void erase(unsigned pos)
 
 	if (pos == 0)
 	{
-		MEM_LEAK *temp = ptr_start;
+		MEM_LEAK *temp1 = ptr_start;
 		ptr_start = ptr_start->next;
-		free(temp);
+		free(temp1);
 	}
 	else
 	{
@@ -95,6 +96,20 @@ void *xmalloc(unsigned int size, const char *file, unsigned int line)
 		add_mem_info(ptr, size, file, line);
 	}
 	return ptr;
+}
+
+void *xrealloc(void *ptr, unsigned int size, const char *file, unsigned int line)
+{
+	void *newptr = xmalloc(size, file, line);
+	if (ptr != NULL)
+	{
+		if (newptr != NULL)
+		{
+			memcpy(newptr, ptr, size);
+		}
+		xfree(ptr);
+	}
+	return newptr;
 }
 
 /*
@@ -168,29 +183,25 @@ void report_mem_leak(void)
 	unsigned short index;
 	MEM_LEAK *leak_info;
 
-	FILE *fp_write = fopen(OUTPUT_FILE, "wt");
-	char info[1024];
+	char info[100];
 
-	if (fp_write != NULL)
+	sprintf(info, "%s\n", "Memory Leak Summary");
+	printf("%s", info);
+	sprintf(info, "%s\n", "-----------------------------------");
+	printf("%s", info);
+
+	for (leak_info = ptr_start; leak_info != NULL; leak_info = leak_info->next)
 	{
-		sprintf(info, "%s\n", "Memory Leak Summary");
+		sprintf(info, "address : %d\n", leak_info->mem_info.address);
+		printf("%s", info);
+		sprintf(info, "size    : %d bytes\n", leak_info->mem_info.size);
+		printf("%s", info);
+		sprintf(info, "file    : %s\n", leak_info->mem_info.file_name);
+		printf("%s", info);
+		sprintf(info, "line    : %d\n", leak_info->mem_info.line);
 		printf("%s", info);
 		sprintf(info, "%s\n", "-----------------------------------");
 		printf("%s", info);
-
-		for (leak_info = ptr_start; leak_info != NULL; leak_info = leak_info->next)
-		{
-			sprintf(info, "address : %d\n", leak_info->mem_info.address);
-			printf("%s", info);
-			sprintf(info, "size    : %d bytes\n", leak_info->mem_info.size);
-			printf("%s", info);
-			sprintf(info, "file    : %s\n", leak_info->mem_info.file_name);
-			printf("%s", info);
-			sprintf(info, "line    : %d\n", leak_info->mem_info.line);
-			printf("%s", info);
-			sprintf(info, "%s\n", "-----------------------------------");
-			printf("%s", info);
-		}
 	}
 	clear();
 }

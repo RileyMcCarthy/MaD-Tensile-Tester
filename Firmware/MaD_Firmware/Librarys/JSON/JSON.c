@@ -1,5 +1,7 @@
 #include "JSON.h"
-
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 //Private Functions
 
 static char *float_to_json(char *name, float value)

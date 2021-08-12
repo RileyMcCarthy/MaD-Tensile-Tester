@@ -1,5 +1,5 @@
  CC = flexcc
- CFLAGS=-2 -O2 -Wall 
+ CFLAGS=-2 -O1 -Wall
 
  TARGET = MAD.binary
  BIN = bin

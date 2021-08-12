@@ -14,7 +14,7 @@ static void test_JSON_MachineProfile()
   //MachineConfiguration
   char *motorType = "640-DST";
   profile->configuration->motorType = (char *)malloc(strlen(motorType) + 1);
-  strcpy(profile->configuration->motorType = "640-DST", motorType);
+  strcpy(profile->configuration->motorType, motorType);
   profile->configuration->maxMotorTorque = 3.82;    //make float
   profile->configuration->maxMotorRPM = 5000;       //make float
   profile->configuration->gearDiameter = 25.4;      //make float
@@ -303,6 +303,9 @@ static void test_motion_planning()
  */
 void mad_begin()
 {
+#ifdef __MEMORY_CHECK__
+  printf("MEMORY CHECK ENABLED\n");
+#endif
   printf("Starting...\n");
   //test_motion_planning();
   test_JSON();
