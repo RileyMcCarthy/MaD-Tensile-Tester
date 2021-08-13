@@ -773,7 +773,9 @@ MotionProfile *json_to_motion_profile(char *json)
     for (int i = 0; i < profile->setCount; i++)
     {
         profile->sets[i] = json_to_motion_set(setJSONArray[i]);
+        free(setJSONArray[i]);
     }
+    free(setJSONArray);
     return profile;
 }
 

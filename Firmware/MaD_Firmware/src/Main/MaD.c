@@ -8,7 +8,10 @@ static void test_JSON_MachineProfile()
 {
   MachineProfile *profile = get_machine_profile();
   //MachineSettings
-  profile->name = "Tensile_Test_1";
+  char *name = "Tensile_Test_1";
+  profile->name = (char *)malloc(strlen(name) + 1);
+  strcpy(profile->name, name);
+
   profile->number = 1;
 
   //MachineConfiguration
@@ -42,6 +45,7 @@ static void test_JSON_MachineProfile()
   //Profile Struct to JSON
   char *json = machine_profile_to_json(profile);
   printf("Machine Profile JSON:%s\n\n", json);
+
   //Create JSON using JSON to validate conversion process
   MachineProfile *profile_validate = json_to_machine_profile(json);
   char *json_validate = machine_profile_to_json(profile_validate);
@@ -56,7 +60,6 @@ static void test_JSON_MachineProfile()
     printf("Machine Profile JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-
   //Free memory
   free(json);
   free(json_validate);
@@ -260,6 +263,7 @@ static void test_json_motion_profile()
   //Profile Struct to JSON
   char *json = motion_profile_to_json(profile);
   printf("Motion Profile JSON:%s\n\n", json);
+
   //Create JSON using JSON to validate conversion process
   MotionProfile *profile_validate = json_to_motion_profile(json);
   char *json_validate = motion_profile_to_json(profile_validate);
@@ -288,6 +292,7 @@ static void test_JSON()
   test_JSON_MachineProfile();
   test_json_sample_profile();
   test_json_test_profile();
+  test_json_test_profile();
   test_json_motion_quartet();
   test_json_motion_profile();
 }
@@ -308,6 +313,7 @@ void mad_begin()
 #endif
   printf("Starting...\n");
   //test_motion_planning();
+
   test_JSON();
 #ifdef __MEMORY_CHECK__
   report_mem_leak();

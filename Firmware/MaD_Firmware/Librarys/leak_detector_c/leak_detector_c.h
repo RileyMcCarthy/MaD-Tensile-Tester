@@ -7,35 +7,11 @@
 #define malloc(size) xmalloc(size, __FUNCTION__, __LINE__)
 #define realloc(ptr, size) xrealloc(ptr, size, __FUNCTION__, __LINE__)
 #define calloc(elements, size) xcalloc(elements, size, __FUNCTION__, __LINE__)
-#define free(mem_ref) xfree(mem_ref)
-
-struct _MEM_INFO
-{
-	void *address;
-	unsigned int size;
-	char file_name[FILE_NAME_LENGTH];
-	unsigned int line;
-};
-typedef struct _MEM_INFO MEM_INFO;
-
-struct _MEM_LEAK
-{
-	MEM_INFO mem_info;
-	struct _MEM_LEAK *next;
-};
-typedef struct _MEM_LEAK MEM_LEAK;
-
-void add(MEM_INFO alloc_info);
-void erase(unsigned pos);
-void clear(void);
+#define free(mem_ref) xfree(mem_ref, __FUNCTION__, __LINE__)
 
 void *xmalloc(unsigned int size, const char *file, unsigned int line);
 void *xrealloc(void *ptr, unsigned int size, const char *file, unsigned int line);
 void *xcalloc(unsigned int elements, unsigned int size, const char *file, unsigned int line);
-void xfree(void *mem_ref);
-
-void add_mem_info(void *mem_ref, unsigned int size, const char *file, unsigned int line);
-void remove_mem_info(void *mem_ref);
-void report_mem_leak(void);
+void xfree(void *mem_ref, const char *file, unsigned int line);
 
 #endif

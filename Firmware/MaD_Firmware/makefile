@@ -1,5 +1,5 @@
  CC = flexcc
- CFLAGS=-2 -O1 -Wall
+ CFLAGS=-2 -O1 -Wall -D __MEMORY_CHECK__
 
  TARGET = MAD.binary
  BIN = bin
