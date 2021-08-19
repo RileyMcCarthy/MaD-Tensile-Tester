@@ -1,5 +1,5 @@
  CC = flexcc
- CFLAGS=-2 -O1 -Wall -D __MEMORY_CHECK__
+ CFLAGS=-2 -O1 -Wall -DDebug -g#-D __MEMORY_CHECK__ 
 
  TARGET = MAD.binary
  BIN = bin

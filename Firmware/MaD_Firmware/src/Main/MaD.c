@@ -302,6 +302,40 @@ static void test_motion_planning()
   motion_profile(2, 1, 1, 3, 1000);
 }
 
+static void test_sd_card()
+{
+  int sd = mount("/sd", _vfs_open_sdcard());
+
+  if (sd == 0)
+  {
+    printf("SD Card Mounted\n");
+  }
+  else
+  {
+    printf("Mount error:%d\n", _geterror());
+  }
+  FILE *fp = fopen("/sd/test.txt", "w");
+  if (fp == NULL)
+  {
+    printf("Error file could not be opened(Error: %d)\n", _geterror());
+    return;
+  }
+  fprintf(fp, "Hello World\n");
+  fclose(fp);
+  fp = fopen("/sd/test.txt", "r");
+  char buffer[100];
+  fgets(buffer, 100, fp);
+  if (strcmp(buffer, "Hello World\n") == 0)
+  {
+    printf("SD card read/write successful\n");
+  }
+  else
+  {
+    printf("SD card read/write failed\n");
+  }
+  fclose(fp);
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  * 
@@ -312,9 +346,7 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  //test_motion_planning();
-
-  test_JSON();
+  test_sd_card();
 #ifdef __MEMORY_CHECK__
   report_mem_leak();
 #endif

@@ -20,10 +20,10 @@
 #define RA8876_XNRESET 9 //Display reset
 #define BACKLIGHT 8      //Display Backlight (replaced with pullup resistor)
 
-#define MAD_SD_DO 22  //SD Data out
-#define MAD_SD_CLK 23 //SD Clock
-#define MAD_CD_DI 24  //SD Data In
-#define MAD_CD_CS 25  //SD Chip Select
+#define MAD_SD_DO 39  //SD Data out
+#define MAD_SD_CLK 40 //SD Clock
+#define MAD_SD_DI 41  //SD Data In
+#define MAD_SD_CS 42  //SD Chip Select
 
 #define MAD_DS3231_SCL 38 //RTC clock pin (Output)
 #define MAD_DS3231_SDA 37 //RTC data pin (bi-directional)
