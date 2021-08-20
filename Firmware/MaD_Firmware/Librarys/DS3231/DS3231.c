@@ -101,7 +101,7 @@ Error ds3231_begin(DS3231 *ds3231, int scl, int sda)
     Error error = SUCCESS;
     ds3231->writeAddr = (ADDR << 1) & 0b11111110; //@todo, statuc address can make definition instead of part of structure
     ds3231->readAddr = (ADDR << 1) | 0b00000001;
-    i2c_open(&(ds3231->bus), scl, sda, 1); //No pullup on clk, mode = 1
+    i2c_open(&(ds3231->bus), scl, sda, 1, 50); //No pullup on clk, mode = 1
     uint8_t status = read_register(ds3231, REG_STATUS);
     printf("Status: %d\n", status);
     if ((status & STATUS_RST) != 0)

@@ -336,6 +336,22 @@ static void test_sd_card()
   fclose(fp);
 }
 
+static void test_ds3231()
+{
+  DS3231 *rtc = ds3231_create();
+  Error status = ds3231_begin(rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
+  Time newTime;
+  // ds3231_set_time(rtc, &newTime);
+  printf("clock started: %d\n", status);
+  for (int i = 0; i < 5; i++)
+  {
+    int res = ds3231_update_time(rtc);
+    printf("updating time:%d\n", res);
+    printf("time: %d\n", rtc->time.second);
+    pause(500);
+  }
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  * 
@@ -346,34 +362,14 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  test_sd_card();
+  test_ds3231();
+
 #ifdef __MEMORY_CHECK__
   report_mem_leak();
 #endif
-  while (1)
-    ;
-  /*while (1)
-  {
-    _pinh(MAD_DS3231_SDA);
-    _waitms(2000);
-    _pinl(MAD_DS3231_SDA);
-    _waitms(2000);
-  }*/
-  printf("Starting display...\n");
-  DS3231 *rtc = ds3231_create();
-  Error status = ds3231_begin(rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
-  Time newTime;
-  ds3231_set_time(rtc, &newTime);
-  printf("clock started: %d\n", status);
-  for (int i = 0; i < 5; i++)
-  {
-    int res = ds3231_update_time(rtc);
-    printf("updating time:%d\n", res);
-    printf("time: %d\n", rtc->time.second);
-    _waitms(500);
-  }
+}
 
-  /* Pages currentPage = PAGE_STATUS;
+/* Pages currentPage = PAGE_STATUS;
   while (1)
   {
     switch (currentPage)
@@ -407,8 +403,8 @@ void mad_begin()
     printf("Selecting new page\n");
     NavigationPage nav;
     currentPage = nav.run(&display);
-  }*/
-}
+  }
+} /*
 
 /**
  * @brief Initializes display object
