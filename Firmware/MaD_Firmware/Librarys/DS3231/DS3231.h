@@ -1,6 +1,7 @@
 #ifndef DS3231_H
 #define DS3231_H
 #include "simpletools.h"
+#include "simpleI2CSlow.h"
 #include "Error.h"
 #include "stdbool.h"
 

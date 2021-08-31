@@ -99,18 +99,18 @@ SampleProfile *get_sample_profile();
 TestProfile *get_test_profile();
 MotionQuartet *get_motion_quartet();
 
-char *machine_profile_to_json(MachineProfile *settings);
-char *motion_profile_to_json(MotionProfile *motion);
-char *sample_profile_to_json(SampleProfile *sample);
-char *test_profile_to_json(TestProfile *test);
-char *motion_set_to_json(MotionSet *set);
-char *motion_quartet_to_json(MotionQuartet *quartet);
+Error *machine_profile_to_json(MachineProfile *settings, FILE *file);
+Error *motion_profile_to_json(MotionProfile *motion, FILE *file);
+Error *sample_profile_to_json(SampleProfile *sample, FILE *file);
+Error *test_profile_to_json(TestProfile *test, FILE *file);
+Error *motion_set_to_json(MotionSet *set, FILE *file);
+Error *motion_quartet_to_json(MotionQuartet *quartet, FILE *file);
 
-MachineProfile *json_to_machine_profile(char *json);
-MotionProfile *json_to_motion_profile(char *json);
-SampleProfile *json_to_sample_profile(char *json);
-TestProfile *json_to_test_profile(char *json);
-MotionQuartet *json_to_motion_quartet(char *json);
+MachineProfile *json_to_machine_profile(FILE *file);
+MotionProfile *json_to_motion_profile(FILE *file);
+SampleProfile *json_to_sample_profile(FILE *file);
+TestProfile *json_to_test_profile(FILE *file);
+MotionQuartet *json_to_motion_quartet(FILE *file);
 
 void free_machine_profile(MachineProfile *settings);
 void free_sample_profile(SampleProfile *sample);

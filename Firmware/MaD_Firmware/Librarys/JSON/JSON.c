@@ -548,101 +548,98 @@ MotionQuartet *get_motion_quartet()
     return quartet;
 }
 
-char *machine_profile_to_json(MachineProfile *settings)
+Error *machine_profile_to_json(MachineProfile *settings, FILE *file)
 {
-    char *json;
-    int size = 5; //{}\0, 3 chars plus interior
+    if (file == NULL)
+    {
+        printf("Error opening file: %s\n", file);
+        return JSON_FILE_ERROR;
+    }
+
     char *nameJSON = string_to_json("Name", settings->name);
-    size += strlen(nameJSON) + 2;
-    char *numberJSON = int_to_json("Number", settings->number);
-    size += strlen(numberJSON) + 2;
-    char *configurationJSON = machine_configuration_to_json(settings->configuration);
-    size += strlen(configurationJSON) + 2;
-    char *performanceJSON = machine_performance_to_json(settings->performance);
-    size += strlen(performanceJSON);
-    json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "{%s,%s,%s,%s}", nameJSON, numberJSON, configurationJSON, performanceJSON);
+    fprintf(file, "{%s,", nameJSON);
     free(nameJSON);
+    char *numberJSON = int_to_json("Number", settings->number);
+    fprintf(file, "%s,", numberJSON);
     free(numberJSON);
+    char *configurationJSON = machine_configuration_to_json(settings->configuration);
+    fprintf(file, "%s,", configurationJSON);
     free(configurationJSON);
+    char *performanceJSON = machine_performance_to_json(settings->performance);
+    fprintf(file, "%s}", performanceJSON);
     free(performanceJSON);
-    return json;
+    return SUCCESS;
 }
 
-char *motion_profile_to_json(MotionProfile *motion)
+Error *motion_profile_to_json(MotionProfile *motion, FILE *file)
 {
-    char *json;
-    int size = 5; //{}\0, 3 chars plus interior
-    char *nameJSON = string_to_json("Name", motion->name);
-    size += strlen(nameJSON) + 2;
-    char *numberJSON = int_to_json("Number", motion->number);
-    size += strlen(numberJSON) + 2;
-    char **setJSONS = (char **)malloc(sizeof(char *) * motion->setCount);
-    int setJSONSize = 20; //\"Motion Sets\":[, 3 chars plus interior
-    for (int i = 0; i < motion->setCount; i++)
+    if (file == NULL)
     {
-        setJSONS[i] = motion_set_to_json(motion->sets[i]);
-        setJSONSize += strlen(setJSONS[i]) + 2;
+        printf("Error opening file: %s\n", file);
+        return JSON_FILE_ERROR;
     }
-    char *setJSON = malloc(sizeof(char) * setJSONSize);
-    strcpy(setJSON, "\"Motion Sets\":[");
+
+    char *nameJSON = string_to_json("Name", motion->name);
+    fprintf(file, "{%s,", nameJSON);
+    free(nameJSON);
+
+    char *numberJSON = int_to_json("Number", motion->number);
+    fprintf(file, "%s,", numberJSON);
+    free(numberJSON);
+
+    fprintf(file, "\"Motion Sets\":[");
     for (int i = 0; i < motion->setCount; i++)
     {
-        strcat(setJSON, setJSONS[i]);
-        free(setJSONS[i]);
+        char *setJSON = motion_set_to_json(motion->sets[i]);
+        fprintf(file, "%s", setJSON);
+        free(setJSON);
         if (i < motion->setCount - 1)
         {
-            strcat(setJSON, ",");
+            fprintf(file, ",");
         }
     }
-    free(setJSONS);
-    strcat(setJSON, "]");
-    size += strlen(setJSON) + 2;
-    json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "{%s,%s,%s}", nameJSON, numberJSON, setJSON);
-    free(nameJSON);
-    free(numberJSON);
-    free(setJSON);
-    return json;
+    fprintf(file, "]}");
+    return SUCCESS;
 }
 
-char *sample_profile_to_json(SampleProfile *sample)
+Error *sample_profile_to_json(SampleProfile *sample, FILE *file)
 {
-    char *json;
-    int size = 5; //{}\0, 3 chars plus interior
+    if (file == NULL)
+    {
+        printf("Error opening file: %s\n", file);
+        return JSON_FILE_ERROR;
+    }
     char *nameJSON = string_to_json("Name", sample->name);
-    size += strlen(nameJSON) + 2;
-    char *numberJSON = int_to_json("Number", sample->number);
-    size += strlen(numberJSON) + 2;
-    char *lengthJSON = float_to_json("Length", sample->length);
-    size += strlen(lengthJSON) + 2;
-    char *stretchMaxJSON = float_to_json("Stretch Max", sample->stretchMax);
-    size += strlen(stretchMaxJSON) + 2;
-    char *maxVelocityJSON = float_to_json("Max Velocity", sample->maxVelocity);
-    size += strlen(maxVelocityJSON) + 2;
-    char *maxAccelerationJSON = float_to_json("Max Acceleration", sample->maxAcceleration);
-    size += strlen(maxAccelerationJSON) + 2;
-    char *maxJerkJSON = float_to_json("Max Jerk", sample->maxJerk);
-    size += strlen(maxJerkJSON) + 2;
-    char *maxForceTensileJSON = float_to_json("Max Force Tensile", sample->maxForceTensile);
-    size += strlen(maxForceTensileJSON) + 2;
-    char *maxForceCompressionJSON = float_to_json("Max Force Compression", sample->maxForceCompression);
-    size += strlen(maxForceCompressionJSON) + 2;
-    json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "{%s,%s,%s,%s,%s,%s,%s,%s,%s}", nameJSON, numberJSON, lengthJSON, stretchMaxJSON, maxVelocityJSON, maxAccelerationJSON, maxJerkJSON, maxForceTensileJSON, maxForceCompressionJSON);
+    fprintf(file, "{%s,", nameJSON);
     free(nameJSON);
+    char *numberJSON = int_to_json("Number", sample->number);
+    fprintf(file, "%s,", numberJSON);
     free(numberJSON);
+    char *lengthJSON = float_to_json("Length", sample->length);
+    fprintf(file, "%s,", lengthJSON);
     free(lengthJSON);
+    char *stretchMaxJSON = float_to_json("Stretch Max", sample->stretchMax);
+    fprintf(file, "%s,", stretchMaxJSON);
     free(stretchMaxJSON);
+    char *maxVelocityJSON = float_to_json("Max Velocity", sample->maxVelocity);
+    fprintf(file, "%s,", maxVelocityJSON);
     free(maxVelocityJSON);
+    char *maxAccelerationJSON = float_to_json("Max Acceleration", sample->maxAcceleration);
+    fprintf(file, "%s,", maxAccelerationJSON);
     free(maxAccelerationJSON);
+    char *maxJerkJSON = float_to_json("Max Jerk", sample->maxJerk);
+    fprintf(file, "%s,", maxJerkJSON);
     free(maxJerkJSON);
+    char *maxForceTensileJSON = float_to_json("Max Force Tensile", sample->maxForceTensile);
+    fprintf(file, "%s,", maxForceTensileJSON);
     free(maxForceTensileJSON);
+    char *maxForceCompressionJSON = float_to_json("Max Force Compression", sample->maxForceCompression);
+    fprintf(file, "%s}", maxForceCompressionJSON);
     free(maxForceCompressionJSON);
-    return json;
+    return SUCCESS;
 }
 
-char *motion_quartet_to_json(MotionQuartet *quartet)
+FILE *motion_quartet_to_json(MotionQuartet *quartet, FILE *file)
 {
     char *json;
     int size = 5; //{}\0, 3 chars plus interior
@@ -672,7 +669,7 @@ char *motion_quartet_to_json(MotionQuartet *quartet)
     return json;
 }
 
-char *test_profile_to_json(TestProfile *test)
+FILE *test_profile_to_json(TestProfile *test, FILE *file)
 {
     char *json;
     int size = 5; //{}\0, 3 chars plus interior
@@ -693,7 +690,7 @@ char *test_profile_to_json(TestProfile *test)
     return json;
 }
 
-char *motion_set_to_json(MotionSet *set)
+FILE *motion_set_to_json(MotionSet *set, FILE *file)
 {
     char *json;
     int size = 20; //"Motion Set":{}\0, 19 chars plus interior
@@ -738,7 +735,7 @@ char *motion_set_to_json(MotionSet *set)
  * @param json A JSON string containing a machine profile.
  * @return A MachineProfile structure containing the machine profile from JSON. 
  */
-MachineProfile *json_to_machine_profile(char *json)
+MachineProfile *json_to_machine_profile(FILE *file)
 {
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(json, "Name");
@@ -762,7 +759,7 @@ MachineProfile *json_to_machine_profile(char *json)
     return settings;
 }
 
-MotionProfile *json_to_motion_profile(char *json)
+MotionProfile *json_to_motion_profile(FILE *file)
 {
     MotionProfile *profile = get_motion_profile();
     profile->name = json_property_to_string(json, "Name");
@@ -779,7 +776,7 @@ MotionProfile *json_to_motion_profile(char *json)
     return profile;
 }
 
-SampleProfile *json_to_sample_profile(char *json)
+SampleProfile *json_to_sample_profile(FILE *file)
 {
     SampleProfile *sample = get_sample_profile();
     sample->name = json_property_to_string(json, "Name");
@@ -794,7 +791,7 @@ SampleProfile *json_to_sample_profile(char *json)
     return sample;
 }
 
-TestProfile *json_to_test_profile(char *json)
+TestProfile *json_to_test_profile(FILE *file)
 {
     TestProfile *test = get_test_profile();
     test->name = json_property_to_string(json, "Name");
@@ -804,7 +801,7 @@ TestProfile *json_to_test_profile(char *json)
     return test;
 }
 
-MotionQuartet *json_to_motion_quartet(char *json)
+MotionQuartet *json_to_motion_quartet(FILE *file)
 {
     MotionQuartet *quartet = get_motion_quartet();
     quartet->name = json_property_to_string(json, "Name");
