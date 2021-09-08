@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "leak_detector_c.h": "c",
+        "cstdio": "c"
+    }
+}

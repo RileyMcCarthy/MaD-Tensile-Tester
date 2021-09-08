@@ -1,9 +1,37 @@
 #include "MaD.h"
 #include "JSON.h"
+#include <stdio.h>
+#include <dirent.h>
 #include "MotionPlanning.h"
 #ifdef __MEMORY_CHECK__
 #include "leak_detector_c.h"
 #endif
+
+//Takes file pointer and prints its content character by character
+static void printFile(FILE *file)
+{
+  int position = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  int c;
+  while ((c = fgetc(file)) != EOF)
+  {
+    printf("%c", (char)c);
+  }
+  fseek(file, position, SEEK_SET);
+}
+
+//Takes file pointer and compares its content character by character
+static bool compareFile(FILE *file1, FILE *file2)
+{
+  char c1, c2;
+  while ((c1 = fgetc(file1)) != EOF && (c2 = fgetc(file2)) != EOF)
+  {
+    if (c1 != c2)
+      return false;
+  }
+  return true;
+}
+
 static void test_JSON_MachineProfile()
 {
   MachineProfile *profile = get_machine_profile();
@@ -43,15 +71,35 @@ static void test_JSON_MachineProfile()
   profile->performance->forceGaugeNeutralOffset = 0.5;
 
   //Profile Struct to JSON
-  char *json = machine_profile_to_json(profile);
-  printf("Machine Profile JSON:%s\n\n", json);
+  mkdir("/sd/MProfile");
+  chdir("/sd/MProfile");
+  FILE *jsonFile = fopen("test.mp", "w+");
+  if (jsonFile == NULL)
+  {
+    printf("Error opening machine profile file!\n");
+    return;
+  }
+  machine_profile_to_json(profile, jsonFile);
+  printf("Machine Profile JSON:");
+  printFile(jsonFile);
+  printf("\n\n");
 
   //Create JSON using JSON to validate conversion process
-  MachineProfile *profile_validate = json_to_machine_profile(json);
-  char *json_validate = machine_profile_to_json(profile_validate);
+  fseek(jsonFile, 0, SEEK_SET);
+  MachineProfile *profile_validate = json_to_machine_profile(jsonFile);
+  FILE *jsonValidateFile = fopen("test_val.mp", "w+");
+  if (jsonFile == NULL)
+  {
+    printf("Error opening machine profile validate file!\n");
+    return;
+  }
+  machine_profile_to_json(profile_validate, jsonValidateFile);
 
-  printf("Machine Profile Validation Json:%s\n\n", json_validate);
-  if (strcmp(json, json_validate) == 0)
+  printf("Machine Profile Validation Json:");
+  printFile(jsonValidateFile);
+  printf("\n\n");
+
+  if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Machine Profile JSON Validation Successful\n");
   }
@@ -61,8 +109,8 @@ static void test_JSON_MachineProfile()
   }
   printf("---------------------------------------------------\n\n");
   //Free memory
-  free(json);
-  free(json_validate);
+  fclose(jsonFile);
+  fclose(jsonValidateFile);
   free_machine_profile(profile);
   free_machine_profile(profile_validate);
 }
@@ -86,16 +134,25 @@ static void test_json_sample_profile()
   profile->maxForceCompression = 0.1;
 
   //Profile Struct to JSON
-  char *json = sample_profile_to_json(profile);
-  printf("Sample Profile JSON:%s\n\n", json);
+  mkdir("/sd/SProfile");
+  chdir("/sd/SProfile");
+  FILE *jsonFile = fopen("test.sp", "w+");
+  sample_profile_to_json(profile, jsonFile);
+  printf("Sample Profile JSON:");
+  printFile(jsonFile);
+  printf("\n\n");
 
   //Create JSON using JSON to validate conversion process
-  SampleProfile *profile_validate = json_to_sample_profile(json);
-  char *json_validate = sample_profile_to_json(profile_validate);
-  printf("Sample Profile Validation Json:%s\n\n", json_validate);
+  fseek(jsonFile, 0, SEEK_SET);
+  SampleProfile *profile_validate = json_to_sample_profile(jsonFile);
+  FILE *jsonValidateFile = fopen("test_val.sp", "w+");
+  sample_profile_to_json(profile_validate, jsonValidateFile);
+  printf("Sample Profile Validation Json:");
+  printFile(jsonValidateFile);
+  printf("\n\n");
 
   //Make sure the JSON is the same
-  if (strcmp(json, json_validate) == 0)
+  if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Sample Profile JSON Validation Successful\n");
   }
@@ -105,8 +162,8 @@ static void test_json_sample_profile()
   }
   printf("---------------------------------------------------\n\n");
   //free memory
-  free(json);
-  free(json_validate);
+  fclose(jsonFile);
+  fclose(jsonValidateFile);
   free_sample_profile(profile);
   free_sample_profile(profile_validate);
 }
@@ -129,16 +186,25 @@ static void test_json_test_profile()
   profile->sampleSerialNumber = 124532;
 
   //Profile Struct to JSON
-  char *json = test_profile_to_json(profile);
-  printf("Test Profile JSON:%s\n\n", json);
+  mkdir("/sd/TProfile");
+  chdir("/sd/TProfile");
+  FILE *jsonFile = fopen("test.tp", "w+");
+  test_profile_to_json(profile, jsonFile);
+  printf("Test Profile JSON:\n");
+  printFile(jsonFile);
+  printf("\n\n");
 
   //Create JSON using JSON to validate conversion process
-  TestProfile *profile_validate = json_to_test_profile(json);
-  char *json_validate = test_profile_to_json(profile_validate);
-  printf("Test Profile Validation Json:%s\n\n", json_validate);
+  fseek(jsonFile, 0, SEEK_SET);
+  TestProfile *profile_validate = json_to_test_profile(jsonFile);
+  FILE *jsonValidateFile = fopen("test_val.tp", "w+");
+  test_profile_to_json(profile_validate, jsonValidateFile);
+  printf("Test Profile Validation Json:\n");
+  printFile(jsonValidateFile);
+  printf("\n\n");
 
   //Make sure the JSON is the same
-  if (strcmp(json, json_validate) == 0)
+  if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Test Profile JSON Validation Successful\n");
   }
@@ -148,10 +214,10 @@ static void test_json_test_profile()
   }
   printf("---------------------------------------------------\n\n");
   //free memory
+  fclose(jsonFile);
+  fclose(jsonValidateFile);
   free_test_profile(profile);
   free_test_profile(profile_validate);
-  free(json);
-  free(json_validate);
 }
 
 static void test_json_motion_quartet()
@@ -173,15 +239,24 @@ static void test_json_motion_quartet()
   profile->dwell = 0.5;
 
   //Profile Struct to JSON
-  char *json = motion_quartet_to_json(profile);
-  printf("Motion Quartet JSON:%s\n\n", json);
+  mkdir("/sd/mquartet");
+  chdir("/sd/mquartet");
+  FILE *jsonFile = fopen("test.mq", "w+");
+  motion_quartet_to_json(profile, jsonFile);
+  printf("Motion Quartet JSON:\n");
+  printFile(jsonFile);
+  printf("\n\n");
 
   //Create JSON using JSON to validate conversion process
-  MotionQuartet *profile_validate = json_to_motion_quartet(json);
-  char *json_validate = motion_quartet_to_json(profile_validate);
-  printf("Motion Quartet Validation Json:%s\n\n", json_validate);
+  fseek(jsonFile, 0, SEEK_SET);
+  MotionQuartet *profile_validate = json_to_motion_quartet(jsonFile);
+  FILE *jsonValidateFile = fopen("test_val.mq", "w+");
+  motion_quartet_to_json(profile_validate, jsonValidateFile);
+  printf("Motion Quartet Validation Json:\n");
+  printFile(jsonValidateFile);
+  printf("\n\n");
   //Make sure the JSON is the same
-  if (strcmp(json, json_validate) == 0)
+  if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Motion Quartet JSON Validation Successful\n");
   }
@@ -191,8 +266,8 @@ static void test_json_motion_quartet()
   }
   printf("---------------------------------------------------\n\n");
   //free memory
-  free(json);
-  free(json_validate);
+  fclose(jsonFile);
+  fclose(jsonValidateFile);
   free_motion_quartet(profile);
   free_motion_quartet(profile_validate);
 }
@@ -261,16 +336,25 @@ static void test_json_motion_profile()
   profile->sets[1] = set2;
 
   //Profile Struct to JSON
-  char *json = motion_profile_to_json(profile);
-  printf("Motion Profile JSON:%s\n\n", json);
+  mkdir("/sd/mopro");
+  chdir("/sd/mopro");
+  FILE *jsonFile = fopen("test.mp", "w+");
+  motion_profile_to_json(profile, jsonFile);
+  printf("Motion Profile JSON:\n");
+  printFile(jsonFile);
+  printf("\n\n");
 
   //Create JSON using JSON to validate conversion process
-  MotionProfile *profile_validate = json_to_motion_profile(json);
-  char *json_validate = motion_profile_to_json(profile_validate);
-  printf("Motion Profile Validation Json:%s\n\n", json_validate);
+  fseek(jsonFile, 0, SEEK_SET);
+  MotionProfile *profile_validate = json_to_motion_profile(jsonFile);
+  FILE *jsonValidateFile = fopen("test_val.mp", "w+");
+  motion_profile_to_json(profile_validate, jsonValidateFile);
+  printf("Motion Profile Validation Json:\n\n");
+  printFile(jsonValidateFile);
+  printf("\n\n");
 
   //Make sure the JSON is the same
-  if (strcmp(json, json_validate) == 0)
+  if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Motion Profile JSON Validation Successful\n");
   }
@@ -280,18 +364,26 @@ static void test_json_motion_profile()
   }
   printf("---------------------------------------------------\n\n");
   //free memory
-  free(json);
-  free(json_validate);
+  fclose(jsonFile);
+  fclose(jsonValidateFile);
   free_motion_profile(profile);
   free_motion_profile(profile_validate);
 }
 
 static void test_JSON()
 {
-  //@todo When all tests run, issues occur with the JSON validation. I think i have memory leaks
+  int sd = mount("/sd", _vfs_open_sdcard());
+
+  if (sd == 0)
+  {
+    printf("SD Card Mounted\n");
+  }
+  else
+  {
+    printf("Mount error:%d\n", _geterror());
+  }
   test_JSON_MachineProfile();
   test_json_sample_profile();
-  test_json_test_profile();
   test_json_test_profile();
   test_json_motion_quartet();
   test_json_motion_profile();
@@ -305,7 +397,6 @@ static void test_motion_planning()
 static void test_sd_card()
 {
   int sd = mount("/sd", _vfs_open_sdcard());
-
   if (sd == 0)
   {
     printf("SD Card Mounted\n");
@@ -314,7 +405,21 @@ static void test_sd_card()
   {
     printf("Mount error:%d\n", _geterror());
   }
-  FILE *fp = fopen("/sd/test.txt", "w");
+  mkdir("/sd/test_dir");
+  chdir("/sd/test_dir");
+  char *dirName[50];
+  getcwd(dirName, 50);
+  printf("Current Directory:%s\n", dirName);
+  if (strcmp(dirName, "/sd/test_dir") == 0)
+  {
+    printf("Directory Change Successful\n");
+  }
+  else
+  {
+    printf("Directory Change Failed\n");
+  }
+
+  FILE *fp = fopen("test.txt", "w");
   if (fp == NULL)
   {
     printf("Error file could not be opened(Error: %d)\n", _geterror());
@@ -322,7 +427,7 @@ static void test_sd_card()
   }
   fprintf(fp, "Hello World\n");
   fclose(fp);
-  fp = fopen("/sd/test.txt", "r");
+  fp = fopen("test.txt", "r");
   char buffer[100];
   fgets(buffer, 100, fp);
   if (strcmp(buffer, "Hello World\n") == 0)
@@ -332,8 +437,48 @@ static void test_sd_card()
   else
   {
     printf("SD card read/write failed\n");
+    return;
   }
   fclose(fp);
+
+  char directory[100] = "/sd";
+  while (1)
+  {
+    DIR *dir = opendir(directory);
+    if (dir == NULL)
+    {
+      printf("Error: %d\n", _geterror());
+      return;
+    }
+    struct dirent *dirent;
+    while ((dirent = readdir(dir)) != NULL)
+    {
+      printf("%s\n", dirent->d_name);
+    }
+    printf("-----------------------------------\n");
+    printf("Please type new directory to enter or .. for back:");
+    char newDir[100];
+    scanf("%s", newDir);
+    if (strcmp(newDir, "..") == 0)
+    {
+      for (int i = strlen(directory) - 1; i >= 0; i--)
+      {
+        if (directory[i] == '/')
+        {
+          directory[i] = '\0';
+          break;
+        }
+      }
+    }
+    else
+    {
+      strcat(directory, "/");
+      strcat(directory, newDir);
+    }
+    closedir(dir);
+  }
+
+  //unmount("/sd");
 }
 
 static void test_ds3231()
@@ -362,7 +507,8 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  test_ds3231();
+  test_JSON();
+  test_sd_card();
 
 #ifdef __MEMORY_CHECK__
   report_mem_leak();

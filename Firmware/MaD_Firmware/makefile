@@ -1,4 +1,6 @@
- CC = flexcc
+ CC = C:\flexprop\bin\flexcc
+ LOAD = C:\flexprop\bin\loadp2
+ 
  CFLAGS=-2 -O1 -Wall -DDebug -g#-D __MEMORY_CHECK__ 
 
  TARGET = MAD.binary
@@ -30,7 +32,7 @@ $(BIN)/%.o: %.cpp
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 run: 
-	loadp2 -p COM5 -b230400 -t -k -v bin\$(TARGET)
+	$(LOAD) -p COM3 -b230400 -t -k -v bin\$(TARGET)
 
 .PHONY: clean
 .PHONY: clear

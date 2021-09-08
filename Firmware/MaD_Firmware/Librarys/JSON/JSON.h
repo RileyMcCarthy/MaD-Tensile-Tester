@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "string.h"
+#include "Error.h"
+#include <stdio.h>
 
 typedef struct MachineConfiguration_s
 {
@@ -99,12 +101,12 @@ SampleProfile *get_sample_profile();
 TestProfile *get_test_profile();
 MotionQuartet *get_motion_quartet();
 
-Error *machine_profile_to_json(MachineProfile *settings, FILE *file);
-Error *motion_profile_to_json(MotionProfile *motion, FILE *file);
-Error *sample_profile_to_json(SampleProfile *sample, FILE *file);
-Error *test_profile_to_json(TestProfile *test, FILE *file);
-Error *motion_set_to_json(MotionSet *set, FILE *file);
-Error *motion_quartet_to_json(MotionQuartet *quartet, FILE *file);
+Error machine_profile_to_json(MachineProfile *settings, FILE *file);
+Error motion_profile_to_json(MotionProfile *motion, FILE *file);
+Error sample_profile_to_json(SampleProfile *sample, FILE *file);
+Error test_profile_to_json(TestProfile *test, FILE *file);
+Error motion_set_to_json(MotionSet *set, FILE *file);
+Error motion_quartet_to_json(MotionQuartet *quartet, FILE *file);
 
 MachineProfile *json_to_machine_profile(FILE *file);
 MotionProfile *json_to_motion_profile(FILE *file);

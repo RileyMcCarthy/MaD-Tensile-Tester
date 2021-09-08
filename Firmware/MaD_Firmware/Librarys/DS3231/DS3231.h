@@ -23,7 +23,7 @@ typedef struct time_st //@todo replace with time library
 
 typedef struct DS3231_t
 {
-    i2c bus;
+    i2c_slow bus;
     uint8_t writeAddr, readAddr;
     Time time;
 } DS3231;

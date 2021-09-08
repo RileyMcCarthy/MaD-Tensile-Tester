@@ -23,13 +23,13 @@
 #include <propeller.h>
 #endif
 
-typedef struct i2c_st
+typedef struct i2c_slow_st
 {
     int scl_pin;
     int sda_pin;
     int drivescl; /* flag to force scl if non-zero */
     int delay;
-} i2c;
+} i2c_slow;
 
 /**
  * @brief Open an i2c device.
@@ -44,21 +44,21 @@ typedef struct i2c_st
  * in for communicating with EEPROMs on those particular boards.  
  * @return Copy of the bus address.
  */
-i2c *i2c_slow_open(i2c *bus, int sclPin, int sdaPin, int sclDrive);
+i2c_slow *i2c_slow_open(i2c_slow *bus, int sclPin, int sdaPin, int sclDrive);
 
 /**
  * @brief Signal i2c start condition on bus.
  *
  * @param *bus is the bus pointer returned by i2c_open.
  */
-void i2c_slow_start(i2c *bus);
+void i2c_slow_start(i2c_slow *bus);
 
 /**
  * @brief Send Signal i2c stop condition on bus.
  *
  * @param *bus is the bus pointer returned by i2c_open.
  */
-void i2c_slow_stop(i2c *bus);
+void i2c_slow_stop(i2c_slow *bus);
 
 /**
  * @brief Send i2c byte and return acknowledgement from device.  Does not
@@ -70,7 +70,7 @@ void i2c_slow_stop(i2c *bus);
  * @returns Acknowledge bit value (ACK = 0) or no-acknowledge (NACK = 1) 
  *  from receiving device.
  */
-int i2c_slow_writeByte(i2c *bus, int byte);
+int i2c_slow_writeByte(i2c_slow *bus, int byte);
 
 /**
  * @brief Receive i2c byte and reply with ack state. Does not set start or stop.
@@ -81,7 +81,7 @@ int i2c_slow_writeByte(i2c *bus, int byte);
  *  data byte in I2C. Acknowledge is ACK = 0, and no-acknowledge (NACK = 1). 
  * @returns The byte Propeller chip reads from I2C device.
  */
-int i2c_slow_readByte(i2c *bus, int ackState);
+int i2c_slow_readByte(i2c_slow *bus, int ackState);
 
 /**
  * @brief Send a block of i2c data. Does not set start or stop.
@@ -95,7 +95,7 @@ int i2c_slow_readByte(i2c *bus, int ackState);
  * @param count is the number of bytes to send.
  * @returns the number of bytes sent (including address byte).
  */
-int i2c_slow_writeData(i2c *bus, const unsigned char *data, int count);
+int i2c_slow_writeData(i2c_slow *bus, const unsigned char *data, int count);
 
 /**
  * @brief Receive a block of i2c data. Does not send start or stop conditions.
@@ -110,7 +110,7 @@ int i2c_slow_writeData(i2c *bus, const unsigned char *data, int count);
  * @param count is the number of bytes to receive.
  * @returns the number of bytes sent.
  */
-int i2c_slow_readData(i2c *bus, unsigned char *data, int count);
+int i2c_slow_readData(i2c_slow *bus, unsigned char *data, int count);
 
 /**
  * @brief Send i2c start and addr byte. Looks for ACK (0) or NACK (1).
@@ -121,7 +121,7 @@ int i2c_slow_readData(i2c *bus, unsigned char *data, int count);
  * @param addr is the I2C device address.
  * @returns (ACK = 0_ if device has responded.
  */
-int i2c_slow_poll(i2c *bus, int addr);
+int i2c_slow_poll(i2c_slow *bus, int addr);
 
 #endif
 /* __i2c_H */

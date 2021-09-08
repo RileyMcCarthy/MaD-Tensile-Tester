@@ -7,19 +7,19 @@
  * Modified for FlexC P1/P2 compatibility by Roy Eltham
  *
  */
-#include "simplei2c.h"
+#include "simpleI2CSlow.h"
 
-static inline void scl_low(i2c *bus)
+static inline void scl_low(i2c_slow *bus)
 {
     _pinl(bus->scl_pin);
 }
 
-static inline void sda_low(i2c *bus)
+static inline void sda_low(i2c_slow *bus)
 {
     _pinl(bus->sda_pin);
 }
 
-static inline void scl_high(i2c *bus)
+static inline void scl_high(i2c_slow *bus)
 {
     if (bus->drivescl)
     {
@@ -33,25 +33,25 @@ static inline void scl_high(i2c *bus)
     }
 }
 
-static inline void sda_high(i2c *bus)
+static inline void sda_high(i2c_slow *bus)
 {
     _wrpin(bus->sda_pin, P_HIGH_1K5);
     _pinh(bus->sda_pin);
 }
 
-static inline void all_low(i2c *dev)
+static inline void all_low(i2c_slow *dev)
 {
     scl_low(dev);
     sda_low(dev);
 }
 
-static inline void all_high(i2c *dev)
+static inline void all_high(i2c_slow *dev)
 {
     sda_high(dev);
     scl_high(dev);
 }
 
-i2c *i2c_slow_open(i2c *bus, int sclPin, int sdaPin, int sclDrive, int frequency)
+i2c_slow *i2c_slow_open(i2c_slow *bus, int sclPin, int sdaPin, int sclDrive, int frequency)
 {
     bus->scl_pin = sclPin;
     bus->sda_pin = sdaPin;
@@ -61,7 +61,7 @@ i2c *i2c_slow_open(i2c *bus, int sclPin, int sdaPin, int sclDrive, int frequency
     return bus;
 }
 
-void i2c_slow_start(i2c *bus)
+void i2c_slow_start(i2c_slow *bus)
 {
     all_high(bus);
     _waitus(bus->delay);
@@ -71,7 +71,7 @@ void i2c_slow_start(i2c *bus)
     _waitus(bus->delay);
 }
 
-void i2c_slow_stop(i2c *bus)
+void i2c_slow_stop(i2c_slow *bus)
 {
     all_low(bus);
     sda_high(bus);
@@ -81,7 +81,7 @@ void i2c_slow_stop(i2c *bus)
     sda_high(bus);
 }
 
-int i2c_slow_writeByte(i2c *bus, int byte)
+int i2c_slow_writeByte(i2c_slow *bus, int byte)
 {
     int result;
     int count = 8;
@@ -120,7 +120,7 @@ int i2c_slow_writeByte(i2c *bus, int byte)
     return result != 0;
 }
 
-int i2c_slow_readByte(i2c *bus, int ackState)
+int i2c_slow_readByte(i2c_slow *bus, int ackState)
 {
     int byte = 0;
     int count = 8;
@@ -155,7 +155,7 @@ int i2c_slow_readByte(i2c *bus, int ackState)
     return byte;
 }
 
-int i2c_slow_writeData(i2c *bus, const unsigned char *data, int count)
+int i2c_slow_writeData(i2c_slow *bus, const unsigned char *data, int count)
 {
     int n = 0;
     int rc = 0;
@@ -171,19 +171,19 @@ int i2c_slow_writeData(i2c *bus, const unsigned char *data, int count)
     return n;
 }
 
-int i2c_slow_readData(i2c *bus, unsigned char *data, int count)
+int i2c_slow_readData(i2c_slow *bus, unsigned char *data, int count)
 {
     int n = 0;
     while (--count > 0)
     {
-        data[n] = (unsigned char)i2c_readByte(bus, 0);
+        data[n] = (unsigned char)i2c_slow_readByte(bus, 0);
         n++;
     }
-    data[n] = (unsigned char)i2c_readByte(bus, 1);
+    data[n] = (unsigned char)i2c_slow_readByte(bus, 1);
     return n;
 }
 
-int i2c_slow_poll(i2c *bus, int devaddr)
+int i2c_slow_poll(i2c_slow *bus, int devaddr)
 {
     int ack = 0;
     i2c_slow_start(bus);
