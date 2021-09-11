@@ -1,7 +1,9 @@
+#define P2_TARGET_MHZ 1
+#include <sys/p2es_clock.h>
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768 * 4
+    HEAPSIZE = 32768
 };
 
 /**
@@ -13,6 +15,7 @@ enum
 
 int main()
 {
+    _clkset(_SETFREQ, _CLOCKFREQ);
     mad_begin();
     while (1)
         ;

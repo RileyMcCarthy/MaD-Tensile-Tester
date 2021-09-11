@@ -44,7 +44,7 @@ typedef struct i2c_slow_st
  * in for communicating with EEPROMs on those particular boards.  
  * @return Copy of the bus address.
  */
-i2c_slow *i2c_slow_open(i2c_slow *bus, int sclPin, int sdaPin, int sclDrive);
+i2c_slow *i2c_slow_open(i2c_slow *bus, int sclPin, int sdaPin, int sclDrive, int frequency);
 
 /**
  * @brief Signal i2c start condition on bus.

@@ -440,7 +440,7 @@ static void test_sd_card()
     return;
   }
   fclose(fp);
-
+  return;
   char directory[100] = "/sd";
   while (1)
   {
@@ -497,6 +497,49 @@ static void test_ds3231()
   }
 }
 
+static void test_display()
+{
+  Error err;
+  Display display;
+  //turn on diplay
+  if ((err = display_begin(&display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
+  {
+    printf("Error starting display:%d\n", err);
+    return;
+  }
+  printf("Display begans\n");
+  display_on(&display, true);
+  printf("Display on\n");
+
+  //Init display and background
+  display_canvas_image_start_address(&display, PAGE1_START_ADDR);
+  display_canvas_image_width(&display, SCREEN_WIDTH);
+  display_active_window_xy(&display, 0, 0);
+  display_active_window_wh(&display, SCREEN_WIDTH, SCREEN_HEIGHT);
+  display_draw_square_fill(&display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
+
+  char buf[50];
+  strcpy(buf, "Operational States");
+  int operationalStartX = SCREEN_WIDTH / 6 - strlen(buf) * 8;
+  int operationalStartY = 40;
+  display_draw_string(&display, operationalStartX, operationalStartY, buf);
+  display_draw_line(&display, operationalStartX, operationalStartY + 30, operationalStartX + strlen(buf) * 16, operationalStartY + 30, MAINTEXTCOLOR);
+  display_draw_square(&display, 20, 30, SCREEN_WIDTH / 3 - 10, SCREEN_HEIGHT - 20, SECONDARYTEXTCOLOR);
+
+  keyboard_get_input(&display, "Name: ");
+  return;
+
+  Image keyboard;
+  strcpy(keyboard.name, "/sd/keyboard.bin");
+  keyboard.page = 1;
+  keyboard.width = 1026;
+  keyboard.height = 284;
+  keyboard.x0 = 0;
+  keyboard.y0 = SCREEN_HEIGHT - keyboard.height;
+  keyboard.backgroundColor = NULL;
+  display_load_image(&display, keyboard);
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  * 
@@ -507,8 +550,10 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  test_JSON();
   test_sd_card();
+  test_display();
+  //test_JSON();
+  //test_sd_card();
 
 #ifdef __MEMORY_CHECK__
   report_mem_leak();

@@ -12,13 +12,15 @@
 #include "i2cNavKey.h"
 #include "ForceGauge.h"
 #include "DYN4.h"
+#include "Keyboard.h"
 
-#define GT9271_INT 7     //SPI Interrupt pin
-#define CLK 28           //SPI Clock Pin
-#define DATA 29          //SPI Data Pin
-#define RA8876_XNSCS 10  //SPI Chip Select Pin
-#define RA8876_XNRESET 9 //Display reset
-#define BACKLIGHT 8      //Display Backlight (replaced with pullup resistor)
+#define DISPLAY_SCK 51     //SPI Clock Pin
+#define DISPLAY_MISO 53    //SPI Data Pin
+#define DISPLAY_MOSI 52    //SPI Clock Pin
+#define DISPLAY_XNSCS 55   //SPI Chip Select Pin
+#define DISPLAY_XNRESET 54 //Display reset pin
+#define DISPLAY_CLK 56     //Display I2C clock pin
+#define DISPLAY_DATA 57    //Display I2C data pin
 
 #define MAD_SD_DO 39  //SD Data out
 #define MAD_SD_CLK 40 //SD Clock

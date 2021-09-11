@@ -1,5 +1,4 @@
 #include "Keyboard.h"
-#include "Images.h"
 #define BUTTONCOUNT 47
 
 enum keys
@@ -64,14 +63,16 @@ enum keys
  * @param key The Button that was pressed
  * @returns if submit was pressed
  */
-static bool check_buttons(Button *keys, char *buffer)
+static bool check_buttons(Display *display, Button *keys, char *buffer)
 {
-    if (display->checkButtons(keys, BUTTONCOUNT) > 0)
+    if (display_update_buttons(display, keys, BUTTONCOUNT) > 0)
     {
+        printf("bvutton pressed\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
             if (keys[i].pressed)
             {
+                buffer = (char *)realloc(buffer, strlen(buffer) + 2);
                 switch (keys[i].name)
                 {
                 case key_0:
@@ -170,6 +171,7 @@ static bool check_buttons(Button *keys, char *buffer)
                     if (strlen(buffer) <= 0)
                         break;
                     buffer[strlen(buffer) - 1] = '\0';
+                    buffer = (char *)realloc(buffer, strlen(buffer));
                     break;
                 case key_shift:
                     break;
@@ -233,17 +235,15 @@ static bool check_buttons(Button *keys, char *buffer)
  * @image html https://cdn.shopify.com/s/files/1/0059/0630/1017/files/Keychron-C1-hot-swappable-wired-type-c-mechanical-keyboard-tenkeyless-layout-for-Mac-Windows-iOS-Keycap-Size_2048x2048.jpg?v=1608368111
  * @return Button struct
  */
-static Button createKey(int name, int xmin, int ymin, float keySize)
+static void createKey(Button *button, int name, int xmin, int ymin, float keySize)
 {
-    Button key;
-    key.name = name;
-    key.xmin = xmin;
-    key.xmax = key.xmin + (int)(54.0 * keySize);
-    key.ymin = ymin;
-    key.ymax = key.ymin + (int)(54.0 * keySize);
-    key.pressed = false;
-    key.lastPress = 0;
-    return key;
+    button->name = name;
+    button->xmin = xmin;
+    button->xmax = button->xmin + (int)(54.0 * keySize);
+    button->ymin = ymin;
+    button->ymax = button->ymin + (int)(54.0 * keySize);
+    button->pressed = false;
+    button->lastPress = 0;
 }
 
 /**
@@ -251,83 +251,102 @@ static Button createKey(int name, int xmin, int ymin, float keySize)
  * 
  * @param input String buffer for user input
  */
-void keyboard_get_input(Display *display, char *input)
+char *keyboard_get_input(Display *display, char *prompt)
 {
-    char *buffer = input;
+    Image keyboard;
+    strcpy(keyboard.name, "/sd/keyboard.bin");
+    keyboard.page = 3;
+    keyboard.width = 1026;
+    keyboard.height = 284;
+    keyboard.x0 = 0;
+    keyboard.y0 = SCREEN_HEIGHT - keyboard.height;
+    keyboard.backgroundColor = NULL;
+
+    //display_load_image(display, keyboard);
+    printf("Loaded\n");
+    char *buffer = (char *)malloc(sizeof(char));
     strcpy(buffer, "");
-    int width = 1026;
-    int height = 284;
-    int startx = 0;
-    int starty = SCREEN_HEIGHT - height;
 
-    display->textColor(COLOR65K_WHITE, COLOR65K_BLUE);
-    display->setTextParameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display->setTextParameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
-    for (int i = 0; i < height; i += 10)
+    display_text_color(display, COLOR65K_WHITE, COLOR65K_BLUE);
+    display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    for (int i = 0; i < keyboard.height; i += 10)
     {
-        display->bteMemoryCopyImage(keyboardImg, startx, SCREEN_HEIGHT - i);
+        display_bte_memory_copy_image(display, keyboard, keyboard.x0, SCREEN_HEIGHT - i);
     }
-    display->bteMemoryCopyImage(keyboardImg, startx, starty);
-
+    display_bte_memory_copy_image(display, keyboard, keyboard.x0, keyboard.y0);
     Button keys[BUTTONCOUNT];
-    keys[0] = createKey(key_1, startx + 823, starty + 148, 1);
-    keys[1] = createKey(key_2, startx + 891, starty + 148, 1);
-    keys[2] = createKey(key_3, startx + 958, starty + 148, 1);
-    keys[3] = createKey(key_4, startx + 823, starty + 81, 1);
-    keys[4] = createKey(key_5, startx + 891, starty + 81, 1);
-    keys[5] = createKey(key_6, startx + 958, starty + 81, 1);
-    keys[6] = createKey(key_7, startx + 823, starty + 14, 1);
-    keys[7] = createKey(key_8, startx + 891, starty + 14, 1);
-    keys[8] = createKey(key_9, startx + 958, starty + 14, 1);
-    keys[9] = createKey(key_0, startx + 823, starty + 216, 3.5);
+    createKey(&keys[0], key_1, keyboard.x0 + 823, keyboard.y0 + 148, 1);
+    createKey(&keys[1], key_2, keyboard.x0 + 891, keyboard.y0 + 148, 1);
+    createKey(&keys[2], key_3, keyboard.x0 + 958, keyboard.y0 + 148, 1);
+    createKey(&keys[3], key_4, keyboard.x0 + 823, keyboard.y0 + 81, 1);
+    createKey(&keys[4], key_5, keyboard.x0 + 891, keyboard.y0 + 81, 1);
+    createKey(&keys[5], key_6, keyboard.x0 + 958, keyboard.y0 + 81, 1);
+    createKey(&keys[6], key_7, keyboard.x0 + 823, keyboard.y0 + 14, 1);
+    createKey(&keys[7], key_8, keyboard.x0 + 891, keyboard.y0 + 14, 1);
+    createKey(&keys[8], key_9, keyboard.x0 + 958, keyboard.y0 + 14, 1);
+    createKey(&keys[9], key_0, keyboard.x0 + 823, keyboard.y0 + 216, 3.5);
 
-    keys[10] = createKey(key_tab, startx + 13, starty + 14, 1.25);
-    keys[11] = createKey(key_q, startx + 94, starty + 14, 1);
-    keys[12] = createKey(key_w, startx + 162, starty + 14, 1);
-    keys[13] = createKey(key_e, startx + 229, starty + 14, 1);
-    keys[14] = createKey(key_r, startx + 297, starty + 14, 1);
-    keys[15] = createKey(key_t, startx + 364, starty + 14, 1);
-    keys[16] = createKey(key_y, startx + 432, starty + 14, 1);
-    keys[17] = createKey(key_u, startx + 499, starty + 14, 1);
-    keys[18] = createKey(key_i, startx + 567, starty + 14, 1);
-    keys[19] = createKey(key_o, startx + 634, starty + 14, 1);
-    keys[20] = createKey(key_p, startx + 702, starty + 14, 1);
+    createKey(&keys[10], key_tab, keyboard.x0 + 13, keyboard.y0 + 14, 1.25);
+    createKey(&keys[11], key_q, keyboard.x0 + 94, keyboard.y0 + 14, 1);
+    createKey(&keys[12], key_w, keyboard.x0 + 162, keyboard.y0 + 14, 1);
+    createKey(&keys[13], key_e, keyboard.x0 + 229, keyboard.y0 + 14, 1);
+    createKey(&keys[14], key_r, keyboard.x0 + 297, keyboard.y0 + 14, 1);
+    createKey(&keys[15], key_t, keyboard.x0 + 364, keyboard.y0 + 14, 1);
+    createKey(&keys[16], key_y, keyboard.x0 + 432, keyboard.y0 + 14, 1);
+    createKey(&keys[17], key_u, keyboard.x0 + 499, keyboard.y0 + 14, 1);
+    createKey(&keys[18], key_i, keyboard.x0 + 567, keyboard.y0 + 14, 1);
+    createKey(&keys[19], key_o, keyboard.x0 + 634, keyboard.y0 + 14, 1);
+    createKey(&keys[20], key_p, keyboard.x0 + 702, keyboard.y0 + 14, 1);
 
-    keys[21] = createKey(key_caps, startx + 702, starty + 14, 1.5);
-    keys[22] = createKey(key_a, startx + 121, starty + 81, 1);
-    keys[23] = createKey(key_s, startx + 189, starty + 81, 1);
-    keys[24] = createKey(key_d, startx + 256, starty + 81, 1);
-    keys[25] = createKey(key_f, startx + 324, starty + 81, 1);
-    keys[26] = createKey(key_g, startx + 391, starty + 81, 1);
-    keys[27] = createKey(key_h, startx + 459, starty + 81, 1);
-    keys[28] = createKey(key_j, startx + 526, starty + 81, 1);
-    keys[29] = createKey(key_k, startx + 594, starty + 81, 1);
-    keys[30] = createKey(key_l, startx + 661, starty + 81, 1);
-    keys[31] = createKey(key_del, startx + 729, starty + 81, 1.5);
+    createKey(&keys[21], key_caps, keyboard.x0 + 702, keyboard.y0 + 14, 1.5);
+    createKey(&keys[22], key_a, keyboard.x0 + 121, keyboard.y0 + 81, 1);
+    createKey(&keys[23], key_s, keyboard.x0 + 189, keyboard.y0 + 81, 1);
+    createKey(&keys[24], key_d, keyboard.x0 + 256, keyboard.y0 + 81, 1);
+    createKey(&keys[25], key_f, keyboard.x0 + 324, keyboard.y0 + 81, 1);
+    createKey(&keys[26], key_g, keyboard.x0 + 391, keyboard.y0 + 81, 1);
+    createKey(&keys[27], key_h, keyboard.x0 + 459, keyboard.y0 + 81, 1);
+    createKey(&keys[28], key_j, keyboard.x0 + 526, keyboard.y0 + 81, 1);
+    createKey(&keys[29], key_k, keyboard.x0 + 594, keyboard.y0 + 81, 1);
+    createKey(&keys[30], key_l, keyboard.x0 + 661, keyboard.y0 + 81, 1);
+    createKey(&keys[31], key_del, keyboard.x0 + 729, keyboard.y0 + 81, 1.5);
 
-    keys[32] = createKey(key_shift, startx + 13, starty + 148, 2.25);
-    keys[33] = createKey(key_z, startx + 162, starty + 148, 1);
-    keys[34] = createKey(key_x, startx + 229, starty + 148, 1);
-    keys[35] = createKey(key_c, startx + 297, starty + 148, 1);
-    keys[36] = createKey(key_v, startx + 364, starty + 148, 1);
-    keys[37] = createKey(key_b, startx + 432, starty + 148, 1);
-    keys[38] = createKey(key_n, startx + 499, starty + 148, 1);
-    keys[39] = createKey(key_m, startx + 567, starty + 148, 1);
-    keys[40] = createKey(key_comma, startx + 634, starty + 148, 1);
-    keys[41] = createKey(key_period, startx + 702, starty + 148, 1);
+    createKey(&keys[32], key_shift, keyboard.x0 + 13, keyboard.y0 + 148, 2.25);
+    createKey(&keys[33], key_z, keyboard.x0 + 162, keyboard.y0 + 148, 1);
+    createKey(&keys[34], key_x, keyboard.x0 + 229, keyboard.y0 + 148, 1);
+    createKey(&keys[35], key_c, keyboard.x0 + 297, keyboard.y0 + 148, 1);
+    createKey(&keys[36], key_v, keyboard.x0 + 364, keyboard.y0 + 148, 1);
+    createKey(&keys[37], key_b, keyboard.x0 + 432, keyboard.y0 + 148, 1);
+    createKey(&keys[38], key_n, keyboard.x0 + 499, keyboard.y0 + 148, 1);
+    createKey(&keys[39], key_m, keyboard.x0 + 567, keyboard.y0 + 148, 1);
+    createKey(&keys[40], key_comma, keyboard.x0 + 634, keyboard.y0 + 148, 1);
+    createKey(&keys[41], key_period, keyboard.x0 + 702, keyboard.y0 + 148, 1);
 
-    keys[42] = createKey(key_cancel, startx + 14, starty + 216, 2.75);
-    keys[43] = createKey(key_left, startx + 175, starty + 216, 1.25);
-    keys[44] = createKey(key_space, startx + 256, starty + 216, 6.25);
-    keys[45] = createKey(key_right, startx + 607, starty + 216, 1.25);
-    keys[46] = createKey(key_submit, startx + 702, starty + 216, 2);
+    createKey(&keys[42], key_cancel, keyboard.x0 + 14, keyboard.y0 + 216, 2.75);
+    createKey(&keys[43], key_left, keyboard.x0 + 175, keyboard.y0 + 216, 1.25);
+    createKey(&keys[44], key_space, keyboard.x0 + 256, keyboard.y0 + 216, 6.25);
+    createKey(&keys[45], key_right, keyboard.x0 + 607, keyboard.y0 + 216, 1.25);
+    createKey(&keys[46], key_submit, keyboard.x0 + 702, keyboard.y0 + 216, 2);
+
     bool complete = false;
+    char *lastString = NULL;
     while (!complete)
     {
-        complete = checkButtons(keys, buffer);
-        display->drawSquareFill(startx, starty - 32, startx + width, starty, COLOR65K_GRAYSCALE30);
-        display->textColor(COLOR65K_WHITE, COLOR65K_GRAYSCALE30);
-        display->putString(SCREEN_WIDTH / 2 - strlen(buffer) * 16, starty - 32, buffer);
-        _waitms(100);
+        complete = check_buttons(display, keys, buffer);
+        if (strcmp(lastString, buffer) != 0)
+        {
+            char *temp = malloc(sizeof(char) * (strlen(buffer) + strlen(prompt) + 2));
+            strcpy(temp, prompt);
+            strcat(temp, buffer);
+            display_draw_square_fill(display, keyboard.x0, keyboard.y0 - 32, keyboard.x0 + keyboard.width, keyboard.y0, COLOR65K_GRAYSCALE30);
+            display_text_color(display, COLOR65K_WHITE, COLOR65K_GRAYSCALE30);
+            display_draw_string(display, SCREEN_WIDTH / 2 - strlen(temp) * 16, keyboard.y0 - 32, temp);
+            free(temp);
+            lastString = (char *)realloc(lastString, sizeof(char) * (strlen(buffer) + 1));
+            strcpy(lastString, buffer);
+        }
     }
+
+    free(lastString);
+    return buffer;
 }

@@ -81,14 +81,15 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
 
   if ((lcdRegDataRead(display, 0xff) != 0x76) && (lcdRegDataRead(display, 0xff) != 0x77))
   {
+    printf("Display not found\n");
     return DISPLAY_NOT_FOUND;
   }
   Error err;
   if ((err = display_initialize(display)) != SUCCESS)
   {
+    printf("Error:%d\n", err);
     return err;
   }
-
   return SUCCESS;
 }
 //**************************************************************//
@@ -97,16 +98,14 @@ Error display_initialize(Display *display)
 {
   if (!display_pll_initial(display))
   {
-    // print("PLL initial fail!");
+    print("PLL initial fail!");
     return DISPLAY_PLL_FAIL;
   }
-
   if (!display_sdram_initial(display))
   {
-    // print("SDRAM initial fail!");
+    print("SDRAM initial fail!");
     return DISPLAY_SDRAM_FAIL;
   }
-
   lcdRegWrite(display, RA8876_CCR); //01h
   lcdDataWrite(display, RA8876_PLL_ENABLE << 7 | RA8876_WAIT_NO_MASK << 6 | RA8876_KEY_SCAN_DISABLE << 5 | RA8876_TFT_OUTPUT24 << 3 | RA8876_I2C_MASTER_DISABLE << 2 | RA8876_SERIAL_IF_ENABLE << 1 | RA8876_HOST_DATA_BUS_SERIAL);
 
@@ -159,6 +158,8 @@ void lcdRegWrite(Display *display, uint8_t reg)
   _pinl(display->xnscs); //xnscs low
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_CMDWRITE);@todo implement spi interface
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)reg);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_CMDWRITE);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)reg);
   _pinh(display->xnscs); //xnscs high
 }
 //**************************************************************//
@@ -168,6 +169,8 @@ void lcdDataWrite(Display *display, uint8_t data)
   _pinl(display->xnscs); //xnscs low
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data); @todo implement spi interface
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)RA8876_SPI_DATAWRITE);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)data);
   _pinh(display->xnscs); //xnscs high
 }
 //**************************************************************//
@@ -176,10 +179,12 @@ uint8_t lcdDataRead(Display *display)
 {
   _pinl(display->xnscs); //xnscs low
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAREAD);@todo implement spi interface
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAREAD);
   _pinh(display->spi_mosi); //mosi high
   //uint8_t data = shift_in_fast(&spi_bus, 8);
+  uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
   _pinh(display->xnscs); //xnscs high
-  //return data;
+  return data;
 }
 //**************************************************************//
 //**************************************************************//
@@ -187,10 +192,12 @@ uint8_t lcdStatusRead(Display *display)
 {
   _pinl(display->xnscs); //xnscs low
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_STATUSREAD);@todo implement spi interface
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_STATUSREAD);
   _pinh(display->spi_mosi); //mosi high
   //uint8_t data = shift_in_fast(&spi_bus, 8);
+  uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
   _pinh(display->xnscs); //xnscs high
-  //return data;
+  return data;
 }
 //**************************************************************//
 //**************************************************************//
@@ -204,7 +211,8 @@ void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data)
 uint8_t lcdRegDataRead(Display *display, uint8_t reg)
 {
   lcdRegWrite(display, reg);
-  return lcdDataRead(display);
+  uint8_t data = lcdDataRead(display);
+  return data;
 }
 
 //**************************************************************//
@@ -216,6 +224,9 @@ void lcdDataWrite16bbp(Display *display, uint16_t data)
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);@todo implement spi interface
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data);
   //shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data >> 8);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data);
+  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data >> 8);
   _pinh(display->xnscs); //xnscs high
 }
 
@@ -505,6 +516,7 @@ bool display_sdram_initial(Display *display)
   lcdRegDataWrite(display, 0xe4, 0x01);
 #endif
   checkSdramReady(display);
+  return true;
 }
 //**************************************************************//
 //**************************************************************//
@@ -1453,10 +1465,12 @@ uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t n
 
 int display_update_buttons(Display *display, Button *buttons, const int amount)
 {
+  printf("uipdating");
   TouchLocation loc[1];
   int amountPressed = 0;
   if (readGT9271TouchLocation(display, loc, 1) > 0)
   {
+    printf("found touch\n");
     //printf("found click: %d,%d   %d %d\n", loc[0].x, loc[0].y, (loc[0].x > buttons[i].xmin) && (loc[0].x < buttons[i].xmax), (loc[0].y > buttons[i].ymin) && (loc[0].y < buttons[i].ymax));
     for (int i = 0; i < amount; i++)
     {
@@ -1469,7 +1483,6 @@ int display_update_buttons(Display *display, Button *buttons, const int amount)
         {
           if ((_getms() - buttons[i].lastPress) > 200)
           {
-            printf("fouind bubtton");
             buttons[i].lastPress = _getms();
             buttons[i].pressed = true;
             amountPressed++;
@@ -1478,6 +1491,7 @@ int display_update_buttons(Display *display, Button *buttons, const int amount)
       }
     }
   }
+  printf("nmo couch\n");
   return amountPressed;
 }
 
@@ -1486,52 +1500,49 @@ To load image with proper settings: use inkscape to export image with anialiasin
 it is exported to jpg using max quality settings (100) and use preview to check for any back "smudging". Finally
 use the image took from RA8876 to convert that jpg to bin. 8 characters max with extension of three characters.
 */
-/*void loadImage(Image image, libpropeller::SD *sd)
+void display_load_image(Display *display, Image image)
 {
   if (image.page == 1)
   {
-    display_canvas_image_start_address(PAGE1_START_ADDR);
+    display_canvas_image_start_address(display, PAGE1_START_ADDR);
   }
   else if (image.page == 2)
   {
-    display_canvas_image_start_address(PAGE2_START_ADDR);
+    display_canvas_image_start_address(display, PAGE2_START_ADDR);
   }
   else if (image.page == 3)
   {
-    display_canvas_image_start_address(PAGE3_START_ADDR);
+    display_canvas_image_start_address(display, PAGE3_START_ADDR);
   }
-  sd->ClearError();
-  sd->Open(image.name, 'r');
-  if (sd->HasError())
+  FILE *fp = fopen(image.name, "r");
+  if (fp == NULL)
   {
-
-    printf("Error opening file(%s): %d\n", image.name, sd->GetError());
-    sd->ClearError();
-    sd->Close();
-    display_canvas_image_start_address(PAGE1_START_ADDR);
-    display_active_window_xy(0, 0);
-    display_active_window_wh(SCREEN_WIDTH, SCREEN_HEIGHT);
+    printf("Error opening file(%s): %d\n", image.name, _geterror());
+    display_canvas_image_start_address(display, PAGE1_START_ADDR);
+    display_active_window_xy(display, 0, 0);
+    display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
     return;
   }
-  display_put_picture_16bpp(image.x0, image.y0, image.width, image.height);
+
+  display_put_picture_16bpp(display, image.x0, image.y0, image.width, image.height);
   int data;
   int limit = image.width * image.height * 2;
   int count = 0;
-  while ((data = sd->Get()) != -1)
+  while ((data = fgetc(fp)) != EOF)
   {
-    lcdDataWrite(data);
+    lcdDataWrite(display, data);
     if (count > limit)
     {
-      printf("file not found");
+      printf("something went wrong...\n");
       break;
     }
     count++;
   }
-  sd->Close();
-  display_canvas_image_start_address(PAGE1_START_ADDR);
-  display_active_window_xy(0, 0);
-  display_active_window_wh(SCREEN_WIDTH, SCREEN_HEIGHT);
-}*/
+  fclose(fp);
+  display_canvas_image_start_address(display, PAGE1_START_ADDR);
+  display_active_window_xy(display, 0, 0);
+  display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
+}
 
 void display_bte_memory_copy_image(Display *display, Image image, int xpos, int ypos)
 {

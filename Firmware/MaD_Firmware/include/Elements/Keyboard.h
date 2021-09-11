@@ -8,6 +8,6 @@
  *
  **/
 
-void keyboard_get_input(Display *display, char *input);
+char *keyboard_get_input(Display *display, char *prompt);
 
 #endif

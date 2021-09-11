@@ -14,6 +14,8 @@ Version   : v1.0
 #include "Error.h"
 #include "stdbool.h"
 #include "stdint.h"
+#include <stdio.h>
+#include "simpleI2CSlow.h"
 
 #define RA8876_SPI_CMDWRITE 0x00
 #define RA8876_SPI_DATAWRITE 0x80
@@ -794,7 +796,7 @@ typedef struct Button_s
 
 typedef struct Image_s
 {
-    char name[13];
+    char name[255];
     int page;
     int x0;
     int y0;
@@ -809,13 +811,13 @@ typedef struct RA8876_s
     int spi_mosi, spi_miso, spi_clk;
     int i2c_addr_write, i2c_addr_read;
     int reset_mask;
-    i2c bus;
+    i2c_slow bus;
 } Display;
 
-Error display_begin(Display *display, int xnscs, int xnreset, int clk, int data, int GT9271_INT, int backlight);
+Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);
 
 /*SD Card*/
-//void loadImage(Image image, libpropeller::SD *sd);
+void display_load_image(Display *display, Image image);
 void display_bte_memory_copy_image(Display *display, Image image, int xpos, int ypos);
 
 /*Touch*/
