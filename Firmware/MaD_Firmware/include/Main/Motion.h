@@ -2,7 +2,7 @@
 #define Motion_H
 #include "DYN4.h"
 #include "ForceGauge.h"
-#include "State.h"
+#include "StateMachine.h"
 
 #define STACK_SIZE 200
 

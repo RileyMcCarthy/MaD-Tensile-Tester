@@ -19,8 +19,8 @@ typedef struct ManualPage_t
     Button *buttons;
 } ManualPage;
 
-ManualPage *ManualPage_Create(Display *display);
-void ManualPage_Destroy(ManualPage *page);
+ManualPage *ManualPage_create(Display *display);
+void ManualPage_destroy(ManualPage *page);
 void ManualPage_run(ManualPage *page);
 
 #endif

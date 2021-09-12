@@ -269,7 +269,7 @@ static void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data)
 
 /*********************************** Public functions *************************************/
 
-NavKey *NavKey_create(int theSCL, int theSDA, uint8_t addr)
+NavKey *navkey_create(int theSCL, int theSDA, uint8_t addr)
 {
   NavKey *navkey = malloc(sizeof(NavKey));
   navkey->_add = (addr << 1);
@@ -277,7 +277,7 @@ NavKey *NavKey_create(int theSCL, int theSDA, uint8_t addr)
   navkey->scl = theSCL;
 }
 
-void NavKey_destroy(NavKey *navkey)
+void navkey_destroy(NavKey *navkey)
 {
   free(navkey);
 }
@@ -298,146 +298,146 @@ void navkey_reset(NavKey *navkey)
 /*********************************** Read functions *************************************/
 
 /** Return the GP1 Configuration**/
-uint8_t readGP1conf(NavKey *navkey)
+uint8_t navkey_read_gp1_conf(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP1CONF));
 }
 
 /** Return the GP1 Configuration**/
-uint8_t readGP2conf(NavKey *navkey)
+uint8_t navkey_read_gp2_conf(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP2CONF));
 }
 
 /** Return the GP1 Configuration**/
-uint8_t readGP3conf(NavKey *navkey)
+uint8_t navkey_read_gp3_conf(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP3CONF));
 }
 
 /** Return the INT pin configuration**/
-uint16_t readInterruptConfig(NavKey *navkey)
+uint16_t navkey_read_interrupt_config(NavKey *navkey)
 {
   return ((uint16_t)readNavKeyInt(navkey, REG_INTCONFB2));
 }
 
 /** Return the status of the NavKey **/
-uint16_t readStatus(NavKey *navkey)
+uint16_t navkey_read_status(NavKey *navkey)
 {
   return navkey->_stat;
 }
 
 /** Return the Int2 status of the NavKey. Before require updateStatus()  **/
-uint8_t readInt2(NavKey *navkey)
+uint8_t navkey_read_int2(NavKey *navkey)
 {
   return navkey->_stat2;
 }
 
 /** Return Fade process status  **/
-uint8_t readFadeStatus(NavKey *navkey)
+uint8_t navkey_read_fade_status(NavKey *navkey)
 {
   return readNavKeyByte(navkey, REG_FSTATUS);
 }
 
 /** Return the 32 bit value of the NavKey counter  **/
-float readCounterFloat(NavKey *navkey)
+float navkey_read_counter_float(NavKey *navkey)
 {
   return (readNavKeyFloat(navkey, REG_CVALB4));
 }
 
 /** Return the 32 bit value of the NavKey counter  **/
-int32_t readCounterLong(NavKey *navkey)
+int32_t navkey_read_counter_long(NavKey *navkey)
 {
   return ((int32_t)readNavKeyLong(navkey, REG_CVALB4));
 }
 
 /** Return the 16 bit value of the NavKey counter  **/
-int16_t readCounterInt(NavKey *navkey)
+int16_t navkey_read_counter_int(NavKey *navkey)
 {
   return ((int16_t)readNavKeyInt(navkey, REG_CVALB2));
 }
 
 /** Return the 8 bit value of the NavKey counter  **/
-int8_t readCounterByte(NavKey *navkey)
+int8_t navkey_read_counter_byte(NavKey *navkey)
 {
   return ((int8_t)readNavKeyByte(navkey, REG_CVALB1));
 }
 
 /** Return the Maximum threshold of the counter **/
-int32_t readMax(NavKey *navkey)
+int32_t navkey_read_max(NavKey *navkey)
 {
   return ((int32_t)readNavKeyLong(navkey, REG_CMAXB4));
 }
 
 /** Return the Minimum threshold of the counter **/
-int32_t readMin(NavKey *navkey)
+int32_t navkey_read_min(NavKey *navkey)
 {
   return ((int32_t)readNavKeyLong(navkey, REG_CMINB4));
 }
 
 /** Return the Maximum threshold of the counter **/
-float readMaxFloat(NavKey *navkey)
+float navkey_read_max_float(NavKey *navkey)
 {
   return (readNavKeyFloat(navkey, REG_CMAXB4));
 }
 
 /** Return the Minimum threshold of the counter **/
-float readMinFloat(NavKey *navkey)
+float navkey_read_min_float(NavKey *navkey)
 {
   return (readNavKeyFloat(navkey, REG_CMINB4));
 }
 
 /** Return the Steps increment **/
-int32_t readStep(NavKey *navkey)
+int32_t navkey_read_step(NavKey *navkey)
 {
   return (readNavKeyInt(navkey, REG_ISTEPB4));
 }
 
 /** Return the Steps increment, in float variable **/
-float readStepFloat(NavKey *navkey)
+float navkey_read_step_float(NavKey *navkey)
 {
   return (readNavKeyFloat(navkey, REG_ISTEPB4));
 }
 
 /** Read GP1 register value **/
-uint8_t readGP1(NavKey *navkey)
+uint8_t navkey_read_gp1(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP1REG));
 }
 
 /** Read GP2 register value **/
-uint8_t readGP2(NavKey *navkey)
+uint8_t navkey_read_gp2(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP2REG));
 }
 
 /** Read GP3 register value **/
-uint8_t readGP3(NavKey *navkey)
+uint8_t navkey_read_gp3(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_GP3REG));
 }
 
 /** Read Double push period register **/
-uint8_t readDoublePushPeriod(NavKey *navkey)
+uint8_t navkey_read_double_push_period(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_DPPERIOD));
 }
 
 /** Read the fade period of the GP LED**/
-uint8_t readFadeGP(NavKey *navkey)
+uint8_t navkey_read_fade_gp(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_FADEGP));
 }
 
 /** Read the EEPROM memory**/
-uint8_t readEEPROM(NavKey *navkey, uint8_t add)
+uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add)
 {
   if (add <= 0x7f)
   {
     if ((navkey->_gconf & EEPROM_BANK1) != 0)
     {
       navkey->_gconf = navkey->_gconf & 0xBF;
-      writeNavKey(navkey, REG_GCONF, navkey->_gconf);
+      writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
     }
     return (readNavKeyByte(navkey, (REG_EEPROMS + add)));
   }
@@ -446,140 +446,140 @@ uint8_t readEEPROM(NavKey *navkey, uint8_t add)
     if ((navkey->_gconf & EEPROM_BANK1) == 0)
     {
       navkey->_gconf = navkey->_gconf | 0x40;
-      writeNavKey(navkey, REG_GCONF, navkey->_gconf);
+      writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
     }
     return (readNavKeyByte(navkey, add));
   }
 }
 
 /** Read the ID code **/
-uint8_t readIDCode(NavKey *navkey)
+uint8_t navkey_read_id_code(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_IDCODE));
 }
 
 /** Read the Version code **/
-uint8_t readVersion(NavKey *navkey)
+uint8_t navkey_read_version(NavKey *navkey)
 {
   return (readNavKeyByte(navkey, REG_VERSION));
 }
 
 /*********************************** Write functions *************************************/
 /** Write the GP1 configuration**/
-void writeGP1conf(NavKey *navkey, uint8_t gp1)
+void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1)
 {
-  writeNavKey(REG_GP1CONF, gp1);
+  writeNavKey8(navkey, REG_GP1CONF, gp1);
 }
 
 /** Write the GP2 configuration**/
-void writeGP2conf(NavKey *navkey, uint8_t gp2)
+void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2)
 {
-  writeNavKey(REG_GP2CONF, gp2);
+  writeNavKey8(navkey, REG_GP2CONF, gp2);
 }
 
 /** Write the GP3 configuration**/
-void writeGP3conf(NavKey *navkey, uint8_t gp3)
+void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3)
 {
-  writeNavKey(REG_GP3CONF, gp3);
+  writeNavKey8(navkey, REG_GP3CONF, gp3);
 }
 
 /** Write the interrupt configuration **/
-void writeInterruptConfig(NavKey *navkey, uint16_t interrupt)
+void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt)
 {
-  writeNavKey(REG_INTCONFB2, interrupt);
+  writeNavKey16(navkey, REG_INTCONFB2, interrupt);
 }
 
 /** Write the counter value **/
-void writeCounter(NavKey *navkey, float value)
+void navkey_write_counter(NavKey *navkey, float value)
 {
-  writeNavKey(REG_CVALB4, value);
+  writeNavKeyFloat(navkey, REG_CVALB4, value);
 }
 
 /** Write the maximum threshold value **/
-void writeMax(NavKey *navkey, float max)
+void navkey_write_max(NavKey *navkey, float max)
 {
-  writeNavKey(REG_CMAXB4, max);
+  writeNavKeyFloat(navkey, REG_CMAXB4, max);
 }
 
 /** Write the minimum threshold value **/
-void writeMin(NavKey *navkey, float min)
+void navkey_write_min(NavKey *navkey, float min)
 {
-  writeNavKey(REG_CMINB4, min);
+  writeNavKeyFLoat(navkey, REG_CMINB4, min);
 }
 
 /** Write the Step increment value **/
-void writeStep(NavKey *navkey, float step)
+void navkey_write_step(NavKey *navkey, float step)
 {
-  writeNavKey(REG_ISTEPB4, step);
+  writeNavKeyFloat(navkey, REG_ISTEPB4, step);
 }
 
 /** Write GP1 register, used when GP1 is set to output or PWM **/
-void writeGP1(NavKey *navkey, uint8_t gp1)
+void navkey_write_gp1(NavKey *navkey, uint8_t gp1)
 {
-  writeNavKey(REG_GP1REG, gp1);
+  writeNavKey8(navkey, REG_GP1REG, gp1);
 }
 
 /** Write GP2 register, used when GP2 is set to output or PWM **/
-void writeGP2(NavKey *navkey, uint8_t gp2)
+void navkey_write_gp2(NavKey *navkey, uint8_t gp2)
 {
-  writeNavKey(REG_GP2REG, gp2);
+  writeNavKey8(navkey, REG_GP2REG, gp2);
 }
 
 /** Write GP3 register, used when GP3 is set to output or PWM **/
-void writeGP3(NavKey *navkey, uint8_t gp3)
+void navkey_write_gp3(NavKey *navkey, uint8_t gp3)
 {
-  writeNavKey(REG_GP3REG, gp3);
+  writeNavKey8(navkey, REG_GP3REG, gp3);
 }
 
 /** Write Anti-bouncing period register **/
-void writeDoublePushPeriod(NavKey *navkey, uint8_t dperiod)
+void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod)
 {
-  writeNavKey(REG_DPPERIOD, dperiod);
+  writeNavKey8(navkey, REG_DPPERIOD, dperiod);
 }
 
 /** Write Fade timing in ms **/
-void writeFadeGP(NavKey *navkey, uint8_t fade)
+void navkey_write_fade_gp(NavKey *navkey, uint8_t fade)
 {
-  writeNavKey(REG_FADEGP, fade);
+  writeNavKey8(navkey, REG_FADEGP, fade);
 }
 
 /** Write the Gamma value on GP1 **/
-void writeGammaGP1(NavKey *navkey, uint8_t gamma)
+void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma)
 {
-  writeNavKey(REG_GAMMAGP1, gamma);
+  writeNavKey8(navkey, REG_GAMMAGP1, gamma);
 }
 
 /** Write the Gamma value on GP2 **/
-void writeGammaGP2(NavKey *navkey, uint8_t gamma)
+void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma)
 {
-  writeNavKey(REG_GAMMAGP2, gamma);
+  writeNavKey8(navkey, REG_GAMMAGP2, gamma);
 }
 
 /** Write the Gamma value on GP1 **/
-void writeGammaGP3(NavKey *navkey, uint8_t gamma)
+void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma)
 {
-  writeNavKey(REG_GAMMAGP3, gamma);
+  writeNavKey8(navkey, REG_GAMMAGP3, gamma);
 }
 
 /** Write the EEPROM memory**/
-void writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data)
+void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data)
 {
   if (add <= 0x7f)
   {
     if ((navkey->_gconf & EEPROM_BANK1) != 0)
     {
       navkey->_gconf = navkey->_gconf & 0xBF;
-      writeNavKey(REG_GCONF, navkey->_gconf);
+      writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
     }
-    writeNavKey((REG_EEPROMS + add), data);
+    writeNavKey8(navkey, (REG_EEPROMS + add), data);
   }
   else
   {
     if ((navkey->_gconf & EEPROM_BANK1) == 0)
     {
       navkey->_gconf = navkey->_gconf | 0x40;
-      writeNavKey(REG_GCONF, navkey->_gconf);
+      writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
     }
-    writeNavKey(add, data);
+    writeNavKey8(navkey, add, data);
   }
 }

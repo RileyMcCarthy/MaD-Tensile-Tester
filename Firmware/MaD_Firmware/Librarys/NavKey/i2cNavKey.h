@@ -44,88 +44,88 @@ typedef struct navkey_t
 
 void navkey_begin(NavKey *navkey, uint8_t conf);
 void navkey_reset(NavKey *navkey);
-void autoconfigInterrupt(NavKey *navkey);
+void navkey_auto_config_interrupt(NavKey *navkey);
 
 /**    Read functions   **/
 /** Configuration function **/
-uint8_t readGP1conf(NavKey *navkey);
-uint8_t readGP2conf(NavKey *navkey);
-uint8_t readGP3conf(NavKey *navkey);
-uint16_t readInterruptConfig(NavKey *navkey);
+uint8_t navkey_read_gp1_conf(NavKey *navkey);
+uint8_t navkey_read_gp2_conf(NavKey *navkey);
+uint8_t navkey_read_gp3_conf(NavKey *navkey);
+uint16_t navkey_read_interrupt_config(NavKey *navkey);
 
 /** Status function **/
-uint16_t readStatus(NavKey *navkey);
+uint16_t navkey_read_status(NavKey *navkey);
 
-uint8_t readInt2(NavKey *navkey);
+uint8_t navkey_read_int2(NavKey *navkey);
 
-uint8_t readFadeStatus(NavKey *navkey);
+uint8_t navkey_read_fade_status(NavKey *navkey);
 
 /** NavKey functions **/
-float readCounterFloat(NavKey *navkey);
-int32_t readCounterLong(NavKey *navkey);
-int16_t readCounterInt(NavKey *navkey);
-int8_t readCounterByte(NavKey *navkey);
+float navkey_read_counter_float(NavKey *navkey);
+int32_t navkey_read_counter_long(NavKey *navkey);
+int16_t navkey_read_counter_int(NavKey *navkey);
+int8_t navkey_read_counter_byte(NavKey *navkey);
 
-int32_t readMax(NavKey *navkey);
-float readMaxFloat(NavKey *navkey);
+int32_t navkey_read_max(NavKey *navkey);
+float navkey_read_max_float(NavKey *navkey);
 
-int32_t readMin(NavKey *navkey);
-float readMinFloat(NavKey *navkey);
+int32_t navkey_read_min(NavKey *navkey);
+float navkey_read_min_float(NavKey *navkey);
 
-int32_t readStep(NavKey *navkey);
-float readStepFloat(NavKey *navkey);
+int32_t navkey_readStep(NavKey *navkey);
+float navkey_read_step_float(NavKey *navkey);
 
 /** GP LED Functions **/
-uint8_t readGP1(NavKey *navkey);
-uint8_t readGP2(NavKey *navkey);
-uint8_t readGP3(NavKey *navkey);
+uint8_t navkey_read_gp1(NavKey *navkey);
+uint8_t navkey_read_gp2(NavKey *navkey);
+uint8_t navkey_read_gp3(NavKey *navkey);
 
 /** Timing registers **/
-uint8_t readDoublePushPeriod(NavKey *navkey);
-uint8_t readFadeGP(NavKey *navkey);
+uint8_t navkey_read_double_push_period(NavKey *navkey);
+uint8_t navkey_read_fade_gp(NavKey *navkey);
 
 /** EEPROM register **/
-uint8_t readEEPROM(NavKey *navkey, uint8_t add);
+uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add);
 
 /** **/
-uint8_t readIDCode(NavKey *navkey);
-uint8_t readVersion(NavKey *navkey);
+uint8_t navkey_read_id_code(NavKey *navkey);
+uint8_t navkey_read_version(NavKey *navkey);
 
 /******    Write functions   ********/
-void writeGP1conf(NavKey *navkey, uint8_t gp1);
-void writeGP2conf(NavKey *navkey, uint8_t gp2);
-void writeGP3conf(NavKey *navkey, uint8_t gp3);
-void writeInterruptConfig(NavKey *navkey, uint16_t interrupt);
+void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3);
+void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
 
 /** NavKey functions **/
-void writeCounter(NavKey *navkey, float counter);
+void navkey_write_counter(NavKey *navkey, float counter);
 
-void writeMax(NavKey *navkey, float max);
+void navkey_write_max(NavKey *navkey, float max);
 
-void writeMin(NavKey *navkey, float min);
+void navkey_write_min(NavKey *navkey, float min);
 
-void writeStep(NavKey *navkey, float step);
+void navkey_write_step(NavKey *navkey, float step);
 
 /** GP LED Functions **/
-void writeGP1(NavKey *navkey, uint8_t gp1);
-void writeGP2(NavKey *navkey, uint8_t gp2);
-void writeGP3(NavKey *navkey, uint8_t gp3);
+void navkey_write_gp1(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3(NavKey *navkey, uint8_t gp3);
 
 /** Timing registers **/
-void writeDoublePushPeriod(NavKey *navkey, uint8_t dperiod);
-void writeFadeGP(NavKey *navkey, uint8_t fade);
+void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod);
+void navkey_write_fade_gp(NavKey *navkey, uint8_t fade);
 
-void writeGammaGP1(NavKey *navkey, uint8_t gamma);
-void writeGammaGP2(NavKey *navkey, uint8_t gamma);
-void writeGammaGP3(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma);
 
 /** EEPROM register **/
-void writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data);
+void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data);
 
-void writeNavKey8(NavKey *navkey, uint8_t reg, uint8_t data);
-void writeNavKey16(NavKey *navkey, uint8_t reg, uint16_t data);
-void writeNavKey32(NavKey *navkey, uint8_t reg, int32_t data);
-void writeNavKeyFloat(NavKey *navkey, uint8_t reg, float data);
-void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data);
+void navkey_write8(NavKey *navkey, uint8_t reg, uint8_t data);
+void navkey_write16(NavKey *navkey, uint8_t reg, uint16_t data);
+void navkey_write32(NavKey *navkey, uint8_t reg, int32_t data);
+void navkey_write_float(NavKey *navkey, uint8_t reg, float data);
+void navkey_write24(NavKey *navkey, uint8_t reg, uint32_t data);
 
 #endif

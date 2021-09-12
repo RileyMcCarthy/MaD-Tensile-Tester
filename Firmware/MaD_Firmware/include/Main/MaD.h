@@ -6,7 +6,7 @@
 #include "IOBoard.h"
 #include "MCP23017.h"
 #include "DS3231.h"
-#include "State.h"
+#include "StateMachine.h"
 #include "Style.h"
 #include "RA8876.h"
 #include "i2cNavKey.h"

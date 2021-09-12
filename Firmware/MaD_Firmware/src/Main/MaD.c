@@ -540,6 +540,43 @@ static void test_display()
   display_load_image(&display, keyboard);
 }
 
+static void filesystem_begin()
+{
+  int sd = mount("/sd", _vfs_open_sdcard());
+  if (sd == 0)
+  {
+    printf("SD Card Mounted\n");
+  }
+  else
+  {
+    printf("Mount error:%d\n", _geterror());
+  }
+  //@TODO mount data SD card also
+}
+
+static Display *display_begin()
+{
+  Error err;
+  Display *display = (Display *)malloc(sizeof(Display *));
+
+  //turn on diplay
+  if ((err = display_begin(display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
+  {
+    printf("Error starting display:%d\n", err);
+    return;
+  }
+
+  display_on(display, true);
+
+  //Init display and background
+  display_canvas_image_start_address(display, PAGE1_START_ADDR);
+  display_canvas_image_width(display, SCREEN_WIDTH);
+  display_active_window_xy(display, 0, 0);
+  display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
+  display_draw_square_fill(display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
+  return display;
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  * 
@@ -555,6 +592,56 @@ void mad_begin()
   //test_JSON();
   //test_sd_card();
 
+  //Begin SD filesystem
+  filesystem_begin();
+
+  //Load Assets from SD card
+
+  //Begin the display
+  Display *display = display_begin();
+
+  //Initialize IO Expansion(MCP23017)
+
+  //Create DYN4 object (currently no communication with DYN4)
+
+  //Create encoder object
+
+  //Connect ForceGauge
+
+  //Start state machine (needs IO expansion, encoder)
+
+  //Start motion control (needs state machine,encoder, forcegauge), responsible for sending commands to dyn4 and gathering data
+
+  //Begin main loop
+  Pages currentPage = PAGE_STATUS;
+  while (1)
+  {
+    switch (currentPage)
+    {
+    case PAGE_STATUS:
+      printf("Loading status page\n");
+      status_page_run(display);
+      printf("Leaving status page\n");
+      break;
+    case PAGE_MANUAL:
+      printf("Loading manual page\n");
+      manual_page_run(display);
+      printf("Leaving manual page\n");
+      break;
+    case PAGE_AUTOMATIC:
+    {
+      printf("Loading automatic page\n");
+      AutomaticPage automatic;
+      automatic.run(&display, (Motion_Cog *)(&motionCog));
+    }
+    break;
+    default:
+      break;
+    }
+    printf("Selecting new page\n");
+    NavigationPage nav;
+    currentPage = nav.run(&display);
+  }
 #ifdef __MEMORY_CHECK__
   report_mem_leak();
 #endif
@@ -596,28 +683,3 @@ void mad_begin()
     currentPage = nav.run(&display);
   }
 } /*
-
-/**
- * @brief Initializes display object
- * 
- * @return Enum Error: SUCCESS if display connected
- */
-/*Error MAD::startDisplay()
-{
-  Error err;
-
-  //turn on diplay
-  if ((err = display.begin(RA8876_XNSCS, RA8876_XNRESET, CLK, DATA, GT9271_INT, BACKLIGHT)) != SUCCESS)
-  {
-    return err;
-  }
-  display.displayOn(true);
-
-  //Init display and background
-  display.canvasImageStartAddress(PAGE1_START_ADDR);
-  display.canvasImageWidth(SCREEN_WIDTH);
-  display.activeWindowXY(0, 0);
-  display.activeWindowWH(SCREEN_WIDTH, SCREEN_HEIGHT);
-  display.drawSquareFill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-  return Error::SUCCESS;
-}*/
