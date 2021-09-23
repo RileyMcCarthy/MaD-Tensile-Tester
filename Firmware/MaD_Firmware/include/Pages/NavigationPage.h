@@ -1,38 +1,36 @@
 #ifndef NavigationPage_H
 #define NavigationPage_H
 #include "simpletools.h"
-#include "Ra8876_Lite.h"
+#include "RA8876.h"
 #include "Error.h"
 #include "Style.h"
-#include "State.h"
+#include "StateMachine.h"
 
 /**
  * @brief Enumeration representing the pages available to select from navigation
  * 
  */
 
-enum Pages
+typedef enum Pages_e
 {
     PAGE_STATUS,
     PAGE_MANUAL,
     PAGE_AUTOMATIC,
     PAGE_SETTINGS
-};
+} Pages;
 
-/**
- * @brief Runs the UI that lets the user select which page to run
- * 
- */
-class NavigationPage
+typedef struct NavigationPage_s
 {
-public:
-    Pages run(Ra8876_Lite *the_display);
-    void checkButtons(Button *buttons);
-
-private:
     bool complete;
-    Ra8876_Lite *display;
+    Display *display;
+    Button *buttons;
     Pages newPage;
-};
+} NavigationPage;
+
+NavigationPage *navigation_page_create(Display *display);
+
+void navigation_page_destroy(NavigationPage *page);
+
+Pages navigation_page_run(NavigationPage *page);
 
 #endif

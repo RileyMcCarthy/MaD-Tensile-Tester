@@ -22,7 +22,7 @@ enum button_names
  */
 static void checkButtons(ManualPage *page)
 {
-    display->checkButtons(buttons, BUTTONCOUNT);
+    page->display->checkButtons(page->buttons, BUTTONCOUNT);
     for (int i = 0; i < BUTTONCOUNT; i++)
     {
         if (buttons[i].pressed)
