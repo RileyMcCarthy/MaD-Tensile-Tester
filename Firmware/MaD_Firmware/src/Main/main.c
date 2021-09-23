@@ -1,4 +1,4 @@
-#define P2_TARGET_MHZ 1
+#define P2_TARGET_MHZ 180
 #include <sys/p2es_clock.h>
 #include "MaD.h"
 enum

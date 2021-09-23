@@ -13,6 +13,7 @@
 #include "ForceGauge.h"
 #include "DYN4.h"
 #include "Keyboard.h"
+#include "NavigationPage.h"
 
 #define DISPLAY_SCK 51     //SPI Clock Pin
 #define DISPLAY_MISO 53    //SPI Data Pin

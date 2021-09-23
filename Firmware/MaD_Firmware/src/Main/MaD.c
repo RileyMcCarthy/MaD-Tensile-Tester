@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include "MotionPlanning.h"
+#include "MCP23017.h"
 #ifdef __MEMORY_CHECK__
 #include "leak_detector_c.h"
 #endif
@@ -554,7 +555,30 @@ static void filesystem_begin()
   //@TODO mount data SD card also
 }
 
-static Display *display_begin()
+static void test_mcp23017()
+{
+  MCP23017 *mcp = mcp23017_create(GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+  Error status = mcp23017_init(mcp);
+  if (status != SUCCESS)
+  {
+    printf("Error:%d\n", status);
+    //return;
+  }
+  printf("MCP23017 begin\n");
+
+  mcp23017_port_mode(mcp, A, 0);          //Port A as output
+  mcp23017_port_mode(mcp, B, 0b11111111); //Port B as input
+
+  while (1)
+  {
+    mcp23017_digital_write(mcp, 4, 1);
+    _waitms(2000);
+    mcp23017_digital_write(mcp, 4, 0);
+    _waitms(2000);
+  }
+}
+
+static Display *start_display()
 {
   Error err;
   Display *display = (Display *)malloc(sizeof(Display *));
@@ -587,8 +611,18 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  test_sd_card();
-  test_display();
+  while (1)
+  {
+    high(0);
+    _waitms(1000);
+    low(0);
+    _waitms(1000);
+  }
+  //test_sd_card();
+  // test_display();
+  test_ds3231();
+  test_mcp23017();
+  return;
   //test_JSON();
   //test_sd_card();
 
@@ -598,7 +632,7 @@ void mad_begin()
   //Load Assets from SD card
 
   //Begin the display
-  Display *display = display_begin();
+  Display *display = start_display();
 
   //Initialize IO Expansion(MCP23017)
 
@@ -620,19 +654,18 @@ void mad_begin()
     {
     case PAGE_STATUS:
       printf("Loading status page\n");
-      status_page_run(display);
+      //status_page_run(display);
       printf("Leaving status page\n");
       break;
     case PAGE_MANUAL:
       printf("Loading manual page\n");
-      manual_page_run(display);
+      //manual_page_run(display);
       printf("Leaving manual page\n");
       break;
     case PAGE_AUTOMATIC:
     {
       printf("Loading automatic page\n");
-      AutomaticPage automatic;
-      automatic.run(&display, (Motion_Cog *)(&motionCog));
+      //automatic.run(&display, (Motion_Cog *)(&motionCog));
     }
     break;
     default:
@@ -640,7 +673,7 @@ void mad_begin()
     }
     printf("Selecting new page\n");
     NavigationPage nav;
-    currentPage = nav.run(&display);
+    // currentPage = nav.run(&display);
   }
 #ifdef __MEMORY_CHECK__
   report_mem_leak();
