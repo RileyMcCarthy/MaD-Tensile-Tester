@@ -1,6 +1,6 @@
 #ifndef StateMachine_H
 #define StateMachine_H
-#include "propeller.h"
+#include "simpletools.h"
 #include "stdbool.h"
 
 typedef enum States_e
@@ -37,19 +37,19 @@ typedef enum MotionMode_e
 
 typedef struct SelfCheck_t
 {
-    bool chargePumpOK; //external
+    bool chargePumpOK; //Internal State
 } SelfCheckParameters;
 
 typedef struct MachineCheck_t
 {
-    bool power;                //internal
-    bool upperLimit;           //internal
-    bool lowerLimit;           //internal
-    bool esd;                  //internal
-    bool servoReady;           //external
-    bool forceGaugeResponding; //external
-    bool dyn4Responding;       //external
-    bool machineReady;         //internal
+    bool power;                //Internal State
+    bool upperLimit;           //Internal State
+    bool lowerLimit;           //Internal State
+    bool esd;                  //Internal State
+    bool servoReady;           //External State
+    bool forceGaugeResponding; //External State
+    bool dyn4Responding;       //External State
+    bool machineReady;         //Internal State
 } MachineCheckParameters;
 
 typedef struct Motion_t
@@ -71,4 +71,13 @@ typedef struct MachineState_t
 
 MachineState *state_machine_run();
 void state_machine_stop(MachineState *machineState);
+
+//External State Setters
+void state_machine_set_servo_ready(MachineState *machineState, bool ready);
+void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding);
+void state_machine_set_dyn4_responding(MachineState *machineState, bool responding);
+void state_machine_set_status(MachineState *machineState, MotionStatus status);
+void state_machine_set_condition(MachineState *machineState, MotionCondition condition);
+void state_machine_set_mode(MachineState *machineState, MotionMode mode);
+
 #endif

@@ -34,7 +34,9 @@ typedef enum Error_e
     JSON_FILE_WRITE_FAIL,
     JSON_FILE_INVALID,
     JSON_FILE_EMPTY,
-    JSON_FILE_NOT_VALID
+    JSON_FILE_NOT_VALID,
+
+    MCP23017_NOT_FOUND = 251,
 
 } Error;
 #endif

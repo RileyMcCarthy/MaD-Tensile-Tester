@@ -63,8 +63,9 @@ enum keys
  * @param key The Button that was pressed
  * @returns if submit was pressed
  */
-static bool check_buttons(Display *display, Button *keys, char *buffer)
+static bool check_buttons(Display *display, Button *keys, char **bufferPtr)
 {
+    char *buffer = *bufferPtr;
     if (display_update_buttons(display, keys, BUTTONCOUNT) > 0)
     {
         printf("bvutton pressed\n");
@@ -72,7 +73,9 @@ static bool check_buttons(Display *display, Button *keys, char *buffer)
         {
             if (keys[i].pressed)
             {
-                buffer = (char *)realloc(buffer, strlen(buffer) + 2);
+                int size = strlen(buffer) + 2;
+                printf("new size:%d\n", size);
+                buffer = (char *)realloc(buffer, size);
                 switch (keys[i].name)
                 {
                 case key_0:
@@ -171,7 +174,7 @@ static bool check_buttons(Display *display, Button *keys, char *buffer)
                     if (strlen(buffer) <= 0)
                         break;
                     buffer[strlen(buffer) - 1] = '\0';
-                    buffer = (char *)realloc(buffer, strlen(buffer));
+                    buffer = (char *)realloc(buffer, strlen(buffer) + 1);
                     break;
                 case key_shift:
                     break;
@@ -222,6 +225,7 @@ static bool check_buttons(Display *display, Button *keys, char *buffer)
             }
         }
     }
+    *bufferPtr = buffer;
     return false;
 }
 
@@ -332,9 +336,10 @@ char *keyboard_get_input(Display *display, char *prompt)
     char *lastString = NULL;
     while (!complete)
     {
-        complete = check_buttons(display, keys, buffer);
+        complete = check_buttons(display, keys, &buffer);
         if (strcmp(lastString, buffer) != 0)
         {
+            printf("updating stringh:%s\n", buffer);
             char *temp = malloc(sizeof(char) * (strlen(buffer) + strlen(prompt) + 2));
             strcpy(temp, prompt);
             strcat(temp, buffer);

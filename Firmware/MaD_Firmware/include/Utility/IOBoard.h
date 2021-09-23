@@ -25,11 +25,9 @@
 #define FORCE_RX 15   //force gauge data (Input)
 #define FORCE_TX 16   //force gauge data (Output)
 
-#define GPIO_SDA 26               //MCP23017 (GPIO Expander) SDA pin
-#define GPIO_SCL 0                //MCP23017 (GPIO Expander) SCL pin
-#define GPIO_ADDR 0               //MCP23017 (GPIO Expander) I2C Address
-#define GPIO_DIR_MASKA 0b11110000 //MCP23017 (GPIO Expander) direction mask A
-#define GPIO_DIR_MASKB 0b11111111 //MCP23017 (GPIO Expander) direction mask B
+#define GPIO_SDA 26 //MCP23017 (GPIO Expander) SDA pin
+#define GPIO_SCL 0  //MCP23017 (GPIO Expander) SCL pin
+#define GPIO_ADDR 0 //MCP23017 (GPIO Expander) I2C Address
 
 #define CHARGE_PUMP_OUT 1
 #define DISTANCE_LIMIT_MAX 1

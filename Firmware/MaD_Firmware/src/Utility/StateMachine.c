@@ -1,5 +1,7 @@
 #include "StateMachine.h"
+
 static long stack[64];
+
 /**
 * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state. 
 * 
@@ -118,4 +120,37 @@ MachineState *state_machine_run()
 void state_machine_stop(MachineState *machineState)
 {
     //stop cog and free MachineState
+}
+
+//External State Setter Functions
+
+void state_machine_set_servo_ready(MachineState *machineState, bool ready)
+{
+    machineState->selfCheckParameters.servoReady = ready;
+}
+
+void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding)
+{
+    machineState->machineCheckParameters.forceGaugeResponding = responding;
+}
+
+void state_machine_set_dyn4_responding(MachineState *machineState, bool responding)
+{
+    machineState->machineCheckParameters.dyn4Responding = responding;
+}
+
+void state_machine_set_status(MachineState *machineState, MotionStatus status)
+{
+    //Set rules for changing status, and update internal parameters
+    machineState->motionParameters.status = status;
+}
+
+void state_machine_set_condition(MachineState *machineState, MotionCondition condition)
+{
+    machineState->motionParameters.condition = condition;
+}
+
+void state_machine_set_mode(MachineState *machineState, MotionMode mode)
+{
+    machineState->motionParameters.mode = mode;
 }

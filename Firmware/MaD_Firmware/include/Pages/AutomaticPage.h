@@ -21,8 +21,8 @@ typedef struct AutomaticPage_t
     Display *display;
 } AutomaticPage;
 
-AutomaticPage *AutomaticPage_create(Display *display, Motion_Cog *cog);
-void AutomaticPage_destroy(AutomaticPage *page);
-void AutomaticPage_run(AutomaticPage *page);
+AutomaticPage *automatic_page_create(Display *display);
+void automatic_page_destroy(AutomaticPage *page);
+void automatic_page_run(AutomaticPage *page);
 
 #endif
