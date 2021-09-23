@@ -50,7 +50,7 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
   display->spi_miso = spi_miso;
 
   //spi_open(&(display->spi), spi_mosi, spi_miso, spi_clk); @todo create spi library
-  i2c_open(&(display->bus), i2c_clk, i2c_sda, 0);
+  i2c_slow_open(&(display->bus), i2c_clk, i2c_sda, 0, 100);
 
   int i2c_addr = 0x5d;
   display->i2c_addr_write = (i2c_addr << 1) & 0b11111110;
@@ -1336,15 +1336,15 @@ void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t x
 void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt)
 {
   uint16_t i = 0;
-  i2c_start(&(display->bus));
-  i2c_writeByte(&(display->bus), display->i2c_addr_write);
-  i2c_writeByte(&(display->bus), regAddr >> 8);
-  i2c_writeByte(&(display->bus), regAddr);
+  i2c_slow_start(&(display->bus));
+  i2c_slow_writeByte(&(display->bus), display->i2c_addr_write);
+  i2c_slow_writeByte(&(display->bus), regAddr >> 8);
+  i2c_slow_writeByte(&(display->bus), regAddr);
   for (i = 0; i < cnt; i++, val++)
   {
-    i2c_writeByte(&(display->bus), *val);
+    i2c_slow_writeByte(&(display->bus), *val);
   }
-  i2c_stop(&(display->bus));
+  i2c_slow_stop(&(display->bus));
 }
 
 uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len)
@@ -1356,23 +1356,23 @@ uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len
 uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len)
 {
   uint8_t i;
-  i2c_start(&(display->bus));
+  i2c_slow_start(&(display->bus));
 
-  i2c_writeByte(&(display->bus), display->i2c_addr_write);
-  i2c_writeByte(&(display->bus), regAddr >> 8);
-  i2c_writeByte(&(display->bus), regAddr);
-  i2c_start(&(display->bus));
-  i2c_writeByte(&(display->bus), display->i2c_addr_read);
+  i2c_slow_writeByte(&(display->bus), display->i2c_addr_write);
+  i2c_slow_writeByte(&(display->bus), regAddr >> 8);
+  i2c_slow_writeByte(&(display->bus), regAddr);
+  i2c_slow_start(&(display->bus));
+  i2c_slow_writeByte(&(display->bus), display->i2c_addr_read);
   for (i = 0; i < len; i++)
   {
     if (i == (len - 1))
     {
-      pBuf[i] = i2c_readByte(&(display->bus), 1);
+      pBuf[i] = i2c_slow_readByte(&(display->bus), 1);
       break;
     }
-    pBuf[i] = i2c_readByte(&(display->bus), 0);
+    pBuf[i] = i2c_slow_readByte(&(display->bus), 0);
   }
-  i2c_stop(&(display->bus));
+  i2c_slow_stop(&(display->bus));
   return i;
 }
 
@@ -1465,7 +1465,6 @@ uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t n
 
 int display_update_buttons(Display *display, Button *buttons, const int amount)
 {
-  printf("uipdating");
   TouchLocation loc[1];
   int amountPressed = 0;
   if (readGT9271TouchLocation(display, loc, 1) > 0)
@@ -1481,9 +1480,12 @@ int display_update_buttons(Display *display, Button *buttons, const int amount)
       {
         if (((SCREEN_HEIGHT - loc[0].y) > buttons[i].ymin) && ((SCREEN_HEIGHT - loc[0].y) < buttons[i].ymax))
         {
+          printf("Button pressed:%d\n", buttons[i].name);
           if ((_getms() - buttons[i].lastPress) > 200)
           {
-            buttons[i].lastPress = _getms();
+            printf("pressed\n");
+            buttons[i]
+                .lastPress = _getms();
             buttons[i].pressed = true;
             amountPressed++;
           }
@@ -1491,7 +1493,6 @@ int display_update_buttons(Display *display, Button *buttons, const int amount)
       }
     }
   }
-  printf("nmo couch\n");
   return amountPressed;
 }
 
