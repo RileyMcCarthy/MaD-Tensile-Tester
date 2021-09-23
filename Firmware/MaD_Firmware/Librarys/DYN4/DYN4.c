@@ -9,7 +9,6 @@
 #define READ_DRIVE_STATUS 0x09
 #define IS_STATUS 0x19
 
-
 /**
  * @brief Begin communication with the servo controller
  * 
@@ -22,7 +21,8 @@
 Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 {
     dyn4->device_id = new_device_id & 0x7F;
-    uart_start(&(dyn4->serial), 14, 12, 2, 38400);
+    //uart_start(&(dyn4->serial), 14, 12, 2, 38400);
+    dyn4->serial.startx(14, 12, 2, 38400);
 
     DYN4_Status status;
     Error ret = dyn4_get_status(dyn4, &status);
@@ -53,7 +53,7 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
 {
     dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
     uint8_t *statusReg;
-    if (dyn4_read_command(dyn4, IS_STATUS, statusReg) == -1)
+    if (dyn4_read_command(dyn4, IS_STATUS, &statusReg) == -1)
     {
         return DYN4_NOT_RESPONDING;
     }
@@ -74,23 +74,32 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
  * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE) 
  * @return int number of bytes recieved
  */
-int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t *returnData)
+int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
 {
     uint8_t byte;
-    uart_read(&(dyn4->serial), 1, &byte);
+    uint8_t *data;
+
+    //uart_read(&(dyn4->serial), 1, &byte);
+    byte = (uint8_t)dyn4->serial.rx;
     if ((byte & dyn4->device_id) != dyn4->device_id)
     {
         return -1;
     }
-    uart_read(&(dyn4->serial), 1, &byte);
+    //uart_read(&(dyn4->serial), 1, &byte);
+    byte = (uint8_t)dyn4->serial.rx;
     if ((byte & IS_STATUS) != IS_STATUS)
     {
         return -1;
     }
-    int n = (byte >> 5) & 0x03;
-    returnData = (uint8_t *)malloc(sizeof(uint8_t) * (n + 1));
-    uart_read(&(dyn4->serial), n + 1, returnData);
-    return n + 1;
+    int n = ((byte >> 5) & 0x03) + 1;
+    data = (uint8_t *)malloc(sizeof(uint8_t) * n);
+    //uart_read(&(dyn4->serial), n, returnData);
+    for (int i = 0; i < n; i++)
+    {
+        data[i] = (uint8_t)dyn4->serial.rx;
+    }
+    *returnData = data;
+    return n;
 }
 
 /**
@@ -137,10 +146,15 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
         totalData += bytes[index];
     }
     bytes[0] = 0x80 + ((bytes[package_size - 1] + bytes[package_size - 2] + totalData) % 128);
-    uart_write(&(dyn4->serial), bytes[4]);
-    uart_write(&(dyn4->serial), bytes[3]);
-    uart_write(&(dyn4->serial), bytes[2]);
-    uart_write(&(dyn4->serial), bytes[1]);
-    uart_write(&(dyn4->serial), bytes[0]);
+    //uart_write(&(dyn4->serial), bytes[4]);
+    //uart_write(&(dyn4->serial), bytes[3]);
+    //uart_write(&(dyn4->serial), bytes[2]);
+    //uart_write(&(dyn4->serial), bytes[1]);
+    //uart_write(&(dyn4->serial), bytes[0]);
+
+    for (int i = package_size - 1; i >= 0; i--)
+    {
+        dyn4->serial.tx(bytes[i]);
+    }
     free(bytes);
 }
