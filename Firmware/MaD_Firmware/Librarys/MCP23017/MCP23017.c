@@ -1,170 +1,151 @@
 #include "MCP23017.h"
 
-// registers
-#define REG_IODIRA 0x00 // Direction Register A
-#define REG_IPOLA 0x02  // Polarity Register A
-#define REG_GPPUA 0x0C  // Pull-up Register A
-#define REG_GPIOA 0x12  // I/O Register A
-#define REG_OLATA 0x14  // Output latch register A
-
-#define REG_IODIRB 0x01 // Direction Register B
-#define REG_IPOLB 0x03  // Polarity Register B
-#define REG_GPPUB 0x0D  // Pull-up Register B
-#define REG_GPIOB 0x13  // I/O Register B
-#define REG_OLATB 0x15  // Output latch register B
-
-/*Private Function Declarations*/
-uint8_t read_register(MCP23017 *mcp23017, uint8_t addr);
-void write_register(MCP23017 *mcp23017, uint8_t addr, uint8_t value);
-
-/**
- * @brief 
- * 
- * @param addr 
- * @param theSDA 
- * @param theSCL 
- */
-void mcp_begin(MCP23017 *mcp23017, uint8_t addr, int theSDA, int theSCL)
+//Private Functions
+static bool write_register(MCP23017 *mcp23017, mcp23017_register reg, uint8_t value)
 {
-    i2c_open(&(mcp23017->bus), theSCL, theSDA, 1);
-    mcp23017->writeAddr = ((0x20 | addr) << 1) & 0b11111110;
-    mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
+	uint8_t ack;
+	i2c_slow_start(&(mcp23017->bus));
+	ack = i2c_slow_writeByte(&(mcp23017->bus), mcp23017->writeAddr);
+	i2c_slow_writeByte(&(mcp23017->bus), reg);
+	i2c_slow_writeByte(&(mcp23017->bus), value);
+	i2c_slow_stop(&(mcp23017->bus));
+	return ack == 0;
 }
 
-void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
+static uint8_t read_register(MCP23017 *mcp23017, mcp23017_register reg)
 {
-    int reg;
-    int mask;
-    if (pin > 8)
-    { //register B
-        reg = REG_IODIRB;
-    }
-    else
-    { //register A
-        reg = REG_IODIRA;
-    }
-    if (direction == 1)
-    {
-        mask = 1 << (pin - 1);
-    }
-    else
-    {
-        mask = ~(1 << (pin - 1));
-    }
-    int currentValue = read_register(mcp23017, reg);
-    int newValue = currentValue & mask;
-    read_register(mcp23017, reg, newValue);
+	uint8_t rdata = 0;
+	i2c_slow_start(&(mcp23017->bus));
+	i2c_slow_writeByte(&(mcp23017->bus), mcp23017->writeAddr); //sends i2c address w/ write bit set
+	i2c_slow_writeByte(&(mcp23017->bus), reg);
+	i2c_slow_start(&(mcp23017->bus));
+	i2c_slow_writeByte(&(mcp23017->bus), mcp23017->readAddr);
+	rdata = i2c_slow_readByte(&(mcp23017->bus), 1);
+	i2c_slow_stop(&(mcp23017->bus));
+	printf("Read: %d\n", rdata);
+	return rdata;
 }
 
-uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin)
+//Public Functions
+
+MCP23017 *mcp23017_create(uint8_t address, int sda, int scl)
 {
-    int reg;
-    if (pin > 8)
-    { //register B
-        reg = REG_IODIRB;
-    }
-    else
-    { //register A
-        reg = REG_IODIRA;
-    }
-    return read_register(mcp23017, reg);
+	MCP23017 *mcp23017 = (MCP23017 *)malloc(sizeof(MCP23017));
+	i2c_slow_open(&(mcp23017->bus), scl, sda, 1, 50);
+	mcp23017->writeAddr = ((0x20 | address) << 1) & 0b11111110;
+	mcp23017->readAddr = ((0x20 | address) << 1) | 0b00000001;
+	return mcp23017;
 }
 
-void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t output)
+void mcp23017_destroy(MCP23017 *mcp23017)
 {
-    int reg;
-    int mask;
-    if (pin > 8)
-    { //register B
-        reg = REG_GPIOB;
-    }
-    else
-    { //register A
-        reg = REG_GPIOA;
-    }
-    if (output == 1)
-    {
-        mask = 1 << (pin - 1);
-    }
-    else
-    {
-        mask = ~(1 << (pin - 1));
-    }
-    int currentValue = read_register(mcp23017, reg);
-    int newValue = currentValue & mask;
-    read_register(mcp23017, reg, newValue);
-}
-uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin)
-{
-    int reg;
-    if (pin > 8)
-    { //register B
-        reg = REG_GPIOB;
-    }
-    else
-    { //register A
-        reg = REG_GPIOA;
-    }
-    return read_register(mcp23017, reg);
+	free(mcp23017);
 }
 
-void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t output)
+Error mcp23017_init(MCP23017 *mcp23017)
 {
-    int reg;
-    int mask;
-    if (pin > 8)
-    { //register B
-        reg = REG_IPOLB;
-    }
-    else
-    { //register A
-        reg = REG_IPOLA;
-    }
-    if (output == 1)
-    {
-        mask = 1 << (pin - 1);
-    }
-    else
-    {
-        mask = ~(1 << (pin - 1));
-    }
-    int currentValue = read_register(mcp23017, reg);
-    int newValue = currentValue & mask;
-    read_register(mcp23017, reg, newValue);
-}
-uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin)
-{
-    int reg;
-    if (pin > 8)
-    { //register B
-        reg = REG_IPOLB;
-    }
-    else
-    { //register A
-        reg = REG_IPOLA;
-    }
-    return read_register(mcp23017, reg);
+	//BANK = 	0 : sequential register addresses
+	//MIRROR = 	0 : use configureInterrupt
+	//SEQOP = 	1 : sequential operation disabled, address pointer does not increment
+	//DISSLW = 	0 : slew rate enabled
+	//HAEN = 	0 : hardware address pin is always enabled on 23017
+	//ODR = 	0 : open drain output
+	//INTPOL = 	0 : interrupt active low
+	if (!write_register(mcp23017, IOCON, 0b00100000))
+	{
+		return MCP23017_NOT_FOUND;
+	}
+	return SUCCESS;
 }
 
-/*Private functions*/
-static uint8_t read_register(MCP23017 *mcp23017, uint8_t addr)
+void mcp23017_port_mode(MCP23017 *mcp23017, mcp23017_port port, uint8_t directions, uint8_t pullups, uint8_t inverted)
 {
-    uint8_t rdata = 0xFF;
-    i2c_start(&(mcp23017->bus));
-    i2c_writeByte(&(mcp23017->bus), mcp23017->writeAddr); //sends i2c address w/ write bit set
-    i2c_writeByte(&(mcp23017->bus), addr);
-    i2c_start(&(mcp23017->bus));
-    i2c_writeByte(&(mcp23017->bus), mcp23017->readAddr);
-    rdata = i2c_readByte(&(mcp23017->bus), 1);
-    i2c_stop(&(mcp23017->bus));
-    return rdata;
+	write_register(mcp23017, IODIR_A + port, directions);
+	write_register(mcp23017, GPPU_A + port, pullups);
+	write_register(mcp23017, IPOL_A + port, inverted);
 }
 
-static void write_register(MCP23017 *mcp23017, uint8_t addr, uint8_t value)
+void mcp23017_pin_mode(MCP23017 *mcp23017, uint8_t pin, uint8_t mode, bool inverted)
 {
-    i2c_start(&(mcp23017->bus));
-    i2c_writeByte(&(mcp23017->bus), mcp23017->writeAddr);
-    i2c_writeByte(&(mcp23017->bus), addr);
-    i2c_writeByte(&(mcp23017->bus), value);
-    i2c_stop(&(mcp23017->bus));
+	mcp23017_register iodirreg = IODIR_A;
+	mcp23017_register pullupreg = GPPU_A;
+	mcp23017_register polreg = IPOL_A;
+	uint8_t iodir, pol, pull;
+
+	if (pin > 7)
+	{
+		iodirreg = IODIR_B;
+		pullupreg = GPPU_B;
+		polreg = IPOL_B;
+		pin -= 8;
+	}
+
+	iodir = read_register(mcp23017, iodirreg);
+	if (mode == INPUT || mode == INPUT_PULLUP)
+		bitSet(iodir, pin);
+	else
+		bitClear(iodir, pin);
+
+	pull = read_register(mcp23017, pullupreg);
+	if (mode == INPUT_PULLUP)
+		bitSet(pull, pin);
+	else
+		bitClear(pull, pin);
+
+	pol = read_register(mcp23017, polreg);
+	if (inverted)
+		bitSet(pol, pin);
+	else
+		bitClear(pol, pin);
+
+	write_register(mcp23017, iodirreg, iodir);
+	write_register(mcp23017, pullupreg, pull);
+	write_register(mcp23017, polreg, pol);
+}
+
+void mcp23017_digital_write(MCP23017 *mcp23017, uint8_t pin, uint8_t state)
+{
+	mcp23017_register gpioreg = GPIO_A;
+	uint8_t gpio;
+	if (pin > 7)
+	{
+		gpioreg = GPIO_B;
+		pin -= 8;
+	}
+
+	gpio = read_register(mcp23017, gpioreg);
+	printf("GPIO:%d\n", gpio);
+	if (state == 1)
+		bitSet(gpio, pin);
+	else
+		bitClear(gpio, pin);
+
+	write_register(mcp23017, gpioreg, gpio);
+	printf("GPIOA:%d\n", read_register(mcp23017, GPIO_A));
+}
+
+uint8_t mcp23017_digital_read(MCP23017 *mcp23017, uint8_t pin)
+{
+	mcp23017_register gpioreg = GPIO_A;
+	uint8_t gpio;
+	if (pin > 7)
+	{
+		gpioreg = GPIO_B;
+		pin -= 8;
+	}
+
+	gpio = read_register(mcp23017, gpioreg);
+	if (bitRead(gpio, pin))
+		return HIGH;
+	return LOW;
+}
+
+void mcp23017_write_port(MCP23017 *mcp23017, mcp23017_port port, uint8_t value)
+{
+	write_register(mcp23017, GPIO_A + port, value);
+}
+
+uint8_t mcp23017_read_port(MCP23017 *mcp23017, mcp23017_port port)
+{
+	return read_register(mcp23017, GPIO_A + port);
 }
