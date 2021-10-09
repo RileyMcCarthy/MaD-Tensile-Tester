@@ -74,7 +74,6 @@ void i2c_slow_start(i2c_slow *bus)
 void i2c_slow_stop(i2c_slow *bus)
 {
     all_low(bus);
-    sda_high(bus);
     _waitus(bus->delay);
     scl_high(bus);
     _waitus(bus->delay);

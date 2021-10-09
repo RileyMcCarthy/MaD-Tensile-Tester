@@ -557,24 +557,41 @@ static void filesystem_begin()
 
 static void test_mcp23017()
 {
-  MCP23017 *mcp = mcp23017_create(GPIO_ADDR, GPIO_SDA, GPIO_SCL);
-  Error status = mcp23017_init(mcp);
-  if (status != SUCCESS)
-  {
-    printf("Error:%d\n", status);
-    //return;
-  }
+  MCP23017 *mcp = mcp23017_create();
+  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+
   printf("MCP23017 begin\n");
 
-  mcp23017_port_mode(mcp, A, 0);          //Port A as output
-  mcp23017_port_mode(mcp, B, 0b11111111); //Port B as input
+  mcp23017_set_direction(mcp, 4, 0); // zero is output
+  printf("Direction:%d\n", mcp23017_get_direction(mcp, 4));
 
+  mcp23017_set_pin(mcp, 4, 0);
+  printf("Output:%d\n", mcp23017_get_pin(mcp, 4));
+  pause(500);
+  mcp23017_set_pin(mcp, 4, 1);
+  printf("Output:%d\n", mcp23017_get_pin(mcp, 4));
+  pause(500);
+  mcp23017_destroy(mcp);
+  return;
+}
+
+static void dyn4_test()
+{
+  MCP23017 *mcp = mcp23017_create();
+  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+  mcp23017_set_direction(mcp, 4, 0);         // zero is output
+  mcp23017_set_pin(mcp, CHARGE_PUMP_OUT, 0); //Enable charge pump, output is inverted
+
+  printf("MCP23017 begin\n");
+  pause(500);
+
+  DYN4 *dyn4 = dyn4_create();
+  dyn4_begin(dyn4, DYN4_RX, DYN4_TX, DYN4_ADDR);
   while (1)
   {
-    mcp23017_digital_write(mcp, 4, 1);
-    _waitms(2000);
-    mcp23017_digital_write(mcp, 4, 0);
-    _waitms(2000);
+    dyn4_send_command(dyn4, 0x0a, 100);
+    printf("position:%d\n", dyn4->encoder.value());
+    _waitms(10);
   }
 }
 
@@ -611,17 +628,11 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-  while (1)
-  {
-    high(0);
-    _waitms(1000);
-    low(0);
-    _waitms(1000);
-  }
+
   //test_sd_card();
   // test_display();
-  test_ds3231();
-  test_mcp23017();
+  // test_ds3231();
+  dyn4_test();
   return;
   //test_JSON();
   //test_sd_card();

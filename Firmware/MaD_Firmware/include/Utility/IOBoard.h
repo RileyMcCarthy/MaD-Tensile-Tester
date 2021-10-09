@@ -29,8 +29,15 @@
 #define GPIO_SCL 0  //MCP23017 (GPIO Expander) SCL pin
 #define GPIO_ADDR 0 //MCP23017 (GPIO Expander) I2C Address
 
-#define CHARGE_PUMP_OUT 1
+#define DYN4_ENCODER_A 19 //A for dynamic 4-encoder (Input)
+#define DYN4_ENCODER_B 20 //B for dynamic 4-encoder (Input)
+
+#define CHARGE_PUMP_OUT 4 //Charge pump enable (Output)
 #define DISTANCE_LIMIT_MAX 1
 #define DISTANCE_LIMIT_MIN 2
+
+#define DYN4_RX 14  //DYN4 data (Input)
+#define DYN4_TX 12  //DYN4 data (Output)
+#define DYN4_ADDR 3 //DYN4 I2C Address
 
 #endif

@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/flexprop/include/**"
+                "C:/flexprop/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -13,9 +13,9 @@
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-msvc-x64",
+            "intelliSenseMode": "linux-gcc-x64",
             "compileCommands": "${workspaceFolder}/MaD_Firmware/build/compile_commands.json",
-            "compilerPath": "C:/flexprop/bin/flexcc.exe"
+            "compilerPath": ""
         }
     ],
     "version": 4

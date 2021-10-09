@@ -4,5 +4,6 @@
         "cstdio": "c",
         "mad.h": "c",
         "type_traits": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -9,6 +9,17 @@
 #define READ_DRIVE_STATUS 0x09
 #define IS_STATUS 0x19
 
+DYN4 *dyn4_create()
+{
+    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4));
+    return dyn4;
+}
+
+void dyn4_destroy(DYN4 *dyn4)
+{
+    free(dyn4);
+}
+
 /**
  * @brief Begin communication with the servo controller
  * 
@@ -20,25 +31,24 @@
  */
 Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 {
+    low(11);
     dyn4->device_id = new_device_id & 0x7F;
     //uart_start(&(dyn4->serial), 14, 12, 2, 38400);
-    dyn4->serial.startx(14, 12, 2, 38400);
-
+    dyn4->serial.start(14, 12, 2, 38400); //flag 2 does nothing.
+    //originally 2 meant invert the rx pin.
     DYN4_Status status;
     Error ret = dyn4_get_status(dyn4, &status);
+    _waitms(100);
+    if (ret != SUCCESS)
+    {
+        printf("DYN4_NOT_RESPONDING\n");
+        return ret;
+    }
+    printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
 
     //start encoder
-    dyn4->encoder.Totenc = 1; // Number of encoders
-    dyn4->encoder.Pin = 19;   // set the first PIN of the first encoder
+    dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
 
-    dyn4->encoder.pasm_cntr = 0;                  // Counter to observe life in asm code
-    dyn4->encoder.PosPointer = dyn4->encoder.POS; // Pointer to POS counters
-
-    int EncCog = encoder_start(&(dyn4->encoder)); // Start asm cog with address to first variable in static block
-    if (EncCog <= 0)
-    {
-        ret = DYN4_COG_FAIL;
-    }
     return ret;
 }
 
@@ -80,13 +90,13 @@ int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
     uint8_t *data;
 
     //uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rx;
+    byte = (uint8_t)dyn4->serial.rx();
     if ((byte & dyn4->device_id) != dyn4->device_id)
     {
         return -1;
     }
     //uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rx;
+    byte = (uint8_t)dyn4->serial.rx();
     if ((byte & IS_STATUS) != IS_STATUS)
     {
         return -1;
@@ -151,10 +161,15 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
     //uart_write(&(dyn4->serial), bytes[2]);
     //uart_write(&(dyn4->serial), bytes[1]);
     //uart_write(&(dyn4->serial), bytes[0]);
+    dyn4->serial.tx(bytes[4]);
+    dyn4->serial.tx(bytes[3]);
+    dyn4->serial.tx(bytes[2]);
+    dyn4->serial.tx(bytes[1]);
+    dyn4->serial.tx(bytes[0]);
 
     for (int i = package_size - 1; i >= 0; i--)
     {
-        dyn4->serial.tx(bytes[i]);
+        //   dyn4->serial.tx(bytes[i]);
     }
     free(bytes);
 }

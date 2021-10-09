@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:\\flexprop\\include"
+                "C:/flexprop/**"
             ],
             "defines": [
                 "_DEBUG",

@@ -3,7 +3,6 @@
 #define LEAK_DETECTOR_C_H
 
 #define FILE_NAME_LENGTH 30
-#define OUTPUT_FILE "/home/leak_info.txt"
 #define malloc(size) xmalloc(size, __FUNCTION__, __LINE__)
 #define realloc(ptr, size) xrealloc(ptr, size, __FUNCTION__, __LINE__)
 #define calloc(elements, size) xcalloc(elements, size, __FUNCTION__, __LINE__)
