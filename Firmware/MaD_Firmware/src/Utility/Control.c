@@ -1,13 +1,12 @@
 #include "Control.h"
 static long stack[64];
 
-/*need to give control access to IO*/
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(Control *control)
 {
     int position = control->dyn4->encoder.value();
     navkey_write_counter(control->navkey, position); // reset counter to position
-    MachineState lastState = NULL;
+    State lastState = NULL;
     while (1)
     {
         MachineState currentMachineState = *(control->stateMachine);
@@ -18,11 +17,11 @@ static void control_cog(Control *control)
                 if (lastState != MODE_MANUAL)
                 {
                     int position = control->dyn4->encoder.value();
-                    navkey_write_counter(control->navkey, position); // reset counter to position
-                    navkey_write_step((int32_t)100);                 // Set increment for manual mode
+                    navkey_write_counter(control->navkey, position);  // reset counter to position
+                    navkey_write_step(control->navkey, (int32_t)100); // Set increment for manual mode
                 }
                 // Use Navkey to move motor
-                int position = navkey_read_counter_int(NavKey * navkey);
+                int position = navkey_read_counter_int(control->navkey);
                 dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
             }
             else if (currentMachineState.motionParameters.mode == MODE_AUTOMATIC)
@@ -40,10 +39,10 @@ static void control_cog(Control *control)
                     dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                     int position = control->dyn4->encoder.value();
                     navkey_write_counter(control->navkey, position); // reset counter to position
-                    navkey_write_step((int32_t)10);                  // Set increment for manual mode
+                    navkey_write_step(control->navkey, (int32_t)10); // Set increment for manual mode
                 }
                 // Use Navkey to move motor very slowly
-                int position = navkey_read_counter_int(NavKey * navkey);
+                int position = navkey_read_counter_int(control->navkey);
                 dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
             }
         }
@@ -140,7 +139,7 @@ static void control_cog(Control *control)
         {
             control->stateMachine->machineCheckParameters.servoReady = false;
         }
-        lastState = currentState.currentState;
+        lastState = currentMachineState.currentState;
     }
 }
 
@@ -153,8 +152,8 @@ bool control_begin(Control *control, MachineProfile *machineProfile, MonitorData
     control->testProfile = NULL;
     control->navkey = navkey;
     control->dyn4 = dyn4;
-    monitor->cogid = _cogstart_C(control_cog, control, &stack[0], sizeof(long) * 64);
-    if (monitor->cogid != -1)
+    control->cogid = _cogstart_C(control_cog, control, &stack[0], sizeof(long) * 64);
+    if (control->cogid != -1)
     {
         return true;
     }

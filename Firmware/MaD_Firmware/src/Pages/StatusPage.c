@@ -1,4 +1,4 @@
-//status page
+// status page
 #include "StatusPage.h"
 #include "Images.h"
 
@@ -63,7 +63,7 @@ void status_page_run(StatusPage *page)
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
 
-    //display->bteMemoryCopy(page->display,PAGE2_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, 100, 50);
+    // display->bteMemoryCopy(page->display,PAGE2_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, 100, 50);
 
     /*Main headers*/
     char buf[50];
@@ -132,15 +132,12 @@ void status_page_run(StatusPage *page)
     buttons[2].pressed = false;
     buttons[2].lastPress = 0;
 
-    //display->drawSquareFill(buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
     display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
     Image navigationImg; //= image_get(IMAGE_NAVIGATION);
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     Image button_wide; // = image_get(IMAGE_BUTTON_WIDE);
     display_bte_memory_copy_image(page->display, button_wide, buttons[0].xmin, buttons[0].ymin);
-
-    // display->loadImage("navigation.bin", 1, 800, 300, 100, 100);
 
     printf("Status page loaded\n");
     while (!page->complete)
@@ -157,7 +154,7 @@ void status_page_run(StatusPage *page)
         display_draw_string(page->display, buttons[1].xmin + 50 - strlen(buf) * 6, buttons[1].ymin + 25 - 12, buf);
 
         /*Self Check State*/
-        //self check status
+        // self check status
         if (page->stateMachine->selfCheckParameters.chargePumpOK)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -170,7 +167,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, selfCheckStartX, selfCheckStartY + 30, buf);
 
-        //charge pump
+        // charge pump
         if (page->stateMachine->selfCheckParameters.chargePumpOK)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -184,7 +181,7 @@ void status_page_run(StatusPage *page)
         display_draw_string(page->display, selfCheckStartX, selfCheckStartY + 60, buf);
 
         /*Machine Check State*/
-        //switched power enabled
+        // switched power enabled
         if (page->stateMachine->machineCheckParameters.power)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -197,20 +194,20 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 30, buf);
 
-        //upper overtravel
-        if (page->stateMachine->machineCheckParameters.upperLimit)
+        // upper overtravel
+        if (page->stateMachine->motionParameters.hardUpperLimit)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-            strcpy(buf, "Upper Limit Fault: NONE  ");
+            strcpy(buf, "Hard Upper Limit Fault: NONE  ");
         }
         else
         {
             display_text_color(page->display, COLOR65K_RED, BACKCOLOR);
-            strcpy(buf, "Upper Limit Fault: ACTIVE");
+            strcpy(buf, "Hard Upper Limit Fault: ACTIVE");
         }
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 60, buf);
 
-        //ESD
+        // ESD
         if (page->stateMachine->machineCheckParameters.esd)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -223,7 +220,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 90, buf);
 
-        //Servo
+        // Servo
         if (page->stateMachine->machineCheckParameters.servoReady)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -236,7 +233,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 120, buf);
 
-        //Force Gauge
+        // Force Gauge
         if (page->stateMachine->machineCheckParameters.forceGaugeResponding)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -249,7 +246,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 150, buf);
 
-        //machine Ready
+        // machine Ready
         if (page->stateMachine->machineCheckParameters.machineReady)
         {
             display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -263,7 +260,7 @@ void status_page_run(StatusPage *page)
         display_draw_string(page->display, machineCheckStartX, machineCheckStartY + 180, buf);
 
         /*Motion State*/
-        //motion enabled
+        // motion enabled
         if (page->stateMachine->motionParameters.status == STATUS_ENABLED)
         {
             display_text_color(page->display, ENABLEDTEXT, ENABLEDBACK);
@@ -281,7 +278,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, motionStartX, motionStartY + 30, buf);
 
-        //Motion Status
+        // Motion Status
         switch (page->stateMachine->motionParameters.condition)
         {
         case MOTION_STOPPED:
@@ -317,7 +314,7 @@ void status_page_run(StatusPage *page)
         }
         display_draw_string(page->display, motionStartX, motionStartY + 60, buf);
 
-        //Motion Mode
+        // Motion Mode
         switch (page->stateMachine->motionParameters.mode)
         {
         case MODE_MANUAL:
@@ -343,7 +340,7 @@ void status_page_run(StatusPage *page)
         int y = 80;
         for (int i = 0; i < 12; i++)
         {
-            sprintf(buf, "GPI_%d: %s", i + 1, (1 ? "HIGH" : "LOW")); //change to using mcp
+            sprintf(buf, "GPI_%d: %s", i + 1, (1 ? "HIGH" : "LOW")); // change to using mcp
             if (i > 6)
             {
                 x = SCREEN_WIDTH * 2 / 3 - strlen(buf) * 12 - 20;

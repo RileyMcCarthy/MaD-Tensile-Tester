@@ -109,7 +109,7 @@ static void state_machine_cog(MachineState *machineState)
         // make snippet of current state
         MachineState currentMachineState = *machineState;
         State newState;
-        switch (currentMachineState->currentState)
+        switch (currentMachineState.currentState)
         {
         case STATE_SELFCHECK:
             newState = state_machine_self_check(&currentMachineState);
@@ -123,7 +123,7 @@ static void state_machine_cog(MachineState *machineState)
         default:
             break;
         }
-        machineState.currentState = newState;
+        machineState->currentState = newState;
 
         // copy contents of state snipped back to machine state
         *machineState = currentMachineState;
@@ -132,7 +132,7 @@ static void state_machine_cog(MachineState *machineState)
 
 MachineState *state_machine_run()
 {
-    MachineState *machineState = (MachineState *)malloc(sizeof(MachineState *));
+    MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
     machineState->cogid = __builtin_cogstart(state_machine_cog(machineState), &stack[0]);
     if (machineState->cogid != -1)
     {

@@ -670,7 +670,7 @@ static MachineProfile *Load_MachineProfile()
   }
 
   // Create JSON using JSON to validate conversion process
-  MachineProfile *profile = json_to_machine_profile(jsonFile);
+  profile = json_to_machine_profile(jsonFile);
 
   return profile;
 }
@@ -700,16 +700,16 @@ static Display *start_display()
 
 static NavKey *start_navkey()
 {
-  NavKey navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
-  navkey_reset();
-  navkey_begin(i2cNavKey::INT_DATA | i2cNavKey::WRAP_ENABLE | i2cNavKey::DIRE_RIGHT | i2cNavKey::IPUP_ENABLE);
+  NavKey *navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
+  navkey_reset(navkey);
+  navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
 
-  navkey_write_counter((int32_t)0);  /* Reset the counter value */
-  navkey_write_max((int32_t)10000);  /* Set the maximum threshold*/
-  navkey_write_min((int32_t)-10000); /* Set the minimum threshold */
-  navkey_write_step((int32_t)100);   /* Set the step to 1*/
+  navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
+  navkey_write_max(navkey, (int32_t)10000);  /* Set the maximum threshold*/
+  navkey_write_min(navkey, (int32_t)-10000); /* Set the minimum threshold */
+  navkey_write_step(navkey, (int32_t)100);   /* Set the step to 1*/
 
-  navkey_write_double_push_period(30); /*Set a period for the double push of 300ms */
+  navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
   return navkey;
 }
 
@@ -764,8 +764,9 @@ void mad_begin()
 
   // Connect to IMU
   // Start state machine (needs IO expansion)
-  MachineState *machineState = state_machine_run(mcp, dyn4);
-
+  MachineState *machineState = state_machine_run();
+  machineState->selfCheckParameters.chargePumpOK = true;
+  loading_overlay_display(display, "State Machine Running", OVERLAY_TYPE_LOADING);
   // Connect to RTC
   DS3231 *rtc = ds3231_create();
   Error status = ds3231_begin(rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
@@ -773,9 +774,11 @@ void mad_begin()
   if (status != SUCCESS)
   {
     loading_overlay_display(display, "Error connecting to RTC", OVERLAY_TYPE_LOADING);
+    machineState->selfCheckParameters.rtcReady = false;
   }
   else
   {
+    machineState->selfCheckParameters.rtcReady = true;
     loading_overlay_display(display, "RTC Connected", OVERLAY_TYPE_LOADING);
   }
 

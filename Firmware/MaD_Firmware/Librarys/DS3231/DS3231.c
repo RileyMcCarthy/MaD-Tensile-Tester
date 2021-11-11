@@ -1,28 +1,28 @@
 #include "DS3231.h"
 
-#define REG_SECONDS 0x00 //Second register
-#define REG_MINUTES 0x01 //Minute register
-#define REG_HOURS 0x02   //Hour register
-#define REG_DAY 0x04     //Day register
-#define REG_MONTHS 0x05  //Month register
-#define REG_YEARS 0x06   //Year register
-#define REG_CONTROL 0x0E //Control register
-#define REG_STATUS 0x0F  //Status register
+#define REG_SECONDS 0x00 // Second register
+#define REG_MINUTES 0x01 // Minute register
+#define REG_HOURS 0x02   // Hour register
+#define REG_DAY 0x04     // Day register
+#define REG_MONTHS 0x05  // Month register
+#define REG_YEARS 0x06   // Year register
+#define REG_CONTROL 0x0E // Control register
+#define REG_STATUS 0x0F  // Status register
 
-#define STATUS_RST 0x80 //Clock reset status bit
+#define STATUS_RST 0x80 // Clock reset status bit
 
-#define SET_PM 0x20     //Control AM/PM set bit
-#define SET_12HOUR 0x40 //Control 12/24 set bit
+#define SET_PM 0x20     // Control AM/PM set bit
+#define SET_12HOUR 0x40 // Control 12/24 set bit
 
 #define ADDR 0x68
 
-//Private functions
+// Private functions
 
 /**
  * @brief Private helper function to read RTC register
- * 
- * @param addr 
- * @return uint8_t 
+ *
+ * @param addr
+ * @return uint8_t
  */
 static uint8_t read_register(DS3231 *ds3231, uint8_t addr)
 {
@@ -38,7 +38,7 @@ static uint8_t read_register(DS3231 *ds3231, uint8_t addr)
 }
 /**
  * @brief Private helper function to write RTC register
- * 
+ *
  * @param addr Register address
  * @param value Value to write to the register
  * @return true if write was acknoledged
@@ -56,7 +56,7 @@ static bool write_register(DS3231 *ds3231, uint8_t addr, uint8_t value)
 
 /**
  * @brief Decimal number to binary coded decimal format
- * 
+ *
  * @param val the decimal number to convert
  * @return uint8_t the equivalent binary coded decimal value
  */
@@ -67,7 +67,7 @@ static uint8_t dectobcd(const uint8_t val)
 
 /**
  * @brief Binary coded decimal to decimal format
- * 
+ *
  * @param val The binary coded decimal number
  * @return uint8_t the equivalent decimal value
  */
@@ -91,7 +91,7 @@ void ds3231_destroy(DS3231 *ds3231)
 
 /**
  * @brief Communicates with the DS3231 Real Time Clock IC
- * 
+ *
  * @param scl I2C Clock Pin
  * @param sda I2C Data Pin
  * @return Error: RTC_RESET if RTC lost power, RTC_NOT_FOUND if communication failed, SUCCESS otherwise.
@@ -102,33 +102,36 @@ Error ds3231_begin(DS3231 *ds3231, int scl, int sda)
     ds3231->writeAddr = (ADDR << 1) & 0b11111110; //@todo, statuc address can make definition instead of part of structure
     ds3231->readAddr = (ADDR << 1) | 0b00000001;
 
-    ds3231->bus.setup(scl, sda, 100, 1); //1.5k pullup
+    ds3231->bus.setup(scl, sda, 100, 1); // 1.5k pullup
 
     uint8_t status = read_register(ds3231, REG_STATUS);
     printf("Status: %d\n", status);
     if ((status & STATUS_RST) != 0)
     {
-        //oscillator is stopped, time must be set again
+        // oscillator is stopped, time must be set again
+        printf("Reset\n", status);
         error = RTC_RESET;
     }
     if (!write_register(ds3231, REG_CONTROL, 0x00))
     {
         error = RTC_NOT_FOUND;
+        printf("Not found\n", status);
         return error;
     }
-    status &= ~0x08; //sets bit 3 in status register to zero (disable 32khz output)
+    status &= ~0x08; // sets bit 3 in status register to zero (disable 32khz output)
     status &= ~0x80;
     if (!write_register(ds3231, REG_STATUS, status))
     {
         error = RTC_NOT_FOUND;
         return error;
     }
+    printf("leaving\n", status);
     return error;
 }
 
 /**
  * @brief Sets the RTC Time
- * 
+ *
  * @param newTime The new time
  * @return Error: RTC_NOT_FOUND if communication error, SUCCESS otherwise
  * @TODO Error checking for bad Time struct values
@@ -157,7 +160,7 @@ Error ds3231_set_time(DS3231 *ds3231, Time *newTime)
 
 /**
  * @brief Read time for RTC and update local copy
- * 
+ *
  * @return Error: RTC_NOT_FOUND if communication error, SUCCESS otherwise.
  */
 Error ds3231_update_time(DS3231 *ds3231)

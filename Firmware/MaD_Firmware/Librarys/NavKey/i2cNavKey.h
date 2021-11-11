@@ -59,6 +59,7 @@ typedef struct navkey_t
 	union Data_v _tem_data;
 } NavKey;
 
+NavKey *navkey_create(int theSCL, int theSDA, uint8_t addr);
 void navkey_begin(NavKey *navkey, uint8_t conf);
 void navkey_reset(NavKey *navkey);
 void navkey_auto_config_interrupt(NavKey *navkey);
