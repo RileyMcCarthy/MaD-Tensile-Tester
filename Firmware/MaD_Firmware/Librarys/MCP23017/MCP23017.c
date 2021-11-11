@@ -17,24 +17,26 @@
 static uint8_t read_register(MCP23017 *mcp23017, uint8_t addr)
 {
     uint8_t rdata = 0xFF;
-    i2c_slow_start(&(mcp23017->bus));
-    i2c_slow_writeByte(&(mcp23017->bus), mcp23017->writeAddr); //sends i2c address w/ write bit set
-    i2c_slow_writeByte(&(mcp23017->bus), addr);
-    i2c_slow_start(&(mcp23017->bus));
-    i2c_slow_writeByte(&(mcp23017->bus), mcp23017->readAddr);
-    rdata = i2c_slow_readByte(&(mcp23017->bus), 1);
-    i2c_slow_stop(&(mcp23017->bus));
+
+    mcp23017->i2cBus.start();
+    mcp23017->i2cBus.write(mcp23017->writeAddr);
+    mcp23017->i2cBus.write(addr);
+    mcp23017->i2cBus.start();
+    mcp23017->i2cBus.write(mcp23017->readAddr);
+    rdata = mcp23017->i2cBus.read(1);
+    mcp23017->i2cBus.stop();
     return rdata;
 }
 
 static bool write_register(MCP23017 *mcp23017, uint8_t addr, uint8_t value)
 {
     int ack = 0;
-    i2c_slow_start(&(mcp23017->bus));
-    ack += i2c_slow_writeByte(&(mcp23017->bus), mcp23017->writeAddr);
-    i2c_slow_writeByte(&(mcp23017->bus), addr);
-    i2c_slow_writeByte(&(mcp23017->bus), value);
-    i2c_slow_stop(&(mcp23017->bus));
+
+    mcp23017->i2cBus.start();
+    ack = mcp23017->i2cBus.write(mcp23017->writeAddr);
+    mcp23017->i2cBus.write(addr);
+    mcp23017->i2cBus.write(value);
+    mcp23017->i2cBus.stop();
     return ack == 0;
 }
 
@@ -45,7 +47,7 @@ MCP23017 *mcp23017_create()
 
 void mcp23017_destroy(MCP23017 *mcp23017)
 {
-    i2c_slow_stop(&(mcp23017->bus));
+    mcp23017->i2cBus.stop();
     free(mcp23017);
 }
 
@@ -58,13 +60,12 @@ void mcp23017_destroy(MCP23017 *mcp23017)
  */
 void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
 {
-    i2c_slow_open(&(mcp23017->bus), scl, sda, 1, 50);
+    mcp23017->i2cBus.setup(scl, sda, 100, 1); //1.5k pullup
     mcp23017->writeAddr = ((0x20 | addr) << 1) & 0b11111110;
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
 }
 
-
-void mcp23017_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
 {
     int reg = REG_IODIRA;
     if (pin > 7)
@@ -75,12 +76,10 @@ void mcp23017_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
 
     int value = read_register(mcp23017, reg);
     bitWrite(value, pin, direction);
-    printf("Value:%d\n", value);
     bool ack = write_register(mcp23017, reg, value);
-    printf("Write ack:%d\n", ack);
 }
 
-uint8_t mcp23017_get_direction(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin)
 {
     int reg = REG_IODIRA;
     if (pin > 7)
@@ -91,7 +90,7 @@ uint8_t mcp23017_get_direction(MCP23017 *mcp23017, uint16_t pin)
     return bitRead(read_register(mcp23017, reg), pin);
 }
 
-void mcp23017_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
 {
     int reg = REG_GPIOA;
     if (pin > 7)
@@ -104,7 +103,7 @@ void mcp23017_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
     bitWrite(value, pin, state);
     write_register(mcp23017, reg, value);
 }
-uint8_t mcp23017_get_pin(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin)
 {
     int reg = REG_GPIOA;
     if (pin > 7)
@@ -115,7 +114,7 @@ uint8_t mcp23017_get_pin(MCP23017 *mcp23017, uint16_t pin)
     return bitRead(read_register(mcp23017, reg), pin);
 }
 
-void mcp23017_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
 {
     int reg = REG_IPOLA;
     if (pin > 7)
@@ -128,7 +127,7 @@ void mcp23017_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
     bitWrite(value, pin, state);
     write_register(mcp23017, reg, value);
 }
-uint8_t mcp23017_get_pullup(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin)
 {
     int reg = REG_IPOLA;
     if (pin > 7)

@@ -1,5 +1,8 @@
 #ifndef Clock_H
 #define Clock_H
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 #include "simpletools.h"
 #include "RA8876.h"
 #include "DS3231.h"

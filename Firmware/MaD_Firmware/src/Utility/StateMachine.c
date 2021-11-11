@@ -3,106 +3,130 @@
 static long stack[64];
 
 /**
-* @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state. 
-* 
-*/
+ * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state.
+ *
+ */
 static State state_machine_self_check(MachineState *machineState)
 {
     State newState;
+    SelfCheckParameters params = machineState->selfCheckParameters;
 
-    //Decide the next state
-    if (machineState->selfCheckParameters.chargePumpOK)
+    // Decide the next state
+    if (params.chargePumpOK && params.rtcReady)
     {
-        newState = State_MachineCheck;
+        newState = STATE_MACHINECHECK;
     }
     else
     {
-        newState = State_SelfCheck;
+        newState = STATE_SELFCHECK;
     }
 
     return newState;
 }
 
 /**
- * @brief Automatic transition into when all Self Check conditions satisfied or if any Machine Check condition not satisfied and Self Check conditions are satisfied. 
- * No motion shall occur in Machine Check.  
- * Motion Status is Disabled in Machine Check State. 
- * 
+ * @brief Automatic transition into when all Self Check conditions satisfied or if any Machine Check condition not satisfied and Self Check conditions are satisfied.
+ * No motion shall occur in Machine Check.
+ * Motion Status is Disabled in Machine Check State.
+ *
  */
 static State state_machine_check(MachineState *machineState)
 {
     State newState;
 
-    //Check internal parameters
-
-    //Decide the next state
-    if (state_machine_self_check() != State_MachineCheck) //Ensure self check state is satisfied
+    // Check previous state
+    if (state_machine_self_check(machineState) != STATE_MACHINECHECK) // Ensure self check state is satisfied
     {
-        return State_SelfCheck;
+        return STATE_SELFCHECK;
     }
-    if (machineState->machineCheckParameters.forceGaugeResponding && machineState->machineCheckParameters.dyn4Responding)
-    {
-        newState = State_Motion;
 
-        //Set state based internal parameters
-        machineState->machineCheckParameters.machineReady = true;
+    MachineCheckParameters params = machineState->machineCheckParameters;
+    // Check internal parameters
+    if (params.power &&
+        params.esd &&
+        params.servoReady &&
+        params.forceGaugeResponding &&
+        params.dyn4Responding &&
+        params.machineReady)
+    {
+        return STATE_MOTION; // Internal parameters passed, change to MOTION
     }
     else
     {
-        newState = State_MachineCheck;
-
-        //Set state based internal parameters
-        machineState->machineCheckParameters.machineReady = false;
+        // Internal parameters failed, stay in Machine Check
+        return STATE_MACHINECHECK;
     }
-
-    return newState;
 }
 
 static State state_machine_motion(MachineState *machineState)
 {
     State newState;
 
-    //Check internal parameters
-
-    //Decide the next state
-    if (MachineCheckState() != State_Motion) //Check if previous state conditions are still valid back
+    // Decide the next state
+    if (state_machine_check(machineState) != STATE_MOTION) // Check if previous state conditions are still valid back
     {
-        //Set state based internal parameters
+        // Set state based internal parameters
         machineState->motionParameters.status = STATUS_DISABLED;
         machineState->motionParameters.condition = MOTION_STOPPED;
         machineState->motionParameters.mode = MODE_MANUAL;
-        return State_MachineCheck;
+        return STATE_MACHINECHECK;
     }
 
-    //Dump temporary parameters to machine state
-    machineState->motionParameters.status = tempStatus;
-    machineState->motionParameters.condition = tempCondition;
-    machineState->motionParameters.mode = tempMode;
-    return State_Motion;
+    MotionParameters params = machineState->motionParameters;
+    // Check internal parameters
+    if (params.softLowerLimit ||
+        params.hardLowerLimit)
+    {
+        // Lower limit reached, override mode
+        machineState->motionParameters.status = STATUS_RESTRICTED;
+        machineState->motionParameters.condition = MOTION_LOWER;
+        machineState->motionParameters.mode = MODE_OVERRIDE;
+    }
+    if (!params.softUpperLimit &&
+        !params.hardUpperLimit)
+    {
+        // Upper limit reached, override mode
+        machineState->motionParameters.status = STATUS_RESTRICTED;
+        machineState->motionParameters.condition = MOTION_UPPER;
+        machineState->motionParameters.mode = MODE_OVERRIDE;
+    }
+    if (params.forceOverload)
+    {
+        machineState->motionParameters.status = STATUS_RESTRICTED;
+        machineState->motionParameters.mode = MODE_OVERRIDE;
+        // Need to tell state machine weather its in tension or compression
+    }
+    return STATE_MOTION;
 }
 
 static void state_machine_cog(MachineState *machineState)
 {
-    //Get MachineState as parameter from hub memory
-    State previousState = machineState->currentState;
+
+    // Get MachineState as parameter from hub memory
+    State currentState = machineState->currentState;
     while (1)
     {
+        // make snippet of current state
+        MachineState currentMachineState = *machineState;
         State newState;
-        switch (previousState)
+        switch (currentMachineState->currentState)
         {
-        case State_SelfCheck:
-            newState = SelfCheckState(machineState);
+        case STATE_SELFCHECK:
+            newState = state_machine_self_check(&currentMachineState);
             break;
-        case State_MachineCheck:
-            newState = MachineCheckState(machineState);
+        case STATE_MACHINECHECK:
+            newState = state_machine_check(&currentMachineState);
             break;
-        case State_Motion:
-            newState = MotionState(machineState);
+        case STATE_MOTION:
+            newState = state_machine_motion(&currentMachineState);
             break;
         default:
             break;
         }
-        machineState->currentState = newState;
+        machineState.currentState = newState;
+
+        // copy contents of state snipped back to machine state
+        *machineState = currentMachineState;
     }
 }
 
@@ -119,14 +143,14 @@ MachineState *state_machine_run()
 
 void state_machine_stop(MachineState *machineState)
 {
-    //stop cog and free MachineState
+    // stop cog and free MachineState
 }
 
-//External State Setter Functions
+// External State Setter Functions
 
 void state_machine_set_servo_ready(MachineState *machineState, bool ready)
 {
-    machineState->selfCheckParameters.servoReady = ready;
+    machineState->machineCheckParameters.servoReady = ready;
 }
 
 void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding)
@@ -141,7 +165,7 @@ void state_machine_set_dyn4_responding(MachineState *machineState, bool respondi
 
 void state_machine_set_status(MachineState *machineState, MotionStatus status)
 {
-    //Set rules for changing status, and update internal parameters
+    // Set rules for changing status, and update internal parameters
     machineState->motionParameters.status = status;
 }
 

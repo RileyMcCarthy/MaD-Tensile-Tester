@@ -22,12 +22,12 @@ enum button_names
  */
 static void checkButtons(ManualPage *page)
 {
-    page->display->checkButtons(page->buttons, BUTTONCOUNT);
+    display_update_buttons(page->display, page->buttons, BUTTONCOUNT);
     for (int i = 0; i < BUTTONCOUNT; i++)
     {
-        if (buttons[i].pressed)
+        if (page->buttons[i].pressed)
         {
-            switch (buttons[i].name)
+            switch (page->buttons[i].name)
             {
             case BUTTON_MOTION_MODE:
                 /* code */
@@ -36,7 +36,7 @@ static void checkButtons(ManualPage *page)
                 /* code */
                 break;
             case BUTTON_NAVIGATION:
-                complete = true;
+                page->complete = true;
                 break;
             default:
                 break;
@@ -45,16 +45,18 @@ static void checkButtons(ManualPage *page)
     }
 }
 
-ManualPage *ManualPage_create(Display *display)
+ManualPage *manual_page_create(Display *display, MachineState *machineState)
 {
     ManualPage *page = (ManualPage *)malloc(sizeof(ManualPage));
     page->display = display;
     page->complete = false;
+    page->machineState = machineState;
     return page;
 }
 
-void ManualPage_destroy(ManualPage *page)
+void manual_page_destroy(ManualPage *page)
 {
+    free(page->buttons);
     free(page);
 }
 
@@ -62,7 +64,7 @@ void ManualPage_destroy(ManualPage *page)
  * @brief Starts manual page
  * 
  */
-void ManualPage_run(ManualPage *page)
+void manual_page_run(ManualPage *page)
 {
     printf("Manual page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
@@ -74,7 +76,7 @@ void ManualPage_run(ManualPage *page)
     printf("loaded dyn4\n");
     //Setup NavKey
     NavKey *navkey = navkey_create(28, 29, 0b0010010);
-    navkey_begin(navkey, i2cNavKey::INT_DATA | i2cNavKey::WRAP_ENABLE | i2cNavKey::DIRE_RIGHT | i2cNavKey::IPUP_ENABLE);
+    navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
     navkey_reset(navkey);
 
     navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
@@ -88,26 +90,28 @@ void ManualPage_run(ManualPage *page)
     strcpy(buf, "Manual");
     int titlex = SCREEN_WIDTH / 2 - strlen(buf) * 16;
     int titley = 10;
-    display_draw_string(navkey->display, titlex, titley, buf);
+    display_draw_string(page->display, titlex, titley, buf);
 
-    display_set_text_parameter1(navkey->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(navkey->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    display_text_color(navkey->display, MAINTEXTCOLOR, BACKCOLOR);
+    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
     strcpy(buf, "Information");
     titley = 120;
     titlex = SCREEN_WIDTH / 6 - strlen(buf) * 8;
-    display_put_string(navkey->display, titlex, titley, buf);
-    display_draw_line(navkey->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
+    display_draw_string(page->display, titlex, titley, buf);
+    display_draw_line(page->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
 
-    display_text_color(navkey->display, MAINTEXTCOLOR, BACKCOLOR);
+    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
     strcpy(buf, "Control");
     titley = 300;
     titlex = SCREEN_WIDTH / 6 - strlen(buf) * 8;
-    display_draw_string(navkey->display, titlex, titley, buf);
-    display_draw_line(navkey->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
+    display_draw_string(page->display, titlex, titley, buf);
+    display_draw_line(page->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
+
     printf("creating buttons\n");
-    Button buttons[BUTTONCOUNT];
+    Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
+    page->buttons = buttons;
     buttons[0].name = BUTTON_MOTION_MODE;
     buttons[0].xmin = SCREEN_WIDTH / 6 - 110;
     buttons[0].xmax = buttons[0].xmin + 100;
@@ -132,20 +136,20 @@ void ManualPage_run(ManualPage *page)
     buttons[2].pressed = false;
     buttons[2].lastPress = 0;
 
-    display_draw_square_fill(navkey->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
-    display_draw_square_fill(navkey->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    display_bte_memory_copy_image(navkey->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
+    display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
+    display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
+    Image navigationImg; //image_get_image(IMAGE_NAVIGATION);
+    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     bool initialRender = true;
     printf("Manual page finished loading\n");
-    MachineState previousState;
-    while (!complete)
+    MachineState previousState = *(page->machineState);
+    while (!page->complete)
     {
-        MachineState currentState;
-        navkey.updateStatus();
-        checkButtons(buttons);
+        MachineState currentState = *(page->machineState);
+        checkButtons(page);
 
-        setTextParameter1(navkey->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
-        setTextParameter2(navkey->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+        display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
+        display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
         int textcolor = 0;
         int backcolor = 0;
         int bordercolor = 0;
@@ -175,22 +179,22 @@ void ManualPage_run(ManualPage *page)
                 break;
             }
 
-            display->drawSquareFill(buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, bordercolor);
-            display->drawSquareFill(buttons[0].xmin + 5, buttons[0].ymin + 5, buttons[0].xmax - 5, buttons[0].ymax - 5, backcolor);
-            display->textColor(textcolor, backcolor);
-            display->putString(buttons[0].xmin + 50 - strlen(buf) * 4, buttons[0].ymin + 25 - 8, buf);
+            display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, bordercolor);
+            display_draw_square_fill(page->display, buttons[0].xmin + 5, buttons[0].ymin + 5, buttons[0].xmax - 5, buttons[0].ymax - 5, backcolor);
+            display_text_color(page->display, textcolor, backcolor);
+            display_draw_string(page->display, buttons[0].xmin + 50 - strlen(buf) * 4, buttons[0].ymin + 25 - 8, buf);
         }
-        display->textColor(MAINTEXTCOLOR, BACKCOLOR);
-        int position = navkey.readCounterInt();
+        display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
+        int position = navkey_read_counter_int(navkey);
         //dyn4_send_command(dyn4, 0x01, position);
         sprintf(buf, "Relitive Position: %d", position);
-        display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 160, buf);
+        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 160, buf);
         strcpy(buf, "Relative Force: 0.00");
-        display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 190, buf);
+        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 190, buf);
         strcpy(buf, "Absolute Position: 0.00");
-        display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 230, buf);
+        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 230, buf);
         strcpy(buf, "Absolute Force: 0.00");
-        display->putString(SCREEN_WIDTH / 6 - strlen(buf) * 6, 260, buf);
+        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 260, buf);
         // clock.render();
         initialRender = false;
         previousState = currentState;

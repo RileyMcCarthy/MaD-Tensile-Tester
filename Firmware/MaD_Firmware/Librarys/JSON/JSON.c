@@ -2,7 +2,7 @@
 #ifdef __MEMORY_CHECK__
 #include "leak_detector_c.h"
 #endif
-//Private Functions
+// Private Functions
 
 static char *get_string_from_index(FILE *file, int start, int end)
 {
@@ -17,7 +17,7 @@ static char *get_string_from_index(FILE *file, int start, int end)
     return string;
 }
 
-static int increment_file_to_string(FILE *json, char *string)
+static int increment_file_to_string(FILE *json, const char *string)
 {
     int c;
     int position = 0;
@@ -42,10 +42,10 @@ static int increment_file_to_string(FILE *json, char *string)
     return ftell(json);
 }
 
-static char *float_to_json(char *name, float value)
+static char *float_to_json(const char *name, float value)
 {
     char *json;
-    char floatStr[32]; //Buffer to hold the float as a string
+    char floatStr[32]; // Buffer to hold the float as a string
     sprintf(floatStr, "%f", value);
     int size = 4 + strlen(name) + strlen(floatStr); //  "":\0 are 4 chars plus strlen(name) and strlen(value)
     json = (char *)malloc(sizeof(char) * size);
@@ -53,17 +53,17 @@ static char *float_to_json(char *name, float value)
     return json;
 }
 
-static char *int_to_json(char *name, int value)
+static char *int_to_json(const char *name, int value)
 {
     char *json;
-    char intStr[32]; //Buffer to hold the int as a string
+    char intStr[32]; // Buffer to hold the int as a string
     sprintf(intStr, "%d", value);
     int size = 4 + strlen(name) + strlen(intStr); //  "":\0 are 4 chars plus strlen(name) and 10 for integer
     json = (char *)malloc(sizeof(char) * size);
     sprintf(json, "\"%s\":%s", name, intStr);
     return json;
 }
-static char *string_to_json(char *name, char *value)
+static char *string_to_json(const char *name, const char *value)
 {
     char *json;
     int size = 6 + strlen(name) + strlen(value); //"":""\0 are 6 chars plus strlen(name,value)
@@ -72,7 +72,7 @@ static char *string_to_json(char *name, char *value)
     return json;
 }
 
-static char *json_property_to_string(FILE *json, char *name)
+static char *json_property_to_string(FILE *json, const char *name)
 {
     int startPosition = ftell(json);
 
@@ -80,114 +80,114 @@ static char *json_property_to_string(FILE *json, char *name)
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":\"", name);
 
-    //read json file until pattern string is matched
+    // read json file until pattern string is matched
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
 
-    //Find end of value string
+    // Find end of value string
     int strEnd1 = increment_file_to_string(json, ",") - 2;
     fseek(json, strStart, SEEK_SET);
     int strEnd2 = increment_file_to_string(json, "}") - 2;
     int strEnd = strEnd1 < strEnd2 ? strEnd1 : strEnd2;
 
-    //Make copy of string to return
+    // Make copy of string to return
     int strLen = strEnd - strStart;
     char *propertyValue = (char *)malloc(sizeof(char) * (strLen + 1));
     fseek(json, strStart, SEEK_SET);
     fread(propertyValue, sizeof(char), strLen, json);
 
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     return propertyValue;
 }
 
-static int json_property_to_int(FILE *json, char *name)
+static int json_property_to_int(FILE *json, const char *name)
 {
-    //Get current file position
+    // Get current file position
     int startPosition = ftell(json);
 
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     int size = strlen(name) + 4; // "": \0, 3 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":", name);
 
-    //Find first index of pattern string in json, add strlen of pattern to get first character of value string
+    // Find first index of pattern string in json, add strlen of pattern to get first character of value string
     increment_file_to_string(json, pattern);
     free(pattern);
     int strStart = ftell(json);
 
-    //Find end of value string
+    // Find end of value string
     int strEnd1 = increment_file_to_string(json, ",");
     fseek(json, strStart, SEEK_SET);
     int strEnd2 = increment_file_to_string(json, "}");
     int strEnd = strEnd1 > strEnd2 ? strEnd1 : strEnd2;
 
-    //Make copy of string to convert
+    // Make copy of string to convert
     int valueLength = strEnd - strStart;
     char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
     fseek(json, strStart, SEEK_SET);
     fread(propertyValueString, sizeof(char), strLen, json);
 
-    //Convert string to int
+    // Convert string to int
     int propertyValue = atoi(propertyValueString);
     free(propertyValueString);
 
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     return propertyValue;
 }
 
-static float json_property_to_float(FILE *json, char *name)
+static float json_property_to_float(FILE *json, const char *name)
 {
-    //Get current file position
+    // Get current file position
     int startPosition = ftell(json);
 
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     int size = strlen(name) + 4; // "": \0, 4 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":", name);
 
-    //Find first index of pattern string in json
+    // Find first index of pattern string in json
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
 
-    //Find end of value string
+    // Find end of value string
     int strEnd1 = increment_file_to_string(json, ",");
     fseek(json, strStart, SEEK_SET);
     int strEnd2 = increment_file_to_string(json, "}");
     int strEnd = strEnd1 > strEnd2 ? strEnd1 : strEnd2;
 
-    //Make copy of string to convert
+    // Make copy of string to convert
     int valueLength = strEnd - strStart;
     char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
     fseek(json, strStart, SEEK_SET);
     fread(propertyValueString, sizeof(char), strLen, json);
 
-    //Convert string to float
+    // Convert string to float
     float propertyValue = atof(propertyValueString);
     free(propertyValueString);
 
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     return propertyValue;
 }
 
-static int json_property_to_string_array(FILE *json, char *name, char ***stringArrayPtr)
+static int json_property_to_string_array(FILE *json, const char *name, char ***stringArrayPtr)
 {
-    //Get current file position
+    // Get current file position
     int startPosition = ftell(json);
 
-    char **stringArray;
+    char **stringArray = NULL;
 
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     int size = strlen(name) + 6; // "":{\0, 6 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":[\"", name);
 
-    //Find first index of pattern string in json
+    // Find first index of pattern string in json
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
     if (strStart == EOF)
@@ -196,7 +196,7 @@ static int json_property_to_string_array(FILE *json, char *name, char ***stringA
         return 0;
     }
 
-    //Find end of object string
+    // Find end of object string
     int strEnd = increment_file_to_string(json, "]") + 1;
 
     int stringCount = 0;
@@ -219,29 +219,29 @@ static int json_property_to_string_array(FILE *json, char *name, char ***stringA
     stringCount++;
     stringArray = (char **)realloc(stringArray, sizeof(char *) * stringCount);
     stringArray[stringCount - 1] = get_string_from_index(json, lastPosition, position);
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     *stringArrayPtr = stringArray;
     return stringCount;
 }
 
-static int json_property_to_object_json_array(char *json, char *objectName, char ***objectArrayPtr)
+static int json_property_to_object_json_array(FILE *json, char *objectName, char ***objectArrayPtr)
 {
-    //Get current file position
+    // Get current file position
     int startPosition = ftell(json);
 
-    char **objectArray;
+    char **objectArray = NULL;
 
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     int size = strlen(objectName) + 6; // "":{\0, 6 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":", objectName);
-    ///Find first index of pattern string in json
+    /// Find first index of pattern string in json
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
 
-    //Find end of object string
+    // Find end of object string
     bool squareBegin = false;
     bool squigleBegin = false;
     int squareCount = 0;
@@ -296,7 +296,7 @@ static int json_property_to_object_json_array(char *json, char *objectName, char
         }
     }
     printf("\n\n");
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     *objectArrayPtr = objectArray;
@@ -304,21 +304,21 @@ static int json_property_to_object_json_array(char *json, char *objectName, char
     return objectCount;
 }
 
-static char *json_property_to_object_json(char *json, char *objectName)
+static char *json_property_to_object_json(FILE *json, char *objectName)
 {
-    //Get current file position
+    // Get current file position
     int startPosition = ftell(json);
 
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     int size = strlen(objectName) + 6; // "":{\0, 6 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":", objectName);
 
-    ///Find first index of pattern string in json
+    /// Find first index of pattern string in json
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
 
-    //Find end of object string
+    // Find end of object string
     int count = 0;
     int strEnd = 0;
     bool begin = false;
@@ -347,12 +347,12 @@ static char *json_property_to_object_json(char *json, char *objectName)
         return NULL;
     }
 
-    //Make copy of string to return
+    // Make copy of string to return
     char *objectString = (char *)malloc(sizeof(char) * (strEnd - strStart + 1));
     fseek(json, strStart, SEEK_SET);
     fread(objectString, sizeof(char), strEnd - strStart, json);
 
-    //Return file pointer to previous position
+    // Return file pointer to previous position
     fseek(json, startPosition, SEEK_SET);
 
     return objectString;
@@ -406,11 +406,11 @@ MotionSet *get_motion_set()
 
 /**
  * @brief Constructs a MachineConfiguration structure from a JSON string.
- * 
+ *
  * @param json A JSON string containing a machine configuration.
  */
 
-static void json_to_machine_configuration(char *json, MachineConfiguration *configuration)
+static void json_to_machine_configuration(FILE *json, MachineConfiguration *configuration)
 {
     configuration->motorType = json_property_to_string(json, "Motor Type");
     configuration->maxMotorRPM = json_property_to_float(json, "Max Motor RPM");
@@ -426,11 +426,11 @@ static void json_to_machine_configuration(char *json, MachineConfiguration *conf
 
 /**
  * @brief Constructs a MachinePerformance structure from a JSON string.
- * 
+ *
  * @param json A JSON string containing a machine performance.
  */
 
-static void json_to_machine_performance(char *json, MachinePerformance *performance)
+static void json_to_machine_performance(FILE *json, MachinePerformance *performance)
 {
     performance->minPosition = json_property_to_float(json, "Position Minimum");
     performance->maxPosition = json_property_to_float(json, "Position Maximum");
@@ -441,7 +441,7 @@ static void json_to_machine_performance(char *json, MachinePerformance *performa
     performance->forceGaugeNeutralOffset = json_property_to_float(json, "Force gauge Neutral Offset");
 }
 
-static MotionSet *json_to_motion_set(char *json)
+static MotionSet *json_to_motion_set(FILE *json)
 {
 
     MotionSet *set = get_motion_set();
@@ -520,7 +520,7 @@ static char *machine_performance_to_json(MachinePerformance *performance)
     json = (char *)malloc(sizeof(char) * size);
     sprintf(json, "\"Performance\":{%s,%s,%s,%s,%s,%s,%s}", minPositionStr, maxPositionStr, maxVelocityStr, maxAccelerationStr,
             maxForceTensileStr, maxForceCompressionStr, forceGaugeNeutralOffsetStr);
-    //printf("Performance:%s\n", json);
+    // printf("Performance:%s\n", json);
     free(minPositionStr);
     free(maxPositionStr);
     free(maxVelocityStr);
@@ -559,7 +559,7 @@ static void free_motion_set(MotionSet *set)
         {
             for (int i = 0; i < set->quartetCount; i++)
             {
-                free_motion_quartet(set->quartets[i]);
+                free(set->quartets[i]);
             }
             free(set->quartets);
         }
@@ -806,9 +806,9 @@ Error motion_set_to_json(MotionSet *set, FILE *file)
 
 /**
  * @brief Converts JSON string to a MachineProfile structure.
- * 
+ *
  * @param json A JSON string containing a machine profile.
- * @return A MachineProfile structure containing the machine profile from JSON. 
+ * @return A MachineProfile structure containing the machine profile from JSON.
  */
 MachineProfile *json_to_machine_profile(FILE *json)
 {
@@ -816,7 +816,7 @@ MachineProfile *json_to_machine_profile(FILE *json)
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(json, "Name");
     settings->number = json_property_to_int(json, "Number");
-    //Determine size of pattern string and create it
+    // Determine size of pattern string and create it
     increment_file_to_string(json, "\"Configuration\":");
     json_to_machine_configuration(json, settings->configuration);
 
@@ -849,7 +849,7 @@ MotionProfile *json_to_motion_profile(FILE *json)
             break;
         case '{':
             curlyCount++;
-            if (curlyCount == 1) //The start of a new object
+            if (curlyCount == 1) // The start of a new object
             {
                 setCount++;
                 profile->sets = (MotionSet **)realloc(profile->sets, sizeof(MotionSet *) * setCount);

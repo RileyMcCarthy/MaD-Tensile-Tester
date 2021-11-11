@@ -22,7 +22,7 @@ void dyn4_destroy(DYN4 *dyn4)
 
 /**
  * @brief Begin communication with the servo controller
- * 
+ *
  * @param dyn4 dyn4 struct that will be used to hold servo information
  * @param rx serial rx pin
  * @param tx serial tx pin
@@ -33,12 +33,10 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 {
     low(11);
     dyn4->device_id = new_device_id & 0x7F;
-    //uart_start(&(dyn4->serial), 14, 12, 2, 38400);
-    dyn4->serial.start(14, 12, 2, 38400); //flag 2 does nothing.
-    //originally 2 meant invert the rx pin.
+    // uart_start(&(dyn4->serial), 14, 12, 2, 38400);
+    dyn4->serial.start(14, 12, 2, 38400);
     DYN4_Status status;
     Error ret = dyn4_get_status(dyn4, &status);
-    _waitms(100);
     if (ret != SUCCESS)
     {
         printf("DYN4_NOT_RESPONDING\n");
@@ -46,7 +44,7 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
     }
     printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
 
-    //start encoder
+    // start encoder
     dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
 
     return ret;
@@ -54,7 +52,7 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 
 /**
  * @brief Get the Status of the servo
- * 
+ *
  * @param dyn4 the servo to get the status from
  * @param status the address status struct that will contain the updated status
  * @return Error: DYN4_NOT_RESPONDING if communications fail, SUCCESS otherwise.
@@ -81,7 +79,7 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
  * @todo if sending command then reading command in seperate functions is too slow, combine them.
  * @param dyn4 the servo to read command from
  * @param dyn4_read_command the command the statement read should contain
- * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE) 
+ * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE)
  * @return int number of bytes recieved
  */
 int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
@@ -89,24 +87,24 @@ int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
     uint8_t byte;
     uint8_t *data;
 
-    //uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rx();
+    // uart_read(&(dyn4->serial), 1, &byte);
+    byte = (uint8_t)dyn4->serial.rxtime(100);
     if ((byte & dyn4->device_id) != dyn4->device_id)
     {
         return -1;
     }
-    //uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rx();
+    // uart_read(&(dyn4->serial), 1, &byte);
+    byte = (uint8_t)dyn4->serial.rxtime(100);
     if ((byte & IS_STATUS) != IS_STATUS)
     {
         return -1;
     }
     int n = ((byte >> 5) & 0x03) + 1;
     data = (uint8_t *)malloc(sizeof(uint8_t) * n);
-    //uart_read(&(dyn4->serial), n, returnData);
+    // uart_read(&(dyn4->serial), n, returnData);
     for (int i = 0; i < n; i++)
     {
-        data[i] = (uint8_t)dyn4->serial.rx;
+        data[i] = (uint8_t)dyn4->serial.rxtime(100);
     }
     *returnData = data;
     return n;
@@ -114,7 +112,7 @@ int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
 
 /**
  * @brief Send command to servo controller
- * 
+ *
  * @param dyn4 The servo to send the command
  * @param command The command to send
  * @param data The data to send with the command
@@ -146,7 +144,7 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
     int package_size = 4 + n;
     uint8_t *bytes = malloc(sizeof(uint8_t) * package_size);
     bytes[package_size - 1] = dyn4->device_id;
-    bytes[package_size - 2] = 0x80 + (n << 5) + command; //0x80 is because the first bit is always 1
+    bytes[package_size - 2] = 0x80 + (n << 5) + command; // 0x80 is because the first bit is always 1
 
     int totalData = 0;
     for (int i = 0; i <= n; i++)
@@ -156,11 +154,11 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
         totalData += bytes[index];
     }
     bytes[0] = 0x80 + ((bytes[package_size - 1] + bytes[package_size - 2] + totalData) % 128);
-    //uart_write(&(dyn4->serial), bytes[4]);
-    //uart_write(&(dyn4->serial), bytes[3]);
-    //uart_write(&(dyn4->serial), bytes[2]);
-    //uart_write(&(dyn4->serial), bytes[1]);
-    //uart_write(&(dyn4->serial), bytes[0]);
+    // uart_write(&(dyn4->serial), bytes[4]);
+    // uart_write(&(dyn4->serial), bytes[3]);
+    // uart_write(&(dyn4->serial), bytes[2]);
+    // uart_write(&(dyn4->serial), bytes[1]);
+    // uart_write(&(dyn4->serial), bytes[0]);
     dyn4->serial.tx(bytes[4]);
     dyn4->serial.tx(bytes[3]);
     dyn4->serial.tx(bytes[2]);

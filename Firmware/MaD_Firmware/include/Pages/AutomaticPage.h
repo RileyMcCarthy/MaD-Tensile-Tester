@@ -1,19 +1,23 @@
 #ifndef AutomaticPage_H
 #define AutomaticPage_H
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 #include <simpletools.h>
 #include "RA8876.h"
 #include "Error.h"
 #include "Style.h"
-#include "State.h"
+#include "StateMachine.h"
 #include "IOBoard.h"
 #include "DYN4.h"
-#include "Motion.h"
+#include "Monitor.h"
 #include "stdbool.h"
 #include "string.h"
 #include "stdio.h"
+
 /**
  * @brief Runs the UI for running tests
- * 
+ *
  */
 typedef struct AutomaticPage_t
 {

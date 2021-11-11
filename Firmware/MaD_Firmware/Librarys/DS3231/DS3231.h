@@ -4,6 +4,11 @@
 #include "simpleI2CSlow.h"
 #include "Error.h"
 #include "stdbool.h"
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
+
+typedef struct __using("jm_i2c.spin2") I2CBus;
 
 typedef struct time_st //@todo replace with time library
 {
@@ -23,7 +28,7 @@ typedef struct time_st //@todo replace with time library
 
 typedef struct DS3231_t
 {
-    i2c_slow bus;
+    I2CBus bus;
     uint8_t writeAddr, readAddr;
     Time time;
 } DS3231;

@@ -49,8 +49,7 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
   display->spi_mosi = spi_mosi;
   display->spi_miso = spi_miso;
 
-  //spi_open(&(display->spi), spi_mosi, spi_miso, spi_clk); @todo create spi library
-  i2c_slow_open(&(display->bus), i2c_clk, i2c_sda, 0, 100);
+  display->i2cBus.setup(i2c_clk, i2c_sda, 100, 1); //1.5k pullup
 
   int i2c_addr = 0x5d;
   display->i2c_addr_write = (i2c_addr << 1) & 0b11111110;
@@ -58,7 +57,7 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
 
   _pinl(display->reset); //reset low
   _waitms(2);            //wait 2ms
-  _pinh(reset);          //reset high
+  _pinh(display->reset); //reset high
   _waitms(2);            //wait 20ms
 
   _waitms(1000); //wait 1s
@@ -1336,15 +1335,16 @@ void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t x
 void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt)
 {
   uint16_t i = 0;
-  i2c_slow_start(&(display->bus));
-  i2c_slow_writeByte(&(display->bus), display->i2c_addr_write);
-  i2c_slow_writeByte(&(display->bus), regAddr >> 8);
-  i2c_slow_writeByte(&(display->bus), regAddr);
+  display->i2cBus.start();
+  display->i2cBus.write(display->i2c_addr_write);
+  display->i2cBus.write(regAddr >> 8);
+  display->i2cBus.write(regAddr);
   for (i = 0; i < cnt; i++, val++)
   {
-    i2c_slow_writeByte(&(display->bus), *val);
+    display->i2cBus.write(*val);
   }
-  i2c_slow_stop(&(display->bus));
+
+  display->i2cBus.stop();
 }
 
 uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len)
@@ -1356,23 +1356,23 @@ uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len
 uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len)
 {
   uint8_t i;
-  i2c_slow_start(&(display->bus));
+  display->i2cBus.start();
 
-  i2c_slow_writeByte(&(display->bus), display->i2c_addr_write);
-  i2c_slow_writeByte(&(display->bus), regAddr >> 8);
-  i2c_slow_writeByte(&(display->bus), regAddr);
-  i2c_slow_start(&(display->bus));
-  i2c_slow_writeByte(&(display->bus), display->i2c_addr_read);
+  display->i2cBus.write(display->i2c_addr_write);
+  display->i2cBus.write(regAddr >> 8);
+  display->i2cBus.write(regAddr);
+  display->i2cBus.start();
+  display->i2cBus.write(display->i2c_addr_read);
   for (i = 0; i < len; i++)
   {
     if (i == (len - 1))
     {
-      pBuf[i] = i2c_slow_readByte(&(display->bus), 1);
+      pBuf[i] = display->i2cBus.read(1);
       break;
     }
-    pBuf[i] = i2c_slow_readByte(&(display->bus), 0);
+    pBuf[i] = display->i2cBus.read(0);
   }
-  i2c_slow_stop(&(display->bus));
+  display->i2cBus.stop();
   return i;
 }
 

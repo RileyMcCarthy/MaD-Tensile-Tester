@@ -27,13 +27,13 @@
 static uint8_t read_register(DS3231 *ds3231, uint8_t addr)
 {
     uint8_t rdata = 0xFF;
-    i2c_slow_start(&(ds3231->bus));
-    i2c_slow_writeByte(&(ds3231->bus), ds3231->writeAddr); //sends i2c address w/ write bit set
-    i2c_slow_writeByte(&(ds3231->bus), addr);
-    i2c_slow_start(&(ds3231->bus));
-    i2c_slow_writeByte(&(ds3231->bus), ds3231->readAddr);
-    rdata = i2c_slow_readByte(&(ds3231->bus), 1);
-    i2c_slow_stop(&(ds3231->bus));
+    ds3231->bus.start();
+    ds3231->bus.write(ds3231->writeAddr);
+    ds3231->bus.write(addr);
+    ds3231->bus.start();
+    ds3231->bus.write(ds3231->readAddr);
+    rdata = ds3231->bus.read(1);
+    ds3231->bus.stop();
     return rdata;
 }
 /**
@@ -46,11 +46,11 @@ static uint8_t read_register(DS3231 *ds3231, uint8_t addr)
  */
 static bool write_register(DS3231 *ds3231, uint8_t addr, uint8_t value)
 {
-    i2c_slow_start(&(ds3231->bus));
-    uint8_t ack = i2c_slow_writeByte(&(ds3231->bus), ds3231->writeAddr);
-    i2c_slow_writeByte(&(ds3231->bus), addr);
-    i2c_slow_writeByte(&(ds3231->bus), value);
-    i2c_slow_stop(&(ds3231->bus));
+    ds3231->bus.start();
+    uint8_t ack = ds3231->bus.write(ds3231->writeAddr);
+    ds3231->bus.write(addr);
+    ds3231->bus.write(value);
+    ds3231->bus.stop();
     return !ack;
 }
 
@@ -80,7 +80,7 @@ static uint8_t bcdtodec(const uint8_t val)
 
 DS3231 *ds3231_create()
 {
-    DS3231 *ds3231 = malloc(sizeof(DS3231));
+    DS3231 *ds3231 = (DS3231 *)malloc(sizeof(DS3231));
     return ds3231;
 }
 
@@ -101,7 +101,9 @@ Error ds3231_begin(DS3231 *ds3231, int scl, int sda)
     Error error = SUCCESS;
     ds3231->writeAddr = (ADDR << 1) & 0b11111110; //@todo, statuc address can make definition instead of part of structure
     ds3231->readAddr = (ADDR << 1) | 0b00000001;
-    i2c_slow_open(&(ds3231->bus), scl, sda, 1, 50); //No pullup on clk, mode = 1
+
+    ds3231->bus.setup(scl, sda, 100, 1); //1.5k pullup
+
     uint8_t status = read_register(ds3231, REG_STATUS);
     printf("Status: %d\n", status);
     if ((status & STATUS_RST) != 0)

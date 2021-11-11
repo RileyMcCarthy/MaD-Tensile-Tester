@@ -1,5 +1,8 @@
 #ifndef Error_H
 #define Error_H
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 /**
  * @brief Error codes:
  * 0: Generic Success

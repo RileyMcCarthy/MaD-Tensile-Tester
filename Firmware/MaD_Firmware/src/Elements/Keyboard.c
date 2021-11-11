@@ -255,7 +255,7 @@ static void createKey(Button *button, int name, int xmin, int ymin, float keySiz
  * 
  * @param input String buffer for user input
  */
-char *keyboard_get_input(Display *display, char *prompt)
+char *keyboard_get_input(Display *display, const char *prompt)
 {
     Image keyboard;
     strcpy(keyboard.name, "/sd/keyboard.bin");

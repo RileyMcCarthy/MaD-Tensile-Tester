@@ -2,7 +2,9 @@
 
 #ifndef Style_H
 #define Style_H
-
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 #define MAINCOLOR 0xd69a          //light gray
 #define BACKCOLOR 0x4c54          //blue munsell
 #define SECONDARYCOLOR 0xb844     //fire brick (red)

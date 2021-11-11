@@ -1,13 +1,18 @@
 #ifndef StateMachine_H
 #define StateMachine_H
-#include "simpletools.h"
-#include "stdbool.h"
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
+#include <simpletools.h>
+#include <stdbool.h>
+#include "DYN4.h"
+#include "MCP23017.h"
 
 typedef enum States_e
 {
-    State_SelfCheck,
-    State_MachineCheck,
-    State_Motion
+    STATE_SELFCHECK,
+    STATE_MACHINECHECK,
+    STATE_MOTION
 } State;
 
 typedef enum MotionStatus_e
@@ -37,27 +42,31 @@ typedef enum MotionMode_e
 
 typedef struct SelfCheck_t
 {
-    bool chargePumpOK; //Internal State
+    bool chargePumpOK; // Updated by MaD initalization
+    bool rtcReady;     // Updated by MaD initalization
 } SelfCheckParameters;
 
 typedef struct MachineCheck_t
 {
-    bool power;                //Internal State
-    bool upperLimit;           //Internal State
-    bool lowerLimit;           //Internal State
-    bool esd;                  //Internal State
-    bool servoReady;           //External State
-    bool forceGaugeResponding; //External State
-    bool dyn4Responding;       //External State
-    bool machineReady;         //Internal State
+    bool power;                // Updated by control.c
+    bool esd;                  // Updated by control.c
+    bool servoReady;           // Updated by control.c
+    bool forceGaugeResponding; // Updated by control.c
+    bool dyn4Responding;       // Updated by control.c
+    bool machineReady;         // External State, Set by user button input
 } MachineCheckParameters;
 
 typedef struct Motion_t
 {
-    MotionStatus status;       //internal and external
-    MotionCondition condition; //internal and external
-    MotionMode mode;           //internal and external
+    MotionStatus status;       // internal and external
+    MotionCondition condition; // internal and external
+    MotionMode mode;           // internal and external
 
+    bool hardUpperLimit; // Updated by control.c
+    bool hardLowerLimit; // Updated by control.c
+    bool softUpperLimit; // Updated by control.c
+    bool softLowerLimit; // Updated by control.c
+    bool forceOverload;  // Updated by control.c
 } MotionParameters;
 
 typedef struct MachineState_t
@@ -72,7 +81,7 @@ typedef struct MachineState_t
 MachineState *state_machine_run();
 void state_machine_stop(MachineState *machineState);
 
-//External State Setters
+// External State Setters
 void state_machine_set_servo_ready(MachineState *machineState, bool ready);
 void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding);
 void state_machine_set_dyn4_responding(MachineState *machineState, bool responding);

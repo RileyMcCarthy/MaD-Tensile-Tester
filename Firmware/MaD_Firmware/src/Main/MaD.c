@@ -8,7 +8,7 @@
 #include "leak_detector_c.h"
 #endif
 
-//Takes file pointer and prints its content character by character
+// Takes file pointer and prints its content character by character
 static void printFile(FILE *file)
 {
   int position = ftell(file);
@@ -21,7 +21,7 @@ static void printFile(FILE *file)
   fseek(file, position, SEEK_SET);
 }
 
-//Takes file pointer and compares its content character by character
+// Takes file pointer and compares its content character by character
 static bool compareFile(FILE *file1, FILE *file2)
 {
   char c1, c2;
@@ -36,24 +36,24 @@ static bool compareFile(FILE *file1, FILE *file2)
 static void test_JSON_MachineProfile()
 {
   MachineProfile *profile = get_machine_profile();
-  //MachineSettings
+  // MachineSettings
   char *name = "Tensile_Test_1";
   profile->name = (char *)malloc(strlen(name) + 1);
   strcpy(profile->name, name);
 
   profile->number = 1;
 
-  //MachineConfiguration
+  // MachineConfiguration
   char *motorType = "640-DST";
   profile->configuration->motorType = (char *)malloc(strlen(motorType) + 1);
   strcpy(profile->configuration->motorType, motorType);
-  profile->configuration->maxMotorTorque = 3.82;    //make float
-  profile->configuration->maxMotorRPM = 5000;       //make float
-  profile->configuration->gearDiameter = 25.4;      //make float
-  profile->configuration->gearPitch = 1.0;          //make float
-  profile->configuration->systemIntertia = 0.00121; //make float
-  profile->configuration->staticTorque = 0.558;     //make float
-  profile->configuration->load = 37.8;              //make float
+  profile->configuration->maxMotorTorque = 3.82;    // make float
+  profile->configuration->maxMotorRPM = 5000;       // make float
+  profile->configuration->gearDiameter = 25.4;      // make float
+  profile->configuration->gearPitch = 1.0;          // make float
+  profile->configuration->systemIntertia = 0.00121; // make float
+  profile->configuration->staticTorque = 0.558;     // make float
+  profile->configuration->load = 37.8;              // make float
   char *positionEncoderType = "QuadEncoder";
   profile->configuration->positionEncoderType = (char *)malloc(strlen(positionEncoderType) + 1);
   strcpy(profile->configuration->positionEncoderType, positionEncoderType);
@@ -62,7 +62,7 @@ static void test_JSON_MachineProfile()
   profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);
   strcpy(profile->configuration->forceGauge, forceGauge);
 
-  //MachinePerformance
+  // MachinePerformance
   profile->performance->minPosition = 0.01;
   profile->performance->maxPosition = 50.5;
   profile->performance->maxVelocity = 200.5;
@@ -71,8 +71,8 @@ static void test_JSON_MachineProfile()
   profile->performance->maxForceCompression = 3.1;
   profile->performance->forceGaugeNeutralOffset = 0.5;
 
-  //Profile Struct to JSON
-  mkdir("/sd/MProfile");
+  // Profile Struct to JSON
+  mkdir("/sd/MProfile", 0);
   chdir("/sd/MProfile");
   FILE *jsonFile = fopen("test.mp", "w+");
   if (jsonFile == NULL)
@@ -85,7 +85,7 @@ static void test_JSON_MachineProfile()
   printFile(jsonFile);
   printf("\n\n");
 
-  //Create JSON using JSON to validate conversion process
+  // Create JSON using JSON to validate conversion process
   fseek(jsonFile, 0, SEEK_SET);
   MachineProfile *profile_validate = json_to_machine_profile(jsonFile);
   FILE *jsonValidateFile = fopen("test_val.mp", "w+");
@@ -109,7 +109,7 @@ static void test_JSON_MachineProfile()
     printf("Machine Profile JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-  //Free memory
+  // Free memory
   fclose(jsonFile);
   fclose(jsonValidateFile);
   free_machine_profile(profile);
@@ -118,10 +118,10 @@ static void test_JSON_MachineProfile()
 
 static void test_json_sample_profile()
 {
-  //Get sample profile structure
+  // Get sample profile structure
   SampleProfile *profile = get_sample_profile();
 
-  //Populate structure
+  // Populate structure
   char *profileName = "profile_name";
   profile->name = (char *)malloc(strlen(profileName) + 1);
   strcpy(profile->name, profileName);
@@ -134,8 +134,8 @@ static void test_json_sample_profile()
   profile->maxForceTensile = 0.5;
   profile->maxForceCompression = 0.1;
 
-  //Profile Struct to JSON
-  mkdir("/sd/SProfile");
+  // Profile Struct to JSON
+  mkdir("/sd/SProfile", 0);
   chdir("/sd/SProfile");
   FILE *jsonFile = fopen("test.sp", "w+");
   sample_profile_to_json(profile, jsonFile);
@@ -143,7 +143,7 @@ static void test_json_sample_profile()
   printFile(jsonFile);
   printf("\n\n");
 
-  //Create JSON using JSON to validate conversion process
+  // Create JSON using JSON to validate conversion process
   fseek(jsonFile, 0, SEEK_SET);
   SampleProfile *profile_validate = json_to_sample_profile(jsonFile);
   FILE *jsonValidateFile = fopen("test_val.sp", "w+");
@@ -152,7 +152,7 @@ static void test_json_sample_profile()
   printFile(jsonValidateFile);
   printf("\n\n");
 
-  //Make sure the JSON is the same
+  // Make sure the JSON is the same
   if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Sample Profile JSON Validation Successful\n");
@@ -162,7 +162,7 @@ static void test_json_sample_profile()
     printf("Sample Profile JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-  //free memory
+  // free memory
   fclose(jsonFile);
   fclose(jsonValidateFile);
   free_sample_profile(profile);
@@ -171,10 +171,10 @@ static void test_json_sample_profile()
 
 static void test_json_test_profile()
 {
-  //Get test profile structure
+  // Get test profile structure
   TestProfile *profile = get_test_profile();
 
-  //Populate structure
+  // Populate structure
   char *profileName = "test_profile_name";
   profile->name = (char *)malloc(strlen(profileName) + 1);
   strcpy(profile->name, profileName);
@@ -186,8 +186,8 @@ static void test_json_test_profile()
   strcpy(profile->sampleProfileFileName, sampleProfileFileName);
   profile->sampleSerialNumber = 124532;
 
-  //Profile Struct to JSON
-  mkdir("/sd/TProfile");
+  // Profile Struct to JSON
+  mkdir("/sd/TProfile", 0);
   chdir("/sd/TProfile");
   FILE *jsonFile = fopen("test.tp", "w+");
   test_profile_to_json(profile, jsonFile);
@@ -195,7 +195,7 @@ static void test_json_test_profile()
   printFile(jsonFile);
   printf("\n\n");
 
-  //Create JSON using JSON to validate conversion process
+  // Create JSON using JSON to validate conversion process
   fseek(jsonFile, 0, SEEK_SET);
   TestProfile *profile_validate = json_to_test_profile(jsonFile);
   FILE *jsonValidateFile = fopen("test_val.tp", "w+");
@@ -204,7 +204,7 @@ static void test_json_test_profile()
   printFile(jsonValidateFile);
   printf("\n\n");
 
-  //Make sure the JSON is the same
+  // Make sure the JSON is the same
   if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Test Profile JSON Validation Successful\n");
@@ -214,7 +214,7 @@ static void test_json_test_profile()
     printf("Test Profile JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-  //free memory
+  // free memory
   fclose(jsonFile);
   fclose(jsonValidateFile);
   free_test_profile(profile);
@@ -223,10 +223,10 @@ static void test_json_test_profile()
 
 static void test_json_motion_quartet()
 {
-  //Get motion quartet structure
+  // Get motion quartet structure
   MotionQuartet *profile = get_motion_quartet();
 
-  //Populate structure
+  // Populate structure
   char *profileName = "quartet_profile_name";
   profile->name = (char *)malloc(strlen(profileName) + 1);
   strcpy(profile->name, profileName);
@@ -239,8 +239,8 @@ static void test_json_motion_quartet()
   profile->jerk = 0.3;
   profile->dwell = 0.5;
 
-  //Profile Struct to JSON
-  mkdir("/sd/mquartet");
+  // Profile Struct to JSON
+  mkdir("/sd/mquartet", 0);
   chdir("/sd/mquartet");
   FILE *jsonFile = fopen("test.mq", "w+");
   motion_quartet_to_json(profile, jsonFile);
@@ -248,7 +248,7 @@ static void test_json_motion_quartet()
   printFile(jsonFile);
   printf("\n\n");
 
-  //Create JSON using JSON to validate conversion process
+  // Create JSON using JSON to validate conversion process
   fseek(jsonFile, 0, SEEK_SET);
   MotionQuartet *profile_validate = json_to_motion_quartet(jsonFile);
   FILE *jsonValidateFile = fopen("test_val.mq", "w+");
@@ -256,7 +256,7 @@ static void test_json_motion_quartet()
   printf("Motion Quartet Validation Json:\n");
   printFile(jsonValidateFile);
   printf("\n\n");
-  //Make sure the JSON is the same
+  // Make sure the JSON is the same
   if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Motion Quartet JSON Validation Successful\n");
@@ -266,7 +266,7 @@ static void test_json_motion_quartet()
     printf("Motion Quartet JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-  //free memory
+  // free memory
   fclose(jsonFile);
   fclose(jsonValidateFile);
   free_motion_quartet(profile);
@@ -275,10 +275,10 @@ static void test_json_motion_quartet()
 
 static void test_json_motion_profile()
 {
-  //Get motion profile structure
+  // Get motion profile structure
   MotionProfile *profile = get_motion_profile();
 
-  //Populate structure
+  // Populate structure
   char *profileName = "motion_profile_name";
   profile->name = (char *)malloc(strlen(profileName) + 1);
   strcpy(profile->name, profileName);
@@ -286,11 +286,11 @@ static void test_json_motion_profile()
   profile->setCount = 2;
   profile->sets = malloc(sizeof(MotionSet) * profile->setCount);
 
-  //Get motion set structure
+  // Get motion set structure
   MotionSet *set = get_motion_set();
 
-  //Populate structure
-  char *profileName = "motion_set_profile_name";
+  // Populate structure
+  profileName = "motion_set_profile_name";
   set->name = (char *)malloc(strlen(profileName) + 1);
   strcpy(set->name, profileName);
   set->number = 3;
@@ -299,7 +299,7 @@ static void test_json_motion_profile()
   strcpy(set->type, profileType);
   set->executions = 5;
   set->quartetCount = 3;
-  set->quartets = (MotionQuartet **)malloc(sizeof(MotionQuartet *) * set->quartetCount);
+  set->quartets = (char **)malloc(sizeof(char *) * set->quartetCount);
   char *quartet1File = "quartet1_file_name.quartet";
   char *quartet2File = "quartet2_file_name.quartet";
   char *quartet3File = "quartet3_file_name.quartet";
@@ -311,7 +311,7 @@ static void test_json_motion_profile()
   set->quartets[2] = malloc(sizeof(char) * (strlen(quartet3File) + 1));
   strcpy(set->quartets[2], quartet3File);
 
-  //Create another set structure
+  // Create another set structure
   MotionSet *set2 = get_motion_set();
   profileName = "motion_set_profile_name2";
   set2->name = (char *)malloc(strlen(profileName) + 1);
@@ -322,7 +322,7 @@ static void test_json_motion_profile()
   strcpy(set2->type, profileType);
   set2->executions = 6;
   set2->quartetCount = 3;
-  set2->quartets = (MotionQuartet **)malloc(sizeof(MotionQuartet *) * set2->quartetCount);
+  set2->quartets = (char **)malloc(sizeof(char *) * set2->quartetCount);
   quartet1File = "quartet1_file_name2.quartet";
   quartet2File = "quartet2_file_name2.quartet";
   quartet3File = "quartet3_file_name2.quartet";
@@ -336,8 +336,8 @@ static void test_json_motion_profile()
   profile->sets[0] = set;
   profile->sets[1] = set2;
 
-  //Profile Struct to JSON
-  mkdir("/sd/mopro");
+  // Profile Struct to JSON
+  mkdir("/sd/mopro", 0);
   chdir("/sd/mopro");
   FILE *jsonFile = fopen("test.mp", "w+");
   motion_profile_to_json(profile, jsonFile);
@@ -345,7 +345,7 @@ static void test_json_motion_profile()
   printFile(jsonFile);
   printf("\n\n");
 
-  //Create JSON using JSON to validate conversion process
+  // Create JSON using JSON to validate conversion process
   fseek(jsonFile, 0, SEEK_SET);
   MotionProfile *profile_validate = json_to_motion_profile(jsonFile);
   FILE *jsonValidateFile = fopen("test_val.mp", "w+");
@@ -354,7 +354,7 @@ static void test_json_motion_profile()
   printFile(jsonValidateFile);
   printf("\n\n");
 
-  //Make sure the JSON is the same
+  // Make sure the JSON is the same
   if (compareFile(jsonFile, jsonValidateFile) == 0)
   {
     printf("Motion Profile JSON Validation Successful\n");
@@ -364,7 +364,7 @@ static void test_json_motion_profile()
     printf("Motion Profile JSON Validation Failed\n");
   }
   printf("---------------------------------------------------\n\n");
-  //free memory
+  // free memory
   fclose(jsonFile);
   fclose(jsonValidateFile);
   free_motion_profile(profile);
@@ -406,12 +406,12 @@ static void test_sd_card()
   {
     printf("Mount error:%d\n", _geterror());
   }
-  mkdir("/sd/test_dir");
+  mkdir("/sd/test_dir", 0);
   chdir("/sd/test_dir");
-  char *dirName[50];
+  char dirName[50];
   getcwd(dirName, 50);
   printf("Current Directory:%s\n", dirName);
-  if (strcmp(dirName, "/sd/test_dir") == 0)
+  if (strcmp((const char *)dirName, "/sd/test_dir") == 0)
   {
     printf("Directory Change Successful\n");
   }
@@ -479,7 +479,7 @@ static void test_sd_card()
     closedir(dir);
   }
 
-  //unmount("/sd");
+  // unmount("/sd");
 }
 
 static void test_ds3231()
@@ -502,7 +502,7 @@ static void test_display()
 {
   Error err;
   Display display;
-  //turn on diplay
+  // turn on diplay
   if ((err = display_begin(&display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
   {
     printf("Error starting display:%d\n", err);
@@ -512,7 +512,7 @@ static void test_display()
   display_on(&display, true);
   printf("Display on\n");
 
-  //Init display and background
+  // Init display and background
   display_canvas_image_start_address(&display, PAGE1_START_ADDR);
   display_canvas_image_width(&display, SCREEN_WIDTH);
   display_active_window_xy(&display, 0, 0);
@@ -541,16 +541,16 @@ static void test_display()
   display_load_image(&display, keyboard);
 }
 
-static void filesystem_begin()
+static bool filesystem_begin()
 {
   int sd = mount("/sd", _vfs_open_sdcard());
   if (sd == 0)
   {
-    printf("SD Card Mounted\n");
+    return true;
   }
   else
   {
-    printf("Mount error:%d\n", _geterror());
+    return false;
   }
   //@TODO mount data SD card also
 }
@@ -562,14 +562,14 @@ static void test_mcp23017()
 
   printf("MCP23017 begin\n");
 
-  mcp23017_set_direction(mcp, 4, 0); // zero is output
+  mcp_set_direction(mcp, 4, 0); // zero is output
   printf("Direction:%d\n", mcp23017_get_direction(mcp, 4));
 
-  mcp23017_set_pin(mcp, 4, 0);
-  printf("Output:%d\n", mcp23017_get_pin(mcp, 4));
+  mcp_set_direction(mcp, 4, 0);
+  printf("Output:%d\n", mcp_get_pin(mcp, 4));
   pause(500);
-  mcp23017_set_pin(mcp, 4, 1);
-  printf("Output:%d\n", mcp23017_get_pin(mcp, 4));
+  mcp_set_pin(mcp, 4, 1);
+  printf("Output:%d\n", mcp_get_pin(mcp, 4));
   pause(500);
   mcp23017_destroy(mcp);
   return;
@@ -579,8 +579,8 @@ static void dyn4_test()
 {
   MCP23017 *mcp = mcp23017_create();
   mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
-  mcp23017_set_direction(mcp, 4, 0);         // zero is output
-  mcp23017_set_pin(mcp, CHARGE_PUMP_OUT, 0); //Enable charge pump, output is inverted
+  mcp_set_direction(mcp, 4, 0);         // zero is output
+  mcp_set_pin(mcp, CHARGE_PUMP_OUT, 0); // Enable charge pump, output is inverted
 
   printf("MCP23017 begin\n");
   pause(500);
@@ -595,21 +595,101 @@ static void dyn4_test()
   }
 }
 
+static void force_test()
+{
+  // Connect Force Gauge
+  ForceGauge *forceGauge = force_gauge_create();
+  force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402);
+  // loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+  while (1)
+  {
+    int force = force_gauge_get_force(forceGauge);
+    printf("Force: %d\n", force);
+  }
+}
+
+static MachineProfile *Load_MachineProfile()
+{
+  // Check for machine profile in filesystem
+  if (chdir("/sd/Machine") == 0)
+  {
+    FILE *jsonFile = fopen("Default.mch", "r");
+    if (jsonFile != NULL)
+    {
+      MachineProfile *profile = json_to_machine_profile(jsonFile);
+      return profile;
+    }
+  }
+
+  // Default machine profile does not exist, make a new one
+
+  MachineProfile *profile = get_machine_profile();
+  // MachineSettings
+  char *name = "Tensile_Test_1";
+  profile->name = (char *)malloc(strlen(name) + 1);
+  strcpy(profile->name, name);
+
+  profile->number = 1;
+
+  // MachineConfiguration
+  char *motorType = "640-DST";
+  profile->configuration->motorType = (char *)malloc(strlen(motorType) + 1);
+  strcpy(profile->configuration->motorType, motorType);
+  profile->configuration->maxMotorTorque = 3.82;    // make float
+  profile->configuration->maxMotorRPM = 5000;       // make float
+  profile->configuration->gearDiameter = 25.4;      // make float
+  profile->configuration->gearPitch = 1.0;          // make float
+  profile->configuration->systemIntertia = 0.00121; // make float
+  profile->configuration->staticTorque = 0.558;     // make float
+  profile->configuration->load = 37.8;              // make float
+  char *positionEncoderType = "QuadEncoder";
+  profile->configuration->positionEncoderType = (char *)malloc(strlen(positionEncoderType) + 1);
+  strcpy(profile->configuration->positionEncoderType, positionEncoderType);
+  profile->configuration->positionEncoderScaleFactor = 23;
+  char *forceGauge = "DS2-5N";
+  profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);
+  strcpy(profile->configuration->forceGauge, forceGauge);
+
+  // MachinePerformance
+  profile->performance->minPosition = 0.01;
+  profile->performance->maxPosition = 50.5;
+  profile->performance->maxVelocity = 200.5;
+  profile->performance->maxAcceleration = 100.5;
+  profile->performance->maxForceTensile = 3.5;
+  profile->performance->maxForceCompression = 3.1;
+  profile->performance->forceGaugeNeutralOffset = 0.5;
+
+  // Profile Struct to JSON
+  mkdir("/sd/Machine", 0);
+  chdir("/sd/Machine");
+  FILE *jsonFile = fopen("Default.mch", "w+");
+  if (jsonFile == NULL)
+  {
+    printf("Error opening machine profile file!\n");
+    return NULL;
+  }
+
+  // Create JSON using JSON to validate conversion process
+  MachineProfile *profile = json_to_machine_profile(jsonFile);
+
+  return profile;
+}
+
 static Display *start_display()
 {
   Error err;
-  Display *display = (Display *)malloc(sizeof(Display *));
+  Display *display = (Display *)malloc(sizeof(Display));
 
-  //turn on diplay
+  // turn on diplay
   if ((err = display_begin(display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
   {
     printf("Error starting display:%d\n", err);
-    return;
+    return NULL;
   }
 
   display_on(display, true);
 
-  //Init display and background
+  // Init display and background
   display_canvas_image_start_address(display, PAGE1_START_ADDR);
   display_canvas_image_width(display, SCREEN_WIDTH);
   display_active_window_xy(display, 0, 0);
@@ -618,9 +698,24 @@ static Display *start_display()
   return display;
 }
 
+static NavKey *start_navkey()
+{
+  NavKey navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
+  navkey_reset();
+  navkey_begin(i2cNavKey::INT_DATA | i2cNavKey::WRAP_ENABLE | i2cNavKey::DIRE_RIGHT | i2cNavKey::IPUP_ENABLE);
+
+  navkey_write_counter((int32_t)0);  /* Reset the counter value */
+  navkey_write_max((int32_t)10000);  /* Set the maximum threshold*/
+  navkey_write_min((int32_t)-10000); /* Set the minimum threshold */
+  navkey_write_step((int32_t)100);   /* Set the step to 1*/
+
+  navkey_write_double_push_period(30); /*Set a period for the double push of 300ms */
+  return navkey;
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
- * 
+ *
  */
 void mad_begin()
 {
@@ -629,35 +724,72 @@ void mad_begin()
 #endif
   printf("Starting...\n");
 
-  //test_sd_card();
-  // test_display();
-  // test_ds3231();
-  dyn4_test();
-  return;
-  //test_JSON();
-  //test_sd_card();
-
-  //Begin SD filesystem
-  filesystem_begin();
-
-  //Load Assets from SD card
-
-  //Begin the display
+  // Begin the display
   Display *display = start_display();
+  if (display == NULL)
+  {
+    printf("Error starting display\n");
+    return;
+  }
+  loading_overlay_display(display, "Display Initialized!", OVERLAY_TYPE_LOADING);
 
-  //Initialize IO Expansion(MCP23017)
+  // Begin SD filesystem
+  if (filesystem_begin())
+  {
+    loading_overlay_display(display, "SD Card Mounted", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "SD Card Mounting Error", OVERLAY_TYPE_LOADING);
+  }
 
-  //Create DYN4 object (currently no communication with DYN4)
+  // Load Assets from SD card
 
-  //Create encoder object
+  // Load Machine Profile
+  MachineProfile *machineProfile = Load_MachineProfile();
 
-  //Connect ForceGauge
+  // Start NavKey
+  NavKey *navkey = start_navkey();
 
-  //Start state machine (needs IO expansion, encoder)
+  // Initialize IO Expansion(MCP23017)
+  MCP23017 *mcp = mcp23017_create();
+  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL); // issues using i2c slow with delay not saving, change to new i2c
+                                                      //  mcp_set_direction(mcp, 4, MCP23017_OUTPUT);         // zero is output
+  loading_overlay_display(display, "MCP23017 Connected", OVERLAY_TYPE_LOADING);
 
-  //Start motion control (needs state machine,encoder, forcegauge), responsible for sending commands to dyn4 and gathering data
+  // Create DYN4 object (currently no communication with DYN4)
+  DYN4 *dyn4 = dyn4_create();
+  dyn4_begin(dyn4, DYN4_RX, DYN4_TX, DYN4_ADDR);
+  loading_overlay_display(display, "DYN4 Connected", OVERLAY_TYPE_LOADING);
 
-  //Begin main loop
+  // Connect to IMU
+  // Start state machine (needs IO expansion)
+  MachineState *machineState = state_machine_run(mcp, dyn4);
+
+  // Connect to RTC
+  DS3231 *rtc = ds3231_create();
+  Error status = ds3231_begin(rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
+
+  if (status != SUCCESS)
+  {
+    loading_overlay_display(display, "Error connecting to RTC", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "RTC Connected", OVERLAY_TYPE_LOADING);
+  }
+
+  // Connect Force Gauge
+  ForceGauge *forceGauge = force_gauge_create();
+  force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402);
+  loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+
+  // Start motion control (needs state machine,encoder, dyn4, rtc, forcegauge), responsible for constantly
+  // gather information from encoder,dyn4,rtc,forcegauge, and update/log data
+  // rename motioncog to monitor
+  // motion_run(mcp, dyn4, forceGauge, 100); // returns null if failed to start cog
+
+  // Begin main loop
   Pages currentPage = PAGE_STATUS;
   while (1)
   {
@@ -665,65 +797,36 @@ void mad_begin()
     {
     case PAGE_STATUS:
       printf("Loading status page\n");
-      //status_page_run(display);
+      StatusPage *statusPage = status_page_create(display, machineState);
+      status_page_run(statusPage);
+      status_page_destroy(statusPage);
       printf("Leaving status page\n");
       break;
     case PAGE_MANUAL:
       printf("Loading manual page\n");
-      //manual_page_run(display);
+      ManualPage *manualPage = manual_page_create(display, machineState);
+      manual_page_run(manualPage);
+      manual_page_destroy(manualPage);
       printf("Leaving manual page\n");
       break;
     case PAGE_AUTOMATIC:
     {
-      printf("Loading automatic page\n");
-      //automatic.run(&display, (Motion_Cog *)(&motionCog));
+      printf("Loading automatic page...\n");
+      AutomaticPage *automaticPage = automatic_page_create(display);
+      automatic_page_run(automaticPage);
+      automatic_page_destroy(automaticPage);
+      printf("Leaving automatic page\n");
     }
     break;
     default:
       break;
     }
     printf("Selecting new page\n");
-    NavigationPage nav;
-    // currentPage = nav.run(&display);
+    NavigationPage *navigationPage = navigation_page_create(display);
+    currentPage = navigation_page_run(navigationPage);
+    navigation_page_destroy(navigationPage);
   }
 #ifdef __MEMORY_CHECK__
   report_mem_leak();
 #endif
 }
-
-/* Pages currentPage = PAGE_STATUS;
-  while (1)
-  {
-    switch (currentPage)
-    {
-    case PAGE_STATUS:
-    {
-      printf("Loading status page\n");
-      StatusPage statusPage;
-      statusPage.run(&display);
-      printf("Leaving status page\n");
-    }
-    break;
-    case PAGE_MANUAL:
-    {
-      printf("Loading manual page\n");
-      ManualPage manual;
-      manual.run(&display, (Motion_Cog *)(&motionCog));
-      printf("Leaving manual page\n");
-    }
-    break;
-    case PAGE_AUTOMATIC:
-    {
-      printf("Loading automatic page\n");
-      AutomaticPage automatic;
-      automatic.run(&display, (Motion_Cog *)(&motionCog));
-    }
-    break;
-    default:
-      break;
-    }
-    printf("Selecting new page\n");
-    NavigationPage nav;
-    currentPage = nav.run(&display);
-  }
-} /*

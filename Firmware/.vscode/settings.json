@@ -3,7 +3,13 @@
         "leak_detector_c.h": "c",
         "cstdio": "c",
         "mad.h": "c",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "forcegauge.h": "c",
+        "loadingoverlay.h": "c",
+        "motion.h": "c",
+        "ra8876.h": "c",
+        "statemachine.h": "c",
+        "monitor.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

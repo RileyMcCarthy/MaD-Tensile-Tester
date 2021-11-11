@@ -1,5 +1,5 @@
 #include "AutomaticPage.h"
-#include "Motion.h"
+#include "Monitor.h"
 
 enum button_names
 {
@@ -8,26 +8,26 @@ enum button_names
     BUTTON_NAVIGATION
 };
 
-//Private Functions
+// Private Functions
 
 static void load_graph(AutomaticPage *page)
 {
-    textColor(page->display, COLOR65K_WHITE, MAINCOLOR);
-    canvasImageStartAddress(page->display, PAGE4_START_ADDR);
-    setTextParameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
-    drawSquareFill(page->display, 492, 32, SCREEN_WIDTH - 32, 32 + 300, MAINCOLOR);
-    drawLine(page->display, 492 + 5, 32 + 5, 492 + 5, 332 - 5, COLOR65K_WHITE);
-    drawLine(page->display, 492 + 5, 182, SCREEN_WIDTH - 32 - 5, 182, COLOR65K_WHITE);
-    drawString(page->display, 492 + 10, 32 + 5, "Force(N)/Distance(Steps)");
-    drawString(page->display, SCREEN_WIDTH - 32 - strlen("Time(s)") * 8, 182 - 20, "Time(s)");
-    canvasImageStartAddress(page->display, PAGE1_START_ADDR);
+    display_text_color(page->display, COLOR65K_WHITE, MAINCOLOR);
+    display_canvas_image_start_address(page->display, PAGE4_START_ADDR);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
+    display_draw_square_fill(page->display, 492, 32, SCREEN_WIDTH - 32, 32 + 300, MAINCOLOR);
+    display_draw_line(page->display, 492 + 5, 32 + 5, 492 + 5, 332 - 5, COLOR65K_WHITE);
+    display_draw_line(page->display, 492 + 5, 182, SCREEN_WIDTH - 32 - 5, 182, COLOR65K_WHITE);
+    display_draw_string(page->display, 492 + 10, 32 + 5, "Force(N)/Distance(Steps)");
+    display_draw_string(page->display, SCREEN_WIDTH - 32 - strlen("Time(s)") * 8, 182 - 20, "Time(s)");
+    display_canvas_image_start_address(page->display, PAGE1_START_ADDR);
 }
 static void draw_graph(AutomaticPage *page)
 {
-    bteMemoryCopy(page->display, PAGE4_START_ADDR, SCREEN_WIDTH, 492, 32, PAGE1_START_ADDR, SCREEN_WIDTH, 492, 32, 500, 300);
+    display_bte_memory_copy(page->display, PAGE4_START_ADDR, SCREEN_WIDTH, 492, 32, PAGE1_START_ADDR, SCREEN_WIDTH, 492, 32, 500, 300);
 }
 
-//Public Functions
+// Public Functions
 
 AutomaticPage *automatic_page_create(Display *display)
 {
@@ -49,7 +49,7 @@ void automatic_page_run(AutomaticPage *page)
     // forceGauge = p_forceGauge;
     // sd = p_sd;
 
-    //Init display with blue background
+    // Init display with blue background
     display_canvas_image_start_address(page->display, PAGE1_START_ADDR);
     display_canvas_image_width(page->display, SCREEN_WIDTH);
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
@@ -64,21 +64,22 @@ void automatic_page_run(AutomaticPage *page)
     display_text_color(page->display, COLOR65K_WHITE, COLOR65K_BLUE);
     display_draw_string(page->display, SCREEN_WIDTH / 2 - 11 * 8, 300 - 16, "LOADING...");
     // display->loadImage("keyboard.bin", 3, 0, SCREEN_HEIGHT - 284, 1026, 284); //loading images adds another 10k bytes (maybe make own sd card system? or fopen)
-    display_load_graph(page->display, display);
-    display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    //setup real time clock
+    load_graph(page);
 
-    //Clock
+    display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
+    // setup real time clock
+
+    // Clock
     display_text_color(page->display, COLOR65K_WHITE, COLOR65K_BLUE);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
     char forceVal[100] = {10};
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    //display->bteMemoryCopy(PAGE2_START_ADDR, SCREEN_WIDTH, (SCREEN_WIDTH - 500), 0, PAGE1_START_ADDR, SCREEN_WIDTH, (SCREEN_WIDTH - 500), 0, 500, 300);
+    // display->bteMemoryCopy(PAGE2_START_ADDR, SCREEN_WIDTH, (SCREEN_WIDTH - 500), 0, PAGE1_START_ADDR, SCREEN_WIDTH, (SCREEN_WIDTH - 500), 0, 500, 300);
     char temp[20];
     int samples = 0;
     int lastForce = 0;
-    int lastPosition;
+    int lastPosition = 0;
 
     display_draw_square_fill(page->display, 32, 32, 32 + 428, SCREEN_HEIGHT - 32, MAINCOLOR);
     display_text_color(page->display, COLOR65K_WHITE, MAINCOLOR);
@@ -99,7 +100,7 @@ void automatic_page_run(AutomaticPage *page)
     display_draw_string(page->display, titlex, titley, "Stats");
     display_draw_line(page->display, titlex, titley + 35, titlex + strlen("Stats") * 16, titley + 35, COLOR65K_WHITE);
 
-    display_set_text_parameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_16, RA8876_SELECT_8859_1);
     display_draw_string(page->display, 55, 47 + 50, "Mode: Sinusoidal");
     display_draw_string(page->display, 55, 47 + 70, "Cycles: 20");
     display_draw_string(page->display, 55, 47 + 90, "Sample Rate: 800sps");
@@ -132,22 +133,22 @@ void automatic_page_run(AutomaticPage *page)
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_draw_string(page->display, keys[2].xmin + 17, keys[2].ymin + 9, "H");
 
-    draw_graph(page->display, display);
+    draw_graph(page);
     float total = 0;
     int max = 0;
     int min = 0;
-    //motionMailbox->dyn4->send_command(0x0c, 1000);
+    // motionMailbox->dyn4->send_command(0x0c, 1000);
     while (1)
     {
-        //navkey.updateStatus();
-        //clock.render();
+        // navkey.updateStatus();
+        // clock.render();
         display_text_color(page->display, COLOR65K_WHITE, MAINCOLOR);
         char pos[15];
-        //sprintf(pos, "Position: %dmm   ", navkey.readCounterInt());
+        // sprintf(pos, "Position: %dmm   ", navkey.readCounterInt());
 
         display_draw_string(page->display, 160, 350, pos);
-        //int tempForce = force.getForce();
-        //int tempForce = motionMailbox->force;
+        // int tempForce = force.getForce();
+        // int tempForce = motionMailbox->force;
         int tempForce = 4;
         int tempPosition = 23;
         if (tempForce != -1)
@@ -172,11 +173,11 @@ void automatic_page_run(AutomaticPage *page)
             display_draw_string(page->display, 575, 480, forceVal);
             sprintf(forceVal, "Max: %d.%d ", max / 1000, max - (max / 1000));
             display_draw_string(page->display, 575, 510, forceVal);
-            display_draw_line(page->display, 498 + samples - 1, 182 + lastForce / 34, 498 + samples, 182 + tempForce / 34, COLOR65K_GREEN);    //force is -5000 to 5000 with 300px resolution
-            display_draw_line(page->display, 498 + samples - 1, 182 + lastPosition / 5, 498 + samples, 182 + tempPosition / 5, COLOR65K_BLUE); //force is -5000 to 5000 with 300px resolution
+            display_draw_line(page->display, 498 + samples - 1, 182 + lastForce / 34, 498 + samples, 182 + tempForce / 34, COLOR65K_GREEN);    // force is -5000 to 5000 with 300px resolution
+            display_draw_line(page->display, 498 + samples - 1, 182 + lastPosition / 5, 498 + samples, 182 + tempPosition / 5, COLOR65K_BLUE); // force is -5000 to 5000 with 300px resolution
             if (samples >= 445)
             {
-                draw_graph(display);
+                draw_graph(page);
                 samples = 0;
             }
             lastForce = tempForce;

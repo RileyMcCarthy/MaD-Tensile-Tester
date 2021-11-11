@@ -55,24 +55,6 @@ enum I2C_Register
   REG_EEPROMS = 0x80,
 };
 
-/* NavKey configuration bit. Use with GCONF */
-enum GCONF_PARAMETER
-{
-  FLOAT_DATA = 0x01,
-  INT_DATA = 0x00,
-  WRAP_ENABLE = 0x02,
-  WRAP_DISABLE = 0x00,
-  DIRE_LEFT = 0x04,
-  DIRE_RIGHT = 0x00,
-  IPUP_DISABLE = 0x08,
-  IPUP_ENABLE = 0x00,
-  CLK_STRECH_ENABLE = 0x10,
-  CLK_STRECH_DISABLE = 0x00,
-  EEPROM_BANK1 = 0x20,
-  EEPROM_BANK2 = 0x00,
-  RESET = 0x80,
-};
-
 /* NavKey status bits and setting. Use with: INTCONF for set and with ESTATUS for read the bits  */
 enum Int_Status
 {
@@ -148,7 +130,7 @@ static uint8_t readNavKeyByte(NavKey *navkey, uint8_t reg)
 {
   uint8_t rdata = 0xFF;
   i2c_start(&(navkey->bus));
-  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); //sends i2c address w/ write bit set
+  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); // sends i2c address w/ write bit set
   i2c_writeByte(&(navkey->bus), reg);
   i2c_start(&(navkey->bus));
   i2c_writeByte(&(navkey->bus), navkey->_add | 0b00000001);
@@ -161,7 +143,7 @@ static uint8_t readNavKeyByte(NavKey *navkey, uint8_t reg)
 static int16_t readNavKeyInt(NavKey *navkey, uint8_t reg)
 {
   i2c_start(&(navkey->bus));
-  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); //sends i2c address w/ write bit set
+  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); // sends i2c address w/ write bit set
   i2c_writeByte(&(navkey->bus), reg);
   i2c_start(&(navkey->bus));
   i2c_writeByte(&(navkey->bus), navkey->_add | 0b00000001);
@@ -175,7 +157,7 @@ static int16_t readNavKeyInt(NavKey *navkey, uint8_t reg)
 static int32_t readNavKeyLong(NavKey *navkey, uint8_t reg)
 {
   i2c_start(&(navkey->bus));
-  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); //sends i2c address w/ write bit set
+  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); // sends i2c address w/ write bit set
   i2c_writeByte(&(navkey->bus), reg);
   i2c_start(&(navkey->bus));
   i2c_writeByte(&(navkey->bus), navkey->_add | 0b00000001);
@@ -191,7 +173,7 @@ static int32_t readNavKeyLong(NavKey *navkey, uint8_t reg)
 static float readNavKeyFloat(NavKey *navkey, uint8_t reg)
 {
   i2c_start(&(navkey->bus));
-  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); //sends i2c address w/ write bit set
+  i2c_writeByte(&(navkey->bus), navkey->_add & 0b11111110); // sends i2c address w/ write bit set
   i2c_writeByte(&(navkey->bus), reg);
   i2c_start(&(navkey->bus));
   i2c_writeByte(&(navkey->bus), navkey->_add | 0b00000001);
@@ -286,12 +268,12 @@ void navkey_begin(NavKey *navkey, uint8_t conf)
 {
   i2c_open(&(navkey->bus), navkey->scl, navkey->sda, 0);
 
-  writeNavKey(navkey, REG_GCONF, conf);
+  writeNavKey8(navkey, REG_GCONF, conf);
   navkey->_gconf = conf;
 }
 void navkey_reset(NavKey *navkey)
 {
-  writeNavKey(navkey, REG_GCONF, (uint8_t)0x80);
+  writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);
   _waitms(10);
 }
 
@@ -490,9 +472,9 @@ void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt)
 }
 
 /** Write the counter value **/
-void navkey_write_counter(NavKey *navkey, float value)
+void navkey_write_counter(NavKey *navkey, int value)
 {
-  writeNavKeyFloat(navkey, REG_CVALB4, value);
+  writeNavKey32(navkey, REG_CVALB4, value);
 }
 
 /** Write the maximum threshold value **/
@@ -504,7 +486,7 @@ void navkey_write_max(NavKey *navkey, float max)
 /** Write the minimum threshold value **/
 void navkey_write_min(NavKey *navkey, float min)
 {
-  writeNavKeyFLoat(navkey, REG_CMINB4, min);
+  writeNavKeyFloat(navkey, REG_CMINB4, min);
 }
 
 /** Write the Step increment value **/

@@ -25,7 +25,7 @@
  */
 void check_buttons(NavigationPage *page)
 {
-    if (display_check_buttons(page->display, buttons, BUTTONCOUNT) > 0)
+    if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -34,16 +34,16 @@ void check_buttons(NavigationPage *page)
                 switch (page->buttons[i].name)
                 {
                 case PAGE_STATUS:
-                    complete = true;
-                    newPage = PAGE_STATUS;
+                    page->complete = true;
+                    page->newPage = PAGE_STATUS;
                     break;
                 case PAGE_MANUAL:
-                    complete = true;
-                    newPage = PAGE_MANUAL;
+                    page->complete = true;
+                    page->newPage = PAGE_MANUAL;
                     break;
                 case PAGE_AUTOMATIC:
-                    complete = true;
-                    newPage = PAGE_AUTOMATIC;
+                    page->complete = true;
+                    page->newPage = PAGE_AUTOMATIC;
                     break;
                 default:
                     break;
@@ -63,6 +63,7 @@ NavigationPage *navigation_page_create(Display *display)
 
 void navigation_page_destroy(NavigationPage *page)
 {
+    free(page->buttons);
     free(page);
 }
 
@@ -75,10 +76,10 @@ Pages navigation_page_run(NavigationPage *page)
     printf("Starting navigation page\n");
     page->complete = false;
 
-    display_draw_square_fill(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display_set_text_parameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
-    display_text_color(MAINTEXTCOLOR, BACKCOLOR);
+    display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
+    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
 
     int buttonSize = 200;
 
@@ -86,9 +87,12 @@ Pages navigation_page_run(NavigationPage *page)
     strcpy(buf, "Navigation Menu");
     int titlex = SCREEN_WIDTH / 2 - strlen(buf) * 16;
     int titley = 30;
-    display_draw_string(titlex, titley, buf);
+    display_draw_string(page->display, titlex, titley, buf);
+
     printf("creating buttons\n");
-    Button buttons[BUTTONCOUNT];
+    Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
+    page->buttons = buttons;
+
     buttons[0].name = PAGE_STATUS;
     buttons[0].xmin = SCREEN_WIDTH / 6 - buttonSize / 2;
     buttons[0].xmax = buttons[0].xmin + buttonSize;
@@ -113,22 +117,26 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[2].pressed = false;
     buttons[2].lastPress = 0;
 
-    display_set_text_parameter1(RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    display_draw_square_fill(buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, MAINCOLOR);
-    display_text_color(MAINTEXTCOLOR, MAINCOLOR);
+    display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, MAINCOLOR);
+    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     strcpy(buf, "Status");
-    display_draw_string(buttons[0].xmin + buttonSize / 2 - strlen(buf) * 8, buttons[0].ymin + buttonSize / 2 - 12, buf);
+    display_draw_string(page->display, buttons[0].xmin + buttonSize / 2 - strlen(buf) * 8, buttons[0].ymin + buttonSize / 2 - 12, buf);
 
-    display_bte_memory_copy_image(manualImg, buttons[1].xmin, buttons[1].ymin);
+    Image manualImg; // = image_get(IMAGE_MANUAL);
 
-    display_bte_memory_copy_image(automaticImg, buttons[2].xmin, buttons[2].ymin);
+    display_bte_memory_copy_image(page->display, manualImg, buttons[1].xmin, buttons[1].ymin);
 
-    while (!complete)
+    Image automaticImg; // = image_get(IMAGE_AUTOMATIC);
+
+    display_bte_memory_copy_image(page->display, automaticImg, buttons[2].xmin, buttons[2].ymin);
+
+    while (!page->complete)
     {
-        check_buttons(buttons);
+        check_buttons(page);
         // clock.render();
     }
-    return newPage;
+    return page->newPage;
 }

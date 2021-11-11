@@ -20,6 +20,24 @@
 #include "stdbool.h"
 #include "inttypes.h"
 
+/* NavKey configuration bit. Use with GCONF */
+enum GCONF_PARAMETER
+{
+	FLOAT_DATA = 0x01,
+	INT_DATA = 0x00,
+	WRAP_ENABLE = 0x02,
+	WRAP_DISABLE = 0x00,
+	DIRE_LEFT = 0x04,
+	DIRE_RIGHT = 0x00,
+	IPUP_DISABLE = 0x08,
+	IPUP_ENABLE = 0x00,
+	CLK_STRECH_ENABLE = 0x10,
+	CLK_STRECH_DISABLE = 0x00,
+	EEPROM_BANK1 = 0x20,
+	EEPROM_BANK2 = 0x00,
+	RESET = 0x80,
+};
+
 union Data_v
 {
 	float fval;
@@ -33,7 +51,6 @@ typedef struct navkey_t
 	i2c bus;
 	int scl;
 	int sda;
-
 	uint8_t _add;
 	uint16_t _stat;
 	uint8_t _stat2;
@@ -98,7 +115,7 @@ void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3);
 void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
 
 /** NavKey functions **/
-void navkey_write_counter(NavKey *navkey, float counter);
+void navkey_write_counter(NavKey *navkey, int counter);
 
 void navkey_write_max(NavKey *navkey, float max);
 

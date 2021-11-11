@@ -32,7 +32,7 @@ void *xrealloc(void *ptr, unsigned int size, const char *file, unsigned int line
 		{
 			memcpy(newptr, ptr, size);
 		}
-		xfree(ptr);
+		xfree(ptr, file, line);
 	}
 	return newptr;
 }
@@ -43,7 +43,7 @@ void *xrealloc(void *ptr, unsigned int size, const char *file, unsigned int line
 void *xcalloc(unsigned int elements, unsigned int size, const char *file, unsigned int line)
 {
 	unsigned total_size;
-	void *ptr = xmalloc(elements * size);
+	void *ptr = xmalloc(elements * size, file, line);
 	return ptr;
 }
 

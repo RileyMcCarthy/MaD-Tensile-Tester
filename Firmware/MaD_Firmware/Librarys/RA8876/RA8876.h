@@ -1,7 +1,7 @@
 //**************************************************************//
 /*
-File Name : Ra8876_Lite.h                                   
-Author    : RAiO Application Team, Modified by Riley McCarthy                           
+File Name : Ra8876_Lite.h
+Author    : RAiO Application Team, Modified by Riley McCarthy
 Edit Date : 09/13/2017
 Version   : v1.0
 */
@@ -15,7 +15,8 @@ Version   : v1.0
 #include "stdbool.h"
 #include "stdint.h"
 #include <stdio.h>
-#include "simpleI2CSlow.h"
+
+typedef struct __using("jm_i2c.spin2") I2CBus;
 
 #define RA8876_SPI_CMDWRITE 0x00
 #define RA8876_SPI_DATAWRITE 0x80
@@ -23,12 +24,12 @@ Version   : v1.0
 #define RA8876_SPI_STATUSREAD 0x40
 
 /*==== [SW_(1)]  PLL  =====*/
-//Crystal resonator for RA8876, suggested 10MHz
-//SDRAMaccess clock,suggested 50~160MHz
-//RA8876 system core clock, suggested 50~130MHz
-//TFTdriving clock PCLK,refer to LCD SPEC specified PCLK frequency requirements
-//DRAM_FREQ>= CORE_FREQ
-//CORE_FREQ>= 2 * SCAN_FREQ
+// Crystal resonator for RA8876, suggested 10MHz
+// SDRAMaccess clock,suggested 50~160MHz
+// RA8876 system core clock, suggested 50~130MHz
+// TFTdriving clock PCLK,refer to LCD SPEC specified PCLK frequency requirements
+// DRAM_FREQ>= CORE_FREQ
+// CORE_FREQ>= 2 * SCAN_FREQ
 
 #define OSC_FREQ 10   // OSC clock frequency, unit: MHz.
 #define DRAM_FREQ 120 // SDRAM clock frequency, unit: MHz.
@@ -38,7 +39,7 @@ Version   : v1.0
 #define W9812G6JH
 
 /*TFT timing configure*/
-#define TFT_MODE 0   //0:SYNC_mode(SYNC+DE mode), 1: DE mode  //if sync only mode do not connect DE signal or XDE_INV = 1
+#define TFT_MODE 0   // 0:SYNC_mode(SYNC+DE mode), 1: DE mode  //if sync only mode do not connect DE signal or XDE_INV = 1
 #define XHSYNC_INV 1 // 0:no inversion, 1:inversion
 #define XVSYNC_INV 1 // 0:no inversion, 1:inversion
 #define XDE_INV 0    // 0:no inversion, 1:inversion
@@ -60,7 +61,7 @@ Version   : v1.0
 /*Page(image buffer) configure*/
 /*The maximum number of pages is based on SDRAM capacity and color depth and width and height of one page*/
 /*For example we used W9825G6JH SDRAM that capacity =  32Mbyte */
-/*The SDRAM is divided into several image buffers and the maximum number of image buffers is limited by the 
+/*The SDRAM is divided into several image buffers and the maximum number of image buffers is limited by the
 memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maximum number = 16/1.2288 */
 /*vertical mulit page application*/
 #define PAGE1_START_ADDR 0
@@ -414,22 +415,22 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_PATTERN_FORMAT16X16 1
 
 #define RA8876_BTE_CTRL1 0x91
-#define RA8876_BTE_ROP_CODE_0 0   //0 ( Blackness )
+#define RA8876_BTE_ROP_CODE_0 0   // 0 ( Blackness )
 #define RA8876_BTE_ROP_CODE_1 1   //~S0?~S1 or ~ ( S0+S1 )
 #define RA8876_BTE_ROP_CODE_2 2   //~S0?S1
 #define RA8876_BTE_ROP_CODE_3 3   //~S0
-#define RA8876_BTE_ROP_CODE_4 4   //S0?~S1
+#define RA8876_BTE_ROP_CODE_4 4   // S0?~S1
 #define RA8876_BTE_ROP_CODE_5 5   //~S1
-#define RA8876_BTE_ROP_CODE_6 6   //S0^S1
+#define RA8876_BTE_ROP_CODE_6 6   // S0^S1
 #define RA8876_BTE_ROP_CODE_7 7   //~S0+~S1 or ~ ( S0?S1 )
-#define RA8876_BTE_ROP_CODE_8 8   //S0?S1
+#define RA8876_BTE_ROP_CODE_8 8   // S0?S1
 #define RA8876_BTE_ROP_CODE_9 9   //~ ( S0^S1 )
-#define RA8876_BTE_ROP_CODE_10 10 //S1
+#define RA8876_BTE_ROP_CODE_10 10 // S1
 #define RA8876_BTE_ROP_CODE_11 11 //~S0+S1
-#define RA8876_BTE_ROP_CODE_12 12 //S0
-#define RA8876_BTE_ROP_CODE_13 13 //S0+~S1
-#define RA8876_BTE_ROP_CODE_14 14 //S0+S1
-#define RA8876_BTE_ROP_CODE_15 15 //1 ( Whiteness )
+#define RA8876_BTE_ROP_CODE_12 12 // S0
+#define RA8876_BTE_ROP_CODE_13 13 // S0+~S1
+#define RA8876_BTE_ROP_CODE_14 14 // S0+S1
+#define RA8876_BTE_ROP_CODE_15 15 // 1 ( Whiteness )
 #define RA8876_BTE_ROP_BUS_WIDTH8 7
 #define RA8876_BTE_ROP_BUS_WIDTH16 15
 
@@ -512,11 +513,11 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_SERIAL_FLASH_ADDR_32BIT 1
 #define RA8876_STANDARD_SPI_MODE 0
 #define RA8876_FOLLOW_RA8876_MODE 1
-#define RA8876_SPI_NORMAL_READ 0       //COMMAND 03h
-#define RA8876_SPI_FAST_READ_8DUMMY 4  //COMMAND 0Bh
-#define RA8876_SPI_FAST_READ_16DUMMY 8 //COMMAND 1Bh
-#define RA8876_SPI_DUAL_READ_8DUMMY 2  //COMMAND 3Bh
-#define RA8876_2XIO_READ_MODE_4DUMMY 3 //COMMAND BBh
+#define RA8876_SPI_NORMAL_READ 0       // COMMAND 03h
+#define RA8876_SPI_FAST_READ_8DUMMY 4  // COMMAND 0Bh
+#define RA8876_SPI_FAST_READ_16DUMMY 8 // COMMAND 1Bh
+#define RA8876_SPI_DUAL_READ_8DUMMY 2  // COMMAND 3Bh
+#define RA8876_2XIO_READ_MODE_4DUMMY 3 // COMMAND BBh
 
 #define RA8876_SPIDR 0xB8
 #define RA8876_SPIMCR2 0xB9
@@ -524,8 +525,8 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_SPIM_INT_ENABLE 1
 #define RA8876_SPIM_NSS_SELECT_0 0
 #define RA8876_SPIM_NSS_SELECT_1 1
-#define RA8876_SPIM_NSS_INACTIVE 0 //nSS port will goes high
-#define RA8876_SPIM_NSS_ACTIVE 1   //nSS port will goes low
+#define RA8876_SPIM_NSS_INACTIVE 0 // nSS port will goes high
+#define RA8876_SPIM_NSS_ACTIVE 1   // nSS port will goes low
 #define RA8876_SPIM_OVFIRQMSK_UNMASK 0
 #define RA8876_SPIM_OVFIRQMSK_MASK 1
 #define RA8876_SPIM_EMTIRQMSK_UNMASK 0
@@ -563,7 +564,7 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 
 #define RA8876_CCR0 0xCC
 #define RA8876_SELECT_INTERNAL_CGROM 0
-#define RA8876_SELECT_EXTERNAL_CGROM 1 //Genitop serial flash
+#define RA8876_SELECT_EXTERNAL_CGROM 1 // Genitop serial flash
 #define RA8876_SELECT_USER_DEFINED 2
 #define RA8876_CHAR_HEIGHT_16 0
 #define RA8876_CHAR_HEIGHT_24 1
@@ -676,8 +677,8 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define RA8876_SDRAM_ENABLE_WARNING 1
 #define RA8876_SDRAM_TIMING_PARA_DISABLE 0
 #define RA8876_SDRAM_TIMING_PARA_ENABLE 1
-#define RA8876_SDRAM_ENTER_POWER_SAVING 1 //0 to 1 transition will enter power saving mode
-#define RA8876_SDRAM_EXIT_POWER_SAVING 0  //1 to 0 transition will exit power saving mode
+#define RA8876_SDRAM_ENTER_POWER_SAVING 1 // 0 to 1 transition will enter power saving mode
+#define RA8876_SDRAM_EXIT_POWER_SAVING 0  // 1 to 0 transition will exit power saving mode
 #define RA8876_SDRAM_INITIALIZE 1         // An 0 to 1 transition will execute SDRAM initialization procedure.
 #define RA8876_SDRAM_PARAMETER1 0xE0
 #define RA8876_SDRAM_PARAMETER2 0xE1
@@ -791,7 +792,7 @@ typedef struct Button_s
     bool pressed;
     uint16_t xmin, xmax;
     uint16_t ymin, ymax;
-    int name; //use enumeration
+    int name; // use enumeration
 } Button;
 
 typedef struct Image_s
@@ -811,7 +812,7 @@ typedef struct RA8876_s
     int spi_mosi, spi_miso, spi_clk;
     int i2c_addr_write, i2c_addr_read;
     int reset_mask;
-    i2c_slow bus;
+    I2CBus i2cBus;
 } Display;
 
 Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);
@@ -854,10 +855,10 @@ void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, ui
 void display_text_mode(Display *display, bool on);
 void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color);
 void display_set_text_cursor(Display *display, uint16_t x, uint16_t y);
-void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select);                   //cch
-void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge); //cdh
+void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select);                   // cch
+void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge); // cdh
 
-void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width); //b7h,bbh,ceh,cfh
+void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width); // b7h,bbh,ceh,cfh
 
 void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str);
 

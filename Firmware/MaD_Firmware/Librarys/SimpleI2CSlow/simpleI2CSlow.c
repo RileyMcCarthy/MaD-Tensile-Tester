@@ -63,6 +63,7 @@ i2c_slow *i2c_slow_open(i2c_slow *bus, int sclPin, int sdaPin, int sclDrive, int
 
 void i2c_slow_start(i2c_slow *bus)
 {
+    printf("Delay:%d\n", bus->delay);
     all_high(bus);
     _waitus(bus->delay);
     sda_low(bus);

@@ -1,6 +1,8 @@
 #ifndef DYN4_H
 #define DYN4_H
-
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 #include "Error.h"
 #include <stdbool.h>
 #include <stdint.h>

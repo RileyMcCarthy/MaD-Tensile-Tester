@@ -2,17 +2,22 @@
 #define MCP23017_H
 
 #include <simpletools.h>
-#include "simpleI2CSlow.h"
 #include <stdbool.h>
+
+#define MCP23017_INPUT 0x1
+#define MCP23017_OUTPUT 0x0
+#define MCP23017_INPUT_PULLUP 0x2
 
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
+typedef struct __using("jm_i2c.spin2") I2CBus;
+
 typedef struct MCP23017_t
 {
-    i2c_slow bus;
+    I2CBus i2cBus;
     uint8_t writeAddr, readAddr;
 } MCP23017;
 

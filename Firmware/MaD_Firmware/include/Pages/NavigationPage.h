@@ -5,7 +5,9 @@
 #include "Error.h"
 #include "Style.h"
 #include "StateMachine.h"
-
+#ifdef __MEMORY_CHECK__
+#include "leak_detector_c.h"
+#endif
 /**
  * @brief Enumeration representing the pages available to select from navigation
  * 
