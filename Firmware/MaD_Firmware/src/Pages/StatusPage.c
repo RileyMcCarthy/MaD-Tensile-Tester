@@ -40,6 +40,20 @@ static void check_buttons(StatusPage *page)
     }
 }
 
+static void drawSuccessIndicator(Display *display, int x, int y)
+{
+    int w = 20;
+    int h = 20;
+    display_draw_circle_square_fill(display, x, y, x + w, y + h, w / 3, h / 3, COLOR65K_GREEN);
+}
+
+static void drawFailIndicator(Display *display, int x, int y)
+{
+    int w = 20;
+    int h = 20;
+    display_draw_circle_square_fill(display, x, y, x + w, y + h, w / 3, h / 3, COLOR65K_RED);
+}
+
 StatusPage *status_page_create(Display *display, MachineState *machineState)
 {
     StatusPage *page = malloc(sizeof(StatusPage));
@@ -133,11 +147,9 @@ void status_page_run(StatusPage *page)
     buttons[2].lastPress = 0;
 
     display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    Image navigationImg; //= image_get(IMAGE_NAVIGATION);
+    Image navigationImg = image_get_navigation();
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    Image button_wide; // = image_get(IMAGE_BUTTON_WIDE);
-    display_bte_memory_copy_image(page->display, button_wide, buttons[0].xmin, buttons[0].ymin);
 
     printf("Status page loaded\n");
     while (!page->complete)

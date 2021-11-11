@@ -7,27 +7,17 @@
 #include "RA8876.h"
 #include "LoadingOverlay.h"
 
-typedef struct assets_s
-{
-    Image keyboard;
-    Image navigation;
-    Image button_wide;
-    Image button_wide_border;
-    Image manual;
-    Image automatic;
-} Assets;
-
-/**
- * @brief Creates Image Objects in preparation for loading
- * 
- */
-void image_create_assets();
-
-/**
+Image image_get_keyboard();
+Image image_get_navigation();
+Image image_get_manual();
+Image image_get_automatic();
+Image image_get_success();
+Image image_get_fails()
+    /**
  * @brief Loads images from MaD SD card to display SDRAM
  * 
  */
 
-void image_load_assets(Display *display, Assets *assets);
+    void image_load_assets(Display *display);
 
 #endif

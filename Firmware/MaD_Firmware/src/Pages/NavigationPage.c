@@ -125,11 +125,11 @@ Pages navigation_page_run(NavigationPage *page)
     strcpy(buf, "Status");
     display_draw_string(page->display, buttons[0].xmin + buttonSize / 2 - strlen(buf) * 8, buttons[0].ymin + buttonSize / 2 - 12, buf);
 
-    Image manualImg; // = image_get(IMAGE_MANUAL);
+    Image manualImg = image_get_manual();
 
     display_bte_memory_copy_image(page->display, manualImg, buttons[1].xmin, buttons[1].ymin);
 
-    Image automaticImg; // = image_get(IMAGE_AUTOMATIC);
+    Image automaticImg = image_get_automatic();
 
     display_bte_memory_copy_image(page->display, automaticImg, buttons[2].xmin, buttons[2].ymin);
 
