@@ -7,34 +7,34 @@ static Image automaticPageImage;
 static Image successImage;
 static Image failImage;
 
-Image image_get_keyboard()
+Image *image_get_keyboard()
 {
-    return keyboardImage;
+    return &keyboardImage;
 }
 
-Image image_get_navigation()
+Image *image_get_navigation()
 {
-    return navigationImage;
+    return &navigationImage;
 }
 
-Image image_get_manual()
+Image *image_get_manual()
 {
-    return manualPageImage;
+    return &manualPageImage;
 }
 
-Image image_get_automatic()
+Image *image_get_automatic()
 {
-    return automaticPageImage;
+    return &automaticPageImage;
 }
 
-Image image_get_success()
+Image *image_get_success()
 {
-    return successImage;
+    return &successImage;
 }
 
-Image image_get_fail()
+Image *image_get_fail()
 {
-    return failImage;
+    return &failImage;
 }
 
 static void image_create_assets()
@@ -76,15 +76,13 @@ static void image_create_assets()
 void image_load_assets(Display *display)
 {
     image_create_assets();
-    //display->loadImage(keyboardImg, &sd);
+    // display->loadImage(keyboardImg, &sd);
     display_load_image(display, navigationImage);
     printf("loading button wide\n");
 
-    printf("loading manual page img\n");
     loading_overlay_display(display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
     display_load_image(display, manualPageImage);
 
-    printf("loading automatic page img\n");
     loading_overlay_display(display, "Loading Image: automatic page", OVERLAY_TYPE_LOADING);
     display_load_image(display, automaticPageImage);
 }

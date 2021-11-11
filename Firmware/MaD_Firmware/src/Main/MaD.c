@@ -744,6 +744,7 @@ void mad_begin()
   }
 
   // Load Assets from SD card
+  image_load_assets(display);
 
   // Load Machine Profile
   MachineProfile *machineProfile = Load_MachineProfile();

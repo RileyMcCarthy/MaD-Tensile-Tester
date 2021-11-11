@@ -819,7 +819,7 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
 
 /*SD Card*/
 void display_load_image(Display *display, Image image);
-void display_bte_memory_copy_image(Display *display, Image image, int xpos, int ypos);
+void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos);
 
 /*Touch*/
 int display_update_buttons(Display *display, Button *buttons, const int amount);

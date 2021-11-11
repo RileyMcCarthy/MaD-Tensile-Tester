@@ -1,7 +1,6 @@
 #ifndef DS3231_H
 #define DS3231_H
 #include "simpletools.h"
-#include "simpleI2CSlow.h"
 #include "Error.h"
 #include "stdbool.h"
 #ifdef __MEMORY_CHECK__
@@ -23,7 +22,7 @@ typedef struct time_st //@todo replace with time library
 
 /**
  * @brief Real Time Clock IC Interface
- * 
+ *
  */
 
 typedef struct DS3231_t

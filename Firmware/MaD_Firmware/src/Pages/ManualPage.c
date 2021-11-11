@@ -12,12 +12,12 @@ enum button_names
 
 /**
  * @brief Manual page contains information and controls for running in manual mode
- * 
+ *
  */
 
 /**
  * @brief Callback method when Button is pressed
- * 
+ *
  * @param b Button that was pressed
  */
 static void checkButtons(ManualPage *page)
@@ -62,13 +62,13 @@ void manual_page_destroy(ManualPage *page)
 
 /**
  * @brief Starts manual page
- * 
+ *
  */
 void manual_page_run(ManualPage *page)
 {
     printf("Manual page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display_set_text_parameter1(pgitage->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
 
@@ -124,8 +124,8 @@ void manual_page_run(ManualPage *page)
 
     display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
     display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    Image navigationImg; //image_get_image(IMAGE_NAVIGATION);
-    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
+    Image *navigationImg = image_get_navigation();
+    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     bool initialRender = true;
     printf("Manual page finished loading\n");
     MachineState previousState = *(page->machineState);
@@ -171,16 +171,6 @@ void manual_page_run(ManualPage *page)
             display_draw_string(page->display, buttons[0].xmin + 50 - strlen(buf) * 4, buttons[0].ymin + 25 - 8, buf);
         }
         display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-        int position = navkey_read_counter_int(navkey);
-        //dyn4_send_command(dyn4, 0x01, position);
-        sprintf(buf, "Relitive Position: %d", position);
-        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 160, buf);
-        strcpy(buf, "Relative Force: 0.00");
-        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 190, buf);
-        strcpy(buf, "Absolute Position: 0.00");
-        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 230, buf);
-        strcpy(buf, "Absolute Force: 0.00");
-        display_draw_string(page->display, SCREEN_WIDTH / 6 - strlen(buf) * 6, 260, buf);
         // clock.render();
         initialRender = false;
         previousState = currentState;

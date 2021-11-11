@@ -147,8 +147,8 @@ void status_page_run(StatusPage *page)
     buttons[2].lastPress = 0;
 
     display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    Image navigationImg = image_get_navigation();
-    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
+    Image *navigationImg = image_get_navigation();
+    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
     printf("Status page loaded\n");

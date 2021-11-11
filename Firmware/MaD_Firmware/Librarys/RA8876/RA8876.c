@@ -1515,6 +1515,7 @@ void display_load_image(Display *display, Image image)
   {
     display_canvas_image_start_address(display, PAGE3_START_ADDR);
   }
+  chdir("/sd/img");
   FILE *fp = fopen(image.name, "r");
   if (fp == NULL)
   {
@@ -1545,10 +1546,10 @@ void display_load_image(Display *display, Image image)
   display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
-void display_bte_memory_copy_image(Display *display, Image image, int xpos, int ypos)
+void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos)
 {
   int pageAddr = 0;
-  switch (image.page)
+  switch (image->page)
   {
   case 1:
     pageAddr = PAGE1_START_ADDR;
@@ -1563,13 +1564,13 @@ void display_bte_memory_copy_image(Display *display, Image image, int xpos, int 
     break;
   }
 
-  if (image.backgroundColor != NULL)
+  if (image->backgroundColor != NULL)
   {
-    display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image.x0, image.y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image.width, image.height, image.backgroundColor);
+    display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->backgroundColor);
   }
   else
   {
-    display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image.x0, image.y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image.width, image.height);
+    display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
   }
 }
 // display.display_bte_memory_copy(PAGE2_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, 100, 50);
