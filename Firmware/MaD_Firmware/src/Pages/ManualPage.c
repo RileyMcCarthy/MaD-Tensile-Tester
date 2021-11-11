@@ -68,23 +68,9 @@ void manual_page_run(ManualPage *page)
 {
     printf("Manual page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter1(pgitage->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-
-    //connect motor
-    printf("loaded dyn4\n");
-    //Setup NavKey
-    NavKey *navkey = navkey_create(28, 29, 0b0010010);
-    navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
-    navkey_reset(navkey);
-
-    navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
-    navkey_write_max(navkey, (int32_t)10000);  /* Set the maximum threshold*/
-    navkey_write_min(navkey, (int32_t)-10000); /* Set the minimum threshold */
-    navkey_write_step(navkey, (int32_t)100);   /* Set the step to 1*/
-
-    navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
 
     char buf[50];
     strcpy(buf, "Manual");
