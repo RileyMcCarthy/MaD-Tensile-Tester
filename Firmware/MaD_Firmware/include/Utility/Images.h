@@ -12,7 +12,7 @@ Image *image_get_navigation();
 Image *image_get_manual();
 Image *image_get_automatic();
 Image *image_get_success();
-Image *image_get_fails();
+Image *image_get_fail();
 
 /**
  * @brief Loads images from MaD SD card to display SDRAM

@@ -35,8 +35,8 @@ static uint8_t read_register(ForceGauge *forceGauge, uint8_t reg)
     // uart_write(&(forceGauge->serial), 0x20 + (reg << 1));
     // uart_read(&(forceGauge->serial), 1, &temp);
     forceGauge->serial.tx(0x55);
-    forceGauge->serial.tx(0x20 + (reg << 1));
-    temp = forceGauge->serial.rxtime(10);
+    forceGauge->serial.tx(0x20 | (reg << 1));
+    temp = forceGauge->serial.rxtime(100);
     return temp;
 }
 ForceGauge *force_gauge_create()
@@ -69,11 +69,14 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int z
     forceGauge->serial.start(rx, tx, 2, 57600);
     forceGauge->serial.tx(0x55); // Synchronization word
     forceGauge->serial.tx(0x06); // Reset
-    _waitms(10);
+    _waitms(100);
 
     write_register(forceGauge, CONFIG_1, 0b00001000); // Setting data mode to continuous
-    write_register(forceGauge, CONFIG_3, 0b00000001); // Setting data aquisition to automatic
+    write_register(forceGauge, CONFIG_2, 0b01000000); // Setting data counter on
+    write_register(forceGauge, CONFIG_4, 0b01110111); // Setting data counter on
 
+    int temp = read_register(forceGauge, CONFIG_4);
+    printf("Config1:%d\n", temp);
     // uart_write(&(forceGauge->serial), 0x55); @todo implement serial
     // uart_write(&(forceGauge->serial), 0x08);
     forceGauge->serial.tx(0x55);
@@ -83,7 +86,16 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int z
 
 int force_gauge_get_force(ForceGauge *forceGauge)
 {
-    int forceRaw = forceGauge->serial.rxtime(1000);
+    forceGauge->serial.rxflush();
+    int dready = read_register(forceGauge, CONFIG_2);
+    printf("Ready:%d\n", dready);
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x10); // Send RData command
+    int counter = forceGauge->serial.rxtime(100);
+    printf("Count:%d\n", counter);
+    int forceRaw = forceGauge->serial.rxtime(100);
+    forceRaw |= forceGauge->serial.rxtime(100) << 8;
+    forceRaw |= forceGauge->serial.rxtime(100) << 16;
     if (forceRaw == -1)
     {
         printf("Force read timeout\n");

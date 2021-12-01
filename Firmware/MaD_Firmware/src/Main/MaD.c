@@ -598,13 +598,15 @@ static void dyn4_test()
 static void force_test()
 {
   // Connect Force Gauge
+  _waitms(1000);
   ForceGauge *forceGauge = force_gauge_create();
   force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402);
   // loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
   while (1)
   {
     int force = force_gauge_get_force(forceGauge);
-    printf("Force: %d\n", force);
+    printf("%d\n", force);
+    _waitms(100);
   }
 }
 
@@ -723,7 +725,8 @@ void mad_begin()
   printf("MEMORY CHECK ENABLED\n");
 #endif
   printf("Starting...\n");
-
+  force_test();
+  return;
   // Begin the display
   Display *display = start_display();
   if (display == NULL)
@@ -766,6 +769,12 @@ void mad_begin()
   // Connect to IMU
   // Start state machine (needs IO expansion)
   MachineState *machineState = state_machine_run();
+  _waitms(100);
+  if (machineState == NULL)
+  {
+    loading_overlay_display(display, "State Machine Failed. Please Reset", OVERLAY_TYPE_LOADING);
+    return;
+  }
   machineState->selfCheckParameters.chargePumpOK = true;
   loading_overlay_display(display, "State Machine Running", OVERLAY_TYPE_LOADING);
   // Connect to RTC

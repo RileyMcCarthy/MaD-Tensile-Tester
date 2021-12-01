@@ -3,6 +3,7 @@
 static Image keyboardImage;
 static Image navigationImage;
 static Image manualPageImage;
+static Image statusPageImage;
 static Image automaticPageImage;
 static Image successImage;
 static Image failImage;
@@ -20,6 +21,10 @@ Image *image_get_navigation()
 Image *image_get_manual()
 {
     return &manualPageImage;
+}
+Image *image_get_status()
+{
+    return &statusPageImage;
 }
 
 Image *image_get_automatic()
@@ -71,6 +76,30 @@ static void image_create_assets()
     automaticPageImage.x0 = 600;
     automaticPageImage.y0 = 0;
     automaticPageImage.backgroundColor = 0xf800;
+
+    strcpy(statusPageImage.name, "status.bin");
+    statusPageImage.page = 3;
+    statusPageImage.width = 200;
+    statusPageImage.height = 200;
+    statusPageImage.x0 = 0;
+    statusPageImage.y0 = 300;
+    statusPageImage.backgroundColor = 0xf800;
+
+    strcpy(successImage.name, "check.bin");
+    successImage.page = 3;
+    successImage.width = 25;
+    successImage.height = 25;
+    successImage.x0 = 900;
+    successImage.y0 = 0;
+    successImage.backgroundColor = 0xf800;
+
+    strcpy(failImage.name, "ex.bin");
+    failImage.page = 3;
+    failImage.width = 25;
+    failImage.height = 25;
+    failImage.x0 = 930;
+    failImage.y0 = 0;
+    failImage.backgroundColor = 0x07e0;
 }
 
 void image_load_assets(Display *display)
@@ -85,4 +114,13 @@ void image_load_assets(Display *display)
 
     loading_overlay_display(display, "Loading Image: automatic page", OVERLAY_TYPE_LOADING);
     display_load_image(display, automaticPageImage);
+
+    loading_overlay_display(display, "Loading Image: status page", OVERLAY_TYPE_LOADING);
+    display_load_image(display, statusPageImage);
+
+    loading_overlay_display(display, "Loading Image: check status", OVERLAY_TYPE_LOADING);
+    display_load_image(display, successImage);
+
+    loading_overlay_display(display, "Loading Image: fail status", OVERLAY_TYPE_LOADING);
+    display_load_image(display, failImage);
 }

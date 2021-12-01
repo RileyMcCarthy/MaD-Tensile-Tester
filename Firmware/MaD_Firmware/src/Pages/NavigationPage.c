@@ -120,10 +120,9 @@ Pages navigation_page_run(NavigationPage *page)
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, MAINCOLOR);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Status");
-    display_draw_string(page->display, buttons[0].xmin + buttonSize / 2 - strlen(buf) * 8, buttons[0].ymin + buttonSize / 2 - 12, buf);
+    Image *statusImage = image_get_status();
+
+    display_bte_memory_copy_image(page->display, statusImage, buttons[0].xmin, buttons[0].ymin);
 
     Image *manualImg = image_get_manual();
 

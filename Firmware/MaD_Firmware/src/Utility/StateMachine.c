@@ -102,38 +102,61 @@ static State state_machine_motion(MachineState *machineState)
 static void state_machine_cog(MachineState *machineState)
 {
 
+    printf("Running state machine\n");
     // Get MachineState as parameter from hub memory
     State currentState = machineState->currentState;
     while (1)
     {
         // make snippet of current state
-        MachineState currentMachineState = *machineState;
         State newState;
-        switch (currentMachineState.currentState)
+        switch (machineState->currentState)
         {
         case STATE_SELFCHECK:
-            newState = state_machine_self_check(&currentMachineState);
+            newState = state_machine_self_check(machineState);
             break;
         case STATE_MACHINECHECK:
-            newState = state_machine_check(&currentMachineState);
+            newState = state_machine_check(machineState);
             break;
         case STATE_MOTION:
-            newState = state_machine_motion(&currentMachineState);
+            newState = state_machine_motion(machineState);
             break;
         default:
             break;
         }
         machineState->currentState = newState;
-
-        // copy contents of state snipped back to machine state
-        *machineState = currentMachineState;
     }
+}
+
+static MachineState *get_machine_state()
+{
+    MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
+    machineState->currentState = STATE_SELFCHECK;
+
+    machineState->selfCheckParameters.chargePumpOK = false;
+    machineState->selfCheckParameters.rtcReady = false;
+
+    machineState->machineCheckParameters.dyn4Responding = false;
+    machineState->machineCheckParameters.esd = false;
+    machineState->machineCheckParameters.forceGaugeResponding = false;
+    machineState->machineCheckParameters.machineReady = false;
+    machineState->machineCheckParameters.power = false;
+    machineState->machineCheckParameters.servoReady = false;
+
+    machineState->motionParameters.condition = MOTION_STOPPED;
+    machineState->motionParameters.forceOverload = false;
+    machineState->motionParameters.hardLowerLimit = false;
+    machineState->motionParameters.hardUpperLimit = false;
+    machineState->motionParameters.mode = MODE_MANUAL;
+    machineState->motionParameters.softLowerLimit = false;
+    machineState->motionParameters.softUpperLimit = false;
+    machineState->motionParameters.status = STATUS_DISABLED;
+    return machineState;
 }
 
 MachineState *state_machine_run()
 {
-    MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
-    machineState->cogid = __builtin_cogstart(state_machine_cog(machineState), &stack[0]);
+    MachineState *machineState = get_machine_state();
+    machineState->cogid = _cogstart_C(state_machine_cog, machineState, &stack[0], sizeof(long) * 64);
     if (machineState->cogid != -1)
     {
         return machineState;

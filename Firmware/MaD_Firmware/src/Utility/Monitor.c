@@ -30,7 +30,7 @@ static void monitor_cog(Monitor *monitor)
         buffer[0].force = force;
         buffer[0].position = position;
         buffer[0].timems = time;
-        writingData = false;
+        monitor->writingData = false;
     }
 }
 

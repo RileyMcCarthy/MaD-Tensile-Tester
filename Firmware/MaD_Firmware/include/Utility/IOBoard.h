@@ -44,10 +44,9 @@
 #define DYN4_TX 12  // DYN4 data (Output)
 #define DYN4_ADDR 3 // DYN4 I2C Address
 
-#define PIN_UPPER_LIMIT 0
-#define PIN_LOWER_LIMIT 0
-#define PIN_ESD 0
-#define PIN_SRVORDY 0
-#define PIN_ENABLEDYN4 0
+#define PIN_UPPER_LIMIT 2
+#define PIN_LOWER_LIMIT 3
+#define PIN_ESD 4
+#define PIN_SRVORDY 4 + 12 // add 12 to compensate for output layout
 
 #endif

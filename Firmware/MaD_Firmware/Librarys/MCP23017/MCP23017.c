@@ -52,25 +52,25 @@ void mcp23017_destroy(MCP23017 *mcp23017)
 }
 
 /**
- * @brief 
- * 
- * @param addr 
- * @param theSDA 
- * @param theSCL 
+ * @brief
+ *
+ * @param addr
+ * @param theSDA
+ * @param theSCL
  */
 void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
 {
-    mcp23017->i2cBus.setup(scl, sda, 100, 1); //1.5k pullup
+    mcp23017->i2cBus.setup(scl, sda, 100, 1); // 1.5k pullup
     mcp23017->writeAddr = ((0x20 | addr) << 1) & 0b11111110;
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
 }
 
 void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
 {
-    int reg = REG_IODIRA;
+    int reg = REG_IODIRB;
     if (pin > 7)
-    { //register B
-        reg = REG_IODIRB;
+    { // register B
+        reg = REG_IODIRA;
         pin -= 8;
     }
 
@@ -81,10 +81,10 @@ void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
 
 uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin)
 {
-    int reg = REG_IODIRA;
+    int reg = REG_IODIRB;
     if (pin > 7)
-    { //register B
-        reg = REG_IODIRB;
+    { // register B
+        reg = REG_IODIRA;
         pin -= 8;
     }
     return bitRead(read_register(mcp23017, reg), pin);
@@ -92,10 +92,11 @@ uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin)
 
 void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
 {
-    int reg = REG_GPIOA;
+    pin--;
+    int reg = REG_GPIOB;
     if (pin > 7)
-    { //register B
-        reg = REG_GPIOB;
+    { // register B
+        reg = REG_GPIOA;
         pin -= 8;
     }
 
@@ -105,10 +106,11 @@ void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
 }
 uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin)
 {
-    int reg = REG_GPIOA;
+    pin--;
+    int reg = REG_GPIOB;
     if (pin > 7)
-    { //register B
-        reg = REG_GPIOB;
+    { // register B
+        reg = REG_GPIOA;
         pin -= 8;
     }
     return bitRead(read_register(mcp23017, reg), pin);
@@ -116,10 +118,10 @@ uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin)
 
 void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
 {
-    int reg = REG_IPOLA;
+    int reg = REG_IPOLB;
     if (pin > 7)
-    { //register B
-        reg = REG_IPOLB;
+    { // register B
+        reg = REG_IPOLA;
         pin -= 8;
     }
 
@@ -131,7 +133,7 @@ uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin)
 {
     int reg = REG_IPOLA;
     if (pin > 7)
-    { //register B
+    { // register B
         reg = REG_IPOLB;
         pin -= 8;
     }
