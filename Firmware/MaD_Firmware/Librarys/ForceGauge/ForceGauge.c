@@ -18,7 +18,7 @@ union Data_v
 
 static void write_register(ForceGauge *forceGauge, uint8_t reg, uint8_t data)
 {
-    // Write has format(rrr = reg to write): 0x55, 0b0001 rrrx {data}
+    // Write has format(rrr = reg to write): 0x55, 0001 rrrx {data}
     // uart_write(&(forceGauge->serial), 0x55); @todo implement serial
     // uart_write(&(forceGauge->serial), 0x40 + (reg << 1));
     // uart_write(&(forceGauge->serial), data);
@@ -30,13 +30,13 @@ static void write_register(ForceGauge *forceGauge, uint8_t reg, uint8_t data)
 static uint8_t read_register(ForceGauge *forceGauge, uint8_t reg)
 {
     uint8_t temp;
-    // read has format(rrr = reg to read): 0x55, 0b0010 rrrx, {returned data}
+    // read has format(rrr = reg to read): 0x55, 0010 rrrx, {returned data}
     // uart_write(&(forceGauge->serial), 0x55);@todo implement serial
     // uart_write(&(forceGauge->serial), 0x20 + (reg << 1));
     // uart_read(&(forceGauge->serial), 1, &temp);
     forceGauge->serial.tx(0x55);
-    forceGauge->serial.tx(0x20 | (reg << 1));
-    temp = forceGauge->serial.rxtime(100);
+    forceGauge->serial.tx(0x20 + (reg << 1));
+    temp = forceGauge->serial.rx();
     return temp;
 }
 ForceGauge *force_gauge_create()
@@ -61,24 +61,38 @@ void force_gauge_destroy(ForceGauge *forceGauge)
  */
 Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int zero)
 {
+    _waitms(100);
+    int configData1 = 0b00001000;
+    int configData2 = 0b01000000;
+    int configData4 = 0b01110111;
+
     forceGauge->interpolationSlope = slope;
     forceGauge->interpolationZero = zero;
     // uart_start(&(forceGauge->serial), rx, tx, 2, 57600); @todo implement serial
     // uart_write(&(forceGauge->serial), 0x55); //Synchronization word
     // uart_write(&(forceGauge->serial), 0x06); //Reset
-    forceGauge->serial.start(rx, tx, 2, 57600);
+    forceGauge->serial.start(rx, tx, 3, 19200);
     forceGauge->serial.tx(0x55); // Synchronization word
     forceGauge->serial.tx(0x06); // Reset
     _waitms(100);
 
-    write_register(forceGauge, CONFIG_1, 0b00001000); // Setting data mode to continuous
-    write_register(forceGauge, CONFIG_2, 0b01000000); // Setting data counter on
-    write_register(forceGauge, CONFIG_4, 0b01110111); // Setting data counter on
+    write_register(forceGauge, CONFIG_1, configData1); // Setting data mode to continuous
+    write_register(forceGauge, CONFIG_2, configData2); // Setting data counter on
+    write_register(forceGauge, CONFIG_4, configData4); // Setting data counter on
+    int temp;
+    if ((temp = read_register(forceGauge, CONFIG_1)) != configData1)
+    {
+        return FORCEGAUGE_NOT_RESPONDING;
+    }
+    else if ((temp = read_register(forceGauge, CONFIG_2)) != configData2)
+    {
+        return FORCEGAUGE_NOT_RESPONDING;
+    }
+    else if ((temp = read_register(forceGauge, CONFIG_4)) != configData4)
+    {
+        return FORCEGAUGE_NOT_RESPONDING;
+    }
 
-    int temp = read_register(forceGauge, CONFIG_4);
-    printf("Config1:%d\n", temp);
-    // uart_write(&(forceGauge->serial), 0x55); @todo implement serial
-    // uart_write(&(forceGauge->serial), 0x08);
     forceGauge->serial.tx(0x55);
     forceGauge->serial.tx(0x08);
     return SUCCESS;
@@ -89,18 +103,23 @@ int force_gauge_get_force(ForceGauge *forceGauge)
     forceGauge->serial.rxflush();
     int dready = read_register(forceGauge, CONFIG_2);
     printf("Ready:%d\n", dready);
+    if ((dready & 0b10000000) != 0b10000000)
+    {
+        return 0;
+    }
+
     forceGauge->serial.tx(0x55);
     forceGauge->serial.tx(0x10); // Send RData command
-    int counter = forceGauge->serial.rxtime(100);
+    int counter = forceGauge->serial.rx();
     printf("Count:%d\n", counter);
-    int forceRaw = forceGauge->serial.rxtime(100);
-    forceRaw |= forceGauge->serial.rxtime(100) << 8;
-    forceRaw |= forceGauge->serial.rxtime(100) << 16;
+    int forceRaw = forceGauge->serial.rx();
+    forceRaw |= forceGauge->serial.rx() << 8;
+    forceRaw |= forceGauge->serial.rx() << 16;
     if (forceRaw == -1)
     {
         printf("Force read timeout\n");
         return forceRaw;
     }
     int force = (forceRaw - forceGauge->interpolationZero) / forceGauge->interpolationSlope;
-    return forceRaw;
+    return force;
 }

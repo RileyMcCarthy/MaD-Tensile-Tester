@@ -85,7 +85,7 @@ void status_page_run(StatusPage *page)
 
     /*Section windows*/
     // Machine State window
-    display_draw_circle_square_fill(page->display, machineStateX0, machineStateY0, machineStateX1, SCREEN_HEIGHT - 20, 20, 20, MAINCOLOR);
+    display_draw_circle_square_fill(page->display, machineStateX0, machineStateY0, machineStateX1, machineStateY1, 20, 20, MAINCOLOR);
 
     /*Main headers*/
     char buf[50];

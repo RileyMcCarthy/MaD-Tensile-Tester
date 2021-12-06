@@ -10,7 +10,8 @@
         "ra8876.h": "c",
         "statemachine.h": "c",
         "monitor.h": "c",
-        "images.h": "c"
+        "images.h": "c",
+        "simpletools.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

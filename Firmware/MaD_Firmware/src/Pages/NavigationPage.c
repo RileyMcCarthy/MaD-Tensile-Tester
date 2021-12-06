@@ -11,7 +11,7 @@
  * @brief Number of buttons on the page
  *
  */
-#define BUTTONCOUNT 3
+#define BUTTONCOUNT 4
 
 /**
  * @brief Enum for name of buttons on page
@@ -23,7 +23,7 @@
  *
  * @param button Button that was pressed
  */
-void check_buttons(NavigationPage *page)
+static void check_buttons(NavigationPage *page)
 {
     if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
@@ -116,6 +116,14 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[2].ymax = buttons[2].ymin + buttonSize;
     buttons[2].pressed = false;
     buttons[2].lastPress = 0;
+
+    buttons[3].name = PAGE_CALIBRATION;
+    buttons[3].xmin = buttons[2].xmax + 30;
+    buttons[3].xmax = buttons[3].xmin + buttonSize;
+    buttons[3].ymin = 120;
+    buttons[3].ymax = buttons[2].ymin + buttonSize;
+    buttons[3].pressed = false;
+    buttons[3].lastPress = 0;
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);

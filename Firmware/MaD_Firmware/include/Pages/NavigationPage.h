@@ -10,7 +10,7 @@
 #endif
 /**
  * @brief Enumeration representing the pages available to select from navigation
- * 
+ *
  */
 
 typedef enum Pages_e
@@ -18,7 +18,8 @@ typedef enum Pages_e
     PAGE_STATUS,
     PAGE_MANUAL,
     PAGE_AUTOMATIC,
-    PAGE_SETTINGS
+    PAGE_SETTINGS,
+    PAGE_CALIBRATION
 } Pages;
 
 typedef struct NavigationPage_s
