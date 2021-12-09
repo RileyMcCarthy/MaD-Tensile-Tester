@@ -1,23 +1,30 @@
 
 #ifndef Images_H
 #define Images_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
 #include "RA8876.h"
 #include "LoadingOverlay.h"
+#include "simpletools.h"
+#include <stdlib.h>
 
-Image *image_get_keyboard();
-Image *image_get_navigation();
-Image *image_get_manual();
-Image *image_get_automatic();
-Image *image_get_success();
-Image *image_get_fail();
+typedef struct images_s
+{
+    Image *keyboardImage;
+    Image *navigationImage;
+    Image *manualPageImage;
+    Image *statusPageImage;
+    Image *automaticPageImage;
+    Image *calibratePageImage;
+    Image *filesPageImage;
+    Image *successImage;
+    Image *failImage;
+    Display *display;
+} Images;
 
+Images *create_images();
 /**
  * @brief Loads images from MaD SD card to display SDRAM
  *
  */
-void image_load_assets(Display *display);
+void image_load_assets(Images *imagesPtr, Display *display);
 
 #endif

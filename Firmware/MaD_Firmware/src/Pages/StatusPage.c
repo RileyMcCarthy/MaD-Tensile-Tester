@@ -3,13 +3,9 @@
 #include "Images.h"
 
 #define BUTTONCOUNT 3
-
-enum button_names
-{
-    BUTTON_MACHINE_ENABLE,
-    BUTTON_MACHINE_DISABLE,
-    BUTTON_NAVIGATION
-};
+#define BUTTON_MACHINE_ENABLE 0
+#define BUTTON_MACHINE_DISABLE 1
+#define BUTTON_NAVIGATION 2
 
 static void check_buttons(StatusPage *page)
 {
@@ -40,24 +36,25 @@ static void check_buttons(StatusPage *page)
     }
 }
 
-static void drawSuccessIndicator(Display *display, int x, int y)
+static void drawSuccessIndicator(StatusPage *page, int x, int y)
 {
-    Image *check = image_get_success();
-    display_bte_memory_copy_image(display, check, x, y);
+    Image *check = page->images->successImage;
+    display_bte_memory_copy_image(page->display, check, x, y);
 }
 
-static void drawFailIndicator(Display *display, int x, int y)
+static void drawFailIndicator(StatusPage *page, int x, int y)
 {
-    Image *ex = image_get_fail();
-    display_bte_memory_copy_image(display, ex, x, y);
+    Image *ex = page->images->failImage;
+    display_bte_memory_copy_image(page->display, ex, x, y);
 }
 
-StatusPage *status_page_create(Display *display, MachineState *machineState)
+StatusPage *status_page_create(Display *display, MachineState *machineState, Images *images)
 {
     StatusPage *page = malloc(sizeof(StatusPage));
     page->display = display;
     page->stateMachine = machineState;
     page->complete = false;
+    page->images = images;
     return page;
 }
 
@@ -254,6 +251,7 @@ void status_page_run(StatusPage *page)
     buttons[0].ymin = 360;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
+    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = BUTTON_MACHINE_DISABLE;
@@ -262,6 +260,7 @@ void status_page_run(StatusPage *page)
     buttons[1].ymin = 360;
     buttons[1].ymax = buttons[1].ymin + 50;
     buttons[1].pressed = false;
+    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[2].name = BUTTON_NAVIGATION;
@@ -270,9 +269,11 @@ void status_page_run(StatusPage *page)
     buttons[2].ymin = 0;
     buttons[2].ymax = buttons[2].ymin + 100;
     buttons[2].pressed = false;
+    buttons[2].debounceTimems = 100;
     buttons[2].lastPress = 0;
 
-    Image *navigationImg = image_get_navigation();
+    Image *navigationImg = page->images->navigationImage;
+    printf("printing:%s,%d\n", navigationImg->name, navigationImg->width);
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
@@ -289,81 +290,81 @@ void status_page_run(StatusPage *page)
         // self check status
         if (page->stateMachine->selfCheckParameters.rtcReady)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
         }
 
         // charge pump
         if (page->stateMachine->selfCheckParameters.chargePumpOK)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
         }
 
         /*Machine Check State*/
         // switched power enabled
         if (page->stateMachine->machineCheckParameters.power)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, powerStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, powerStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
         }
 
         // ESD
         if (page->stateMachine->machineCheckParameters.esd)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, esdStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, esdStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
         }
 
         // Servo
         if (page->stateMachine->machineCheckParameters.servoReady)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, servoStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, servoStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
         }
 
         // Force Gauge
         if (page->stateMachine->machineCheckParameters.forceGaugeResponding)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, forceStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, forceStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
         }
 
         if (page->stateMachine->machineCheckParameters.dyn4Responding)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, dyn4StartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, dyn4StartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
         }
 
         // machine Ready
         if (page->stateMachine->machineCheckParameters.machineReady)
         {
-            drawSuccessIndicator(page->display, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
+            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
         }
         else
         {
-            drawFailIndicator(page->display, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
+            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
         }
 
         /*Motion State*/

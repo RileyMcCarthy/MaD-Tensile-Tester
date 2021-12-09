@@ -5,9 +5,7 @@
 #include "Error.h"
 #include "Style.h"
 #include "StateMachine.h"
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+#include "Images.h"
 /**
  * @brief Enumeration representing the pages available to select from navigation
  *
@@ -28,9 +26,10 @@ typedef struct NavigationPage_s
     Display *display;
     Button *buttons;
     Pages newPage;
+    Images *images;
 } NavigationPage;
 
-NavigationPage *navigation_page_create(Display *display);
+NavigationPage *navigation_page_create(Display *display, Images *images);
 
 void navigation_page_destroy(NavigationPage *page);
 

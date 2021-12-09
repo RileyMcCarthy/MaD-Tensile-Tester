@@ -1,12 +1,9 @@
 #include "AutomaticPage.h"
 #include "Monitor.h"
 
-enum button_names
-{
-    BUTTON_MOTION_MODE,
-    BUTTON_CONDITION,
-    BUTTON_NAVIGATION
-};
+#define BUTTON_MOTION_MODE 0
+#define BUTTON_CONDITION 1
+#define BUTTON_NAVIGATION 2
 
 // Private Functions
 
@@ -29,11 +26,12 @@ static void draw_graph(AutomaticPage *page)
 
 // Public Functions
 
-AutomaticPage *automatic_page_create(Display *display)
+AutomaticPage *automatic_page_create(Display *display, Images *images)
 {
     AutomaticPage *page = (AutomaticPage *)malloc(sizeof(AutomaticPage));
     page->display = display;
     page->complete = false;
+    page->images = images;
     return page;
 }
 

@@ -8,9 +8,7 @@
 #include "DYN4.h"
 #include "Monitor.h"
 #include "i2cNavKey.h"
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+#include "Images.h"
 /**
  * @brief Runs the UI for manually controlling the machine
  *
@@ -21,9 +19,10 @@ typedef struct ManualPage_t
     Display *display;
     Button *buttons;
     MachineState *machineState;
+    Images *images;
 } ManualPage;
 
-ManualPage *manual_page_create(Display *display, MachineState *machineState);
+ManualPage *manual_page_create(Display *display, MachineState *machineState, Images *images);
 void manual_page_destroy(ManualPage *page);
 void manual_page_run(ManualPage *page);
 

@@ -45,6 +45,10 @@ static void check_buttons(NavigationPage *page)
                     page->complete = true;
                     page->newPage = PAGE_AUTOMATIC;
                     break;
+                case PAGE_CALIBRATION:
+                    page->complete = true;
+                    page->newPage = PAGE_CALIBRATION;
+                    break;
                 default:
                     break;
                 }
@@ -53,11 +57,12 @@ static void check_buttons(NavigationPage *page)
     }
 }
 
-NavigationPage *navigation_page_create(Display *display)
+NavigationPage *navigation_page_create(Display *display, Images *images)
 {
     NavigationPage *page = malloc(sizeof(NavigationPage));
     page->display = display;
     page->complete = false;
+    page->images = images;
     return page;
 }
 
@@ -99,6 +104,7 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[0].ymin = 120;
     buttons[0].ymax = buttons[0].ymin + buttonSize;
     buttons[0].pressed = false;
+    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = PAGE_MANUAL;
@@ -107,6 +113,7 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[1].ymin = 120;
     buttons[1].ymax = buttons[1].ymin + buttonSize;
     buttons[1].pressed = false;
+    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[2].name = PAGE_AUTOMATIC;
@@ -115,6 +122,7 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[2].ymin = 120;
     buttons[2].ymax = buttons[2].ymin + buttonSize;
     buttons[2].pressed = false;
+    buttons[2].debounceTimems = 100;
     buttons[2].lastPress = 0;
 
     buttons[3].name = PAGE_CALIBRATION;
@@ -123,22 +131,27 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[3].ymin = 120;
     buttons[3].ymax = buttons[2].ymin + buttonSize;
     buttons[3].pressed = false;
+    buttons[3].debounceTimems = 100;
     buttons[3].lastPress = 0;
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    Image *statusImage = image_get_status();
+    Image *statusImage = page->images->statusPageImage;
 
     display_bte_memory_copy_image(page->display, statusImage, buttons[0].xmin, buttons[0].ymin);
 
-    Image *manualImg = image_get_manual();
+    Image *manualImg = page->images->manualPageImage;
 
     display_bte_memory_copy_image(page->display, manualImg, buttons[1].xmin, buttons[1].ymin);
 
-    Image *automaticImg = image_get_automatic();
+    Image *automaticImg = page->images->automaticPageImage;
 
     display_bte_memory_copy_image(page->display, automaticImg, buttons[2].xmin, buttons[2].ymin);
+
+    Image *calibrateImg = page->images->calibratePageImage;
+
+    display_bte_memory_copy_image(page->display, calibrateImg, buttons[3].xmin, buttons[3].ymin);
 
     while (!page->complete)
     {
