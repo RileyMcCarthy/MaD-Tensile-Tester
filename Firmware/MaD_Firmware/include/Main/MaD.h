@@ -1,15 +1,16 @@
 #ifndef MaD_H
 #define MaD_H
 
-#include "simpletools.h"
-#include "Clock.h"
+#include <simpletools.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "IOBoard.h"
 #include "MCP23017.h"
 #include "DS3231.h"
 #include "StateMachine.h"
 #include "Style.h"
 #include "RA8876.h"
-#include "i2cNavKey.h"
 #include "ForceGauge.h"
 #include "DYN4.h"
 #include "Keyboard.h"
@@ -21,9 +22,9 @@
 #include "StatusPage.h"
 #include "NavigationPage.h"
 #include "AutomaticPage.h"
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+#include "CalibrateForcePage.h"
+#include "JSON.h"
+
 #define DISPLAY_SCK 51     // SPI Clock Pin
 #define DISPLAY_MISO 53    // SPI Data Pin
 #define DISPLAY_MOSI 52    // SPI Clock Pin
@@ -44,5 +45,5 @@
  *
  */
 void mad_begin();
-Error startDisplay();
+
 #endif
