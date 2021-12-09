@@ -1,6 +1,6 @@
 #include "StateMachine.h"
 
-static long stack[64];
+static long state_stack[64];
 
 /**
  * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state.
@@ -156,7 +156,7 @@ static MachineState *get_machine_state()
 MachineState *state_machine_run()
 {
     MachineState *machineState = get_machine_state();
-    machineState->cogid = _cogstart_C(state_machine_cog, machineState, &stack[0], sizeof(long) * 64);
+    machineState->cogid = _cogstart_C(state_machine_cog, machineState, &state_stack[0], sizeof(long) * 64);
     if (machineState->cogid != -1)
     {
         return machineState;

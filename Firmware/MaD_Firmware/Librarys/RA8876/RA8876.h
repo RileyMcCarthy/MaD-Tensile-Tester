@@ -15,6 +15,7 @@ Version   : v1.0
 #include "stdbool.h"
 #include "stdint.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct __using("jm_i2c.spin2") I2CBus;
 
@@ -788,16 +789,17 @@ typedef struct TouchLocation_s
 
 typedef struct Button_s
 {
-    unsigned int lastPress;
+    int lastPress;
     bool pressed;
     uint16_t xmin, xmax;
     uint16_t ymin, ymax;
+    int debounceTimems;
     int name; // use enumeration
 } Button;
 
 typedef struct Image_s
 {
-    char name[255];
+    char *name;
     int page;
     int x0;
     int y0;
@@ -818,7 +820,7 @@ typedef struct RA8876_s
 Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);
 
 /*SD Card*/
-void display_load_image(Display *display, Image image);
+void display_load_image(Display *display, Image *image);
 void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos);
 
 /*Touch*/

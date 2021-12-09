@@ -1,7 +1,7 @@
  CC = C:\flexprop\bin\flexcc
  LOAD = C:\flexprop\bin\loadp2
  
- CFLAGS=-2 -O2 -Wall -DDebug -g #-D __MEMORY_CHECK__ 
+ CFLAGS=-2  -Wall -O1 -DDebug -g #-D __MEMORY_CHECK__ 
 
  TARGET = MAD.binary
  BIN = bin

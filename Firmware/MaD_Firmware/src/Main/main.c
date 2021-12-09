@@ -3,7 +3,7 @@
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768
+    HEAPSIZE = 32768 * 4
 };
 
 /**
@@ -15,7 +15,7 @@ enum
 
 int main()
 {
-    //_clkset(_SETFREQ, _CLOCKFREQ);
+    // _clkset(_SETFREQ, _CLOCKFREQ);
     mad_begin();
     while (1)
         ;

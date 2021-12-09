@@ -1501,34 +1501,36 @@ To load image with proper settings: use inkscape to export image with anialiasin
 it is exported to jpg using max quality settings (100) and use preview to check for any back "smudging". Finally
 use the image took from RA8876 to convert that jpg to bin. 8 characters max with extension of three characters.
 */
-void display_load_image(Display *display, Image image)
+void display_load_image(Display *display, Image *image)
 {
-  if (image.page == 1)
+  printf("Loading image %s\n", image->name);
+  if (image->page == 1)
   {
     display_canvas_image_start_address(display, PAGE1_START_ADDR);
   }
-  else if (image.page == 2)
+  else if (image->page == 2)
   {
     display_canvas_image_start_address(display, PAGE2_START_ADDR);
   }
-  else if (image.page == 3)
+  else if (image->page == 3)
   {
     display_canvas_image_start_address(display, PAGE3_START_ADDR);
   }
+  mkdir("/sd/img", 0);
   chdir("/sd/img");
-  FILE *fp = fopen(image.name, "r");
+  FILE *fp = fopen(image->name, "r");
   if (fp == NULL)
   {
-    printf("Error opening file(%s): %d\n", image.name, _geterror());
+    printf("Error opening file(%s): %d\n", image->name, _geterror());
     display_canvas_image_start_address(display, PAGE1_START_ADDR);
     display_active_window_xy(display, 0, 0);
     display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
     return;
   }
 
-  display_put_picture_16bpp(display, image.x0, image.y0, image.width, image.height);
+  display_put_picture_16bpp(display, image->x0, image->y0, image->width, image->height);
   int data;
-  int limit = image.width * image.height * 2;
+  int limit = image->width * image->height * 2;
   int count = 0;
   while ((data = fgetc(fp)) != EOF)
   {
@@ -1548,6 +1550,7 @@ void display_load_image(Display *display, Image image)
 
 void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos)
 {
+  // printf("moving:%s\n", image->name);
   int pageAddr = 0;
   switch (image->page)
   {

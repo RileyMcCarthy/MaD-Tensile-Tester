@@ -45,29 +45,35 @@ static int increment_file_to_string(FILE *json, const char *string)
 static char *float_to_json(const char *name, float value)
 {
     char *json;
-    char floatStr[32]; // Buffer to hold the float as a string
-    sprintf(floatStr, "%f", value);
-    int size = 4 + strlen(name) + strlen(floatStr); //  "":\0 are 4 chars plus strlen(name) and strlen(value)
+    int size = 6 + strlen(name) + 32; //  "":\0 are 4 chars plus strlen(name) and strlen(value)
     json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "\"%s\":%s", name, floatStr);
+    if (json == NULL)
+    {
+        printf("Error: malloc failed\n");
+        return NULL;
+    }
+    sprintf(json, "\"%s\":%f", name, value);
     return json;
 }
 
 static char *int_to_json(const char *name, int value)
 {
     char *json;
-    char intStr[32]; // Buffer to hold the int as a string
-    sprintf(intStr, "%d", value);
-    int size = 4 + strlen(name) + strlen(intStr); //  "":\0 are 4 chars plus strlen(name) and 10 for integer
+    int size = 6 + strlen(name) + 32; //  "":\0 are 4 chars plus strlen(name) and 10 for integer
     json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "\"%s\":%s", name, intStr);
+    sprintf(json, "\"%s\":%d", name, value);
     return json;
 }
 static char *string_to_json(const char *name, const char *value)
 {
     char *json;
-    int size = 6 + strlen(name) + strlen(value); //"":""\0 are 6 chars plus strlen(name,value)
+    int size = 8 + strlen(name) + strlen(value); //"":""\0 are 6 chars plus strlen(name,value)
     json = (char *)malloc(sizeof(char) * size);
+    if (json == NULL)
+    {
+        printf("Error: malloc failed\n");
+        return NULL;
+    }
     sprintf(json, "\"%s\":\"%s\"", name, value);
     return json;
 }
@@ -166,7 +172,7 @@ static float json_property_to_float(FILE *json, const char *name)
     fread(propertyValueString, sizeof(char), strLen, json);
 
     // Convert string to float
-    float propertyValue = atof(propertyValueString);
+    float propertyValue = 5.00; // atof(propertyValueString);
     free(propertyValueString);
 
     // Return file pointer to previous position
@@ -374,6 +380,8 @@ static MachineConfiguration *get_machine_configuration()
     configuration->positionEncoderType = NULL;
     configuration->positionEncoderScaleFactor = 0;
     configuration->forceGauge = NULL;
+    configuration->forceGaugeScaleFactor = 0.0;
+    configuration->forceGaugeZeroFactor = 0;
     return configuration;
 }
 
@@ -422,6 +430,9 @@ static void json_to_machine_configuration(FILE *json, MachineConfiguration *conf
     configuration->load = json_property_to_float(json, "Load");
     configuration->positionEncoderType = json_property_to_string(json, "Position Encoder Type");
     configuration->positionEncoderScaleFactor = json_property_to_int(json, "Position Encoder Scale Factor");
+    configuration->forceGauge = json_property_to_string(json, "Force Gauge");
+    configuration->forceGaugeScaleFactor = json_property_to_float(json, "Force Gauge Scale Factor");
+    configuration->forceGaugeZeroFactor = json_property_to_int(json, "Force Gauge Zero Factor");
 }
 
 /**
@@ -458,44 +469,103 @@ static MotionSet *json_to_motion_set(FILE *json)
 static char *machine_configuration_to_json(MachineConfiguration *configuration)
 {
     char *json;
-    int size = 20; //"Configuration":{}\0, 19 chars plus interior
+    int size = 24; //"Configuration":{}\0, 19 chars plus interior
+    json = (char *)malloc(sizeof(char) * size);
+    strcpy(json, "\"Configuration\":{");
+
     char *motorTypeJSON = string_to_json("Motor Type", configuration->motorType);
     size += strlen(motorTypeJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, motorTypeJSON);
+    free(motorTypeJSON);
+    strcat(json, ",");
+
     char *maxMotorRPMJSON = float_to_json("Max Motor RPM", configuration->maxMotorRPM);
     size += strlen(maxMotorRPMJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, maxMotorRPMJSON);
+    free(maxMotorRPMJSON);
+    strcat(json, ",");
+
     char *maxMotorTorqueJSON = float_to_json("Max Motor Torque", configuration->maxMotorTorque);
     size += strlen(maxMotorTorqueJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, maxMotorTorqueJSON);
+    free(maxMotorTorqueJSON);
+    strcat(json, ",");
+
     char *gearDiameterJSON = float_to_json("Gear Diameter", configuration->gearDiameter);
     size += strlen(gearDiameterJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, gearDiameterJSON);
+    free(gearDiameterJSON);
+    strcat(json, ",");
+
     char *gearPitchJSON = float_to_json("Gear Pitch", configuration->gearPitch);
     size += strlen(gearPitchJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, gearPitchJSON);
+    free(gearPitchJSON);
+    strcat(json, ",");
+
     char *systemInertiaJSON = float_to_json("System Intertia", configuration->systemIntertia);
     size += strlen(systemInertiaJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, systemInertiaJSON);
+    free(systemInertiaJSON);
+    strcat(json, ",");
+
     char *staticTorqueJSON = float_to_json("Static Torque", configuration->staticTorque);
     size += strlen(staticTorqueJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, staticTorqueJSON);
+    free(staticTorqueJSON);
+    strcat(json, ",");
+
     char *loadJSON = float_to_json("Load", configuration->load);
     size += strlen(loadJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, loadJSON);
+    free(loadJSON);
+    strcat(json, ",");
+
     char *encoderTypeJSON = string_to_json("Position Encoder Type", configuration->positionEncoderType);
     size += strlen(encoderTypeJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, encoderTypeJSON);
+    free(encoderTypeJSON);
+    strcat(json, ",");
+
     char *encoderScaleFactorJSON = int_to_json("Position Encoder Scale Factor", configuration->positionEncoderScaleFactor);
     size += strlen(encoderScaleFactorJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, encoderScaleFactorJSON);
+    free(encoderScaleFactorJSON);
+    strcat(json, ",");
+
     char *forceGaugeJSON = string_to_json("Force Gauge", configuration->forceGauge);
     size += strlen(forceGaugeJSON) + 2;
-    json = (char *)malloc(sizeof(char) * size);
-    sprintf(json, "\"Configuration\":{%s,%s,%s,%s,%s,%s,%s,%s,%s,%s}", motorTypeJSON, maxMotorRPMJSON, maxMotorTorqueJSON,
-            gearDiameterJSON, gearPitchJSON, systemInertiaJSON, staticTorqueJSON, loadJSON, encoderTypeJSON,
-            encoderScaleFactorJSON, forceGaugeJSON);
-    free(motorTypeJSON);
-    free(maxMotorRPMJSON);
-    free(maxMotorTorqueJSON);
-    free(gearDiameterJSON);
-    free(gearPitchJSON);
-    free(systemInertiaJSON);
-    free(staticTorqueJSON);
-    free(loadJSON);
-    free(encoderTypeJSON);
-    free(encoderScaleFactorJSON);
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, forceGaugeJSON);
     free(forceGaugeJSON);
+    strcat(json, ",");
+
+    char *forceGaugeScaleFactorJSON = int_to_json("Force Gauge Scale Factor", (int)configuration->forceGaugeScaleFactor);
+    printf("Force Scalle: %s\n", forceGaugeScaleFactorJSON);
+    size += strlen(forceGaugeScaleFactorJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, forceGaugeScaleFactorJSON);
+    free(forceGaugeScaleFactorJSON);
+    strcat(json, ",");
+
+    char *forceGaugeZeroFactorJSON = int_to_json("Force Gauge Zero Factor", configuration->forceGaugeZeroFactor);
+    printf("Force Scalle: %s\n", forceGaugeZeroFactorJSON);
+    size += strlen(forceGaugeZeroFactorJSON) + 2;
+    json = (char *)realloc(json, sizeof(char) * size);
+    strcat(json, forceGaugeZeroFactorJSON);
+    free(forceGaugeZeroFactorJSON);
+    strcat(json, "}");
+
     return json;
 }
 
@@ -633,7 +703,7 @@ Error machine_profile_to_json(MachineProfile *settings, FILE *file)
 {
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file\n");
         return JSON_FILE_ERROR;
     }
 
@@ -644,9 +714,11 @@ Error machine_profile_to_json(MachineProfile *settings, FILE *file)
     fprintf(file, "%s,", numberJSON);
     free(numberJSON);
     char *configurationJSON = machine_configuration_to_json(settings->configuration);
+    printf("Configuration:%s\n", configurationJSON);
     fprintf(file, "%s,", configurationJSON);
     free(configurationJSON);
     char *performanceJSON = machine_performance_to_json(settings->performance);
+    printf("Performance:%s\n", performanceJSON);
     fprintf(file, "%s}", performanceJSON);
     free(performanceJSON);
     return SUCCESS;
@@ -812,16 +884,22 @@ Error motion_set_to_json(MotionSet *set, FILE *file)
  */
 MachineProfile *json_to_machine_profile(FILE *json)
 {
-
+    if (json == NULL)
+    {
+        printf("Error opening file\n");
+        return NULL;
+    }
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(json, "Name");
     settings->number = json_property_to_int(json, "Number");
+    printf("Name%s,number:%d\n", settings->name, settings->number);
     // Determine size of pattern string and create it
     increment_file_to_string(json, "\"Configuration\":");
     json_to_machine_configuration(json, settings->configuration);
-
+    printf("Configuration:%s\n", settings->configuration->forceGauge);
     increment_file_to_string(json, "\"Performance\":");
     json_to_machine_performance(json, settings->performance);
+    printf("performance:%d\n", settings->performance->forceGaugeNeutralOffset);
     return settings;
 }
 

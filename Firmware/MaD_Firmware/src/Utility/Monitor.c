@@ -1,5 +1,5 @@
 #include "Monitor.h"
-static long stack[64];
+static long monitor_stack[64];
 
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
@@ -39,7 +39,7 @@ bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, int sam
     monitor->dyn4 = dyn4;
     monitor->forceGauge = forceGauge;
     monitor->sampleRate = sampleRate;
-    monitor->cogid = _cogstart_C(monitor_cog, monitor, &stack[0], sizeof(long) * 64);
+    monitor->cogid = _cogstart_C(monitor_cog, monitor, &monitor_stack[0], sizeof(long) * 64);
     if (monitor->cogid != -1)
     {
         return true;

@@ -1,5 +1,5 @@
 #include "Control.h"
-static long stack[64];
+static long control_stack[64];
 
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(Control *control)
@@ -152,7 +152,7 @@ bool control_begin(Control *control, MachineProfile *machineProfile, MonitorData
     control->testProfile = NULL;
     control->navkey = navkey;
     control->dyn4 = dyn4;
-    control->cogid = _cogstart_C(control_cog, control, &stack[0], sizeof(long) * 64);
+    control->cogid = _cogstart_C(control_cog, control, &control_stack[0], sizeof(long) * 64);
     if (control->cogid != -1)
     {
         return true;

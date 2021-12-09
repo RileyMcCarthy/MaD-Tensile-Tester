@@ -1,8 +1,7 @@
 #include "keyboard.h"
 #define BUTTONCOUNT 47
 
-enum keys
-{
+static enum keys {
     key_0,
     key_1,
     key_2,
@@ -63,169 +62,168 @@ enum keys
  * @param key The Button that was pressed
  * @returns if submit was pressed
  */
-static bool check_buttons(Display *display, Button *keys, char **bufferPtr)
+static bool check_buttons(Keyboard *keyboard)
 {
-    char *buffer = *bufferPtr;
-    if (display_update_buttons(display, keys, BUTTONCOUNT) > 0)
+    if (display_update_buttons(keyboard->display, keyboard->keys, BUTTONCOUNT) > 0)
     {
         printf("bvutton pressed\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
-            if (keys[i].pressed)
+            if (keyboard->keys[i].pressed)
             {
-                int size = strlen(buffer) + 2;
+                int size = strlen(keyboard->keyboard_buffer) + 2;
                 printf("new size:%d\n", size);
-                buffer = (char *)realloc(buffer, size);
-                switch (keys[i].name)
+                keyboard->keyboard_buffer = (char *)realloc(keyboard->keyboard_buffer, size);
+                switch (keyboard->keys[i].name)
                 {
                 case key_0:
-                    strcat(buffer, "0");
+                    strcat(keyboard->keyboard_buffer, "0");
                     break;
                 case key_1:
-                    strcat(buffer, "1");
+                    strcat(keyboard->keyboard_buffer, "1");
                     break;
                 case key_2:
-                    strcat(buffer, "2");
+                    strcat(keyboard->keyboard_buffer, "2");
                     break;
                 case key_3:
-                    strcat(buffer, "3");
+                    strcat(keyboard->keyboard_buffer, "3");
                     break;
                 case key_4:
-                    strcat(buffer, "4");
+                    strcat(keyboard->keyboard_buffer, "4");
                     break;
                 case key_5:
-                    strcat(buffer, "5");
+                    strcat(keyboard->keyboard_buffer, "5");
                     break;
                 case key_6:
-                    strcat(buffer, "6");
+                    strcat(keyboard->keyboard_buffer, "6");
                     break;
                 case key_7:
-                    strcat(buffer, "7");
+                    strcat(keyboard->keyboard_buffer, "7");
                     break;
                 case key_8:
-                    strcat(buffer, "8");
+                    strcat(keyboard->keyboard_buffer, "8");
                     break;
                 case key_9:
-                    strcat(buffer, "9");
+                    strcat(keyboard->keyboard_buffer, "9");
                     break;
                 case key_tab:
-                    strcat(buffer, "\t");
+                    strcat(keyboard->keyboard_buffer, "\t");
                     break;
                 case key_q:
-                    strcat(buffer, "Q");
+                    strcat(keyboard->keyboard_buffer, "Q");
                     break;
                 case key_w:
-                    strcat(buffer, "W");
+                    strcat(keyboard->keyboard_buffer, "W");
                     break;
                 case key_e:
-                    strcat(buffer, "E");
+                    strcat(keyboard->keyboard_buffer, "E");
                     break;
                 case key_r:
-                    strcat(buffer, "R");
+                    strcat(keyboard->keyboard_buffer, "R");
                     break;
                 case key_t:
-                    strcat(buffer, "T");
+                    strcat(keyboard->keyboard_buffer, "T");
                     break;
                 case key_y:
-                    strcat(buffer, "Y");
+                    strcat(keyboard->keyboard_buffer, "Y");
                     break;
                 case key_u:
-                    strcat(buffer, "U");
+                    strcat(keyboard->keyboard_buffer, "U");
                     break;
                 case key_i:
-                    strcat(buffer, "I");
+                    strcat(keyboard->keyboard_buffer, "I");
                     break;
                 case key_o:
-                    strcat(buffer, "O");
+                    strcat(keyboard->keyboard_buffer, "O");
                     break;
                 case key_p:
-                    strcat(buffer, "P");
+                    strcat(keyboard->keyboard_buffer, "P");
                     break;
                 case key_caps:
                     break;
                 case key_a:
-                    strcat(buffer, "A");
+                    strcat(keyboard->keyboard_buffer, "A");
                     break;
                 case key_s:
-                    strcat(buffer, "S");
+                    strcat(keyboard->keyboard_buffer, "S");
                     break;
                 case key_d:
-                    strcat(buffer, "D");
+                    strcat(keyboard->keyboard_buffer, "D");
                     break;
                 case key_f:
-                    strcat(buffer, "F");
+                    strcat(keyboard->keyboard_buffer, "F");
                     break;
                 case key_g:
-                    strcat(buffer, "G");
+                    strcat(keyboard->keyboard_buffer, "G");
                     break;
                 case key_h:
-                    strcat(buffer, "H");
+                    strcat(keyboard->keyboard_buffer, "H");
                     break;
                 case key_j:
-                    strcat(buffer, "J");
+                    strcat(keyboard->keyboard_buffer, "J");
                     break;
                 case key_k:
-                    strcat(buffer, "K");
+                    strcat(keyboard->keyboard_buffer, "K");
                     break;
                 case key_l:
-                    strcat(buffer, "L");
+                    strcat(keyboard->keyboard_buffer, "L");
                     break;
                 case key_del:
-                    if (strlen(buffer) <= 0)
+                    if (strlen(keyboard->keyboard_buffer) <= 0)
                         break;
-                    buffer[strlen(buffer) - 1] = '\0';
-                    buffer = (char *)realloc(buffer, strlen(buffer) + 1);
+                    keyboard->keyboard_buffer[strlen(keyboard->keyboard_buffer) - 1] = '\0';
+                    keyboard->keyboard_buffer = (char *)realloc(keyboard->keyboard_buffer, strlen(keyboard->keyboard_buffer) + 1);
                     break;
                 case key_shift:
                     break;
                 case key_z:
-                    strcat(buffer, "Z");
+                    strcat(keyboard->keyboard_buffer, "Z");
                     break;
                 case key_x:
-                    strcat(buffer, "X");
+                    strcat(keyboard->keyboard_buffer, "X");
                     break;
                 case key_c:
-                    strcat(buffer, "C");
+                    strcat(keyboard->keyboard_buffer, "C");
                     break;
                 case key_v:
-                    strcat(buffer, "V");
+                    strcat(keyboard->keyboard_buffer, "V");
                     break;
                 case key_b:
-                    strcat(buffer, "B");
+                    strcat(keyboard->keyboard_buffer, "B");
                     break;
                 case key_n:
-                    strcat(buffer, "N");
+                    strcat(keyboard->keyboard_buffer, "N");
                     break;
                 case key_m:
-                    strcat(buffer, "M");
+                    strcat(keyboard->keyboard_buffer, "M");
                     break;
                 case key_comma:
-                    strcat(buffer, ",");
+                    strcat(keyboard->keyboard_buffer, ",");
                     break;
                 case key_period:
-                    strcat(buffer, ".");
+                    strcat(keyboard->keyboard_buffer, ".");
                     break;
                 case key_cancel:
-                    buffer = NULL;
-                    return true;
+                    keyboard->keyboard_buffer = NULL;
+                    keyboard->keyboard_complete = true;
                     break;
                 case key_left:
                     break;
                 case key_space:
-                    strcat(buffer, " ");
+                    strcat(keyboard->keyboard_buffer, " ");
                     break;
                 case key_right:
                     break;
                 case key_submit:
-                    return true;
+                    keyboard->keyboard_complete = true;
                     break;
                 default:
                     break;
                 }
+                return true;
             }
         }
     }
-    *bufferPtr = buffer;
     return false;
 }
 
@@ -247,31 +245,48 @@ static void createKey(Button *button, int name, int xmin, int ymin, float keySiz
     button->ymin = ymin;
     button->ymax = button->ymin + (int)(54.0 * keySize);
     button->pressed = false;
+    button->debounceTimems = 100;
     button->lastPress = 0;
+}
+
+Keyboard *keyboard_create(Display *display, Images *images)
+{
+    Keyboard *keyboard = (Keyboard *)malloc(sizeof(Keyboard));
+    keyboard->display = display;
+    keyboard->images = images;
+    keyboard->keyboard_buffer = NULL;
+    keyboard->keyboard_complete = false;
+    return keyboard;
+}
+void keyboard_destroy(Keyboard *keyboard)
+{
+    free(keyboard->keyboard_buffer);
+    free(keyboard);
 }
 
 /**
  * @brief Gets user input using on display keyboard
  *
- * @param input String buffer for user input
+ * @param input String keyboard_buffer for user input
  */
-char *keyboard_get_input(Display *display, const char *prompt)
+char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
 {
-    Image *keyboard = image_get_keyboard();
+    Image *keyboard = keyboardObj->images->keyboardImage;
+    int topBarSize = 32;
+    keyboardObj->keyboard_buffer = (char *)malloc(sizeof(char));
+    strcpy(keyboardObj->keyboard_buffer, "");
 
-    // display_load_image(display, keyboard);
-    printf("Loaded\n");
-    char *buffer = (char *)malloc(sizeof(char));
-    strcpy(buffer, "");
+    display_text_color(keyboardObj->display, COLOR65K_WHITE, COLOR65K_BLUE);
+    display_set_text_parameter1(keyboardObj->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(keyboardObj->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
-    display_text_color(display, COLOR65K_WHITE, COLOR65K_BLUE);
-    display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    display_bte_memory_copy(keyboardObj->display, PAGE1_START_ADDR, SCREEN_WIDTH, keyboard->x0, keyboard->y0 - topBarSize, PAGE3_START_ADDR, SCREEN_WIDTH, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
     for (int i = 0; i < keyboard->height; i += 10)
     {
-        display_bte_memory_copy_image(display, keyboard, keyboard->x0, SCREEN_HEIGHT - i);
+        display_bte_memory_copy_image(keyboardObj->display, keyboard, keyboard->x0, SCREEN_HEIGHT - i);
     }
-    display_bte_memory_copy_image(display, keyboard, keyboard->x0, keyboard->y0);
+    display_bte_memory_copy_image(keyboardObj->display, keyboard, keyboard->x0, keyboard->y0);
     Button keys[BUTTONCOUNT];
     createKey(&keys[0], key_1, keyboard->x0 + 823, keyboard->y0 + 148, 1);
     createKey(&keys[1], key_2, keyboard->x0 + 891, keyboard->y0 + 148, 1);
@@ -325,26 +340,27 @@ char *keyboard_get_input(Display *display, const char *prompt)
     createKey(&keys[45], key_right, keyboard->x0 + 607, keyboard->y0 + 216, 1.25);
     createKey(&keys[46], key_submit, keyboard->x0 + 702, keyboard->y0 + 216, 2);
 
-    bool complete = false;
-    char *lastString = NULL;
-    while (!complete)
+    keyboardObj->keys = keys;
+
+    keyboardObj->keyboard_complete = false;
+    bool initial = true;
+    while (!keyboardObj->keyboard_complete)
     {
-        complete = check_buttons(display, keys, &buffer);
-        if (strcmp(lastString, buffer) != 0)
+        if (check_buttons(keyboardObj) || initial)
         {
-            printf("updating stringh:%s\n", buffer);
-            char *temp = malloc(sizeof(char) * (strlen(buffer) + strlen(prompt) + 2));
+            initial = false;
+            char *temp = malloc(sizeof(char) * (strlen(keyboardObj->keyboard_buffer) + strlen(prompt) + 2));
             strcpy(temp, prompt);
-            strcat(temp, buffer);
-            display_draw_square_fill(display, keyboard->x0, keyboard->y0 - 32, keyboard->x0 + keyboard->width, keyboard->y0, COLOR65K_GRAYSCALE30);
-            display_text_color(display, COLOR65K_WHITE, COLOR65K_GRAYSCALE30);
-            display_draw_string(display, SCREEN_WIDTH / 2 - strlen(temp) * 16, keyboard->y0 - 32, temp);
+            strcat(temp, keyboardObj->keyboard_buffer);
+            display_draw_square_fill(keyboardObj->display, keyboard->x0, keyboard->y0 - topBarSize, keyboard->x0 + keyboard->width, keyboard->y0, COLOR65K_GRAYSCALE30);
+            display_text_color(keyboardObj->display, COLOR65K_WHITE, COLOR65K_GRAYSCALE30);
+            display_draw_string(keyboardObj->display, SCREEN_WIDTH / 2 - strlen(temp) * 8, keyboard->y0 - topBarSize, temp);
             free(temp);
-            lastString = (char *)realloc(lastString, sizeof(char) * (strlen(buffer) + 1));
-            strcpy(lastString, buffer);
         }
     }
+    display_bte_memory_copy(keyboardObj->display, PAGE3_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, keyboard->x0, keyboard->y0 - topBarSize, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    free(lastString);
-    return buffer;
+    char *toReturn = (char *)malloc(sizeof(char) * (strlen(keyboardObj->keyboard_buffer) + 1));
+    strcpy(toReturn, keyboardObj->keyboard_buffer);
+    return toReturn;
 }
