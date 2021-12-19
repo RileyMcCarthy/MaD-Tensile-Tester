@@ -19,13 +19,11 @@ static char *get_string_from_index(FILE *file, int start, int end)
 
 static int increment_file_to_string(FILE *json, const char *string)
 {
-    int c;
+    int temp;
     int position = 0;
-    // printf("Incrementing to %s\n\n", string);
-    while ((c = fgetc(json)) != EOF)
+    while ((temp = fgetc(json)) != EOF)
     {
-        c = (char)c;
-        //   printf("%c", c);
+        char c = (char)temp;
         if (c == string[position])
         {
             if (position == strlen(string) - 1)
@@ -82,10 +80,10 @@ static char *json_property_to_string(FILE *json, const char *name)
 {
     int startPosition = ftell(json);
 
-    int size = strlen(name) + 5; // "":" \0, 4 chars plus interior
+    int size = strlen(name) + 6; // "":" \0, 4 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":\"", name);
-
+    printf("Pattern: %s\n", pattern);
     // read json file until pattern string is matched
     int strStart = increment_file_to_string(json, pattern);
     free(pattern);
@@ -151,7 +149,7 @@ static float json_property_to_float(FILE *json, const char *name)
     int startPosition = ftell(json);
 
     // Determine size of pattern string and create it
-    int size = strlen(name) + 4; // "": \0, 4 chars plus interior
+    int size = strlen(name) + 6; // "": \0, 4 chars plus interior
     char *pattern = (char *)malloc(sizeof(char) * size);
     sprintf(pattern, "\"%s\":", name);
 
@@ -172,7 +170,7 @@ static float json_property_to_float(FILE *json, const char *name)
     fread(propertyValueString, sizeof(char), strLen, json);
 
     // Convert string to float
-    float propertyValue = 5.00; // atof(propertyValueString);
+    float propertyValue = atof(propertyValueString);
     free(propertyValueString);
 
     // Return file pointer to previous position
@@ -550,7 +548,7 @@ static char *machine_configuration_to_json(MachineConfiguration *configuration)
     free(forceGaugeJSON);
     strcat(json, ",");
 
-    char *forceGaugeScaleFactorJSON = int_to_json("Force Gauge Scale Factor", (int)configuration->forceGaugeScaleFactor);
+    char *forceGaugeScaleFactorJSON = float_to_json("Force Gauge Scale Factor", configuration->forceGaugeScaleFactor);
     printf("Force Scalle: %s\n", forceGaugeScaleFactorJSON);
     size += strlen(forceGaugeScaleFactorJSON) + 2;
     json = (char *)realloc(json, sizeof(char) * size);
@@ -876,6 +874,43 @@ Error motion_set_to_json(MotionSet *set, FILE *file)
     return SUCCESS;
 }
 
+static void json_print_machine_configuration(MachineConfiguration *configuration)
+{
+    printf("Machine Configuration:\n");
+    printf("    Motor Type: %s\n", configuration->motorType);
+    printf("    maxMotorTorque: %f\n", configuration->maxMotorTorque);
+    printf("    maxMotorRPM: %f\n", configuration->maxMotorRPM);
+    printf("    gearPitch: %f\n", configuration->gearPitch);
+    printf("    systemIntertia: %f\n", configuration->systemIntertia);
+    printf("    staticTorque: %f\n", configuration->staticTorque);
+    printf("    load: %f\n", configuration->load);
+    printf("    positionEncoderType: %s\n", configuration->positionEncoderType);
+    printf("    positionEncoderScaleFactor: %d\n", configuration->positionEncoderScaleFactor);
+    printf("    forceGauge: %s\n", configuration->forceGauge);
+    printf("    forceGaugeScaleFactor: %f\n", configuration->forceGaugeScaleFactor);
+    printf("    forceGaugeZeroFactor: %d\n", configuration->forceGaugeZeroFactor);
+}
+
+static void json_print_machine_performance(MachinePerformance *performance)
+{
+    printf("Machine performance:\n");
+    printf("    minPosition: %f\n", performance->minPosition);
+    printf("    maxPosition: %f\n", performance->maxPosition);
+    printf("    maxVelocity: %f\n", performance->maxVelocity);
+    printf("    maxAcceleration: %f\n", performance->maxAcceleration);
+    printf("    maxForceTensile: %f\n", performance->maxForceTensile);
+    printf("    maxForceCompression: %f\n", performance->maxForceCompression);
+    printf("    forceGaugeNeutralOffset: %f\n", performance->forceGaugeNeutralOffset);
+}
+
+void json_print_machine_profile(MachineProfile *profile)
+{
+    printf("Name:%s\n", profile->name);
+    printf("Number:%d\n", profile->number);
+    json_print_machine_configuration(profile->configuration);
+    json_print_machine_performance(profile->performance);
+}
+
 /**
  * @brief Converts JSON string to a MachineProfile structure.
  *
@@ -889,17 +924,15 @@ MachineProfile *json_to_machine_profile(FILE *json)
         printf("Error opening file\n");
         return NULL;
     }
+    fseek(json, 0, SEEK_SET);
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(json, "Name");
     settings->number = json_property_to_int(json, "Number");
-    printf("Name%s,number:%d\n", settings->name, settings->number);
     // Determine size of pattern string and create it
     increment_file_to_string(json, "\"Configuration\":");
     json_to_machine_configuration(json, settings->configuration);
-    printf("Configuration:%s\n", settings->configuration->forceGauge);
     increment_file_to_string(json, "\"Performance\":");
     json_to_machine_performance(json, settings->performance);
-    printf("performance:%d\n", settings->performance->forceGaugeNeutralOffset);
     return settings;
 }
 

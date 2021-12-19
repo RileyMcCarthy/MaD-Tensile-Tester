@@ -117,6 +117,8 @@ SampleProfile *json_to_sample_profile(FILE *file);
 TestProfile *json_to_test_profile(FILE *file);
 MotionQuartet *json_to_motion_quartet(FILE *file);
 
+void json_print_machine_profile(MachineProfile *profile);
+
 void free_machine_profile(MachineProfile *settings);
 void free_sample_profile(SampleProfile *sample);
 void free_test_profile(TestProfile *test);
