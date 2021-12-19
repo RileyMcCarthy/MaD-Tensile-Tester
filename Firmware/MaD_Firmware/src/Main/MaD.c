@@ -14,19 +14,21 @@ static void write_machine_profile(MachineProfile *profile)
   {
     printf("Writing machine profile to settings file\n");
     machine_profile_to_json(profile, file);
-    fclose(file);
   }
+  fclose(file);
 }
 
 static MachineProfile *load_machine_profile()
 {
   // Check for machine profile in filesystem
   chdir("/sd/settings");
-  FILE *jsonFile = fopen("Default1.mcp", "r");
-  if (jsonFile != NULL)
+  // FILE *jsonFile = fopen("Default.mcp", "r+");
+  if (access("Default.mcp", F_OK) == 0)
   {
+    FILE *jsonFile = fopen("Default.mcp", "r");
     printf("Loading machine profile from settings file\n");
-    MachineProfile *profile = json_to_machine_profile(jsonFile);
+    MachineProfile *profile = get_machine_profile(); // json_to_machine_profile(jsonFile);
+    json_print_machine_profile(profile);
     fclose(jsonFile);
     return profile;
   }
@@ -57,8 +59,8 @@ static MachineProfile *load_machine_profile()
   char *forceGauge = "DS2-5N";
   profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);
   strcpy(profile->configuration->forceGauge, forceGauge);
-  profile->configuration->forceGaugeScaleFactor = 0.0012;
-  profile->configuration->forceGaugeZeroFactor = 1245432;
+  profile->configuration->forceGaugeScaleFactor = 1.0;
+  profile->configuration->forceGaugeZeroFactor = 0;
 
   // MachinePerformance
   profile->performance->minPosition = 0.01;
@@ -130,13 +132,15 @@ void mad_begin()
   }
 
   loading_overlay_display(display, "Display Initialized!", OVERLAY_TYPE_LOADING);
+
+  MachineProfile *machineProfile = load_machine_profile();
+
   Images *images = create_images();
 
   // Load Assets from SD card
   printf("Testingh:%s\n", images->statusPageImage->name);
   image_load_assets(images, display);
   printf("after load%s\n", images->statusPageImage->name);
-  MachineProfile *machineProfile = load_machine_profile();
 
   // Start NavKey
   NavKey *navkey = start_navkey();
@@ -185,8 +189,14 @@ void mad_begin()
 
   // Connect Force Gauge
   ForceGauge *forceGauge = force_gauge_create();
-  force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402);
-  loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402) == SUCCESS)
+  {
+    loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "Force Gauge Failed to Connect", OVERLAY_TYPE_LOADING);
+  }
 
   // Start motion control (needs state machine,encoder, dyn4, rtc, forcegauge), responsible for constantly
   // gather information from encoder,dyn4,rtc,forcegauge, and update/log data

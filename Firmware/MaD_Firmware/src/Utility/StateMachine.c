@@ -156,6 +156,7 @@ static MachineState *get_machine_state()
 MachineState *state_machine_run()
 {
     MachineState *machineState = get_machine_state();
+    return machineState;
     machineState->cogid = _cogstart_C(state_machine_cog, machineState, &state_stack[0], sizeof(long) * 64);
     if (machineState->cogid != -1)
     {

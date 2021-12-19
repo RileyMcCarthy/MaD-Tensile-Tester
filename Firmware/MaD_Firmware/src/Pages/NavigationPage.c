@@ -157,6 +157,18 @@ Pages navigation_page_run(NavigationPage *page)
     {
         check_buttons(page);
         // clock.render();
+        void *temp = malloc(1);
+        if (temp == NULL)
+        {
+            printf("malloc failed\n");
+            return;
+        }
+        else
+        {
+            printf("Memory:%d\n", temp);
+            free(temp);
+        }
+        _waitms(100);
     }
     return page->newPage;
 }

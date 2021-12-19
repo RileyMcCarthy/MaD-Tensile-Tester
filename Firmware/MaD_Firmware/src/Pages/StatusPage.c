@@ -66,6 +66,7 @@ void status_page_destroy(StatusPage *page)
 
 void status_page_run(StatusPage *page)
 {
+
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
@@ -85,7 +86,7 @@ void status_page_run(StatusPage *page)
     display_draw_circle_square_fill(page->display, machineStateX0, machineStateY0, machineStateX1, machineStateY1, 20, 20, MAINCOLOR);
 
     /*Main headers*/
-    char buf[50];
+    char buf[100];
     strcpy(buf, "Machine State");
     int machineStateStartX = machineStateX0 + machineStateWidth / 2 - strlen(buf) * 8;
     int machineStateStartY = 40;
@@ -461,5 +462,18 @@ void status_page_run(StatusPage *page)
             y += 30;
         }
         // clock.render();
+
+        void *temp = malloc(1);
+        if (temp == NULL)
+        {
+            printf("malloc failed\n");
+            return;
+        }
+        else
+        {
+            printf("Memory:%d\n", temp);
+            free(temp);
+        }
+        _waitms(100);
     }
 }

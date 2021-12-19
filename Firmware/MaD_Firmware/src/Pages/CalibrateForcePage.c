@@ -276,6 +276,7 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
         display_draw_string(page->display, forceRealStartX, forceRealStartY, buf);
 
         lastState = page->state;
+        _waitms(100);
     }
 
     page->stateMachine->machineCheckParameters.machineReady = isMachineReady;
