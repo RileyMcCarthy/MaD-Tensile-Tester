@@ -8,12 +8,13 @@
 #include "ForceGauge.h"
 #include "Keyboard.h"
 #include "JSON.h"
+#include "Monitor.h"
 
 typedef struct CalibrateForcePage_s
 {
     bool complete;
     Display *display;
-    MachineState *stateMachine;
+    Monitor *monitor;
     ForceGauge *forceGauge;
     Button *buttons;
     MachineProfile *machineProfile;
@@ -21,7 +22,7 @@ typedef struct CalibrateForcePage_s
     int state;
 } CalibrateForcePage;
 
-CalibrateForcePage *calibrate_force_page_create(Display *display, MachineState *machineState, ForceGauge *forceGauge, Images *images);
+CalibrateForcePage *calibrate_force_page_create(Display *display, Monitor *monitor, ForceGauge *forceGauge, Images *images);
 void calibrate_force_page_destroy(CalibrateForcePage *page);
 bool calibrate_force_page_run(CalibrateForcePage *page);
 

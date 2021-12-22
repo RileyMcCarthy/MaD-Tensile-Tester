@@ -4,6 +4,9 @@
 #include <simpletools.h>
 #include <stdbool.h>
 
+#define DIRA 0x00
+#define DIRB 0x01
+
 #define MCP23017_INPUT 0x1
 #define MCP23017_OUTPUT 0x0
 #define MCP23017_INPUT_PULLUP 0x2
@@ -28,18 +31,18 @@ void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
 
 /**
  * @brief sets the direction of the pins
- * 
- * @param mcp23017 
+ *
+ * @param mcp23017
  * @param pin the pin to set
  * @param direction 0: output, 1: input
  */
-void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction);
-uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin);
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction);
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint8_t reg, uint16_t pin);
 
-void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t output);
-uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin);
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
 
-void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t output);
-uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin);
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
 
 #endif

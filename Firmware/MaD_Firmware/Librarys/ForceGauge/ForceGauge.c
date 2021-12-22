@@ -68,9 +68,7 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int z
 
     forceGauge->interpolationSlope = slope;
     forceGauge->interpolationZero = zero;
-    // uart_start(&(forceGauge->serial), rx, tx, 2, 57600); @todo implement serial
-    // uart_write(&(forceGauge->serial), 0x55); //Synchronization word
-    // uart_write(&(forceGauge->serial), 0x06); //Reset
+
     forceGauge->serial.start(rx, tx, 3, 19200);
     forceGauge->serial.tx(0x55); // Synchronization word
     forceGauge->serial.tx(0x06); // Reset
@@ -100,28 +98,13 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int z
 
 int force_gauge_get_force(ForceGauge *forceGauge)
 {
-    forceGauge->serial.rxflush();
-    int dready = read_register(forceGauge, CONFIG_2);
-    printf("Ready:%d\n", dready);
-    if ((dready & 0b10000000) != 0b10000000)
-    {
-        return 0;
-    }
+    int forceRaw = force_gauge_get_raw(forceGauge);
+    return force_gauge_raw_to_force(forceGauge, forceRaw);
+}
 
-    forceGauge->serial.tx(0x55);
-    forceGauge->serial.tx(0x10); // Send RData command
-    int counter = forceGauge->serial.rxtime(100);
-    printf("Count:%d\n", counter);
-    int forceRaw = forceGauge->serial.rxtime(100);
-    forceRaw |= forceGauge->serial.rxtime(100) << 8;
-    forceRaw |= forceGauge->serial.rxtime(100) << 16;
-    if (forceRaw == -1)
-    {
-        printf("Force read timeout\n");
-        return forceRaw;
-    }
-    int force = (forceRaw - forceGauge->interpolationZero) / forceGauge->interpolationSlope;
-    return force;
+int force_gauge_raw_to_force(ForceGauge *forceGauge, int raw)
+{
+    return (raw - forceGauge->interpolationZero) / forceGauge->interpolationSlope;
 }
 
 int force_gauge_get_raw(ForceGauge *forceGauge)
@@ -131,7 +114,7 @@ int force_gauge_get_raw(ForceGauge *forceGauge)
 
     if ((dready & 0b10000000) != 0b10000000)
     {
-        return 0;
+        return NULL;
     }
 
     forceGauge->serial.tx(0x55);

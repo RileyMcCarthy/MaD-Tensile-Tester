@@ -8,7 +8,9 @@
 #include "Error.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "tiny-json.h"
 
+#define MACHINE_CONFIGURATION_FIELD_COUNT 13
 typedef struct MachineConfiguration_s
 {
     char *motorType;                // Motor used for the machine (model)
@@ -26,6 +28,7 @@ typedef struct MachineConfiguration_s
     int forceGaugeZeroFactor;       // Force offset (steps)
 } MachineConfiguration;
 
+#define MACHINE_PERFORMANCE_FIELD_COUNT 7
 typedef struct MachinePerformance_s
 {
     float minPosition;             // Minimum position of the motor (mm)
@@ -37,6 +40,7 @@ typedef struct MachinePerformance_s
     float forceGaugeNeutralOffset; // Force gauge neutral offset (N)
 } MachinePerformance;
 
+#define MACHINE_PROFILE_FIELD_COUNT MACHINE_PERFORMANCE_FIELD_COUNT + MACHINE_CONFIGURATION_FIELD_COUNT + 2
 typedef struct MachineProfile_s
 {
     char *name; // Name of the machine profile
@@ -46,6 +50,7 @@ typedef struct MachineProfile_s
 
 } MachineProfile;
 
+#define MOTION_QUARTET_FIELD_COUNT 7
 typedef struct MotionQuartet_s
 {
     char *name;         // Name of the motion quartet

@@ -1,5 +1,4 @@
 #include "MCP23017.h"
-
 // registers
 #define REG_IODIRA 0x00 // Direction Register A
 #define REG_IPOLA 0x02  // Polarity Register A
@@ -12,7 +11,6 @@
 #define REG_GPPUB 0x0D  // Pull-up Register B
 #define REG_GPIOB 0x13  // I/O Register B
 #define REG_OLATB 0x15  // Output latch register B
-
 /*Private functions*/
 static uint8_t read_register(MCP23017 *mcp23017, uint8_t addr)
 {
@@ -65,78 +63,85 @@ void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
 }
 
-void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t direction)
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction)
 {
-    int reg = REG_IODIRB;
-    if (pin > 7)
-    { // register B
-        reg = REG_IODIRA;
-        pin -= 8;
-    }
 
+    if (reg == DIRA)
+    {
+        reg = REG_IODIRA;
+    }
+    else
+    {
+        reg = REG_IODIRB;
+    }
     int value = read_register(mcp23017, reg);
     bitWrite(value, pin, direction);
     bool ack = write_register(mcp23017, reg, value);
 }
 
-uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 {
-    int reg = REG_IODIRB;
-    if (pin > 7)
-    { // register B
+    if (reg == DIRA)
+    {
         reg = REG_IODIRA;
-        pin -= 8;
+    }
+    else
+    {
+        reg = REG_IODIRB;
     }
     return bitRead(read_register(mcp23017, reg), pin);
 }
 
-void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 {
-    pin--;
-    int reg = REG_GPIOB;
-    if (pin > 7)
-    { // register B
+    if (reg == DIRA)
+    {
         reg = REG_GPIOA;
-        pin -= 8;
     }
-
+    else
+    {
+        reg = REG_GPIOB;
+    }
     int value = read_register(mcp23017, reg);
     bitWrite(value, pin, state);
     write_register(mcp23017, reg, value);
 }
-uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 {
-    pin--;
-    int reg = REG_GPIOB;
-    if (pin > 7)
-    { // register B
+    if (reg == DIRA)
+    {
         reg = REG_GPIOA;
-        pin -= 8;
+    }
+    else
+    {
+        reg = REG_GPIOB;
     }
     return bitRead(read_register(mcp23017, reg), pin);
 }
 
-void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t state)
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 {
-    int reg = REG_IPOLB;
-    if (pin > 7)
-    { // register B
+    if (reg == DIRA)
+    {
         reg = REG_IPOLA;
-        pin -= 8;
     }
-
+    else
+    {
+        reg = REG_IPOLB;
+    }
     int value = read_register(mcp23017, reg);
     bitWrite(value, pin, state);
     write_register(mcp23017, reg, value);
 }
-uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin)
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 {
-    int reg = REG_IPOLA;
-    if (pin > 7)
-    { // register B
-        reg = REG_IPOLB;
-        pin -= 8;
+    if (reg == DIRA)
+    {
+        reg = REG_IPOLA;
     }
-
+    else
+    {
+        reg = REG_IPOLB;
+    }
     return bitRead(read_register(mcp23017, reg), pin);
 }

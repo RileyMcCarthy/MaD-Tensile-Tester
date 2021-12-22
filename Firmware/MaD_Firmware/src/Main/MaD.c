@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include "MCP23017.h"
+#include "tiny-json.h"
 #include "Images.h"
 
 static void write_machine_profile(MachineProfile *profile)
@@ -27,7 +28,8 @@ static MachineProfile *load_machine_profile()
   {
     FILE *jsonFile = fopen("Default.mcp", "r");
     printf("Loading machine profile from settings file\n");
-    MachineProfile *profile = get_machine_profile(); // json_to_machine_profile(jsonFile);
+    MachineProfile *profile = json_to_machine_profile(jsonFile);
+
     json_print_machine_profile(profile);
     fclose(jsonFile);
     return profile;
@@ -113,6 +115,29 @@ static NavKey *start_navkey()
   return navkey;
 }
 
+static void test_mcp23017()
+{
+  MCP23017 *mcp = mcp23017_create();
+  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+
+  printf("MCP23017 begin\n");
+  int pin = 4;
+  mcp_set_direction(mcp, pin, DIRA, 1); // zero is output
+  printf("Direction:%d\n", mcp_get_direction(mcp, pin, DIRA));
+  pause(500);
+  mcp_set_direction(mcp, pin, DIRA, 0);
+  printf("direction:%d\n", mcp_get_direction(mcp, pin, DIRA));
+  pause(500);
+  mcp_set_pin(mcp, pin, DIRA, 0);
+  printf("Output:%d\n", mcp_get_pin(mcp, pin, DIRA));
+  pause(500);
+  mcp_set_pin(mcp, pin, DIRA, 1);
+  printf("Output:%d\n", mcp_get_pin(mcp, pin, DIRA));
+  pause(500);
+  // mcp23017_destroy(mcp);
+  return;
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  *
@@ -189,19 +214,38 @@ void mad_begin()
 
   // Connect Force Gauge
   ForceGauge *forceGauge = force_gauge_create();
-  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, -666, 2048402) == SUCCESS)
+  while (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, forceGauge->interpolationSlope, forceGauge->interpolationZero) != SUCCESS)
   {
-    loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(display, "Connect/Power Force Gauge", OVERLAY_TYPE_LOADING);
+    _waitms(100);
   }
-  else
-  {
-    loading_overlay_display(display, "Force Gauge Failed to Connect", OVERLAY_TYPE_LOADING);
-  }
+
+  loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
 
   // Start motion control (needs state machine,encoder, dyn4, rtc, forcegauge), responsible for constantly
   // gather information from encoder,dyn4,rtc,forcegauge, and update/log data
   // rename motioncog to monitor
   // motion_run(mcp, dyn4, forceGauge, 100); // returns null if failed to start cog
+
+  Monitor *monitor = monitor_create();
+  if (monitor_begin(monitor, dyn4, forceGauge, 100))
+  {
+    loading_overlay_display(display, "Monitor Started", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "Monitor Failed to Start", OVERLAY_TYPE_LOADING);
+  }
+
+  Control *control = control_create(machineProfile, machineState, mcp, dyn4, navkey, &(monitor->data));
+  if (control_begin(control))
+  {
+    loading_overlay_display(display, "Control Started", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "Control Failed", OVERLAY_TYPE_LOADING);
+  }
 
   // Begin main loop
   Pages currentPage = PAGE_STATUS;
@@ -232,11 +276,15 @@ void mad_begin()
       break;
     case PAGE_CALIBRATION:
       printf("Loading force calibration page...\n");
-      CalibrateForcePage *calibrateForcePage = calibrate_force_page_create(display, machineState, forceGauge, machineProfile, images);
+      CalibrateForcePage *calibrateForcePage = calibrate_force_page_create(display, monitor, forceGauge, machineProfile, images);
       bool update = calibrate_force_page_run(calibrateForcePage);
       calibrate_force_page_destroy(calibrateForcePage);
       if (update)
+      {
         write_machine_profile(machineProfile);
+        forceGauge->interpolationSlope = machineProfile->configuration->forceGaugeScaleFactor;
+        forceGauge->interpolationZero = machineProfile->configuration->forceGaugeZeroFactor;
+      }
       printf("Leaving force calibration page\n");
       break;
     default:

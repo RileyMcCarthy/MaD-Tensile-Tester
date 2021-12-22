@@ -76,107 +76,37 @@ static char *string_to_json(const char *name, const char *value)
     return json;
 }
 
-static char *json_property_to_string(FILE *json, const char *name)
+static char *json_property_to_string(json_t *parser, const char *name)
 {
-    int startPosition = ftell(json);
-
-    int size = strlen(name) + 6; // "":" \0, 4 chars plus interior
-    char *pattern = (char *)malloc(sizeof(char) * size);
-    sprintf(pattern, "\"%s\":\"", name);
-    printf("Pattern: %s\n", pattern);
-    // read json file until pattern string is matched
-    int strStart = increment_file_to_string(json, pattern);
-    free(pattern);
-
-    // Find end of value string
-    int strEnd1 = increment_file_to_string(json, ",") - 2;
-    fseek(json, strStart, SEEK_SET);
-    int strEnd2 = increment_file_to_string(json, "}") - 2;
-    int strEnd = strEnd1 < strEnd2 ? strEnd1 : strEnd2;
-
-    // Make copy of string to return
-    int strLen = strEnd - strStart;
-    char *propertyValue = (char *)malloc(sizeof(char) * (strLen + 1));
-    fseek(json, strStart, SEEK_SET);
-    fread(propertyValue, sizeof(char), strLen, json);
-
-    // Return file pointer to previous position
-    fseek(json, startPosition, SEEK_SET);
-
-    return propertyValue;
+    json_t const *property = json_getProperty(parser, name);
+    if (!property || JSON_TEXT != json_getType(property))
+    {
+        printf("Error, the %s property is not found.", name);
+    }
+    char const *value = json_getValue(property);
+    char *valueMem = (char *)malloc(sizeof(char) * (strlen(value) + 1));
+    strcpy(valueMem, value);
+    return valueMem;
 }
 
-static int json_property_to_int(FILE *json, const char *name)
+static int json_property_to_int(json_t *parser, const char *name)
 {
-    // Get current file position
-    int startPosition = ftell(json);
-
-    // Determine size of pattern string and create it
-    int size = strlen(name) + 4; // "": \0, 3 chars plus interior
-    char *pattern = (char *)malloc(sizeof(char) * size);
-    sprintf(pattern, "\"%s\":", name);
-
-    // Find first index of pattern string in json, add strlen of pattern to get first character of value string
-    increment_file_to_string(json, pattern);
-    free(pattern);
-    int strStart = ftell(json);
-
-    // Find end of value string
-    int strEnd1 = increment_file_to_string(json, ",");
-    fseek(json, strStart, SEEK_SET);
-    int strEnd2 = increment_file_to_string(json, "}");
-    int strEnd = strEnd1 > strEnd2 ? strEnd1 : strEnd2;
-
-    // Make copy of string to convert
-    int valueLength = strEnd - strStart;
-    char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
-    fseek(json, strStart, SEEK_SET);
-    fread(propertyValueString, sizeof(char), strLen, json);
-
-    // Convert string to int
-    int propertyValue = atoi(propertyValueString);
-    free(propertyValueString);
-
-    // Return file pointer to previous position
-    fseek(json, startPosition, SEEK_SET);
-
-    return propertyValue;
+    json_t const *property = json_getProperty(parser, name);
+    if (!property || JSON_INTEGER != json_getType(property))
+    {
+        printf("Error, the %s property is not found.", name);
+    }
+    return (int)json_getInteger(property);
 }
 
 static float json_property_to_float(FILE *json, const char *name)
 {
-    // Get current file position
-    int startPosition = ftell(json);
-
-    // Determine size of pattern string and create it
-    int size = strlen(name) + 6; // "": \0, 4 chars plus interior
-    char *pattern = (char *)malloc(sizeof(char) * size);
-    sprintf(pattern, "\"%s\":", name);
-
-    // Find first index of pattern string in json
-    int strStart = increment_file_to_string(json, pattern);
-    free(pattern);
-
-    // Find end of value string
-    int strEnd1 = increment_file_to_string(json, ",");
-    fseek(json, strStart, SEEK_SET);
-    int strEnd2 = increment_file_to_string(json, "}");
-    int strEnd = strEnd1 > strEnd2 ? strEnd1 : strEnd2;
-
-    // Make copy of string to convert
-    int valueLength = strEnd - strStart;
-    char *propertyValueString = (char *)malloc(sizeof(char) * (valueLength + 1));
-    fseek(json, strStart, SEEK_SET);
-    fread(propertyValueString, sizeof(char), strLen, json);
-
-    // Convert string to float
-    float propertyValue = atof(propertyValueString);
-    free(propertyValueString);
-
-    // Return file pointer to previous position
-    fseek(json, startPosition, SEEK_SET);
-
-    return propertyValue;
+    json_t const *property = json_getProperty(json, name);
+    if (!property || JSON_REAL != json_getType(property))
+    {
+        printf("Error, the %s property is not found.", name);
+    }
+    return (float)json_getReal(property);
 }
 
 static int json_property_to_string_array(FILE *json, const char *name, char ***stringArrayPtr)
@@ -917,22 +847,45 @@ void json_print_machine_profile(MachineProfile *profile)
  * @param json A JSON string containing a machine profile.
  * @return A MachineProfile structure containing the machine profile from JSON.
  */
-MachineProfile *json_to_machine_profile(FILE *json)
+MachineProfile *json_to_machine_profile(FILE *file)
 {
-    if (json == NULL)
+    if (file == NULL)
     {
         printf("Error opening file\n");
         return NULL;
     }
-    fseek(json, 0, SEEK_SET);
+
+    // may be neccisary to device file into smaller strings to avoid buffer overflow
+    // Read file into string
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *profileStr = malloc(fileSize + 1);
+    fread(profileStr, fileSize, 1, file);
+    profileStr[fileSize] = '\0';
+
+    // Use tiny-json to parse the string
+    json_t mem[MACHINE_PROFILE_FIELD_COUNT + 10];
+    json_t *parser = json_create(profileStr, mem, sizeof(mem) / sizeof(*mem));
+
     MachineProfile *settings = get_machine_profile();
-    settings->name = json_property_to_string(json, "Name");
-    settings->number = json_property_to_int(json, "Number");
-    // Determine size of pattern string and create it
-    increment_file_to_string(json, "\"Configuration\":");
-    json_to_machine_configuration(json, settings->configuration);
-    increment_file_to_string(json, "\"Performance\":");
-    json_to_machine_performance(json, settings->performance);
+    settings->name = json_property_to_string(parser, "Name");
+    settings->number = json_property_to_int(parser, "Number");
+
+    json_t *mcParser = json_getProperty(parser, "Configuration");
+    if (!mcParser || JSON_OBJ != json_getType(mcParser))
+    {
+        printf("Error, the  Machine Configuration  property is not found.");
+    }
+    json_to_machine_configuration(mcParser, settings->configuration);
+
+    json_t *mpParser = json_getProperty(parser, "Performance");
+    if (!mpParser || JSON_OBJ != json_getType(mpParser))
+    {
+        printf("Error, the  Machine Profile  property is not found.");
+    }
+    json_to_machine_performance(mpParser, settings->performance);
+    free(profileStr);
     return settings;
 }
 

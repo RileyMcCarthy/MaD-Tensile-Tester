@@ -1,5 +1,7 @@
 #include "CalibrateForcePage.h"
 #include <stdlib.h>
+#include "Monitor.h"
+
 #define BUTTONCOUNT 2
 #define BUTTON_NAVIGATION 0
 #define BUTTON_FORCE_NAVIGATION 1
@@ -34,11 +36,11 @@ static void check_buttons(CalibrateForcePage *page)
     }
 }
 
-CalibrateForcePage *calibrate_force_page_create(Display *display, MachineState *machineState, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
+CalibrateForcePage *calibrate_force_page_create(Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
 {
     CalibrateForcePage *page = malloc(sizeof(CalibrateForcePage));
     page->display = display;
-    page->stateMachine = machineState;
+    page->monitor = monitor;
     page->forceGauge = forceGauge;
     page->machineProfile = machineProfile;
     page->images = images;
@@ -56,10 +58,6 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
 {
     bool infoUpdated = false;
     printf("Force Calibration page running\n");
-
-    // Reset machine state to stop data aquisition and motion
-    bool isMachineReady = page->stateMachine->machineCheckParameters.machineReady;
-    page->stateMachine->machineCheckParameters.machineReady = false;
 
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
@@ -144,8 +142,11 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
         currentMills = _getms();
         if ((currentMills - lastMills) > 100)
         {
+            // while (page->monitor->writingData)
+            //     ;
             lastMills = currentMills;
-            currentForce = force_gauge_get_raw(page->forceGauge);
+            currentForce = page->monitor->data.forceRaw;
+            printf("Force: %d\n", currentForce);
         }
         check_buttons(page);
         int actionStartX;
@@ -279,6 +280,5 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
         _waitms(100);
     }
 
-    page->stateMachine->machineCheckParameters.machineReady = isMachineReady;
     return infoUpdated;
 }

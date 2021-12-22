@@ -462,18 +462,5 @@ void status_page_run(StatusPage *page)
             y += 30;
         }
         // clock.render();
-
-        void *temp = malloc(1);
-        if (temp == NULL)
-        {
-            printf("malloc failed\n");
-            return;
-        }
-        else
-        {
-            printf("Memory:%d\n", temp);
-            free(temp);
-        }
-        _waitms(100);
     }
 }
