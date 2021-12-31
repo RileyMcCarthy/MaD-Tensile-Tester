@@ -94,6 +94,7 @@ uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 
 void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 {
+    mcp_set_direction(mcp23017, pin, reg, MCP23017_OUTPUT);
     if (reg == DIRA)
     {
         reg = REG_GPIOA;
@@ -108,6 +109,7 @@ void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 }
 uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 {
+    mcp_set_direction(mcp23017, pin, reg, MCP23017_INPUT);
     if (reg == DIRA)
     {
         reg = REG_GPIOA;
