@@ -19,11 +19,11 @@ static void check_buttons(StatusPage *page)
                 {
                 case BUTTON_MACHINE_ENABLE:
                     printf("enabling motion\n");
-                    state_machine_set_status(page->stateMachine, STATUS_ENABLED);
+                    // state_machine_set_status(page->stateMachine, STATUS_ENABLED);
                     break;
                 case BUTTON_MACHINE_DISABLE:
                     printf("disabling motion\n");
-                    state_machine_set_status(page->stateMachine, STATUS_DISABLED);
+                    // state_machine_set_status(page->stateMachine, STATUS_DISABLED);
                     break;
                 case BUTTON_NAVIGATION:
                     page->complete = true;
@@ -39,12 +39,14 @@ static void check_buttons(StatusPage *page)
 static void drawSuccessIndicator(StatusPage *page, int x, int y)
 {
     Image *check = page->images->successImage;
+    display_draw_square_fill(page->display, x, y, x + check->width - 1, y + check->height - 1, BACKCOLOR);
     display_bte_memory_copy_image(page->display, check, x, y);
 }
 
 static void drawFailIndicator(StatusPage *page, int x, int y)
 {
     Image *ex = page->images->failImage;
+    display_draw_square_fill(page->display, x, y, x + ex->width - 1, y + ex->height - 1, BACKCOLOR);
     display_bte_memory_copy_image(page->display, ex, x, y);
 }
 
@@ -66,7 +68,7 @@ void status_page_destroy(StatusPage *page)
 
 void status_page_run(StatusPage *page)
 {
-
+    printf("Status page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
@@ -104,34 +106,34 @@ void status_page_run(StatusPage *page)
     display_draw_string(page->display, selfCheckStartX, selfCheckStartY, buf);
     display_draw_line(page->display, selfCheckStartX, selfCheckStartY + 22, selfCheckStartX + strlen(buf) * 12, selfCheckStartY + 22, MAINTEXTCOLOR);
 
-    int selfCheckStateStartY = selfCheckStartY + 30;
-    int selfCheckStateStartX = selfCheckStartX + 20;
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Self check:");
-    display_draw_string(page->display, selfCheckStateStartX, selfCheckStateStartY, buf);
-
-    int chargePumpStartX = selfCheckStateStartX;
-    int chargePumpStartY = selfCheckStateStartY + 30;
+    int chargePumpStartY = selfCheckStartY + 30;
+    int chargePumpStartX = machineStateStartX + 20;
     strcpy(buf, "Charge Pump:");
     display_draw_string(page->display, chargePumpStartX, chargePumpStartY, buf);
 
-    int powerStartX = chargePumpStartX;
-    int powerStartY = chargePumpStartY + 30;
+    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+    strcpy(buf, "Machine Check Status");
+    int machineCheckStartX = chargePumpStartX;
+    int machineCheckStartY = chargePumpStartY + 30;
+    display_draw_string(page->display, machineCheckStartX, machineCheckStartY, buf);
+    display_draw_line(page->display, machineCheckStartX, machineCheckStartY + 22, machineCheckStartX + strlen(buf) * 12, machineCheckStartY + 22, MAINTEXTCOLOR);
+
+    int powerStartX = machineStateStartX + 20;
+    int powerStartY = machineCheckStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     strcpy(buf, "Switched Power:");
     display_draw_string(page->display, powerStartX, powerStartY, buf);
 
+    int overTravelStartX = powerStartX;
+    int overTravelStartY = powerStartY + 30;
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Machine Check Status");
-    int machineCheckStartY = powerStartY + 30;
-    int machineCheckStartX = selfCheckStartX;
-    display_draw_string(page->display, machineCheckStartX, machineCheckStartY, buf);
-    display_draw_line(page->display, machineCheckStartX, machineCheckStartY + 22, machineCheckStartX + strlen(buf) * 12, machineCheckStartY + 22, MAINTEXTCOLOR);
+    strcpy(buf, "Travel Limits:");
+    display_draw_string(page->display, overTravelStartX, overTravelStartY, buf);
 
-    int esdStartX = machineCheckStartX + 20;
-    int esdStartY = machineCheckStartY + 30;
+    int esdStartX = overTravelStartX;
+    int esdStartY = overTravelStartY + 30;
     strcpy(buf, "ESD:");
     display_draw_string(page->display, esdStartX, esdStartY, buf);
 
@@ -147,17 +149,21 @@ void status_page_run(StatusPage *page)
 
     int dyn4StartX = forceStartX;
     int dyn4StartY = forceStartY + 30;
-    strcpy(buf, "DYN4 Ready:");
+    strcpy(buf, "DYN4:");
     display_draw_string(page->display, dyn4StartX, dyn4StartY, buf);
 
-    int machineReadyStartX = dyn4StartX;
-    int machineReadyStartY = dyn4StartY + 30;
-    strcpy(buf, "Machine Ready:");
-    display_draw_string(page->display, machineReadyStartX, machineReadyStartY, buf);
+    int dyn5StartX = dyn4StartX;
+    int rtcStartY = dyn4StartY + 30;
+    strcpy(buf, "RTC:");
+
+    int machineOKStartX = dyn4StartX;
+    int machineOKStartY = dyn4StartY + 30;
+    strcpy(buf, "Machine:");
+    display_draw_string(page->display, machineOKStartX, machineOKStartY, buf);
 
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     strcpy(buf, "Machine Limits");
-    int motionStartY = machineReadyStartY + 30;
+    int motionStartY = machineOKStartY + 30;
     int motionStartX = machineCheckStartX;
     display_draw_string(page->display, motionStartX, motionStartY, buf);
     display_draw_line(page->display, motionStartX, motionStartY + 22, motionStartX + strlen(buf) * 12, motionStartY + 22, MAINTEXTCOLOR);
@@ -279,6 +285,9 @@ void status_page_run(StatusPage *page)
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
     printf("Status page loaded\n");
+    MachineState previousState = *(page->stateMachine);
+    bool initial = true;
+
     while (!page->complete)
     {
         check_buttons(page);
@@ -287,86 +296,109 @@ void status_page_run(StatusPage *page)
 
         display_text_color(page->display, MAINTEXTCOLOR, COLOR65K_BLACK);
 
-        /*Self Check State*/
-        // self check status
-        if (page->stateMachine->selfCheckParameters.rtcReady)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, selfCheckStateStartY);
-        }
+        MachineState currentState = *(page->stateMachine);
 
+        /*Self Check State*/
         // charge pump
-        if (page->stateMachine->selfCheckParameters.chargePumpOK)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
-        }
+        if (currentState.selfCheckParameters.chargePumpOK != previousState.selfCheckParameters.chargePumpOK || initial)
+            if (currentState.selfCheckParameters.chargePumpOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
+            }
 
         /*Machine Check State*/
         // switched power enabled
-        if (page->stateMachine->machineCheckParameters.power)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
-        }
+        if (currentState.machineCheckParameters.switchedPowerOK != previousState.machineCheckParameters.switchedPowerOK || initial)
+            if (page->stateMachine->machineCheckParameters.switchedPowerOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
+            }
+
+        // Over Travel Limits
+        if (currentState.machineCheckParameters.overTravelLimit != previousState.machineCheckParameters.overTravelLimit || initial)
+            if (page->stateMachine->machineCheckParameters.overTravelLimit == MOTION_OVER_TRAVEL_OK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, overTravelStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, overTravelStartY);
+            }
 
         // ESD
-        if (page->stateMachine->machineCheckParameters.esd)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
-        }
+        if (currentState.machineCheckParameters.esdOK != previousState.machineCheckParameters.esdOK)
+            if (page->stateMachine->machineCheckParameters.esdOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
+            }
 
         // Servo
-        if (page->stateMachine->machineCheckParameters.servoReady)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
-        }
+        if (currentState.machineCheckParameters.servoOK != previousState.machineCheckParameters.servoOK || initial)
+            if (page->stateMachine->machineCheckParameters.servoOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, servoStartY);
+            }
 
         // Force Gauge
-        if (page->stateMachine->machineCheckParameters.forceGaugeResponding)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
-        }
+        if (currentState.machineCheckParameters.forceGaugeOK != previousState.machineCheckParameters.forceGaugeOK || initial)
+            if (page->stateMachine->machineCheckParameters.forceGaugeOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
+            }
 
-        if (page->stateMachine->machineCheckParameters.dyn4Responding)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
-        }
+        // RTC
+        if (currentState.machineCheckParameters.rtcOK != previousState.machineCheckParameters.rtcOK || initial)
+            if (page->stateMachine->machineCheckParameters.rtcOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
+            }
 
-        // machine Ready
-        if (page->stateMachine->machineCheckParameters.machineReady)
-        {
-            drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
-        }
-        else
-        {
-            drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, machineReadyStartY);
-        }
+        // DYN4
+        if (currentState.machineCheckParameters.dyn4OK != previousState.machineCheckParameters.dyn4OK || initial)
+            if (page->stateMachine->machineCheckParameters.dyn4OK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
+            }
+
+        // machine
+        if (currentState.machineCheckParameters.machineOK != previousState.machineCheckParameters.machineOK || initial)
+
+            if (page->stateMachine->machineCheckParameters.machineOK)
+            {
+                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, machineOKStartY);
+            }
+            else
+            {
+                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, machineOKStartY);
+            }
 
         /*Motion State*/
         // motion enabled
@@ -461,6 +493,8 @@ void status_page_run(StatusPage *page)
             display_draw_string(page->display, x, y, buf);
             y += 30;
         }
-        // clock.render();
+        previousState = currentState;
+        initial = false;
+        //  clock.render();
     }
 }

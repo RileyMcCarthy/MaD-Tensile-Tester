@@ -22,6 +22,13 @@ typedef enum MotionStatus_e
     STATUS_RESTRICTED
 } MotionStatus;
 
+typedef enum MotionOverTravel_e
+{
+    MOTION_OVER_TRAVEL_OK,
+    MOTION_OVER_TRAVEL_UPPER,
+    MOTION_OVER_TRAVEL_LOWER
+} MotionOverTravel;
+
 typedef enum MotionCondition_e
 {
     MOTION_STOPPED,
@@ -42,18 +49,20 @@ typedef enum MotionMode_e
 
 typedef struct SelfCheck_t
 {
-    bool chargePumpOK; // Updated by MaD initalization
-    bool rtcReady;     // Updated by MaD initalization
+    bool chargePumpOK; // Charge pump signal is activated, self check is satisfied. StateMachine, working
 } SelfCheckParameters;
 
 typedef struct MachineCheck_t
 {
-    bool power;                // Updated by control.c
-    bool esd;                  // Updated by control.c
-    bool servoReady;           // Updated by control.c
-    bool forceGaugeResponding; // Updated by control.c
-    bool dyn4Responding;       // Updated by control.c
-    bool machineReady;         // External State, Set by user button input
+    bool switchedPowerOK;             // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. changed to GPI12
+    MotionOverTravel overTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. working, needs switched power on
+    bool esdOK;                       // User ESD switch is activated ( GPI_4 ). Control.c. working (big red button)
+    bool servoOK;                     // Servo ready signal recieved ( Pin 7 ). Control.c
+    bool forceGaugeOK;                // Force gauge communicating. Control.c
+    bool dyn4OK;                      // DYN4 is communicating. Control.c
+    bool rtcOK;                       // RTC is communicating. Control.c
+    bool machineOK;                   // User input to enable machine. Status.c
+
 } MachineCheckParameters;
 
 typedef struct Motion_t
@@ -64,8 +73,8 @@ typedef struct Motion_t
 
     bool hardUpperLimit; // Updated by control.c
     bool hardLowerLimit; // Updated by control.c
-    bool softUpperLimit; // Updated by control.c
-    bool softLowerLimit; // Updated by control.c
+    bool softUpperLimit; // Updated by control.c  (GPI_7)
+    bool softLowerLimit; // Updated by control.c. (GPI_6)
     bool forceOverload;  // Updated by control.c
 } MotionParameters;
 

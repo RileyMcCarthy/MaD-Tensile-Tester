@@ -4,8 +4,24 @@ static long control_stack[64];
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(Control *control)
 {
+    /*Initialize mcp23017*/
+    MCP23017 *mcp = mcp23017_create();
+    mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+
+    /*Initialize NavKey*/
+    NavKey *navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
+    navkey_reset(navkey);
+    navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
+
+    navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
+    navkey_write_max(navkey, (int32_t)10000);  /* Set the maximum threshold*/
+    navkey_write_min(navkey, (int32_t)-10000); /* Set the minimum threshold */
+    navkey_write_step(navkey, (int32_t)100);   /* Set the step to 1*/
+
+    navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
+
     int position = control->dyn4->encoder.value();
-    navkey_write_counter(control->navkey, position); // reset counter to position
+    navkey_write_counter(navkey, position); // reset counter to position
     MachineState lastState;
     while (1)
     {
@@ -14,8 +30,8 @@ static void control_cog(Control *control)
         {
             if (lastState.currentState != STATE_MOTION)
             {
-                mcp_set_direction(control->mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-                mcp_set_pin(control->mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
+                mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
+                mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
             }
 
             if (currentMachineState.motionParameters.mode == MODE_MANUAL)
@@ -23,11 +39,11 @@ static void control_cog(Control *control)
                 if (lastState.motionParameters.mode != MODE_MANUAL)
                 {
                     int position = control->dyn4->encoder.value();
-                    navkey_write_counter(control->navkey, position);  // reset counter to position
-                    navkey_write_step(control->navkey, (int32_t)100); // Set increment for manual mode
+                    navkey_write_counter(navkey, position);  // reset counter to position
+                    navkey_write_step(navkey, (int32_t)100); // Set increment for manual mode
                 }
                 // Use Navkey to move motor
-                int position = navkey_read_counter_int(control->navkey);
+                int position = navkey_read_counter_int(navkey);
                 dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
             }
             else if (currentMachineState.motionParameters.mode == MODE_AUTOMATIC)
@@ -44,11 +60,11 @@ static void control_cog(Control *control)
                     // stop motor from moving, keep dyn4 powered
                     dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                     int position = control->dyn4->encoder.value();
-                    navkey_write_counter(control->navkey, position); // reset counter to position
-                    navkey_write_step(control->navkey, (int32_t)10); // Set increment for manual mode
+                    navkey_write_counter(navkey, position); // reset counter to position
+                    navkey_write_step(navkey, (int32_t)10); // Set increment for manual mode
                 }
                 // Use Navkey to move motor very slowly
-                int position = navkey_read_counter_int(control->navkey);
+                int position = navkey_read_counter_int(navkey);
                 dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
             }
         }
@@ -56,12 +72,14 @@ static void control_cog(Control *control)
         {
             // turn off all motion
             // turn off IO that powers dyn4
-            mcp_set_direction(control->mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-            mcp_set_pin(control->mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
+            mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
+            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
         }
         // Check for system exeeding performance conditions
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
+
+        /*Update Motion State parameters*/
 
         /*Check soft positional limits*/
         if (data.position > machinePerformance.maxPosition)
@@ -108,66 +126,75 @@ static void control_cog(Control *control)
                 control->stateMachine->motionParameters.forceOverload = false;
             }
         }
+
+        /*Update Machine Check State parameters*/
+
+        // Switched power
+        if (mcp_get_pin(mcp, SWITCHED_POWER_PIN, SWITCHED_POWER_REGISTER) == 0)
+        {
+            control->stateMachine->machineCheckParameters.switchedPowerOK = true;
+        }
+        else
+        {
+            control->stateMachine->machineCheckParameters.switchedPowerOK = false;
+        }
+
+        // ESD
+        if (mcp_get_pin(mcp, ESD_ACTIVE_PIN, ESD_ACTIVE_REGISTER) == 0)
+        {
+            control->stateMachine->machineCheckParameters.esdOK = true;
+        }
+        else
+        {
+            control->stateMachine->machineCheckParameters.esdOK = false;
+        }
+
+        // Servo Ready
+        if (mcp_get_pin(mcp, PIN_SRVORDY_PIN, PIN_SRVORDY_REGISTER) == 1)
+        {
+            control->stateMachine->machineCheckParameters.servoOK = true;
+        }
+        else
+        {
+            control->stateMachine->machineCheckParameters.servoOK = false;
+        }
+
+        // Force Gauge
         if (data.forceRaw == -1)
         { /*need to change to proper error value, not -1*/
-            control->stateMachine->machineCheckParameters.forceGaugeResponding = false;
+            control->stateMachine->machineCheckParameters.forceGaugeOK = false;
         }
         else
         {
-            control->stateMachine->machineCheckParameters.forceGaugeResponding = true;
+            control->stateMachine->machineCheckParameters.forceGaugeOK = true;
         }
 
-        if (mcp_get_pin(control->mcp, SWITCHED_POWER_PIN, SWITCHED_POWER_REGISTER) == 0)
-        {
-            control->stateMachine->machineCheckParameters.power = true;
-        }
-        else
-        {
-            control->stateMachine->machineCheckParameters.power = false;
-        }
+        // RTC
 
         /*Check IO Expansion for hard upper/lower limits*/
-        if (mcp_get_pin(control->mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1)
+        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1)
         {
-            control->stateMachine->motionParameters.hardUpperLimit = true;
+            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_UPPER;
         }
-        if (mcp_get_pin(control->mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1)
+        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1)
         {
-            control->stateMachine->motionParameters.hardLowerLimit = true;
-        }
-
-        /*Check ESD pin*/
-        if (mcp_get_pin(control->mcp, ESD_ACTIVE_PIN, ESD_ACTIVE_REGISTER) == 0)
-        {
-            control->stateMachine->machineCheckParameters.esd = true;
+            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_LOWER;
         }
         else
         {
-            control->stateMachine->machineCheckParameters.esd = false;
-        }
-
-        /*Check IO Expansion for servoReady*/
-        if (mcp_get_pin(control->mcp, PIN_SRVORDY_PIN, PIN_SRVORDY_REGISTER) == 1)
-        {
-            control->stateMachine->machineCheckParameters.servoReady = true;
-        }
-        else
-        {
-            control->stateMachine->machineCheckParameters.servoReady = false;
+            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_OK;
         }
         lastState = currentMachineState;
     }
 }
 
-Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, MCP23017 *mcp, DYN4 *dyn4, NavKey *navkey, MonitorData *monitorData)
+Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData)
 {
     Control *control = (Control *)malloc(sizeof(Control));
     control->machineProfile = machineProfile;
     control->monitorData = monitorData;
     control->stateMachine = stateMachine;
-    control->mcp = mcp;
     control->testProfile = NULL;
-    control->navkey = navkey;
     control->dyn4 = dyn4;
     control->cogid = -1;
     return control;

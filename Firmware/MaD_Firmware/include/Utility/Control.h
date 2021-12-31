@@ -18,7 +18,7 @@ typedef struct control_t
     int cogid;
 } Control;
 
-Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, MCP23017 *mcp, DYN4 *dyn4, NavKey *navkey, MonitorData *monitorData);
+Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
 void control_destry(Control *control);
 bool control_begin(Control *control);
 

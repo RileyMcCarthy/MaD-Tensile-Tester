@@ -9,10 +9,11 @@ static long state_stack[64];
 static State state_machine_self_check(MachineState *machineState)
 {
     State newState;
-    SelfCheckParameters params = machineState->selfCheckParameters;
+
+    machineState->selfCheckParameters.chargePumpOK = true;
 
     // Decide the next state
-    if (params.chargePumpOK && params.rtcReady)
+    if (machineState->selfCheckParameters.chargePumpOK)
     {
         newState = STATE_MACHINECHECK;
     }
@@ -42,12 +43,14 @@ static State state_machine_check(MachineState *machineState)
 
     MachineCheckParameters params = machineState->machineCheckParameters;
     // Check internal parameters
-    if (params.power &&
-        params.esd &&
-        params.servoReady &&
-        params.forceGaugeResponding &&
-        params.dyn4Responding &&
-        params.machineReady)
+    if (params.switchedPowerOK &&
+        params.overTravelLimit == MOTION_OVER_TRAVEL_OK &&
+        params.esdOK &&
+        params.servoOK &&
+        params.forceGaugeOK &&
+        params.dyn4OK &&
+        params.machineOK &&
+        params.rtcOK)
     {
         return STATE_MOTION; // Internal parameters passed, change to MOTION
     }
@@ -133,14 +136,15 @@ static MachineState *get_machine_state()
     machineState->currentState = STATE_SELFCHECK;
 
     machineState->selfCheckParameters.chargePumpOK = false;
-    machineState->selfCheckParameters.rtcReady = false;
 
-    machineState->machineCheckParameters.dyn4Responding = false;
-    machineState->machineCheckParameters.esd = false;
-    machineState->machineCheckParameters.forceGaugeResponding = false;
-    machineState->machineCheckParameters.machineReady = false;
-    machineState->machineCheckParameters.power = false;
-    machineState->machineCheckParameters.servoReady = false;
+    machineState->machineCheckParameters.switchedPowerOK = false;
+    machineState->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_OK;
+    machineState->machineCheckParameters.esdOK = false;
+    machineState->machineCheckParameters.servoOK = false;
+    machineState->machineCheckParameters.forceGaugeOK = false;
+    machineState->machineCheckParameters.dyn4OK = false;
+    machineState->machineCheckParameters.machineOK;
+    machineState->machineCheckParameters.rtcOK = false;
 
     machineState->motionParameters.condition = MOTION_STOPPED;
     machineState->motionParameters.forceOverload = false;
@@ -168,37 +172,4 @@ MachineState *state_machine_run()
 void state_machine_stop(MachineState *machineState)
 {
     // stop cog and free MachineState
-}
-
-// External State Setter Functions
-
-void state_machine_set_servo_ready(MachineState *machineState, bool ready)
-{
-    machineState->machineCheckParameters.servoReady = ready;
-}
-
-void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding)
-{
-    machineState->machineCheckParameters.forceGaugeResponding = responding;
-}
-
-void state_machine_set_dyn4_responding(MachineState *machineState, bool responding)
-{
-    machineState->machineCheckParameters.dyn4Responding = responding;
-}
-
-void state_machine_set_status(MachineState *machineState, MotionStatus status)
-{
-    // Set rules for changing status, and update internal parameters
-    machineState->motionParameters.status = status;
-}
-
-void state_machine_set_condition(MachineState *machineState, MotionCondition condition)
-{
-    machineState->motionParameters.condition = condition;
-}
-
-void state_machine_set_mode(MachineState *machineState, MotionMode mode)
-{
-    machineState->motionParameters.mode = mode;
 }

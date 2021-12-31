@@ -100,21 +100,6 @@ static Display *start_display()
   return display;
 }
 
-static NavKey *start_navkey()
-{
-  NavKey *navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
-  navkey_reset(navkey);
-  navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
-
-  navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
-  navkey_write_max(navkey, (int32_t)10000);  /* Set the maximum threshold*/
-  navkey_write_min(navkey, (int32_t)-10000); /* Set the minimum threshold */
-  navkey_write_step(navkey, (int32_t)100);   /* Set the step to 1*/
-
-  navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
-  return navkey;
-}
-
 static void test_mcp23017()
 {
   MCP23017 *mcp = mcp23017_create();
@@ -164,17 +149,8 @@ void mad_begin()
 
   // Load Assets from SD card
   printf("Testingh:%s\n", images->statusPageImage->name);
-  image_load_assets(images, display);
+  // image_load_assets(images, display);
   printf("after load%s\n", images->statusPageImage->name);
-
-  // Start NavKey
-  NavKey *navkey = start_navkey();
-
-  // Initialize IO Expansion(MCP23017)
-  MCP23017 *mcp = mcp23017_create();
-  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL); // issues using i2c slow with delay not saving, change to new i2c
-                                                      //  mcp_set_direction(mcp, 4, MCP23017_OUTPUT);         // zero is output
-  loading_overlay_display(display, "MCP23017 Connected", OVERLAY_TYPE_LOADING);
 
   // Load Machine Profile
   loading_overlay_display(display, "Loading Machine Profile", OVERLAY_TYPE_LOADING);
@@ -204,11 +180,11 @@ void mad_begin()
   if (status != SUCCESS)
   {
     loading_overlay_display(display, "Error connecting to RTC", OVERLAY_TYPE_LOADING);
-    machineState->selfCheckParameters.rtcReady = false;
+    machineState->machineCheckParameters.rtcOK = false;
   }
   else
   {
-    machineState->selfCheckParameters.rtcReady = true;
+    machineState->machineCheckParameters.rtcOK = true;
     loading_overlay_display(display, "RTC Connected", OVERLAY_TYPE_LOADING);
   }
 
@@ -222,11 +198,6 @@ void mad_begin()
 
   loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
 
-  // Start motion control (needs state machine,encoder, dyn4, rtc, forcegauge), responsible for constantly
-  // gather information from encoder,dyn4,rtc,forcegauge, and update/log data
-  // rename motioncog to monitor
-  // motion_run(mcp, dyn4, forceGauge, 100); // returns null if failed to start cog
-
   Monitor *monitor = monitor_create();
   if (monitor_begin(monitor, dyn4, forceGauge, 100))
   {
@@ -237,7 +208,7 @@ void mad_begin()
     loading_overlay_display(display, "Monitor Failed to Start", OVERLAY_TYPE_LOADING);
   }
 
-  Control *control = control_create(machineProfile, machineState, mcp, dyn4, navkey, &(monitor->data));
+  Control *control = control_create(machineProfile, machineState, dyn4, &(monitor->data));
   if (control_begin(control))
   {
     loading_overlay_display(display, "Control Started", OVERLAY_TYPE_LOADING);
