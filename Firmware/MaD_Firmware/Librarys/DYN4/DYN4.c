@@ -31,18 +31,16 @@ void dyn4_destroy(DYN4 *dyn4)
  */
 Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
 {
-    low(11);
-    dyn4->device_id = new_device_id & 0x7F;
-    // uart_start(&(dyn4->serial), 14, 12, 2, 38400);
-    dyn4->serial.start(14, 12, 2, 38400);
+    dyn4->device_id = new_device_id;
+    dyn4->serial.start(rx, tx, 2, 38400);
     DYN4_Status status;
     Error ret = dyn4_get_status(dyn4, &status);
     if (ret != SUCCESS)
     {
-        printf("DYN4_NOT_RESPONDING\n");
+        // printf("DYN4_NOT_RESPONDING\n");
         return ret;
     }
-    printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
+    // printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
 
     // start encoder
     dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
@@ -59,17 +57,18 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
  */
 Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
 {
-    dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
     uint8_t *statusReg;
-    if (dyn4_read_command(dyn4, IS_STATUS, &statusReg) == -1)
+
+    dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
+    if ((statusReg = dyn4_read_command(dyn4, IS_STATUS, NULL)) == NULL)
     {
         return DYN4_NOT_RESPONDING;
     }
-    status->onRange = (statusReg[0] & (STATUS_ONRANGE + 1)) >> STATUS_ONRANGE;
-    status->motorFree = (statusReg[0] & (STATUS_MOTORFREE + 1)) >> STATUS_MOTORFREE;
-    status->alarm = (statusReg[0] & (STATUS_ALARM + 1)) >> STATUS_ALARM;
-    status->motorBusy = (statusReg[0] & (STATUS_MOTORBUSY + 1)) >> STATUS_MOTORBUSY;
-    status->jp3P2Status = (statusReg[0] & (STATUS_JP3STATUS + 1)) >> STATUS_JP3STATUS;
+    status->onRange = (statusReg[0] & (0x01 << STATUS_ONRANGE)) >> STATUS_ONRANGE;
+    status->motorFree = (statusReg[0] & (0x01 << STATUS_MOTORFREE)) >> STATUS_MOTORFREE;
+    status->alarm = (statusReg[0] & (0x07 << STATUS_ALARM)) >> STATUS_ALARM;
+    status->motorBusy = (statusReg[0] & (0x01 << STATUS_MOTORBUSY)) >> STATUS_MOTORBUSY;
+    status->jp3P2Status = (statusReg[0] & (0x01 << STATUS_JP3STATUS)) >> STATUS_JP3STATUS;
     free(statusReg);
     return SUCCESS;
 }
@@ -82,32 +81,44 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
  * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE)
  * @return int number of bytes recieved
  */
-int dyn4_read_command(DYN4 *dyn4, int dyn4_read_command, uint8_t **returnData)
+uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size)
 {
     uint8_t byte;
-    uint8_t *data;
 
-    // uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rxtime(100);
-    if ((byte & dyn4->device_id) != dyn4->device_id)
+    for (int i = 0; i < 10; i++)
     {
-        return -1;
+        byte = (uint8_t)dyn4->serial.rxtime(100);
+        if (byte == dyn4->device_id)
+        {
+            break;
+        }
+        else
+        {
+            byte = -1;
+        }
     }
-    // uart_read(&(dyn4->serial), 1, &byte);
-    byte = (uint8_t)dyn4->serial.rxtime(100);
-    if ((byte & IS_STATUS) != IS_STATUS)
+    if (byte == -1)
     {
-        return -1;
+        return NULL;
+    }
+
+    byte = (uint8_t)dyn4->serial.rxtime(200);
+
+    if (byte != (0x80 + command))
+    {
+        return NULL;
     }
     int n = ((byte >> 5) & 0x03) + 1;
-    data = (uint8_t *)malloc(sizeof(uint8_t) * n);
-    // uart_read(&(dyn4->serial), n, returnData);
+    uint8_t *data = (uint8_t *)malloc(sizeof(uint8_t) * n);
     for (int i = 0; i < n; i++)
     {
-        data[i] = (uint8_t)dyn4->serial.rxtime(100);
+        data[i] = (uint8_t)dyn4->serial.rxtime(200);
     }
-    *returnData = data;
-    return n;
+    if (size != NULL)
+    {
+        *size = n;
+    }
+    return data;
 }
 
 /**
@@ -143,7 +154,7 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
 
     int package_size = 4 + n;
     uint8_t *bytes = malloc(sizeof(uint8_t) * package_size);
-    bytes[package_size - 1] = dyn4->device_id;
+    bytes[package_size - 1] = 0x00 | dyn4->device_id;
     bytes[package_size - 2] = 0x80 + (n << 5) + command; // 0x80 is because the first bit is always 1
 
     int totalData = 0;
@@ -154,11 +165,6 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
         totalData += bytes[index];
     }
     bytes[0] = 0x80 + ((bytes[package_size - 1] + bytes[package_size - 2] + totalData) % 128);
-    // uart_write(&(dyn4->serial), bytes[4]);
-    // uart_write(&(dyn4->serial), bytes[3]);
-    // uart_write(&(dyn4->serial), bytes[2]);
-    // uart_write(&(dyn4->serial), bytes[1]);
-    // uart_write(&(dyn4->serial), bytes[0]);
     dyn4->serial.tx(bytes[4]);
     dyn4->serial.tx(bytes[3]);
     dyn4->serial.tx(bytes[2]);

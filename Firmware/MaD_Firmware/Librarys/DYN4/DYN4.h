@@ -1,14 +1,13 @@
 #ifndef DYN4_H
 #define DYN4_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+
 #include "Error.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include "Error.h"
 #include <stdlib.h>
 #include "IOBoard.h"
+#include <stdint.h>
 
 /**Commands**/
 #define dyn4_set_origin 0x00
@@ -26,7 +25,7 @@
 #define dyn4_sin_wave 0x0C
 #define dyn4_ss_frequency 0x0D
 #define dyn4_general_read 0x0E
-//skip 0x0F
+// skip 0x0F
 #define dyn4_set_main_gain 0x10
 #define dyn4_set_speed_gain 0x11
 #define dyn4_set_int_gain 0x12
@@ -95,7 +94,7 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id);
 int dyn4_getPosition(DYN4 *dyn4);
 
 void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data);
-int dyn4_read_command(DYN4 *dyn4, int readCommand, uint8_t *returnData);
+uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size);
 Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status);
 
 #endif

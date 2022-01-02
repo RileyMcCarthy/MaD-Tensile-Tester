@@ -8,7 +8,7 @@
 typedef struct monitor_data_t
 {
     int forceRaw;
-    int force;
+    float force;
     int position;
     int timems;
 } MonitorData;

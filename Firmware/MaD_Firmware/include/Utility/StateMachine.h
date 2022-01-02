@@ -54,14 +54,13 @@ typedef struct SelfCheck_t
 
 typedef struct MachineCheck_t
 {
-    bool switchedPowerOK;             // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. changed to GPI12
-    MotionOverTravel overTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. working, needs switched power on
-    bool esdOK;                       // User ESD switch is activated ( GPI_4 ). Control.c. working (big red button)
-    bool servoOK;                     // Servo ready signal recieved ( Pin 7 ). Control.c
-    bool forceGaugeOK;                // Force gauge communicating. Control.c
+    bool switchedPowerOK;             // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. implemented, changed to GPI12
+    MotionOverTravel overTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
+    bool esdOK;                       // User ESD switch is activated ( GPI_4 ). Control.c. implemented (big red button)
+    bool servoOK;                     // Servo ready signal recieved ( GPI_11 ). Control.c, implemented
+    bool forceGaugeOK;                // Force gauge communicating. Control.c, implemented
     bool dyn4OK;                      // DYN4 is communicating. Control.c
-    bool rtcOK;                       // RTC is communicating. Control.c
-    bool machineOK;                   // User input to enable machine. Status.c
+    bool rtcOK;                       // RTC is communicating. Control.c , not implmeented
 
 } MachineCheckParameters;
 
@@ -71,11 +70,9 @@ typedef struct Motion_t
     MotionCondition condition; // internal and external
     MotionMode mode;           // internal and external
 
-    bool hardUpperLimit; // Updated by control.c
-    bool hardLowerLimit; // Updated by control.c
-    bool softUpperLimit; // Updated by control.c  (GPI_7)
-    bool softLowerLimit; // Updated by control.c. (GPI_6)
-    bool forceOverload;  // Updated by control.c
+    MotionOverTravel travelLimit; // Updated by control.c, travellimit and softlimit replaced by condition
+    MotionOverTravel softLimit;   // Updated by control.c
+    bool forceOverload;           // Updated by control.c
 } MotionParameters;
 
 typedef struct MachineState_t
@@ -87,15 +84,26 @@ typedef struct MachineState_t
     int cogid;
 } MachineState;
 
-MachineState *state_machine_run();
-void state_machine_stop(MachineState *machineState);
+typedef enum parameters_e
+{
+    PARAM_CHARGEPUMPOK,
+    PARAM_SWITCHEDPOWEROK,
+    PARAM_OVERTRAVELLIMIT,
+    PARAM_ESDOK,
+    PARAM_SERVOOK,
+    PARAM_FORCEGAUGEOK,
+    PARAM_DYN4OK,
+    PARAM_RTCOK,
+    PARAM_STATUS,
+    PARAM_CONDITION,
+    PARAM_MODE,
+    PARAM_TRAVELLIMIT,
+    PARAM_SOFTLIMIT,
+    PARAM_FORCEOVERLOAD,
+} Parameter;
+
+MachineState *machine_state_create();
 
 // External State Setters
-void state_machine_set_servo_ready(MachineState *machineState, bool ready);
-void state_machine_set_force_gauge_responding(MachineState *machineState, bool responding);
-void state_machine_set_dyn4_responding(MachineState *machineState, bool responding);
-void state_machine_set_status(MachineState *machineState, MotionStatus status);
-void state_machine_set_condition(MachineState *machineState, MotionCondition condition);
-void state_machine_set_mode(MachineState *machineState, MotionMode mode);
-
+void state_machine_set(MachineState *machineState, Parameter param, int state);
 #endif

@@ -2,10 +2,9 @@
 #include "StatusPage.h"
 #include "Images.h"
 
-#define BUTTONCOUNT 3
-#define BUTTON_MACHINE_ENABLE 0
-#define BUTTON_MACHINE_DISABLE 1
-#define BUTTON_NAVIGATION 2
+#define BUTTONCOUNT 2
+#define BUTTON_MACHINE 0
+#define BUTTON_NAVIGATION 1
 
 static void check_buttons(StatusPage *page)
 {
@@ -17,13 +16,16 @@ static void check_buttons(StatusPage *page)
             {
                 switch (page->buttons[i].name)
                 {
-                case BUTTON_MACHINE_ENABLE:
-                    printf("enabling motion\n");
-                    // state_machine_set_status(page->stateMachine, STATUS_ENABLED);
-                    break;
-                case BUTTON_MACHINE_DISABLE:
-                    printf("disabling motion\n");
-                    // state_machine_set_status(page->stateMachine, STATUS_DISABLED);
+                case BUTTON_MACHINE:
+                    switch (page->stateMachine->motionParameters.status)
+                    {
+                    case STATUS_DISABLED:
+                        state_machine_set(page->stateMachine, PARAM_STATUS, STATUS_ENABLED);
+                        break;
+                    case STATUS_ENABLED:
+                        state_machine_set(page->stateMachine, PARAM_STATUS, STATUS_DISABLED);
+                        break;
+                    }
                     break;
                 case BUTTON_NAVIGATION:
                     page->complete = true;
@@ -39,23 +41,24 @@ static void check_buttons(StatusPage *page)
 static void drawSuccessIndicator(StatusPage *page, int x, int y)
 {
     Image *check = page->images->successImage;
-    display_draw_square_fill(page->display, x, y, x + check->width - 1, y + check->height - 1, BACKCOLOR);
+    display_draw_square_fill(page->display, x, y, x + check->width - 1, y + check->height - 1, MAINCOLOR);
     display_bte_memory_copy_image(page->display, check, x, y);
 }
 
 static void drawFailIndicator(StatusPage *page, int x, int y)
 {
     Image *ex = page->images->failImage;
-    display_draw_square_fill(page->display, x, y, x + ex->width - 1, y + ex->height - 1, BACKCOLOR);
+    display_draw_square_fill(page->display, x, y, x + ex->width - 1, y + ex->height - 1, MAINCOLOR);
     display_bte_memory_copy_image(page->display, ex, x, y);
 }
 
-StatusPage *status_page_create(Display *display, MachineState *machineState, Images *images)
+StatusPage *status_page_create(Display *display, MachineState *machineState, MonitorData *data, Images *images)
 {
     StatusPage *page = malloc(sizeof(StatusPage));
     page->display = display;
     page->stateMachine = machineState;
     page->complete = false;
+    page->data = data;
     page->images = images;
     return page;
 }
@@ -107,18 +110,18 @@ void status_page_run(StatusPage *page)
     display_draw_line(page->display, selfCheckStartX, selfCheckStartY + 22, selfCheckStartX + strlen(buf) * 12, selfCheckStartY + 22, MAINTEXTCOLOR);
 
     int chargePumpStartY = selfCheckStartY + 30;
-    int chargePumpStartX = machineStateStartX + 20;
+    int chargePumpStartX = selfCheckStartX + 20;
     strcpy(buf, "Charge Pump:");
     display_draw_string(page->display, chargePumpStartX, chargePumpStartY, buf);
 
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     strcpy(buf, "Machine Check Status");
-    int machineCheckStartX = chargePumpStartX;
+    int machineCheckStartX = selfCheckStartX;
     int machineCheckStartY = chargePumpStartY + 30;
     display_draw_string(page->display, machineCheckStartX, machineCheckStartY, buf);
     display_draw_line(page->display, machineCheckStartX, machineCheckStartY + 22, machineCheckStartX + strlen(buf) * 12, machineCheckStartY + 22, MAINTEXTCOLOR);
 
-    int powerStartX = machineStateStartX + 20;
+    int powerStartX = machineCheckStartX + 20;
     int powerStartY = machineCheckStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
@@ -129,7 +132,7 @@ void status_page_run(StatusPage *page)
     int overTravelStartY = powerStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Travel Limits:");
+    strcpy(buf, "ESD Limits:");
     display_draw_string(page->display, overTravelStartX, overTravelStartY, buf);
 
     int esdStartX = overTravelStartX;
@@ -156,66 +159,15 @@ void status_page_run(StatusPage *page)
     int rtcStartY = dyn4StartY + 30;
     strcpy(buf, "RTC:");
 
-    int machineOKStartX = dyn4StartX;
-    int machineOKStartY = dyn4StartY + 30;
-    strcpy(buf, "Machine:");
-    display_draw_string(page->display, machineOKStartX, machineOKStartY, buf);
-
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Machine Limits");
-    int motionStartY = machineOKStartY + 30;
-    int motionStartX = machineCheckStartX;
-    display_draw_string(page->display, motionStartX, motionStartY, buf);
-    display_draw_line(page->display, motionStartX, motionStartY + 22, motionStartX + strlen(buf) * 12, motionStartY + 22, MAINTEXTCOLOR);
-
-    int hardUpperStartX = motionStartX + 20;
-    int hardUpperStartY = motionStartY + 30;
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    strcpy(buf, "Hard Upper Limit:");
-    display_draw_string(page->display, hardUpperStartX, hardUpperStartY, buf);
-
-    int hardLowerStartX = hardUpperStartX;
-    int hardLowerStartY = hardUpperStartY + 30;
-    strcpy(buf, "Hard Lower Limit:");
-    display_draw_string(page->display, hardLowerStartX, hardLowerStartY, buf);
-
-    int softUpperStartX = hardLowerStartX;
-    int softUpperStartY = hardLowerStartY + 30;
-    strcpy(buf, "Soft Upper Limit:");
-    display_draw_string(page->display, softUpperStartX, softUpperStartY, buf);
-
-    int softLowerStartX = softUpperStartX;
-    int softLowerStartY = softUpperStartY + 30;
-    strcpy(buf, "Soft Lower Limit:");
-    display_draw_string(page->display, softLowerStartX, softLowerStartY, buf);
-
-    int forceOverloadStartX = softLowerStartX;
-    int forceOverloadStartY = softLowerStartY + 30;
-    strcpy(buf, "Soft Lower Limit:");
-    display_draw_string(page->display, forceOverloadStartX, forceOverloadStartY, buf);
-
-    /*Motion Status window*/
-    int motionStatusX0 = SCREEN_WIDTH / 3 + 10;
-    int motionStatusX1 = SCREEN_WIDTH * 2 / 3 - 10;
-    int motionStatusY0 = 20;
-    int motionStatusY1 = 180;
-    int motionStatusWidth = motionStatusX1 - motionStatusX0;
-
-    display_draw_circle_square_fill(page->display, motionStatusX0, motionStatusY0, motionStatusX1, motionStatusY1, 20, 20, MAINCOLOR);
-
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
-    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
     strcpy(buf, "Motion Status");
-    int motionStatusStartX = motionStatusX0 + motionStatusWidth / 2 - strlen(buf) * 8;
-    int motionStatusStartY = motionStatusY0 + 10;
+    int motionStatusStartX = dyn4StartX;
+    int motionStatusStartY = dyn4StartY + 30;
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     display_draw_string(page->display, motionStatusStartX, motionStatusStartY, buf);
-    display_draw_line(page->display, motionStatusStartX, motionStatusStartY + 30, motionStatusStartX + strlen(buf) * 16, motionStatusStartY + 30, MAINTEXTCOLOR);
+    display_draw_line(page->display, motionStatusStartX, motionStatusStartY + 22, motionStatusStartX + strlen(buf) * 12, motionStatusStartY + 22, MAINTEXTCOLOR);
 
-    int motionStatus1StartX = motionStatusX0 + 20;
-    int motionStatus1StartY = motionStatusStartY + 40;
+    int motionStatus1StartX = forceStartX;
+    int motionStatus1StartY = motionStatusStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
     strcpy(buf, "Motion:");
@@ -231,59 +183,89 @@ void status_page_run(StatusPage *page)
     strcpy(buf, "Mode:");
     display_draw_string(page->display, motionModeStartX, motionModeStartY, buf);
 
-    /*Machine GPIO*/
-    int gpioX0 = SCREEN_WIDTH / 3 + 10;
-    int gpioX1 = SCREEN_WIDTH * 2 / 3 - 10;
-    int gpioY0 = 200;
-    int gpioY1 = SCREEN_HEIGHT - 20;
-    int gpioWidth = gpioX1 - gpioX0;
-    display_draw_circle_square_fill(page->display, gpioX0, gpioY0, gpioX1, gpioY1, 20, 20, MAINCOLOR);
+    int travelLimitStartX = motionModeStartX;
+    int travelLimitStartY = motionModeStartY + 30;
+    strcpy(buf, "Travel Limits:");
+    display_draw_string(page->display, travelLimitStartX, travelLimitStartY, buf);
+
+    int softLimitStartX = travelLimitStartX;
+    int softLimitStartY = travelLimitStartY + 30;
+    strcpy(buf, "Soft Limits:");
+    display_draw_string(page->display, softLimitStartX, softLimitStartY, buf);
+
+    /*Motion Status window*/
+    int motionStatusX0 = SCREEN_WIDTH / 3 + 10;
+    int motionStatusX1 = SCREEN_WIDTH * 2 / 3 - 10;
+    int motionStatusY0 = 20;
+    int motionStatusY1 = SCREEN_HEIGHT - 20;
+    int motionStatusWidth = motionStatusX1 - motionStatusX0;
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-    strcpy(buf, "Machine GPIO");
-    int gpioStartX = gpioX0 + gpioWidth / 2 - strlen(buf) * 8;
-    int gpioStartY = gpioY0 + 10;
+    display_draw_circle_square_fill(page->display, motionStatusX0, motionStatusY0, motionStatusX1, motionStatusY1, 20, 20, MAINCOLOR);
+
+    strcpy(buf, "Values");
+    int valuesStartX = motionStatusX0 + motionStatusWidth / 2 - strlen(buf) * 8;
+    int valuesStartY = motionStatusY0 + 20;
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    display_draw_string(page->display, gpioStartX, gpioStartY, buf);
-    display_draw_line(page->display, gpioStartX, gpioStartY + 30, gpioStartX + strlen(buf) * 16, gpioStartY + 30, MAINTEXTCOLOR);
+    display_draw_string(page->display, valuesStartX, valuesStartY, buf);
+    display_draw_line(page->display, valuesStartX, valuesStartY + 30, valuesStartX + strlen(buf) * 16, valuesStartY + 30, MAINTEXTCOLOR);
+    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
+
+    int positionStartY = valuesStartY + 40;
+    int positionStartX = motionStatusX0 + 20;
+    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
+    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+    strcpy(buf, "Position:");
+    display_draw_string(page->display, positionStartX, positionStartY, buf);
+
+    int forceValStartY = positionStartY + 30;
+    int forceValStartX = positionStartX;
+    strcpy(buf, "Force:");
+    display_draw_string(page->display, forceValStartX, forceValStartY, buf);
+
+    int forceGraphStartY = forceValStartY + 50;
+    int forceGraphStartX = forceValStartX;
+    int forceGraphWidth = motionStatusWidth - 40;
+    strcpy(buf, "Force vs Time");
+    display_draw_string(page->display, forceGraphStartX, forceGraphStartY, buf);
 
     /*page buttons*/
     Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
     page->buttons = buttons;
-    buttons[0].name = BUTTON_MACHINE_ENABLE;
-    buttons[0].xmin = SCREEN_WIDTH / 2 - 10 - 100;
+    buttons[0].name = BUTTON_MACHINE;
+    buttons[0].xmin = SCREEN_WIDTH - 100 - 20;
     buttons[0].xmax = buttons[0].xmin + 100;
-    buttons[0].ymin = 360;
+    buttons[0].ymin = SCREEN_HEIGHT - 50 - 20;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
     buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
-    buttons[1].name = BUTTON_MACHINE_DISABLE;
-    buttons[1].xmin = SCREEN_WIDTH / 2 + 10;
+    buttons[1].name = BUTTON_NAVIGATION;
+    buttons[1].xmin = SCREEN_WIDTH - 100;
     buttons[1].xmax = buttons[1].xmin + 100;
-    buttons[1].ymin = 360;
-    buttons[1].ymax = buttons[1].ymin + 50;
+    buttons[1].ymin = 0;
+    buttons[1].ymax = buttons[1].ymin + 100;
     buttons[1].pressed = false;
     buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
-
-    buttons[2].name = BUTTON_NAVIGATION;
-    buttons[2].xmin = SCREEN_WIDTH - 100;
-    buttons[2].xmax = buttons[2].xmin + 100;
-    buttons[2].ymin = 0;
-    buttons[2].ymax = buttons[2].ymin + 100;
-    buttons[2].pressed = false;
-    buttons[2].debounceTimems = 100;
-    buttons[2].lastPress = 0;
 
     Image *navigationImg = page->images->navigationImage;
     printf("printing:%s,%d\n", navigationImg->name, navigationImg->width);
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
+    float *forceLog = __builtin_alloca(sizeof(float) * (forceGraphWidth));
+    for (int i = 0; i < forceGraphWidth; i++)
+    {
+        forceLog[i] = 0;
+    }
     printf("Status page loaded\n");
     MachineState previousState = *(page->stateMachine);
     bool initial = true;
@@ -334,7 +316,7 @@ void status_page_run(StatusPage *page)
             }
 
         // ESD
-        if (currentState.machineCheckParameters.esdOK != previousState.machineCheckParameters.esdOK)
+        if (currentState.machineCheckParameters.esdOK != previousState.machineCheckParameters.esdOK || initial)
             if (page->stateMachine->machineCheckParameters.esdOK)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
@@ -367,16 +349,16 @@ void status_page_run(StatusPage *page)
             }
 
         // RTC
-        if (currentState.machineCheckParameters.rtcOK != previousState.machineCheckParameters.rtcOK || initial)
-            if (page->stateMachine->machineCheckParameters.rtcOK)
-            {
-                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
-            }
-            else
-            {
-                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
-            }
-
+        /* if (currentState.machineCheckParameters.rtcOK != previousState.machineCheckParameters.rtcOK || initial)
+             if (page->stateMachine->machineCheckParameters.rtcOK)
+             {
+                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
+             }
+             else
+             {
+                 drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, rtcStartY);
+             }
+ */
         // DYN4
         if (currentState.machineCheckParameters.dyn4OK != previousState.machineCheckParameters.dyn4OK || initial)
             if (page->stateMachine->machineCheckParameters.dyn4OK)
@@ -388,113 +370,178 @@ void status_page_run(StatusPage *page)
                 drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
             }
 
-        // machine
-        if (currentState.machineCheckParameters.machineOK != previousState.machineCheckParameters.machineOK || initial)
+        /*Motion State*/
+        // motion enabled
+        if (currentState.motionParameters.status != previousState.motionParameters.status || initial)
+        {
+            display_draw_square_fill(page->display, machineStateX1 - 11 * 12 - 20, motionStatus1StartY, machineStateX1 - 20, motionStatus1StartY + 24, MAINCOLOR);
 
-            if (page->stateMachine->machineCheckParameters.machineOK)
+            if (page->stateMachine->motionParameters.status == STATUS_ENABLED)
             {
-                drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, machineOKStartY);
+                display_text_color(page->display, ENABLEDTEXT, ENABLEDBACK);
+                strcpy(buf, "ENABLED");
+            }
+            else if (page->stateMachine->motionParameters.status == STATUS_DISABLED)
+            {
+                display_text_color(page->display, DISABLEDTEXT, DISABLEDBACK);
+                strcpy(buf, "DISABLED");
+            }
+            else if (page->stateMachine->motionParameters.status == STATUS_RESTRICTED)
+            {
+                display_text_color(page->display, ERRORTEXT, ERRORBACK);
+                strcpy(buf, "RESTRICTED");
+            }
+            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, motionStatus1StartY, buf);
+        }
+
+        // Motion Status
+        if (currentState.motionParameters.condition != previousState.motionParameters.condition || initial)
+        {
+            display_draw_square_fill(page->display, machineStateX1 - 12 * 12 - 20, motionConditionStartY, machineStateX1 - 20, motionConditionStartY + 24, MAINCOLOR);
+
+            switch (page->stateMachine->motionParameters.condition)
+            {
+            case MOTION_STOPPED:
+                display_text_color(page->display, ERRORTEXT, ERRORBACK);
+                strcpy(buf, "STOPPED");
+                break;
+            case MOTION_MOVING:
+                display_text_color(page->display, ACTIVETEXT, ACTIVEBACK);
+                strcpy(buf, "MOVING");
+                break;
+            case MOTION_TENSION:
+                display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
+                strcpy(buf, "TENSION");
+                break;
+            case MOTION_COMPRESSION:
+                display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
+                strcpy(buf, "COMPRESSION");
+                break;
+            case MOTION_UPPER:
+                display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
+                strcpy(buf, "UPPER");
+                break;
+            case MOTION_LOWER:
+                display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
+                strcpy(buf, "LOWER");
+                break;
+            case MOTION_DOOR:
+                display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
+                strcpy(buf, "DOOR");
+                break;
+            default:
+                break;
+            }
+            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, motionConditionStartY, buf);
+        }
+        // Motion Mode
+        if (currentState.motionParameters.mode != previousState.motionParameters.mode || initial)
+        {
+            display_draw_square_fill(page->display, machineStateX1 - 10 * 12 - 20, motionModeStartY, machineStateX1 - 20, motionModeStartY + 24, MAINCOLOR);
+
+            switch (page->stateMachine->motionParameters.mode)
+            {
+            case MODE_MANUAL:
+                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_BLUE);
+                strcpy(buf, "MANUAL");
+                break;
+            case MODE_AUTOMATIC:
+                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_LIGHTBLUE);
+                strcpy(buf, "AUTOMATIC");
+                break;
+            case MODE_OVERRIDE:
+                display_text_color(page->display, ERRORTEXT, ERRORBACK);
+                strcpy(buf, "OVERRIDE");
+                break;
+            default:
+                break;
+            }
+            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, motionModeStartY, buf);
+        }
+        // Travel limits
+        if (currentState.motionParameters.travelLimit != previousState.motionParameters.travelLimit || initial)
+        {
+            display_draw_square_fill(page->display, machineStateX1 - 6 * 12 - 20, travelLimitStartY, machineStateX1 - 20, travelLimitStartY + 24, MAINCOLOR);
+            switch (page->stateMachine->motionParameters.travelLimit)
+            {
+            case MOTION_OVER_TRAVEL_LOWER:
+                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
+                strcpy(buf, "LOWER");
+                break;
+            case MOTION_OVER_TRAVEL_UPPER:
+                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
+                strcpy(buf, "UPPER");
+                break;
+            case MOTION_OVER_TRAVEL_OK:
+                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_GREEN);
+                strcpy(buf, "OK");
+                break;
+            default:
+                break;
+            }
+            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, travelLimitStartY, buf);
+        }
+        // Soft limits
+        if (currentState.motionParameters.softLimit != previousState.motionParameters.softLimit || initial)
+        {
+            display_draw_square_fill(page->display, machineStateX1 - 6 * 12 - 20, softLimitStartY, machineStateX1 - 20, softLimitStartY + 24, MAINCOLOR);
+            switch (page->stateMachine->motionParameters.softLimit)
+            {
+            case MOTION_OVER_TRAVEL_LOWER:
+                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
+                strcpy(buf, "LOWER");
+                break;
+            case MOTION_OVER_TRAVEL_UPPER:
+                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
+                strcpy(buf, "UPPER");
+                break;
+            case MOTION_OVER_TRAVEL_OK:
+                display_text_color(page->display, ERRORTEXT, COLOR65K_GREEN);
+                strcpy(buf, "OK");
+                break;
+            default:
+                break;
+            }
+            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, softLimitStartY, buf);
+        }
+        /*Machine Toggle Button*/
+        if (currentState.motionParameters.status != previousState.motionParameters.status || initial)
+        {
+            if (page->stateMachine->motionParameters.status == STATUS_ENABLED)
+            {
+                strcpy(buf, "DISABLE");
+                display_draw_circle_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, 20, 20, ERRORBACK);
+                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
             }
             else
             {
-                drawFailIndicator(page, machineStateX0 + machineStateWidth - 50, machineOKStartY);
+                strcpy(buf, "ENABLE");
+                display_draw_circle_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, 20, 20, COLOR65K_GREEN);
+                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_GREEN);
             }
+            display_draw_string(page->display, buttons[0].xmin + (buttons[0].xmax - buttons[0].xmin) / 2 - strlen(buf) * 6, buttons[0].ymin + (buttons[0].ymax - buttons[0].ymin) / 2 - 12, buf);
+        }
 
-        /*Motion State*/
-        // motion enabled
-        if (page->stateMachine->motionParameters.status == STATUS_ENABLED)
-        {
-            display_text_color(page->display, ENABLEDTEXT, ENABLEDBACK);
-            strcpy(buf, "ENABLED");
-        }
-        else if (page->stateMachine->motionParameters.status == STATUS_DISABLED)
-        {
-            display_text_color(page->display, DISABLEDTEXT, DISABLEDBACK);
-            strcpy(buf, "DISABLED");
-        }
-        else if (page->stateMachine->motionParameters.status == STATUS_RESTRICTED)
-        {
-            display_text_color(page->display, ERRORTEXT, ERRORBACK);
-            strcpy(buf, "RESTRICTED");
-        }
-        display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, motionStatus1StartY, buf);
-
-        // Motion Status
-        switch (page->stateMachine->motionParameters.condition)
-        {
-        case MOTION_STOPPED:
-            display_text_color(page->display, ERRORTEXT, ERRORBACK);
-            strcpy(buf, "STOPPED");
-            break;
-        case MOTION_MOVING:
-            display_text_color(page->display, ACTIVETEXT, ACTIVEBACK);
-            strcpy(buf, "MOVING");
-            break;
-        case MOTION_TENSION:
-            display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
-            strcpy(buf, "TENSION");
-            break;
-        case MOTION_COMPRESSION:
-            display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
-            strcpy(buf, "COMPRESSION");
-            break;
-        case MOTION_UPPER:
-            display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
-            strcpy(buf, "UPPER");
-            break;
-        case MOTION_LOWER:
-            display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
-            strcpy(buf, "LOWER");
-            break;
-        case MOTION_DOOR:
-            display_text_color(page->display, WARNINGTEXT, WARNINGBACK);
-            strcpy(buf, "DOOR");
-            break;
-        default:
-            break;
-        }
-        display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, motionConditionStartY, buf);
-
-        // Motion Mode
-        switch (page->stateMachine->motionParameters.mode)
-        {
-        case MODE_MANUAL:
-            display_text_color(page->display, COLOR65K_WHITE, COLOR65K_BLUE);
-            strcpy(buf, "MANUAL");
-            break;
-        case MODE_AUTOMATIC:
-            display_text_color(page->display, COLOR65K_WHITE, COLOR65K_LIGHTBLUE);
-            strcpy(buf, "AUTOMATIC");
-            break;
-        case MODE_OVERRIDE:
-            display_text_color(page->display, ERRORTEXT, ERRORBACK);
-            strcpy(buf, "OVERRIDE ");
-            break;
-        default:
-            break;
-        }
-        display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, motionModeStartY, buf);
-
-        /*GPIO*/
+        /*Values*/
+        // printf("Position: %d\n", page->data->position);
+        sprintf(buf, "%dmm", page->data->position);
+        display_draw_square_fill(page->display, motionStatusX1 - 12 * 12 - 20, positionStartY, motionStatusX1 - 20, positionStartY + 24, MAINCOLOR);
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-        int x = gpioX0 + 10;
-        int y = gpioStartY + 45;
-        for (int i = 0; i < 12; i++)
+        display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, positionStartY, buf);
+
+        // printf("Force: %f\n", page->data->force);
+        sprintf(buf, "%0.3fN", page->data->force);
+        display_draw_square_fill(page->display, motionStatusX1 - 12 * 12 - 20, forceValStartY, motionStatusX1 - 20, forceValStartY + 24, MAINCOLOR);
+        display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+        display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, forceValStartY, buf);
+        for (int i = 0; i < forceGraphWidth - 1; i++)
         {
-            sprintf(buf, "GPI_%d: %s", i + 1, (1 ? "HIGH" : "LOW ")); // change to using mcp
-            if (i > 6)
-            {
-                x = gpioX1 - 10 - strlen(buf) * 12;
-            }
-            if (i == 7)
-            {
-                y = gpioStartY + 45;
-            }
-            display_draw_string(page->display, x, y, buf);
-            y += 30;
+            forceLog[i] = forceLog[i + 1];
         }
-        previousState = currentState;
+        forceLog[forceGraphWidth - 1] = page->data->force;
+        // display_draw_square_fill(page->display, forceGraphStartX - 1, forceGraphStartY - 1, forceGraphStartX + forceGraphWidth, forceGraphStartY + 100, MAINCOLOR);
+        draw_graph(page->display, forceGraphStartX, forceGraphStartY, forceGraphWidth, 100, forceLog);
+        _waitms(10);
         initial = false;
-        //  clock.render();
     }
 }

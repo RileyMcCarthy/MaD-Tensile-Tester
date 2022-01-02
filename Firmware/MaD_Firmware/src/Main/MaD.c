@@ -5,6 +5,7 @@
 #include "MCP23017.h"
 #include "tiny-json.h"
 #include "Images.h"
+#include "DYN4.h"
 
 static void write_machine_profile(MachineProfile *profile)
 {
@@ -123,12 +124,54 @@ static void test_mcp23017()
   return;
 }
 
+static void dyn4_test()
+{
+  MCP23017 *mcp = mcp23017_create();
+  mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+  mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
+  printf("MCP23017 begin\n");
+  pause(500);
+
+  DYN4 *dyn4 = dyn4_create();
+  dyn4_begin(dyn4, DYN4_RX, DYN4_TX, DYN4_ADDR);
+  DYN4_Status status;
+  while (dyn4_get_status(dyn4, &status) != SUCCESS)
+  {
+    printf("Error getting status\n");
+    _waitms(100);
+  }
+
+  printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
+  low(11);
+  while (dyn4_get_status(dyn4, &status) != SUCCESS)
+  {
+    printf("Error getting status\n");
+    _waitms(100);
+  }
+  printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
+
+  dyn4_send_command(dyn4, 0x0a, 100);
+
+  while (1)
+  {
+    printf("position:%d\n", dyn4->encoder.value());
+    while (dyn4_get_status(dyn4, &status) != SUCCESS)
+    {
+      printf("Error getting status\n");
+      _waitms(100);
+    }
+    printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
+    _waitms(1000);
+  }
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  *
  */
 void mad_begin()
 {
+
   printf("Starting...\n");
   mount("/sd", _vfs_open_sdcard());
 
@@ -148,29 +191,31 @@ void mad_begin()
   Images *images = create_images();
 
   // Load Assets from SD card
-  printf("Testingh:%s\n", images->statusPageImage->name);
   // image_load_assets(images, display);
-  printf("after load%s\n", images->statusPageImage->name);
 
   // Load Machine Profile
   loading_overlay_display(display, "Loading Machine Profile", OVERLAY_TYPE_LOADING);
 
   // Create DYN4 object (currently no communication with DYN4)
   DYN4 *dyn4 = dyn4_create();
-  dyn4_begin(dyn4, DYN4_RX, DYN4_TX, DYN4_ADDR);
-  loading_overlay_display(display, "DYN4 Connected", OVERLAY_TYPE_LOADING);
+  if (dyn4_begin(dyn4, DYN4_RX, DYN4_TX, DYN4_ADDR) != SUCCESS)
+  {
+    loading_overlay_display(display, "DYN4 Error", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(display, "DYN4 Connected", OVERLAY_TYPE_LOADING);
+  }
 
   // Connect to IMU
   // Start state machine (needs IO expansion)
-  MachineState *machineState = state_machine_run();
-  _waitms(100);
+  MachineState *machineState = machine_state_create();
 
   if (machineState == NULL)
   {
     loading_overlay_display(display, "State Machine Failed. Please Reset", OVERLAY_TYPE_LOADING);
     return;
   }
-  machineState->selfCheckParameters.chargePumpOK = true;
   loading_overlay_display(display, "State Machine Running", OVERLAY_TYPE_LOADING);
 
   // Connect to RTC
@@ -190,13 +235,14 @@ void mad_begin()
 
   // Connect Force Gauge
   ForceGauge *forceGauge = force_gauge_create();
-  while (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, forceGauge->interpolationSlope, forceGauge->interpolationZero) != SUCCESS)
+  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, machineProfile->configuration->forceGaugeScaleFactor, machineProfile->configuration->forceGaugeZeroFactor) != SUCCESS)
   {
-    loading_overlay_display(display, "Connect/Power Force Gauge", OVERLAY_TYPE_LOADING);
-    _waitms(100);
+    loading_overlay_display(display, "Force gauge failed", OVERLAY_TYPE_LOADING);
   }
-
-  loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+  else
+  {
+    loading_overlay_display(display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
+  }
 
   Monitor *monitor = monitor_create();
   if (monitor_begin(monitor, dyn4, forceGauge, 100))
@@ -217,6 +263,7 @@ void mad_begin()
   {
     loading_overlay_display(display, "Control Failed", OVERLAY_TYPE_LOADING);
   }
+  machineState->selfCheckParameters.chargePumpOK = true;
 
   // Begin main loop
   Pages currentPage = PAGE_STATUS;
@@ -226,7 +273,7 @@ void mad_begin()
     {
     case PAGE_STATUS:
       printf("Loading status page\n");
-      StatusPage *statusPage = status_page_create(display, machineState, images);
+      StatusPage *statusPage = status_page_create(display, machineState, &(monitor->data), images);
       status_page_run(statusPage);
       status_page_destroy(statusPage);
       printf("Leaving status page\n");

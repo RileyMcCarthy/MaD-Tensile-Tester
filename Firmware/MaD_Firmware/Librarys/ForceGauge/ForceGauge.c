@@ -102,9 +102,9 @@ int force_gauge_get_force(ForceGauge *forceGauge)
     return force_gauge_raw_to_force(forceGauge, forceRaw);
 }
 
-int force_gauge_raw_to_force(ForceGauge *forceGauge, int raw)
+float force_gauge_raw_to_force(ForceGauge *forceGauge, int raw)
 {
-    return (raw - forceGauge->interpolationZero) / forceGauge->interpolationSlope;
+    return (float)(raw - forceGauge->interpolationZero) / ((float)forceGauge->interpolationSlope * (float)1000);
 }
 
 int force_gauge_get_raw(ForceGauge *forceGauge)

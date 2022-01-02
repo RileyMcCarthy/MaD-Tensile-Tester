@@ -1,5 +1,5 @@
 #include "Monitor.h"
-static long monitor_stack[64];
+static long monitor_stack[64 * 4];
 
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
@@ -8,7 +8,6 @@ static void monitor_cog(Monitor *monitor)
     int lastms = 0;
     int delayms = 1000000 / monitor->sampleRate;
     int delay = 0;
-    int forceRaw;
     while (1)
     {
         /*Delay to run at sampleRate*/
@@ -22,10 +21,14 @@ static void monitor_cog(Monitor *monitor)
         if (forceRawTemp != NULL)
         {
             monitor->data.forceRaw = forceRawTemp;
-            monitor->data.force = force_gauge_raw_to_force(monitor->forceGauge, forceRaw);
+            monitor->data.force = force_gauge_raw_to_force(monitor->forceGauge, forceRawTemp);
         }
-        monitor->data.position = monitor->dyn4->encoder.value(); // Get Position
-        monitor->data.timems = _getms();                         // Get Time
+        else // Force gauge isnt responding attempt to reconnect
+        {
+            force_gauge_begin(monitor->forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, monitor->forceGauge->interpolationSlope, monitor->forceGauge->interpolationZero);
+        }
+        monitor->data.position = monitor->dyn4->encoder.value() / 10000; // Get Position
+        monitor->data.timems = _getms();                                 // Get Time
 
         // Update Buffer
         // circular buffer is faster implementation, this is simple for now

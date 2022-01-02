@@ -1,5 +1,5 @@
 #include "Control.h"
-static long control_stack[64];
+static long control_stack[64 * 4];
 
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(Control *control)
@@ -23,9 +23,26 @@ static void control_cog(Control *control)
     int position = control->dyn4->encoder.value();
     navkey_write_counter(navkey, position); // reset counter to position
     MachineState lastState;
+
+    unsigned long timems = _getms();
+    unsigned long intervalDYN4Check = 100;
+    unsigned long intervalDYN4CheckLast = 0;
     while (1)
     {
         MachineState currentMachineState = *(control->stateMachine);
+
+        // DYN4
+        DYN4_Status status;
+
+        if (dyn4_get_status(control->dyn4, &status) != SUCCESS)
+        {
+            state_machine_set(control->stateMachine, PARAM_DYN4OK, (int)false);
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_DYN4OK, (int)true);
+        }
+
         if (currentMachineState.currentState == STATE_MOTION)
         {
             if (lastState.currentState != STATE_MOTION)
@@ -72,9 +89,19 @@ static void control_cog(Control *control)
         {
             // turn off all motion
             // turn off IO that powers dyn4
-            mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
+            // mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
+            // mcp_set_pin(mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0); // low will enable servo
         }
+
+        if (currentMachineState.selfCheckParameters.chargePumpOK)
+        {
+            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
+        }
+        else
+        {
+            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);
+        }
+
         // Check for system exeeding performance conditions
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
@@ -86,44 +113,31 @@ static void control_cog(Control *control)
         {
             // Error machine out of bounds (Upper Limit)
             // Update state machine
-            control->stateMachine->motionParameters.softUpperLimit = true;
+            state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_UPPER);
         }
         else if (data.position < machinePerformance.maxPosition)
         {
             // Error machine out of bounds
             // Update state machine
-            control->stateMachine->motionParameters.softLowerLimit = true;
+            state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_LOWER);
+        }
+        else if (data.force >= 0 && data.force > machinePerformance.maxForceTensile) /*Check force overload tension*/
+        {
+            state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_TENSION);
+        }
+        else if (data.force < 0 && data.force < -machinePerformance.maxForceCompression) /*Check force overload compression*/
+        {
+            state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_COMPRESSION);
         }
         else
         {
-            // Machine operating withen bounds, update state machine
-            control->stateMachine->motionParameters.softUpperLimit = false;
-            control->stateMachine->motionParameters.softLowerLimit = false;
-        }
-
-        /*Check force overload*/
-        if (data.force >= 0)
-        {
-            // Tensile forces
-            if (data.force > machinePerformance.maxForceTensile)
+            if (status.motorBusy)
             {
-                control->stateMachine->motionParameters.forceOverload = true;
+                state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_MOVING);
             }
             else
             {
-                control->stateMachine->motionParameters.forceOverload = false;
-            }
-        }
-        else
-        {
-            // Compression forces
-            if (data.force < -machinePerformance.maxForceCompression)
-            {
-                control->stateMachine->motionParameters.forceOverload = true;
-            }
-            else
-            {
-                control->stateMachine->motionParameters.forceOverload = false;
+                state_machine_set(control->stateMachine, PARAM_CONDITION, MOTION_STOPPED);
             }
         }
 
@@ -132,57 +146,70 @@ static void control_cog(Control *control)
         // Switched power
         if (mcp_get_pin(mcp, SWITCHED_POWER_PIN, SWITCHED_POWER_REGISTER) == 0)
         {
-            control->stateMachine->machineCheckParameters.switchedPowerOK = true;
+            state_machine_set(control->stateMachine, PARAM_SWITCHEDPOWEROK, (int)true);
         }
         else
         {
-            control->stateMachine->machineCheckParameters.switchedPowerOK = false;
+            state_machine_set(control->stateMachine, PARAM_SWITCHEDPOWEROK, (int)false);
+        }
+
+        // ESD Distance limits
+        if (mcp_get_pin(mcp, ESD_LIMIT_MIN_PIN_NUMBER, ESD_LIMIT_MIN_PIN_REGISTER) == 0)
+        {
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_LOWER);
+        }
+        else if (mcp_get_pin(mcp, ESD_LIMIT_MAX_PIN_NUMBER, ESD_LIMIT_MAX_PIN_REGISTER) == 0)
+        {
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_UPPER);
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_OK);
         }
 
         // ESD
-        if (mcp_get_pin(mcp, ESD_ACTIVE_PIN, ESD_ACTIVE_REGISTER) == 0)
+        if (mcp_get_pin(mcp, ESD_ACTIVE_PIN, ESD_ACTIVE_REGISTER) == 1)
         {
-            control->stateMachine->machineCheckParameters.esdOK = true;
+            state_machine_set(control->stateMachine, PARAM_ESDOK, (int)true);
         }
         else
         {
-            control->stateMachine->machineCheckParameters.esdOK = false;
+            state_machine_set(control->stateMachine, PARAM_ESDOK, (int)false);
         }
 
-        // Servo Ready
-        if (mcp_get_pin(mcp, PIN_SRVORDY_PIN, PIN_SRVORDY_REGISTER) == 1)
+        // Servo ready
+        if (mcp_get_pin(mcp, SRVORDY_PIN, SRVORDY_REGISTER) == 1)
         {
-            control->stateMachine->machineCheckParameters.servoOK = true;
+            state_machine_set(control->stateMachine, PARAM_SERVOOK, (int)true);
         }
         else
         {
-            control->stateMachine->machineCheckParameters.servoOK = false;
+            state_machine_set(control->stateMachine, PARAM_SERVOOK, (int)false);
         }
 
         // Force Gauge
         if (data.forceRaw == -1)
-        { /*need to change to proper error value, not -1*/
-            control->stateMachine->machineCheckParameters.forceGaugeOK = false;
+        { /*need to change to proper error value, not -1, this is possible force value*/
+            state_machine_set(control->stateMachine, PARAM_FORCEGAUGEOK, (int)false);
         }
         else
         {
-            control->stateMachine->machineCheckParameters.forceGaugeOK = true;
+            state_machine_set(control->stateMachine, PARAM_FORCEGAUGEOK, (int)true);
         }
-
         // RTC
 
-        /*Check IO Expansion for hard upper/lower limits*/
-        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1)
+        // Travel Limits
+        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1)
         {
-            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_UPPER;
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_LOWER);
         }
-        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1)
+        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1)
         {
-            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_LOWER;
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_UPPER);
         }
         else
         {
-            control->stateMachine->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_OK;
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_OK);
         }
         lastState = currentMachineState;
     }
@@ -201,7 +228,7 @@ Control *control_create(MachineProfile *machineProfile, MachineState *stateMachi
 }
 bool control_begin(Control *control)
 {
-    control->cogid = _cogstart_C(control_cog, control, &control_stack[0], sizeof(long) * 64);
+    control->cogid = _cogstart_C(control_cog, control, &control_stack[0], sizeof(control_stack));
     if (control->cogid != -1)
     {
         return true;

@@ -6,16 +6,20 @@
 #include "Style.h"
 #include "StateMachine.h"
 #include "Images.h"
+#include "Monitor.h"
+#include "Graph.h"
+
 typedef struct StatusPage_s
 {
     bool complete;
     Display *display;
     MachineState *stateMachine;
+    MonitorData *data;
     Button *buttons;
     Images *images;
 } StatusPage;
 
-StatusPage *status_page_create(Display *display, MachineState *machineState, Images *images);
+StatusPage *status_page_create(Display *display, MachineState *machineState, MonitorData *data, Images *images);
 
 void status_page_destroy(StatusPage *statusPage);
 
