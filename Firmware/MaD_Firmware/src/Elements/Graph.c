@@ -1,118 +1,92 @@
 #include "Graph.h"
 
-// make graph an object so it has memory!
-void draw_graph(Display *display, int GRAPH_X, int GRAPH_Y, int GRAPH_W, int GRAPH_H, float *signal)
+Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, char *units, char *title)
 {
-    // Signal properties (to be determined and used)
-    float maxValue;
-    float minValue;
-    float overallHeight;
-    float relativeHeight1;
-    float relativeHeight2;
-    int i;
-    maxValue = signal[0];
-    minValue = signal[0];
-    bool redraw = true;
-    for (i = 1; i < GRAPH_W; i++)
+    Graph *graph = (Graph *)malloc(sizeof(Graph));
+    graph->startX = startX;
+    graph->startY = startY;
+    graph->width = width;
+    graph->height = height;
+    graph->maxY = maxY;
+    graph->minY = minY;
+    graph->lastX = NULL;
+    graph->lastY = NULL;
+    graph->markerCount = 0;
+    graph->units = (char *)malloc(strlen(units) + 1);
+    strcpy(graph->units, units);
+    graph->title = (char *)malloc(sizeof(char) * (strlen(title) + 1));
+    strcpy(graph->title, title);
+    return graph;
+}
+
+void graph_destroy(Graph *graph)
+{
+    free(graph->title);
+    free(graph->units);
+    free(graph);
+}
+
+void graph_add_marker(Graph *graph, float value)
+{
+    if (graph->markerCount < MAX_GRAPH_MARKERS)
     {
-        if (signal[i] > maxValue)
-        {
-            maxValue = signal[i];
-            redraw = false;
-        }
-        if (signal[i] < minValue)
-        {
-            minValue = signal[i];
-            redraw = false;
-        }
+        graph->markerY[graph->markerCount] = value;
+        graph->markerCount++;
     }
-    if (redraw && false) // redraw
+}
+
+// make graph an object so it has memory!
+bool graph_draw(Graph *graph, Display *display, float newValue)
+{
+    display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->startX + 2, graph->startY, PAGE1_START_ADDR, SCREEN_WIDTH, graph->startX, graph->startY, graph->width, graph->height);
+    display_draw_line(display, graph->startX, graph->startY, graph->startX, graph->startY + graph->height, COLOR65K_BLACK);
+    display_draw_line(display, graph->startX, graph->startY + graph->height, graph->startX + graph->width, graph->startY + graph->height, COLOR65K_BLACK);
+
+    // Draw markerts
+
+    int relativeHeight = ((newValue - graph->minY) / (graph->maxY - graph->minY)) * (graph->height); // Scale new value to graphs height
+    if (relativeHeight < 0)
     {
-        printf("redraw: max:%d,min%d\n", maxValue, minValue);
-        maxValue = signal[2];
-        minValue = signal[2];
-        for (i = 2; i < GRAPH_W; i++)
-        {
-            if (signal[i] > maxValue)
-            {
-                maxValue = signal[i];
-            }
-            if (signal[i] < minValue)
-            {
-                minValue = signal[i];
-            }
-        }
-        // printf("new values: max:%d,min%d\n", maxValue, minValue);
-        int lastX = GRAPH_X;
-        int lastY = GRAPH_Y;
-        display_draw_square_fill(display, GRAPH_X, GRAPH_Y, GRAPH_X + GRAPH_W, GRAPH_Y + GRAPH_H, MAINCOLOR);
-        for (int i = 1; i < GRAPH_W; i++)
-        {
-            // In case the smallest signal value is being plotted, plot is dirrectly,
-            // As relative height will be undefined
-            int relativeHeight;
-            if (overallHeight != 0)
-            {
-                relativeHeight = (signal[i] - minValue) / (overallHeight); // Relative height of a given signal value (decimal between 0 and 1)
-            }
-            else
-            {
-                relativeHeight = 0;
-            }
-            int x = GRAPH_X + i;
-            int y = (int)(GRAPH_Y + relativeHeight * GRAPH_H);
-            display_draw_line(display, x, y, lastX, lastY);
-            lastX = x;
-            lastY = y;
-        }
-        return;
+        relativeHeight = 0;
+    }
+    else if (relativeHeight > graph->height)
+    {
+        relativeHeight = graph->height;
+    }
+    int x = graph->startX + graph->width;
+    int y = (int)(graph->startY + graph->height - relativeHeight);
+
+    if (graph->lastX == NULL)
+    {
+        printf("init\n");
+        graph->lastX = x;
+        graph->lastY = y;
     }
 
-    overallHeight = maxValue - minValue;
+    // Erase old information
+    display_draw_line(display, graph->lastX - 2, graph->startY, graph->lastX - 2, graph->startY + graph->height, MAINCOLOR);
+    display_draw_line(display, x, graph->startY, x, graph->startY + graph->height, MAINCOLOR);
+    // Draw new value
+    display_draw_line(display, graph->lastX - 2, graph->lastY, x, y, COLOR65K_GREEN);
 
-    int lastX = GRAPH_X;
-    int lastY = GRAPH_Y;
-    /*for (int i = 0; i < GRAPH_W; i++) use this for single draw graphs, not live graphs
+    // draw markers
+    for (int i = 0; i < graph->markerCount; i++)
     {
-        // In case the smallest signal value is being plotted, plot is dirrectly,
-        // As relative height will be undefined
-        if (overallHeight != 0)
-        {
-            relativeHeight = (signal[i] - minValue) / (overallHeight); // Relative height of a given signal value (decimal between 0 and 1)
-        }
-        else
-        {
-            relativeHeight = 0;
-        }
-        int x = GRAPH_X + i;
-        int y = (int)(GRAPH_Y + relativeHeight * GRAPH_H);
-        display_draw_line(display, x, y, lastX, lastY);
-        lastX = x;
-        lastY = y;
-    }*/
-    display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, GRAPH_X + 2, GRAPH_Y, PAGE1_START_ADDR, SCREEN_WIDTH, GRAPH_X, GRAPH_Y, GRAPH_W, GRAPH_H);
-    if (overallHeight != 0)
-    {
-        relativeHeight1 = (signal[GRAPH_W - 1] - minValue) / (overallHeight); // Relative height of a given signal value (decimal between 0 and 1)
-        relativeHeight2 = (signal[GRAPH_W - 2] - minValue) / (overallHeight); // Relative height of a given signal value (decimal between 0 and 1)
+        int markerY = (int)(graph->startY + graph->height - ((graph->markerY[i] - graph->minY) / (graph->maxY - graph->minY)) * (graph->height));
+        display_draw_line(display, graph->startX, markerY, graph->startX + graph->width, markerY, COLOR65K_RED);
     }
-    else
-    {
-        relativeHeight1 = 0;
-        relativeHeight2 = 0;
-    }
-    int x1 = GRAPH_X + GRAPH_W;
-    int y1 = (int)(GRAPH_Y + GRAPH_H - relativeHeight1 * GRAPH_H);
-    int x2 = GRAPH_X + GRAPH_W - 1;
-    int y2 = (int)(GRAPH_Y + GRAPH_H - relativeHeight2 * GRAPH_H);
-    // printf("%d %d\n", y1, y2);
-    // display_draw_square_fill(display, x2, GRAPH_Y, x1, GRAPH_Y + GRAPH_H, MAINCOLOR);
-    display_draw_line(display, x2, GRAPH_Y, x2, GRAPH_Y + GRAPH_H, MAINCOLOR);
-    display_draw_line(display, x1, GRAPH_Y, x1, GRAPH_Y + GRAPH_H, MAINCOLOR);
-    display_draw_line(display, x2, y2, x1, y1, COLOR65K_GREEN);
+
+    display_text_color(display, MAINTEXTCOLOR, MAINCOLOR);
+
+    display_draw_string(display, graph->startX + graph->width / 2 - strlen(graph->title) * 6, graph->startY - 20, graph->title);
+    display_text_color(display, COLOR65K_BLACK, MAINCOLOR);
+
     char buf[20];
-    sprintf(buf, "%0.3f", maxValue);
-    display_draw_string(display, GRAPH_X + 20, GRAPH_Y - 20, buf);
-    sprintf(buf, "%0.3f", minValue);
-    display_draw_string(display, GRAPH_X + 20, GRAPH_Y + 20 + GRAPH_H, buf);
+    sprintf(buf, "%0.1f%s", graph->maxY, graph->units);
+    display_draw_string(display, graph->startX, graph->startY - 20, buf);
+    sprintf(buf, "%0.1f%s", graph->minY, graph->units);
+    display_draw_string(display, graph->startX, graph->startY + 4 + graph->height, buf);
+    graph->lastX = x;
+    graph->lastY = y;
+    return true;
 }

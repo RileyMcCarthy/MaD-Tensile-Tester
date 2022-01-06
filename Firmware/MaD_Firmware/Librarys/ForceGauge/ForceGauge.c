@@ -62,7 +62,7 @@ void force_gauge_destroy(ForceGauge *forceGauge)
 Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int zero)
 {
     _waitms(100);
-    int configData1 = 0b00001000;
+    int configData1 = 0b11001000;
     int configData2 = 0b01000000;
     int configData4 = 0b01110111;
 

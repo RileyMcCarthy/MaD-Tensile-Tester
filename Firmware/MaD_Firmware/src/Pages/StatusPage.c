@@ -232,8 +232,14 @@ void status_page_run(StatusPage *page)
     int forceGraphStartY = forceValStartY + 50;
     int forceGraphStartX = forceValStartX;
     int forceGraphWidth = motionStatusWidth - 40;
-    strcpy(buf, "Force vs Time");
-    display_draw_string(page->display, forceGraphStartX, forceGraphStartY, buf);
+    Graph *forceTimeGraph = graph_create(forceGraphStartX, forceGraphStartY, forceGraphWidth, 100, 2.5, 0, "N", "F vs t");
+    graph_add_marker(forceTimeGraph, 2);
+
+    int positionGraphStartY = forceGraphStartY + 150;
+    int positionGraphStartX = forceGraphStartX;
+    int positionGraphWidth = motionStatusWidth - 40;
+    Graph *positionTimeGraph = graph_create(positionGraphStartX, positionGraphStartY, positionGraphWidth, 100, 200, 0, "mm", "P vs t");
+    graph_add_marker(positionTimeGraph, 150);
 
     /*page buttons*/
     Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
@@ -282,8 +288,8 @@ void status_page_run(StatusPage *page)
 
         /*Self Check State*/
         // charge pump
-        if (currentState.selfCheckParameters.chargePumpOK != previousState.selfCheckParameters.chargePumpOK || initial)
-            if (currentState.selfCheckParameters.chargePumpOK)
+        if (currentState.selfCheckParameters.chargePump != previousState.selfCheckParameters.chargePump || initial)
+            if (currentState.selfCheckParameters.chargePump)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, chargePumpStartY);
             }
@@ -294,8 +300,8 @@ void status_page_run(StatusPage *page)
 
         /*Machine Check State*/
         // switched power enabled
-        if (currentState.machineCheckParameters.switchedPowerOK != previousState.machineCheckParameters.switchedPowerOK || initial)
-            if (page->stateMachine->machineCheckParameters.switchedPowerOK)
+        if (currentState.machineCheckParameters.switchedPower != previousState.machineCheckParameters.switchedPower || initial)
+            if (page->stateMachine->machineCheckParameters.switchedPower)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, powerStartY);
             }
@@ -305,8 +311,8 @@ void status_page_run(StatusPage *page)
             }
 
         // Over Travel Limits
-        if (currentState.machineCheckParameters.overTravelLimit != previousState.machineCheckParameters.overTravelLimit || initial)
-            if (page->stateMachine->machineCheckParameters.overTravelLimit == MOTION_OVER_TRAVEL_OK)
+        if (currentState.machineCheckParameters.esdTravelLimit != previousState.machineCheckParameters.esdTravelLimit || initial)
+            if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_OK)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, overTravelStartY);
             }
@@ -316,8 +322,8 @@ void status_page_run(StatusPage *page)
             }
 
         // ESD
-        if (currentState.machineCheckParameters.esdOK != previousState.machineCheckParameters.esdOK || initial)
-            if (page->stateMachine->machineCheckParameters.esdOK)
+        if (currentState.machineCheckParameters.esdSwitch != previousState.machineCheckParameters.esdSwitch || initial)
+            if (page->stateMachine->machineCheckParameters.esdSwitch)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, esdStartY);
             }
@@ -338,8 +344,8 @@ void status_page_run(StatusPage *page)
             }
 
         // Force Gauge
-        if (currentState.machineCheckParameters.forceGaugeOK != previousState.machineCheckParameters.forceGaugeOK || initial)
-            if (page->stateMachine->machineCheckParameters.forceGaugeOK)
+        if (currentState.machineCheckParameters.forceGaugeCom != previousState.machineCheckParameters.forceGaugeCom || initial)
+            if (page->stateMachine->machineCheckParameters.forceGaugeCom)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, forceStartY);
             }
@@ -360,8 +366,8 @@ void status_page_run(StatusPage *page)
              }
  */
         // DYN4
-        if (currentState.machineCheckParameters.dyn4OK != previousState.machineCheckParameters.dyn4OK || initial)
-            if (page->stateMachine->machineCheckParameters.dyn4OK)
+        if (currentState.machineCheckParameters.servoCom != previousState.machineCheckParameters.servoCom || initial)
+            if (page->stateMachine->machineCheckParameters.servoCom)
             {
                 drawSuccessIndicator(page, machineStateX0 + machineStateWidth - 50, dyn4StartY);
             }
@@ -445,7 +451,7 @@ void status_page_run(StatusPage *page)
                 display_text_color(page->display, COLOR65K_WHITE, COLOR65K_BLUE);
                 strcpy(buf, "MANUAL");
                 break;
-            case MODE_AUTOMATIC:
+            case MODE_TEST:
                 display_text_color(page->display, COLOR65K_WHITE, COLOR65K_LIGHTBLUE);
                 strcpy(buf, "AUTOMATIC");
                 break;
@@ -458,52 +464,7 @@ void status_page_run(StatusPage *page)
             }
             display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, motionModeStartY, buf);
         }
-        // Travel limits
-        if (currentState.motionParameters.travelLimit != previousState.motionParameters.travelLimit || initial)
-        {
-            display_draw_square_fill(page->display, machineStateX1 - 6 * 12 - 20, travelLimitStartY, machineStateX1 - 20, travelLimitStartY + 24, MAINCOLOR);
-            switch (page->stateMachine->motionParameters.travelLimit)
-            {
-            case MOTION_OVER_TRAVEL_LOWER:
-                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
-                strcpy(buf, "LOWER");
-                break;
-            case MOTION_OVER_TRAVEL_UPPER:
-                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
-                strcpy(buf, "UPPER");
-                break;
-            case MOTION_OVER_TRAVEL_OK:
-                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_GREEN);
-                strcpy(buf, "OK");
-                break;
-            default:
-                break;
-            }
-            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, travelLimitStartY, buf);
-        }
-        // Soft limits
-        if (currentState.motionParameters.softLimit != previousState.motionParameters.softLimit || initial)
-        {
-            display_draw_square_fill(page->display, machineStateX1 - 6 * 12 - 20, softLimitStartY, machineStateX1 - 20, softLimitStartY + 24, MAINCOLOR);
-            switch (page->stateMachine->motionParameters.softLimit)
-            {
-            case MOTION_OVER_TRAVEL_LOWER:
-                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
-                strcpy(buf, "LOWER");
-                break;
-            case MOTION_OVER_TRAVEL_UPPER:
-                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
-                strcpy(buf, "UPPER");
-                break;
-            case MOTION_OVER_TRAVEL_OK:
-                display_text_color(page->display, ERRORTEXT, COLOR65K_GREEN);
-                strcpy(buf, "OK");
-                break;
-            default:
-                break;
-            }
-            display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, softLimitStartY, buf);
-        }
+
         /*Machine Toggle Button*/
         if (currentState.motionParameters.status != previousState.motionParameters.status || initial)
         {
@@ -534,14 +495,13 @@ void status_page_run(StatusPage *page)
         display_draw_square_fill(page->display, motionStatusX1 - 12 * 12 - 20, forceValStartY, motionStatusX1 - 20, forceValStartY + 24, MAINCOLOR);
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, forceValStartY, buf);
-        for (int i = 0; i < forceGraphWidth - 1; i++)
-        {
-            forceLog[i] = forceLog[i + 1];
-        }
-        forceLog[forceGraphWidth - 1] = page->data->force;
         // display_draw_square_fill(page->display, forceGraphStartX - 1, forceGraphStartY - 1, forceGraphStartX + forceGraphWidth, forceGraphStartY + 100, MAINCOLOR);
-        draw_graph(page->display, forceGraphStartX, forceGraphStartY, forceGraphWidth, 100, forceLog);
+        graph_draw(forceTimeGraph, page->display, page->data->force);
+        graph_draw(positionTimeGraph, page->display, page->data->position);
+        printf("Position: %d\n", page->data->position);
         _waitms(10);
         initial = false;
+        previousState = currentState;
     }
+    graph_destroy(forceTimeGraph);
 }

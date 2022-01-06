@@ -1,8 +1,5 @@
 #ifndef StateMachine_H
 #define StateMachine_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
 #include <simpletools.h>
 #include <stdbool.h>
 #include "DYN4.h"
@@ -17,50 +14,72 @@ typedef enum States_e
 
 typedef enum MotionStatus_e
 {
-    STATUS_DISABLED,
-    STATUS_ENABLED,
-    STATUS_RESTRICTED
+    STATUS_DISABLED,      // Motion is disabled
+    STATUS_ENABLED,       // Motion is enabled
+    STATUS_SAMPLE_LIMIT,  // Motion is enabled but limited by condition (ie. length, force)
+    STATUS_MACHINE_LIMIT, // Motion is enabled but limited by condition (ie. tension, compression, travel upper/lower, door)
+    STATUS_FAULTED        // Motion is disabled due to fault (ie. ESD switch, ESD travel)
 } MotionStatus;
 
 typedef enum MotionOverTravel_e
 {
-    MOTION_OVER_TRAVEL_OK,
-    MOTION_OVER_TRAVEL_UPPER,
-    MOTION_OVER_TRAVEL_LOWER
+    MOTION_LIMIT_OK,    // No limit
+    MOTION_LIMIT_UPPER, // Upper limit
+    MOTION_LIMIT_LOWER  // Lower limit
 } MotionOverTravel;
 
+/**
+ * @brief Motion conditions ordered from most to least critical.
+ *
+ */
 typedef enum MotionCondition_e
 {
-    MOTION_STOPPED,
-    MOTION_MOVING,
-    MOTION_TENSION,
-    MOTION_COMPRESSION,
-    MOTION_UPPER,
-    MOTION_LOWER,
-    MOTION_DOOR
+    MOTION_LENGTH,      // Test sample maximum length exceeded
+    MOTION_FORCE,       // Test sample maximum force exceeded
+    MOTION_TENSION,     // Machine maximum tensile force exceeded
+    MOTION_COMPRESSION, // Machine maximum compression force exceeded
+    MOTION_UPPER,       // Machine upper travel limit exceeded
+    MOTION_LOWER,       // Machine lower travel limit exceeded
+    MOTION_DOOR,        // Door is open
+    MOTION_STOPPED,     // Motor is stationary
+    MOTION_MOVING,      // Motion is moving
 } MotionCondition;
 
 typedef enum MotionMode_e
 {
-    MODE_MANUAL,
-    MODE_AUTOMATIC,
-    MODE_OVERRIDE
+    MODE_MANUAL, // Manual mode
+    MODE_TEST    // Test mode
 } MotionMode;
+
+typedef enum ModeFunctions_e
+{
+    MANUAL_OFF,               // Terminates current motion
+    MANUAL_INCREMENTAL_JOG,   // Jog by incremental amount
+    MANUAL_CONTINUOUS_JOG,    // Jog continuously
+    MANUAL_POSITIONAL_MOVE,   // Move to position
+    MANUAL_HOME,              // Move to home position
+    MANUAL_MOVE_GAUGE_LENGTH, // Move gauge to length
+    MANUAL_MOVE_FORCE,        // Move gauge to force
+    TEST_LOAD,                // Load test profile
+    TEST_RUN,                 // Run test profile
+    TEST_STOP,                // Stop test profile
+    TEST_TOGGLE_HOLD_RESUME   // Toggle hold/resume
+} ManualModeFunctions;
 
 typedef struct SelfCheck_t
 {
-    bool chargePumpOK; // Charge pump signal is activated, self check is satisfied. StateMachine, working
+    bool chargePump; // Charge pump signal is activated, self check is satisfied. StateMachine, working
 } SelfCheckParameters;
 
 typedef struct MachineCheck_t
 {
-    bool switchedPowerOK;             // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. implemented, changed to GPI12
-    MotionOverTravel overTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
-    bool esdOK;                       // User ESD switch is activated ( GPI_4 ). Control.c. implemented (big red button)
-    bool servoOK;                     // Servo ready signal recieved ( GPI_11 ). Control.c, implemented
-    bool forceGaugeOK;                // Force gauge communicating. Control.c, implemented
-    bool dyn4OK;                      // DYN4 is communicating. Control.c
-    bool rtcOK;                       // RTC is communicating. Control.c , not implmeented
+    bool switchedPower;              // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. implemented, changed to GPI12
+    MotionOverTravel esdTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
+    bool esdSwitch;                  // User ESD switch is activated ( GPI_4 ). Control.c. implemented (big red button)
+    bool servoOK;                    // Servo ready signal recieved ( GPI_11 ). Control.c, implemented
+    bool forceGaugeCom;              // Force gauge communicating. Control.c, implemented
+    bool servoCom;                   // DYN4 is communicating. Control.c
+    bool rtcCom;                     // RTC is communicating. Control.c , not implmeented
 
 } MachineCheckParameters;
 
@@ -69,10 +88,6 @@ typedef struct Motion_t
     MotionStatus status;       // internal and external
     MotionCondition condition; // internal and external
     MotionMode mode;           // internal and external
-
-    MotionOverTravel travelLimit; // Updated by control.c, travellimit and softlimit replaced by condition
-    MotionOverTravel softLimit;   // Updated by control.c
-    bool forceOverload;           // Updated by control.c
 } MotionParameters;
 
 typedef struct MachineState_t

@@ -10,10 +10,10 @@ static State state_machine_self_check(MachineState *machineState)
 {
     State newState;
 
-    machineState->selfCheckParameters.chargePumpOK = true;
+    machineState->selfCheckParameters.chargePump = true;
 
     // Decide the next state
-    if (machineState->selfCheckParameters.chargePumpOK)
+    if (machineState->selfCheckParameters.chargePump)
     {
         newState = STATE_MACHINECHECK;
     }
@@ -43,13 +43,13 @@ static State state_machine_check(MachineState *machineState)
 
     MachineCheckParameters params = machineState->machineCheckParameters;
     // Check internal parameters
-    if (params.switchedPowerOK &&
-        params.overTravelLimit == MOTION_OVER_TRAVEL_OK &&
-        params.esdOK &&
+    if (params.switchedPower &&
+        params.esdTravelLimit == MOTION_LIMIT_OK &&
+        params.esdSwitch &&
         params.servoOK &&
-        params.forceGaugeOK &&
-        params.dyn4OK &&
-        params.rtcOK)
+        params.forceGaugeCom &&
+        params.servoCom &&
+        params.rtcCom)
     {
         return STATE_MOTION; // Internal parameters passed, change to MOTION
     }
@@ -76,45 +76,61 @@ static State state_machine_motion(MachineState *machineState)
 
     MotionParameters params = machineState->motionParameters;
     // Check internal parameters
-    if (params.travelLimit != MOTION_OVER_TRAVEL_OK)
+    if (params.travelLimit != MOTION_LIMIT_OK)
     {
         // Upper limit reached, override mode
         machineState->motionParameters.status = STATUS_RESTRICTED;
         machineState->motionParameters.mode = MODE_OVERRIDE;
         switch (params.travelLimit)
         {
-        case MOTION_OVER_TRAVEL_UPPER:
+        case MOTION_LIMIT_UPPER:
             machineState->motionParameters.condition = MOTION_UPPER;
             break;
-        case MOTION_OVER_TRAVEL_LOWER:
+        case MOTION_LIMIT_LOWER:
             machineState->motionParameters.condition = MOTION_LOWER;
             break;
         default:
             break;
         }
     }
-    if (params.softLimit != MOTION_OVER_TRAVEL_OK)
+
+    switch (machineState->motionParameters.condition)
     {
+    case MOTION_STOPPED:
+
+        break;
+    case MOTION_MOVING:
+
+        break;
+    case MOTION_LENGTH:
+        machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
+        break;
+    case MOTION_FORCE:
+        machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
+        break;
+    case MOTION_TENSION:
+        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+        break;
+    case MOTION_COMPRESSION:
+        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+        break;
+    case MOTION_UPPER:
+        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+        break;
+    case MOTION_LOWER:
         machineState->motionParameters.status = STATUS_RESTRICTED;
-        machineState->motionParameters.mode = MODE_OVERRIDE;
-        switch (params.softLimit)
-        {
-        case MOTION_OVER_TRAVEL_UPPER:
-            machineState->motionParameters.condition = MOTION_UPPER;
-            break;
-        case MOTION_OVER_TRAVEL_LOWER:
-            machineState->motionParameters.condition = MOTION_LOWER;
-            break;
-        default:
-            break;
-        }
-    }
-    if (params.forceOverload)
-    {
+        break;
+    case MOTION_DOOR:
         machineState->motionParameters.status = STATUS_RESTRICTED;
-        machineState->motionParameters.mode = MODE_OVERRIDE;
-        // Need to tell state machine weather its in tension or compression
+        break;
+    case MOTION_STOPPED:
+        machineState->motionParameters.status = STATUS_RESTRICTED;
+        break;
+    case MOTION_MOVING:
+        machineState->motionParameters.status = STATUS_RESTRICTED;
+        break;
     }
+
     return STATE_MOTION;
 }
 
@@ -128,28 +144,28 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
     switch (param)
     {
     case PARAM_CHARGEPUMPOK:
-        machineState->selfCheckParameters.chargePumpOK = state;
+        machineState->selfCheckParameters.chargePump = state;
         break;
     case PARAM_SWITCHEDPOWEROK:
-        machineState->machineCheckParameters.switchedPowerOK = state;
+        machineState->machineCheckParameters.switchedPower = state;
         break;
     case PARAM_OVERTRAVELLIMIT:
-        machineState->machineCheckParameters.overTravelLimit = state;
+        machineState->machineCheckParameters.esdTravelLimit = state;
         break;
     case PARAM_ESDOK:
-        machineState->machineCheckParameters.esdOK = state;
+        machineState->machineCheckParameters.esdSwitch = state;
         break;
     case PARAM_SERVOOK:
         machineState->machineCheckParameters.servoOK = state;
         break;
     case PARAM_FORCEGAUGEOK:
-        machineState->machineCheckParameters.forceGaugeOK = state;
+        machineState->machineCheckParameters.forceGaugeCom = state;
         break;
     case PARAM_DYN4OK:
-        machineState->machineCheckParameters.dyn4OK = state;
+        machineState->machineCheckParameters.servoCom = state;
         break;
     case PARAM_RTCOK:
-        machineState->machineCheckParameters.rtcOK = state;
+        machineState->machineCheckParameters.rtcCom = state;
         break;
     case PARAM_STATUS:
         machineState->motionParameters.status = state;
@@ -160,15 +176,6 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
     case PARAM_MODE:
         machineState->motionParameters.mode = state;
         break;
-    case PARAM_TRAVELLIMIT:
-        machineState->motionParameters.travelLimit = state;
-        break;
-    case PARAM_SOFTLIMIT:
-        machineState->motionParameters.softLimit = state;
-        break;
-    case PARAM_FORCEOVERLOAD:
-        machineState->motionParameters.forceOverload = state;
-        break;
     }
     state_machine_update(machineState);
 }
@@ -178,21 +185,18 @@ MachineState *machine_state_create()
     MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
     machineState->currentState = STATE_SELFCHECK;
 
-    machineState->selfCheckParameters.chargePumpOK = false;
+    machineState->selfCheckParameters.chargePump = false;
 
-    machineState->machineCheckParameters.switchedPowerOK = false;
-    machineState->machineCheckParameters.overTravelLimit = MOTION_OVER_TRAVEL_OK;
-    machineState->machineCheckParameters.esdOK = false;
+    machineState->machineCheckParameters.switchedPower = false;
+    machineState->machineCheckParameters.esdTravelLimit = MOTION_LIMIT_OK;
+    machineState->machineCheckParameters.esdSwitch = false;
     machineState->machineCheckParameters.servoOK = false;
-    machineState->machineCheckParameters.forceGaugeOK = false;
-    machineState->machineCheckParameters.dyn4OK = false;
-    machineState->machineCheckParameters.rtcOK = false;
+    machineState->machineCheckParameters.forceGaugeCom = false;
+    machineState->machineCheckParameters.servoCom = false;
+    machineState->machineCheckParameters.rtcCom = false;
 
     machineState->motionParameters.condition = MOTION_STOPPED;
-    machineState->motionParameters.forceOverload = false;
-    machineState->motionParameters.travelLimit = MOTION_OVER_TRAVEL_OK;
     machineState->motionParameters.mode = MODE_MANUAL;
-    machineState->motionParameters.softLimit = MOTION_OVER_TRAVEL_OK;
     machineState->motionParameters.status = STATUS_DISABLED;
     return machineState;
 }

@@ -191,7 +191,7 @@ void mad_begin()
   Images *images = create_images();
 
   // Load Assets from SD card
-  // image_load_assets(images, display);
+  image_load_assets(images, display);
 
   // Load Machine Profile
   loading_overlay_display(display, "Loading Machine Profile", OVERLAY_TYPE_LOADING);
@@ -225,11 +225,11 @@ void mad_begin()
   if (status != SUCCESS)
   {
     loading_overlay_display(display, "Error connecting to RTC", OVERLAY_TYPE_LOADING);
-    machineState->machineCheckParameters.rtcOK = false;
+    machineState->machineCheckParameters.rtcCom = false;
   }
   else
   {
-    machineState->machineCheckParameters.rtcOK = true;
+    machineState->machineCheckParameters.rtcCom = true;
     loading_overlay_display(display, "RTC Connected", OVERLAY_TYPE_LOADING);
   }
 
@@ -263,7 +263,7 @@ void mad_begin()
   {
     loading_overlay_display(display, "Control Failed", OVERLAY_TYPE_LOADING);
   }
-  machineState->selfCheckParameters.chargePumpOK = true;
+  machineState->selfCheckParameters.chargePump = true;
 
   // Begin main loop
   Pages currentPage = PAGE_STATUS;

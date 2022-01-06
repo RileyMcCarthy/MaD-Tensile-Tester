@@ -1,4 +1,5 @@
 #include "Control.h"
+
 static long control_stack[64 * 4];
 
 /*responsible for moving machine, updating state machine, checking for faults*/
@@ -27,10 +28,12 @@ static void control_cog(Control *control)
     unsigned long timems = _getms();
     unsigned long intervalDYN4Check = 100;
     unsigned long intervalDYN4CheckLast = 0;
+    bool initial = true;
+    bool testInit = true;
+
     while (1)
     {
         MachineState currentMachineState = *(control->stateMachine);
-
         // DYN4
         DYN4_Status status;
 
@@ -47,42 +50,54 @@ static void control_cog(Control *control)
         {
             if (lastState.currentState != STATE_MOTION)
             {
-                mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-                mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
+                // mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
+                // mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
             }
-
-            if (currentMachineState.motionParameters.mode == MODE_MANUAL)
+            if (currentMachineState.motionParameters.status == STATUS_DISABLED)
             {
-                if (lastState.motionParameters.mode != MODE_MANUAL)
-                {
-                    int position = control->dyn4->encoder.value();
-                    navkey_write_counter(navkey, position);  // reset counter to position
-                    navkey_write_step(navkey, (int32_t)100); // Set increment for manual mode
-                }
-                // Use Navkey to move motor
-                int position = navkey_read_counter_int(navkey);
-                dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
+                dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
             }
-            else if (currentMachineState.motionParameters.mode == MODE_AUTOMATIC)
+            else
             {
-                // Run the loaded test profile
-                if (control->testProfile != NULL)
+                if (lastState.motionParameters.status != STATUS_ENABLED)
                 {
+                    dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1000);
+                    _waitms(300);
+                    dyn4_send_command(control->dyn4, dyn4_sin_wave, 1000);
                 }
-            }
-            else if (currentMachineState.motionParameters.mode == MODE_OVERRIDE)
-            {
-                if (lastState.motionParameters.mode != MODE_OVERRIDE)
+                if (currentMachineState.motionParameters.mode == MODE_MANUAL)
                 {
-                    // stop motor from moving, keep dyn4 powered
-                    dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
-                    int position = control->dyn4->encoder.value();
-                    navkey_write_counter(navkey, position); // reset counter to position
-                    navkey_write_step(navkey, (int32_t)10); // Set increment for manual mode
+                    if (lastState.motionParameters.mode != MODE_MANUAL)
+                    {
+                        int position = control->dyn4->encoder.value();
+                        navkey_write_counter(navkey, position);  // reset counter to position
+                        navkey_write_step(navkey, (int32_t)100); // Set increment for manual mode
+                    }
+                    // Use Navkey to move motor
+                    int position = navkey_read_counter_int(navkey);
+                    // dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
                 }
-                // Use Navkey to move motor very slowly
-                int position = navkey_read_counter_int(navkey);
-                dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
+                else if (currentMachineState.motionParameters.mode == MODE_TEST)
+                {
+                    // Run the loaded test profile
+                    if (control->testProfile != NULL)
+                    {
+                    }
+                }
+                else if (currentMachineState.motionParameters.mode == MODE_OVERRIDE)
+                {
+                    if (lastState.motionParameters.mode != MODE_OVERRIDE)
+                    {
+                        // stop motor from moving, keep dyn4 powered
+                        // dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                        int position = control->dyn4->encoder.value();
+                        navkey_write_counter(navkey, position); // reset counter to position
+                        navkey_write_step(navkey, (int32_t)10); // Set increment for manual mode
+                    }
+                    // Use Navkey to move motor very slowly
+                    int position = navkey_read_counter_int(navkey);
+                    // dyn4_send_command(control->dyn4, dyn4_go_abs_pos, position);
+                }
             }
         }
         else
@@ -91,9 +106,10 @@ static void control_cog(Control *control)
             // turn off IO that powers dyn4
             // mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
             // mcp_set_pin(mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0); // low will enable servo
+            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
         }
 
-        if (currentMachineState.selfCheckParameters.chargePumpOK)
+        if (currentMachineState.selfCheckParameters.chargePump)
         {
             mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
         }
@@ -147,6 +163,11 @@ static void control_cog(Control *control)
         if (mcp_get_pin(mcp, SWITCHED_POWER_PIN, SWITCHED_POWER_REGISTER) == 0)
         {
             state_machine_set(control->stateMachine, PARAM_SWITCHEDPOWEROK, (int)true);
+            if (lastState.machineCheckParameters.switchedPower != true)
+            {
+                control->dyn4->encoder.stop();
+                control->dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
+            }
         }
         else
         {
@@ -156,15 +177,15 @@ static void control_cog(Control *control)
         // ESD Distance limits
         if (mcp_get_pin(mcp, ESD_LIMIT_MIN_PIN_NUMBER, ESD_LIMIT_MIN_PIN_REGISTER) == 0)
         {
-            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_LOWER);
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_LIMIT_LOWER);
         }
         else if (mcp_get_pin(mcp, ESD_LIMIT_MAX_PIN_NUMBER, ESD_LIMIT_MAX_PIN_REGISTER) == 0)
         {
-            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_UPPER);
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_LIMIT_UPPER);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_OVER_TRAVEL_OK);
+            state_machine_set(control->stateMachine, PARAM_OVERTRAVELLIMIT, MOTION_LIMIT_OK);
         }
 
         // ESD
@@ -201,15 +222,15 @@ static void control_cog(Control *control)
         // Travel Limits
         if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1)
         {
-            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_LOWER);
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_LIMIT_LOWER);
         }
         else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1)
         {
-            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_UPPER);
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_LIMIT_UPPER);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_OVER_TRAVEL_OK);
+            state_machine_set(control->stateMachine, PARAM_TRAVELLIMIT, MOTION_LIMIT_OK);
         }
         lastState = currentMachineState;
     }

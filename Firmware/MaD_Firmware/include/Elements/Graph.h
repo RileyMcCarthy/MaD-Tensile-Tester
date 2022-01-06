@@ -1,3 +1,24 @@
 #include "RA8876.h"
 #include "Style.h"
-void draw_graph(Display *display, int GRAPH_X, int GRAPH_Y, int GRAPH_W, int GRAPH_H, float *signal);
+#define MAX_GRAPH_MARKERS 10
+
+typedef struct graph_t
+{
+    int startX;
+    int startY;
+    int width;
+    int height;
+    float maxY;
+    float minY;
+    int lastX;
+    int lastY;
+    float markerY[MAX_GRAPH_MARKERS];
+    int markerCount;
+    char *title;
+    char *units;
+} Graph;
+
+void graph_draw(Graph *graph, Display *display, float newValue);
+void graph_add_marker(Graph *graph, float value);
+Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, char *units, char *title);
+void graph_destroy(Graph *graph);
