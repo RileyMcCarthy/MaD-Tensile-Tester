@@ -251,7 +251,8 @@ void mad_begin()
   }
   else
   {
-    loading_overlay_display(display, "Monitor Failed to Start", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(display, "Monitor Failed, please reset", OVERLAY_TYPE_LOADING);
+    return;
   }
 
   Control *control = control_create(machineProfile, machineState, dyn4, &(monitor->data));
@@ -261,7 +262,8 @@ void mad_begin()
   }
   else
   {
-    loading_overlay_display(display, "Control Failed", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(display, "Control Failed, please reset", OVERLAY_TYPE_LOADING);
+    return;
   }
   machineState->selfCheckParameters.chargePump = true;
 
@@ -304,6 +306,16 @@ void mad_begin()
         forceGauge->interpolationZero = machineProfile->configuration->forceGaugeZeroFactor;
       }
       printf("Leaving force calibration page\n");
+      break;
+    case PAGE_SETTINGS:
+      printf("Loading settings page...\n");
+      SettingsPage *settingsPage = settings_page_create(display, machineProfile, images);
+      while (settings_page_run(settingsPage)) // Keep running settings page until navigation icon selected
+      {
+        write_machine_profile(machineProfile);
+      }
+      settings_page_destroy(settingsPage);
+      printf("Leaving settings page\n");
       break;
     default:
       break;

@@ -26,6 +26,7 @@
 #include "JSON.h"
 #include "tiny-json.h"
 #include "Control.h"
+#include "SettingsPage.h"
 
 #define DISPLAY_SCK 51     // SPI Clock Pin
 #define DISPLAY_MISO 53    // SPI Data Pin

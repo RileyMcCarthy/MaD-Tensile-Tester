@@ -65,115 +65,101 @@ static State state_machine_motion(MachineState *machineState)
 
     // Decide the next state
     State newState = state_machine_check(machineState);
-    if (newState != STATE_MOTION) // Check if previous state conditions are still valid back
+    if (newState != STATE_MOTION) // Set default exit state parameters
     {
         // Set state based internal parameters
-        machineState->motionParameters.status = STATUS_DISABLED;
+        if (machineState->state == STATE_MOTION &&                                    // Ensure previous state is MOTION
+            machineState->machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK && // Check for esd fault
+            machineState->machineCheckParameters.esdSwitch)
+        {
+            // Motion exited due to esd fault
+            // printf("motion faulted\n");
+            machineState->motionParameters.status = STATUS_FAULTED;
+        }
+        else
+        {
+            machineState->motionParameters.status = STATUS_DISABLED;
+        }
+        // printf("machine check failed\n");
         machineState->motionParameters.condition = MOTION_STOPPED;
         machineState->motionParameters.mode = MODE_MANUAL;
         return newState;
     }
 
-    MotionParameters params = machineState->motionParameters;
     // Check internal parameters
-    if (params.travelLimit != MOTION_LIMIT_OK)
-    {
-        // Upper limit reached, override mode
-        machineState->motionParameters.status = STATUS_RESTRICTED;
-        machineState->motionParameters.mode = MODE_OVERRIDE;
-        switch (params.travelLimit)
+    if (machineState->motionParameters.status != STATUS_DISABLED)
+        switch (machineState->motionParameters.condition) // Update status based on condition
         {
-        case MOTION_LIMIT_UPPER:
-            machineState->motionParameters.condition = MOTION_UPPER;
+        case MOTION_LENGTH:
+            machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
             break;
-        case MOTION_LIMIT_LOWER:
-            machineState->motionParameters.condition = MOTION_LOWER;
+        case MOTION_FORCE:
+            machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
             break;
-        default:
+        case MOTION_TENSION:
+            machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+            break;
+        case MOTION_COMPRESSION:
+            machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+            break;
+        case MOTION_UPPER:
+            machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+            break;
+        case MOTION_LOWER:
+            machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+            break;
+        case MOTION_DOOR:
+            machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
+            break;
+        case MOTION_STOPPED:
+            break;
+        case MOTION_MOVING:
             break;
         }
-    }
-
-    switch (machineState->motionParameters.condition)
-    {
-    case MOTION_STOPPED:
-
-        break;
-    case MOTION_MOVING:
-
-        break;
-    case MOTION_LENGTH:
-        machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
-        break;
-    case MOTION_FORCE:
-        machineState->motionParameters.status = STATUS_SAMPLE_LIMIT;
-        break;
-    case MOTION_TENSION:
-        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
-        break;
-    case MOTION_COMPRESSION:
-        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
-        break;
-    case MOTION_UPPER:
-        machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
-        break;
-    case MOTION_LOWER:
-        machineState->motionParameters.status = STATUS_RESTRICTED;
-        break;
-    case MOTION_DOOR:
-        machineState->motionParameters.status = STATUS_RESTRICTED;
-        break;
-    case MOTION_STOPPED:
-        machineState->motionParameters.status = STATUS_RESTRICTED;
-        break;
-    case MOTION_MOVING:
-        machineState->motionParameters.status = STATUS_RESTRICTED;
-        break;
-    }
 
     return STATE_MOTION;
 }
 
 static void state_machine_update(MachineState *machineState)
 {
-    machineState->currentState = state_machine_motion(machineState);
+    machineState->state = state_machine_motion(machineState);
 }
 
 void state_machine_set(MachineState *machineState, Parameter param, int state)
 {
     switch (param)
     {
-    case PARAM_CHARGEPUMPOK:
+    case PARAM_SELF_CHARGE_PUMP:
         machineState->selfCheckParameters.chargePump = state;
         break;
-    case PARAM_SWITCHEDPOWEROK:
+    case PARAM_MACHINE_SWITCHED_POWER:
         machineState->machineCheckParameters.switchedPower = state;
         break;
-    case PARAM_OVERTRAVELLIMIT:
+    case PARAM_MACHINE_ESD_TRAVEL_LIMIT:
         machineState->machineCheckParameters.esdTravelLimit = state;
         break;
-    case PARAM_ESDOK:
+    case PARAM_MACHINE_ESD_SWITCH:
         machineState->machineCheckParameters.esdSwitch = state;
         break;
-    case PARAM_SERVOOK:
+    case PARAM_MACHINE_SERVO_OK:
         machineState->machineCheckParameters.servoOK = state;
         break;
-    case PARAM_FORCEGAUGEOK:
+    case PARAM_MACHINE_FORCE_GAUGE_COM:
         machineState->machineCheckParameters.forceGaugeCom = state;
         break;
-    case PARAM_DYN4OK:
+    case PARAM_MACHINE_SERVO_COM:
         machineState->machineCheckParameters.servoCom = state;
         break;
-    case PARAM_RTCOK:
+    case PARAM_MACHINE_RTC_COM:
         machineState->machineCheckParameters.rtcCom = state;
         break;
-    case PARAM_STATUS:
+    case PARAM_MOTION_STATUS:
         machineState->motionParameters.status = state;
         break;
-    case PARAM_CONDITION:
+    case PARAM_MOTION_CONDITION:
         machineState->motionParameters.condition = state;
         break;
-    case PARAM_MODE:
+    case PARAM_MOTION_MODE:
         machineState->motionParameters.mode = state;
         break;
     }
@@ -183,7 +169,7 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
 MachineState *machine_state_create()
 {
     MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
-    machineState->currentState = STATE_SELFCHECK;
+    machineState->state = STATE_SELFCHECK;
 
     machineState->selfCheckParameters.chargePump = false;
 

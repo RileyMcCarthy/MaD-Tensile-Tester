@@ -20,10 +20,10 @@ static void check_buttons(StatusPage *page)
                     switch (page->stateMachine->motionParameters.status)
                     {
                     case STATUS_DISABLED:
-                        state_machine_set(page->stateMachine, PARAM_STATUS, STATUS_ENABLED);
+                        state_machine_set(page->stateMachine, PARAM_MOTION_STATUS, STATUS_ENABLED);
                         break;
                     case STATUS_ENABLED:
-                        state_machine_set(page->stateMachine, PARAM_STATUS, STATUS_DISABLED);
+                        state_machine_set(page->stateMachine, PARAM_MOTION_STATUS, STATUS_DISABLED);
                         break;
                     }
                     break;
@@ -73,7 +73,6 @@ void status_page_run(StatusPage *page)
 {
     printf("Status page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
@@ -392,10 +391,20 @@ void status_page_run(StatusPage *page)
                 display_text_color(page->display, DISABLEDTEXT, DISABLEDBACK);
                 strcpy(buf, "DISABLED");
             }
-            else if (page->stateMachine->motionParameters.status == STATUS_RESTRICTED)
+            else if (page->stateMachine->motionParameters.status == STATUS_SAMPLE_LIMIT)
             {
                 display_text_color(page->display, ERRORTEXT, ERRORBACK);
-                strcpy(buf, "RESTRICTED");
+                strcpy(buf, "SMPL LIMIT");
+            }
+            else if (page->stateMachine->motionParameters.status == STATUS_MACHINE_LIMIT)
+            {
+                display_text_color(page->display, ERRORTEXT, ERRORBACK);
+                strcpy(buf, "MACH LIMIT");
+            }
+            else if (page->stateMachine->motionParameters.status == STATUS_FAULTED)
+            {
+                display_text_color(page->display, ERRORTEXT, ERRORBACK);
+                strcpy(buf, "FAULTED");
             }
             display_draw_string(page->display, machineStateX1 - strlen(buf) * 12 - 20, motionStatus1StartY, buf);
         }
@@ -455,10 +464,6 @@ void status_page_run(StatusPage *page)
                 display_text_color(page->display, COLOR65K_WHITE, COLOR65K_LIGHTBLUE);
                 strcpy(buf, "AUTOMATIC");
                 break;
-            case MODE_OVERRIDE:
-                display_text_color(page->display, ERRORTEXT, ERRORBACK);
-                strcpy(buf, "OVERRIDE");
-                break;
             default:
                 break;
             }
@@ -498,7 +503,6 @@ void status_page_run(StatusPage *page)
         // display_draw_square_fill(page->display, forceGraphStartX - 1, forceGraphStartY - 1, forceGraphStartX + forceGraphWidth, forceGraphStartY + 100, MAINCOLOR);
         graph_draw(forceTimeGraph, page->display, page->data->force);
         graph_draw(positionTimeGraph, page->display, page->data->position);
-        printf("Position: %d\n", page->data->position);
         _waitms(10);
         initial = false;
         previousState = currentState;

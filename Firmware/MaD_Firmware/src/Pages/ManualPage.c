@@ -156,12 +156,6 @@ void manual_page_run(ManualPage *page)
                 backcolor = COLOR65K_WHITE;
                 bordercolor = COLOR65K_GREEN;
                 break;
-            case STATUS_RESTRICTED:
-                strcpy(buf, "RESTRICTED");
-                textcolor = COLOR65K_WHITE;
-                backcolor = COLOR65K_RED;
-                bordercolor = COLOR65K_DARKRED;
-                break;
             default:
                 break;
             }

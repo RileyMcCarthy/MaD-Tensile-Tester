@@ -53,18 +53,18 @@ typedef enum MotionMode_e
 
 typedef enum ModeFunctions_e
 {
-    MANUAL_OFF,               // Terminates current motion
-    MANUAL_INCREMENTAL_JOG,   // Jog by incremental amount
-    MANUAL_CONTINUOUS_JOG,    // Jog continuously
-    MANUAL_POSITIONAL_MOVE,   // Move to position
-    MANUAL_HOME,              // Move to home position
-    MANUAL_MOVE_GAUGE_LENGTH, // Move gauge to length
-    MANUAL_MOVE_FORCE,        // Move gauge to force
-    TEST_LOAD,                // Load test profile
-    TEST_RUN,                 // Run test profile
-    TEST_STOP,                // Stop test profile
-    TEST_TOGGLE_HOLD_RESUME   // Toggle hold/resume
-} ManualModeFunctions;
+    FUNC_MANUAL_OFF,               // Terminates current motion
+    FUNC_MANUAL_INCREMENTAL_JOG,   // Jog by incremental amount
+    FUNC_MANUAL_CONTINUOUS_JOG,    // Jog continuously
+    FUNC_MANUAL_POSITIONAL_MOVE,   // Move to position
+    FUNC_MANUAL_HOME,              // Move to home position
+    FUNC_MANUAL_MOVE_GAUGE_LENGTH, // Move gauge to length
+    FUNC_MANUAL_MOVE_FORCE,        // Move gauge to force
+    FUNC_TEST_LOAD,                // Load test profile
+    FUNC_TEST_RUN,                 // Run test profile
+    FUNC_TEST_STOP,                // Stop test profile
+    FUNC_TEST_TOGGLE_HOLD_RESUME   // Toggle hold/resume
+} ModeFunctions;
 
 typedef struct SelfCheck_t
 {
@@ -92,29 +92,27 @@ typedef struct Motion_t
 
 typedef struct MachineState_t
 {
-    State currentState;
+    State state;
     SelfCheckParameters selfCheckParameters;
     MachineCheckParameters machineCheckParameters;
     MotionParameters motionParameters;
+    ModeFunctions function;
     int cogid;
 } MachineState;
 
 typedef enum parameters_e
 {
-    PARAM_CHARGEPUMPOK,
-    PARAM_SWITCHEDPOWEROK,
-    PARAM_OVERTRAVELLIMIT,
-    PARAM_ESDOK,
-    PARAM_SERVOOK,
-    PARAM_FORCEGAUGEOK,
-    PARAM_DYN4OK,
-    PARAM_RTCOK,
-    PARAM_STATUS,
-    PARAM_CONDITION,
-    PARAM_MODE,
-    PARAM_TRAVELLIMIT,
-    PARAM_SOFTLIMIT,
-    PARAM_FORCEOVERLOAD,
+    PARAM_SELF_CHARGE_PUMP,
+    PARAM_MACHINE_SWITCHED_POWER,
+    PARAM_MACHINE_ESD_TRAVEL_LIMIT,
+    PARAM_MACHINE_ESD_SWITCH,
+    PARAM_MACHINE_SERVO_OK,
+    PARAM_MACHINE_FORCE_GAUGE_COM,
+    PARAM_MACHINE_SERVO_COM,
+    PARAM_MACHINE_RTC_COM,
+    PARAM_MOTION_STATUS,
+    PARAM_MOTION_CONDITION,
+    PARAM_MOTION_MODE,
 } Parameter;
 
 MachineState *machine_state_create();

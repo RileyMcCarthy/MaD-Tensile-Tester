@@ -11,7 +11,7 @@
  * @brief Number of buttons on the page
  *
  */
-#define BUTTONCOUNT 4
+#define BUTTONCOUNT 5
 
 /**
  * @brief Enum for name of buttons on page
@@ -31,27 +31,8 @@ static void check_buttons(NavigationPage *page)
         {
             if (page->buttons[i].pressed)
             {
-                switch (page->buttons[i].name)
-                {
-                case PAGE_STATUS:
-                    page->complete = true;
-                    page->newPage = PAGE_STATUS;
-                    break;
-                case PAGE_MANUAL:
-                    page->complete = true;
-                    page->newPage = PAGE_MANUAL;
-                    break;
-                case PAGE_AUTOMATIC:
-                    page->complete = true;
-                    page->newPage = PAGE_AUTOMATIC;
-                    break;
-                case PAGE_CALIBRATION:
-                    page->complete = true;
-                    page->newPage = PAGE_CALIBRATION;
-                    break;
-                default:
-                    break;
-                }
+                page->complete = true;
+                page->newPage = (Pages)page->buttons[i].name;
             }
         }
     }
@@ -134,6 +115,15 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[3].debounceTimems = 100;
     buttons[3].lastPress = 0;
 
+    buttons[4].name = PAGE_SETTINGS;
+    buttons[4].xmin = buttons[0].xmin;
+    buttons[4].xmax = buttons[4].xmin + buttonSize;
+    buttons[4].ymin = buttons[0].ymax + 30;
+    buttons[4].ymax = buttons[4].ymin + buttonSize;
+    buttons[4].pressed = false;
+    buttons[4].debounceTimems = 100;
+    buttons[4].lastPress = 0;
+
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
@@ -153,9 +143,12 @@ Pages navigation_page_run(NavigationPage *page)
 
     display_bte_memory_copy_image(page->display, calibrateImg, buttons[3].xmin, buttons[3].ymin);
 
+    display_draw_circle_square_fill(page->display, buttons[4].xmin, buttons[4].ymin, buttons[4].xmax, buttons[4].ymax, COLOR65K_BLACK);
+    display_draw_string(page->display, buttons[4].xmin + 10, buttons[4].ymin + 10, "Settings");
+
     while (!page->complete)
     {
         check_buttons(page);
-        }
+    }
     return page->newPage;
 }

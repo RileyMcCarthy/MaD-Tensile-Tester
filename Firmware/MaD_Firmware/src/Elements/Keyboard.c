@@ -204,6 +204,7 @@ static bool check_buttons(Keyboard *keyboard)
                     strcat(keyboard->keyboard_buffer, ".");
                     break;
                 case key_cancel:
+                    free(keyboard->keyboard_buffer);
                     keyboard->keyboard_buffer = NULL;
                     keyboard->keyboard_complete = true;
                     break;
@@ -344,6 +345,7 @@ char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
 
     keyboardObj->keyboard_complete = false;
     bool initial = true;
+    display_update_buttons(keyboardObj->display, keyboardObj->keys, BUTTONCOUNT); // Clear button presses
     while (!keyboardObj->keyboard_complete)
     {
         if (check_buttons(keyboardObj) || initial)
@@ -360,6 +362,10 @@ char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
     }
     display_bte_memory_copy(keyboardObj->display, PAGE3_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, keyboard->x0, keyboard->y0 - topBarSize, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    if (keyboardObj->keyboard_buffer == NULL)
+    {
+        return NULL;
+    }
     char *toReturn = (char *)malloc(sizeof(char) * (strlen(keyboardObj->keyboard_buffer) + 1));
     strcpy(toReturn, keyboardObj->keyboard_buffer);
     return toReturn;

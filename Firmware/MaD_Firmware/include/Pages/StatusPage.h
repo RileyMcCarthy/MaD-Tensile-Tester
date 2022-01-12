@@ -27,6 +27,6 @@ void status_page_destroy(StatusPage *statusPage);
  * @brief Runs the UI that displays machine information and status
  *
  */
-StatusPage *status_page_run(StatusPage *statusPage);
+void status_page_run(StatusPage *statusPage);
 
 #endif
