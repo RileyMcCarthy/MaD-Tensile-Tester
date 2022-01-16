@@ -68,9 +68,9 @@ static State state_machine_motion(MachineState *machineState)
     if (newState != STATE_MOTION) // Set default exit state parameters
     {
         // Set state based internal parameters
-        if (machineState->state == STATE_MOTION &&                                    // Ensure previous state is MOTION
-            machineState->machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK && // Check for esd fault
-            machineState->machineCheckParameters.esdSwitch)
+        if (machineState->state == STATE_MOTION && // Ensure previous state is MOTION
+            (machineState->machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK ||
+             !machineState->machineCheckParameters.esdSwitch)) // Check for esd fault
         {
             // Motion exited due to esd fault
             // printf("motion faulted\n");
@@ -81,7 +81,6 @@ static State state_machine_motion(MachineState *machineState)
             machineState->motionParameters.status = STATUS_DISABLED;
         }
         // printf("machine check failed\n");
-        machineState->motionParameters.condition = MOTION_STOPPED;
         machineState->motionParameters.mode = MODE_MANUAL;
         return newState;
     }
@@ -112,8 +111,18 @@ static State state_machine_motion(MachineState *machineState)
             machineState->motionParameters.status = STATUS_MACHINE_LIMIT;
             break;
         case MOTION_STOPPED:
+            if (machineState->motionParameters.status != STATUS_ENABLED && machineState->motionParameters.status != STATUS_DISABLED)
+            {
+                // Motion returning from condition, enter enabled state
+                machineState->motionParameters.status = STATUS_ENABLED;
+            }
             break;
         case MOTION_MOVING:
+            if (machineState->motionParameters.status != STATUS_ENABLED && machineState->motionParameters.status != STATUS_DISABLED)
+            {
+                // Motion returning from condition, enter enabled state
+                machineState->motionParameters.status = STATUS_ENABLED;
+            }
             break;
         }
 

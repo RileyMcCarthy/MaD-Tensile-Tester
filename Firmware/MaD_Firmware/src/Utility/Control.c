@@ -143,16 +143,19 @@ static void control_cog(Control *control)
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_COMPRESSION);
         }
-        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1) // UPPER
+        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 0) // UPPER
         {
             // Error machine out of bounds (Upper Limit)
             // Update state machine
+            printf("Upper Limit\n");
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_UPPER);
         }
-        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1) // LOWER
+        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0) // LOWER
         {
             // Error machine out of bounds
             // Update state machine
+            printf("lower Limit\n");
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_LOWER);
         }
         else if (false) // Door
         {

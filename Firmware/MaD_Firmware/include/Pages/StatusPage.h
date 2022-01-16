@@ -8,6 +8,7 @@
 #include "Images.h"
 #include "Monitor.h"
 #include "Graph.h"
+#include "MotionStateWindow.h"
 
 typedef struct StatusPage_s
 {

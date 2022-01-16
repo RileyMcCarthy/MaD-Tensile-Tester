@@ -16,17 +16,6 @@ static void check_buttons(StatusPage *page)
             {
                 switch (page->buttons[i].name)
                 {
-                case BUTTON_MACHINE:
-                    switch (page->stateMachine->motionParameters.status)
-                    {
-                    case STATUS_DISABLED:
-                        state_machine_set(page->stateMachine, PARAM_MOTION_STATUS, STATUS_ENABLED);
-                        break;
-                    case STATUS_ENABLED:
-                        state_machine_set(page->stateMachine, PARAM_MOTION_STATUS, STATUS_DISABLED);
-                        break;
-                    }
-                    break;
                 case BUTTON_NAVIGATION:
                     page->complete = true;
                     break;
@@ -262,9 +251,10 @@ void status_page_run(StatusPage *page)
     buttons[1].lastPress = 0;
 
     Image *navigationImg = page->images->navigationImage;
-    printf("printing:%s,%d\n", navigationImg->name, navigationImg->width);
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+
+    MotionStateWindow *motionStateWindow = motion_state_window_create(page->display, page->stateMachine, 690, SCREEN_HEIGHT - 90 - 20);
 
     float *forceLog = __builtin_alloca(sizeof(float) * (forceGraphWidth));
     for (int i = 0; i < forceGraphWidth; i++)
@@ -471,22 +461,8 @@ void status_page_run(StatusPage *page)
         }
 
         /*Machine Toggle Button*/
-        if (currentState.motionParameters.status != previousState.motionParameters.status || initial)
-        {
-            if (page->stateMachine->motionParameters.status == STATUS_ENABLED)
-            {
-                strcpy(buf, "DISABLE");
-                display_draw_circle_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, 20, 20, ERRORBACK);
-                display_text_color(page->display, COLOR65K_WHITE, ERRORBACK);
-            }
-            else
-            {
-                strcpy(buf, "ENABLE");
-                display_draw_circle_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, 20, 20, COLOR65K_GREEN);
-                display_text_color(page->display, COLOR65K_WHITE, COLOR65K_GREEN);
-            }
-            display_draw_string(page->display, buttons[0].xmin + (buttons[0].xmax - buttons[0].xmin) / 2 - strlen(buf) * 6, buttons[0].ymin + (buttons[0].ymax - buttons[0].ymin) / 2 - 12, buf);
-        }
+
+        motion_state_window_update(motionStateWindow);
 
         /*Values*/
         // printf("Position: %d\n", page->data->position);

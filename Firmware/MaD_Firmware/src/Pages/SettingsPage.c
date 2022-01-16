@@ -58,12 +58,10 @@ static bool check_buttons(SettingsPage *page)
 {
     if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
-        printf("greater\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
             if (page->buttons[i].pressed)
             {
-                printf("button pre\n");
                 switch (page->buttons[i].name)
                 {
                 case BUTTON_NAVIGATION:
