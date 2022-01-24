@@ -952,6 +952,24 @@ SampleProfile *json_to_sample_profile(FILE *json)
 
 TestProfile *json_to_test_profile(FILE *json)
 {
+    if (file == NULL)
+    {
+        printf("Error opening file\n");
+        return NULL;
+    }
+
+    // may be neccisary to device file into smaller strings to avoid buffer overflow
+    // Read file into string
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *testStr = malloc(fileSize + 1);
+    fread(testStr, fileSize, 1, file);
+    testStr[fileSize] = '\0';
+    // Use tiny-json to parse the string
+    json_t mem[MOTION_QUARTET_FIELD_COUNT + 10];
+    json_t *parser = json_create(testStr, mem, sizeof(mem) / sizeof(*mem));
+
     TestProfile *test = get_test_profile();
     test->name = json_property_to_string(json, "Name");
     test->machineProfileFileName = json_property_to_string(json, "Machine Profile File Name");
@@ -962,14 +980,33 @@ TestProfile *json_to_test_profile(FILE *json)
 
 MotionQuartet *json_to_motion_quartet(FILE *json)
 {
+    if (file == NULL)
+    {
+        printf("Error opening file\n");
+        return NULL;
+    }
+
+    // may be neccisary to device file into smaller strings to avoid buffer overflow
+    // Read file into string
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *quartetStr = malloc(fileSize + 1);
+    fread(quartetStr, fileSize, 1, file);
+    quartetStr[fileSize] = '\0';
+
+    // Use tiny-json to parse the string
+    json_t mem[MOTION_QUARTET_FIELD_COUNT + 10];
+    json_t *parser = json_create(quartetStr, mem, sizeof(mem) / sizeof(*mem));
+
     MotionQuartet *quartet = get_motion_quartet();
-    quartet->name = json_property_to_string(json, "Name");
-    quartet->type = json_property_to_string(json, "Type");
-    quartet->distance = json_property_to_float(json, "Distance");
-    quartet->velocity = json_property_to_float(json, "Velocity");
-    quartet->acceleration = json_property_to_float(json, "Acceleration");
-    quartet->jerk = json_property_to_float(json, "Jerk");
-    quartet->dwell = json_property_to_float(json, "Dwell");
+    quartet->name = json_property_to_string(parser, "Name");
+    quartet->type = json_property_to_string(parser, "Type");
+    quartet->distance = json_property_to_float(parser, "Distance");
+    quartet->velocity = json_property_to_float(parser, "Velocity");
+    quartet->acceleration = json_property_to_float(parser, "Acceleration");
+    quartet->jerk = json_property_to_float(parser, "Jerk");
+    quartet->dwell = json_property_to_float(parser, "Dwell");
     return quartet;
 }
 

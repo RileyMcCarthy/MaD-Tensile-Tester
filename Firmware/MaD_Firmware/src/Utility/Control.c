@@ -28,7 +28,9 @@ static void control_cog(Control *control)
     navkey_write_double_push_period(navkey, 300); /*Set a period for the double push of 300ms */
 
     navkey_write_counter(navkey, 0); // reset counter to position
-    MachineState lastState;
+    MachineState lastState = *(control->stateMachine);
+
+    // dyn4_send_command(control->dyn4, dyn4_set_gear_number, 4096);
 
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
@@ -165,7 +167,7 @@ static void control_cog(Control *control)
 
         if (currentMachineState.state == STATE_MOTION) // Motion Enabled
         {
-            if (lastState.state != STATE_MOTION)
+            if (lastState.state != STATE_MOTION || initial)
             {
                 // dyn4_send_command(control->dyn4, dyn4_)
             }
@@ -175,7 +177,7 @@ static void control_cog(Control *control)
             }
             else if (currentMachineState.motionParameters.status == STATUS_ENABLED)
             {
-                if (lastState.motionParameters.status != STATUS_ENABLED) // Motion enabled initial
+                if (lastState.motionParameters.status != STATUS_ENABLED || initial) // Motion enabled initial
                 {
                     // dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1000);
                     // _waitms(300);
@@ -183,7 +185,7 @@ static void control_cog(Control *control)
                 }
                 if (currentMachineState.motionParameters.mode == MODE_MANUAL)
                 {
-                    if (lastState.motionParameters.mode != MODE_MANUAL) //  sync navkey and encoder position
+                    if (lastState.motionParameters.mode != MODE_MANUAL || initial) //  sync navkey and encoder position
                     {
                         // navkey_reset(navkey);
                         // navkey_update_status(navkey);
@@ -238,7 +240,7 @@ static void control_cog(Control *control)
                         dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                         break;
                     case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
-                        if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG)
+                        if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG || initial)
                         {
                             dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                             control->stateMachine->functionData = 100; // Default step size
@@ -264,7 +266,7 @@ static void control_cog(Control *control)
                         }
                         break;
                     case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
-                        if (lastState.function != FUNC_MANUAL_CONTINUOUS_JOG)
+                        if (lastState.function != FUNC_MANUAL_CONTINUOUS_JOG || initial)
                         {
                             dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                             control->stateMachine->functionData = 100; // Default step size
@@ -298,7 +300,7 @@ static void control_cog(Control *control)
                         }
                         break;
                     case FUNC_MANUAL_POSITIONAL_MOVE:
-                        if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE)
+                        if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
                         {
                             dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                             control->stateMachine->functionData = data.position; // Default position
@@ -324,7 +326,7 @@ static void control_cog(Control *control)
                         }
                         break;
                     case FUNC_MANUAL_HOME:
-                        if (lastState.function != FUNC_MANUAL_HOME)
+                        if (lastState.function != FUNC_MANUAL_HOME || initial)
                         {
                             dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                             control->stateMachine->functionData = (int)false; // Set to false, will be set to true when home is complete
@@ -360,7 +362,7 @@ static void control_cog(Control *control)
                         dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                         break;
                     case FUNC_MANUAL_MOVE_FORCE:
-                        if (lastState.function != FUNC_MANUAL_MOVE_FORCE)
+                        if (lastState.function != FUNC_MANUAL_MOVE_FORCE || initial)
                         {
                             control->stateMachine->functionData = 0; // Set force to zero
                         }
@@ -425,6 +427,7 @@ static void control_cog(Control *control)
         }
         lastState = currentMachineState;
         lastData = data;
+        initial = false;
     }
 }
 

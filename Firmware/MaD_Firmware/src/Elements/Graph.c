@@ -1,6 +1,6 @@
 #include "Graph.h"
 
-Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, char *units, char *title)
+Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, const char *units, const char *title)
 {
     Graph *graph = (Graph *)malloc(sizeof(Graph));
     graph->startX = startX;

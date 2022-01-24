@@ -20,5 +20,5 @@ typedef struct graph_t
 
 void graph_draw(Graph *graph, Display *display, float newValue);
 void graph_add_marker(Graph *graph, float value);
-Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, char *units, char *title);
+Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, const char *units, const char *title);
 void graph_destroy(Graph *graph);

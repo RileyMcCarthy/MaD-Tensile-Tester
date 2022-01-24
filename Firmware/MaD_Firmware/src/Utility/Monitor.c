@@ -17,7 +17,6 @@ static void monitor_cog(Monitor *monitor)
     {
         /*Delay to run at sampleRate*/
         delay = delayms - (_getus() - lastms);
-        // printf("delay: %d\n", delay);
         if (delay > 0)
             _waitus(delay);
         lastms = _getus();
@@ -31,16 +30,14 @@ static void monitor_cog(Monitor *monitor)
         {
             force_gauge_begin(monitor->forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, monitor->forceGauge->interpolationSlope, monitor->forceGauge->interpolationZero);
             encoder.set(0);
-            // monitor->dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
         }
         if (monitorHasNewPosition)
         {
-            printf("new position:%d \n", monitorNewPosition);
             encoder.set(monitorNewPosition);
             monitorHasNewPosition = false;
         }
-        monitor->data.position = encoder.value() / 10; // Get Position
-        monitor->data.timems = _getms();               // Get Time
+        monitor->data.position = encoder.value(); // Get Position
+        monitor->data.timems = _getms();          // Get Time
 
         // Update Buffer
         // circular buffer is faster implementation, this is simple for now

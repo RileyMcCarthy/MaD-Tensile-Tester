@@ -145,7 +145,7 @@ Pages navigation_page_run(NavigationPage *page)
 
     display_bte_memory_copy_image(page->display, calibrateImg, buttons[3].xmin, buttons[3].ymin);
 
-    display_draw_circle_square_fill(page->display, buttons[4].xmin, buttons[4].ymin, buttons[4].xmax, buttons[4].ymax, COLOR65K_BLACK);
+    display_draw_circle_square_fill(page->display, buttons[4].xmin, buttons[4].ymin, buttons[4].xmax, buttons[4].ymax, 20, 20, COLOR65K_BLACK);
     display_draw_string(page->display, buttons[4].xmin + 10, buttons[4].ymin + 10, "Settings");
 
     while (!page->complete)

@@ -147,42 +147,35 @@ void function_window_update(FunctionWindow *window)
     display_draw_string(window->display, window->x + 10, window->y + 10, buf);
 
     /*Machine Toggle Button*/
-    char buf[50];
-    int statusOutlineColor = COLOR65K_BLACK;
-    int statusInnerColor = COLOR65K_BLACK;
-    int statusTextColor = COLOR65K_BLACK;
-    int conditionOutlineColor = COLOR65K_BLACK;
-    int conditionInnerColor = COLOR65K_BLACK;
-    int conditionTextColor = COLOR65K_BLACK;
-    int modeOutlineColor = COLOR65K_BLACK;
-    int modeInnerColor = COLOR65K_BLACK;
-    int modeTextColor = COLOR65K_BLACK;
+    int outlineColor = COLOR65K_BLACK;
+    int innerColor = COLOR65K_BLACK;
+    int textColor = COLOR65K_BLACK;
 
     strcpy(buf, "OFF");
     if (window->state->state == STATE_MOTION && window->state->motionParameters.status == STATUS_ENABLED)
     {
         if (window->state->function == FUNC_MANUAL_OFF)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
 
-    display_draw_circle_square_fill(window->display, window->buttons[0].xmin, window->buttons[0].ymin, window->buttons[0].xmax, window->buttons[0].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[0].xmin, window->buttons[0].ymin, window->buttons[0].xmax, window->buttons[0].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[0].xmin + (window->buttons[0].xmax - window->buttons[0].xmin) / 2 - strlen(buf) * 6, window->buttons[0].ymin + (window->buttons[0].ymax - window->buttons[0].ymin) / 2 - 12, buf);
 
     strcpy(buf, "INCR");
@@ -190,25 +183,25 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_INCREMENTAL_JOG)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
-    display_draw_circle_square_fill(window->display, window->buttons[1].xmin, window->buttons[1].ymin, window->buttons[1].xmax, window->buttons[1].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[1].xmin, window->buttons[1].ymin, window->buttons[1].xmax, window->buttons[1].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[1].xmin + (window->buttons[1].xmax - window->buttons[1].xmin) / 2 - strlen(buf) * 6, window->buttons[1].ymin + (window->buttons[1].ymax - window->buttons[1].ymin) / 2 - 12, buf);
 
     strcpy(buf, "CONT");
@@ -216,25 +209,25 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_CONTINUOUS_JOG)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
-    display_draw_circle_square_fill(window->display, window->buttons[2].xmin, window->buttons[2].ymin, window->buttons[2].xmax, window->buttons[2].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[2].xmin, window->buttons[2].ymin, window->buttons[2].xmax, window->buttons[2].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[2].xmin + (window->buttons[2].xmax - window->buttons[2].xmin) / 2 - strlen(buf) * 6, window->buttons[2].ymin + (window->buttons[2].ymax - window->buttons[2].ymin) / 2 - 12, buf);
 
     strcpy(buf, "POS");
@@ -242,25 +235,25 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_POSITIONAL_MOVE)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
-    display_draw_circle_square_fill(window->display, window->buttons[3].xmin, window->buttons[3].ymin, window->buttons[3].xmax, window->buttons[3].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[3].xmin, window->buttons[3].ymin, window->buttons[3].xmax, window->buttons[3].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[3].xmin + (window->buttons[3].xmax - window->buttons[3].xmin) / 2 - strlen(buf) * 6, window->buttons[3].ymin + (window->buttons[3].ymax - window->buttons[3].ymin) / 2 - 12, buf);
 
     strcpy(buf, "HOME");
@@ -268,25 +261,25 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_HOME)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
-    display_draw_circle_square_fill(window->display, window->buttons[4].xmin, window->buttons[4].ymin, window->buttons[4].xmax, window->buttons[4].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[4].xmin, window->buttons[4].ymin, window->buttons[4].xmax, window->buttons[4].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[4].xmin + (window->buttons[4].xmax - window->buttons[4].xmin) / 2 - strlen(buf) * 6, window->buttons[4].ymin + (window->buttons[4].ymax - window->buttons[4].ymin) / 2 - 12, buf);
 
     strcpy(buf, "GA-L");
@@ -294,25 +287,25 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_MOVE_GAUGE_LENGTH)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
-    display_draw_circle_square_fill(window->display, window->buttons[5].xmin, window->buttons[5].ymin, window->buttons[5].xmax, window->buttons[5].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[5].xmin, window->buttons[5].ymin, window->buttons[5].xmax, window->buttons[5].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[5].xmin + (window->buttons[5].xmax - window->buttons[5].xmin) / 2 - strlen(buf) * 6, window->buttons[5].ymin + (window->buttons[5].ymax - window->buttons[5].ymin) / 2 - 12, buf);
 
     strcpy(buf, "GA-F");
@@ -320,26 +313,26 @@ void function_window_update(FunctionWindow *window)
     {
         if (window->state->function == FUNC_MANUAL_MOVE_FORCE)
         {
-            statusOutlineColor = COLOR65K_BLUE;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_BLUE;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
         else
         {
-            statusOutlineColor = COLOR65K_GREEN;
-            statusInnerColor = COLOR65K_BLACK;
-            statusTextColor = COLOR65K_WHITE;
+            outlineColor = COLOR65K_GREEN;
+            innerColor = COLOR65K_BLACK;
+            textColor = COLOR65K_WHITE;
         }
     }
     else
     {
-        statusOutlineColor = COLOR65K_ORANGE;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
+        outlineColor = COLOR65K_ORANGE;
+        innerColor = COLOR65K_BLACK;
+        textColor = COLOR65K_WHITE;
     }
 
-    display_draw_circle_square_fill(window->display, window->buttons[6].xmin, window->buttons[6].ymin, window->buttons[6].xmax, window->buttons[6].ymax, 20, 20, statusOutlineColor);
-    display_text_color(window->display, statusTextColor, statusInnerColor);
+    display_draw_circle_square_fill(window->display, window->buttons[6].xmin, window->buttons[6].ymin, window->buttons[6].xmax, window->buttons[6].ymax, 20, 20, outlineColor);
+    display_text_color(window->display, textColor, innerColor);
     display_draw_string(window->display, window->buttons[6].xmin + (window->buttons[6].xmax - window->buttons[6].xmin) / 2 - strlen(buf) * 6, window->buttons[6].ymin + (window->buttons[6].ymax - window->buttons[6].ymin) / 2 - 12, buf);
 
     window->lastState = *window->state;
