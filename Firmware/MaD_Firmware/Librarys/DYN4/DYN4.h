@@ -46,7 +46,6 @@
 /**Functions**/
 
 typedef struct __using("jm_fullduplexserial.spin2") FDS;
-typedef struct __using("jm_quadrature.spin2") Encoder;
 
 /**
  * @brief Enumeration for the alerm states in the status register
@@ -81,7 +80,6 @@ typedef struct DYN4Status_s
 typedef struct DYN4_s
 {
     int device_id;
-    Encoder encoder;
     FDS serial;
 } DYN4;
 

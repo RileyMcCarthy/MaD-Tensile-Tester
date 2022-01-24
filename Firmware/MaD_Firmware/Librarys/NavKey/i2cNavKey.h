@@ -18,7 +18,8 @@
 
 #include "simpletools.h"
 #include "stdbool.h"
-#include "inttypes.h"
+#include <stdint.h>
+#include <stdlib.h>
 
 /* NavKey configuration bit. Use with GCONF */
 enum GCONF_PARAMETER
@@ -45,12 +46,21 @@ union Data_v
 	int32_t val;
 	uint8_t bval[4];
 };
+typedef struct navkeystatus_t
+{
+	int UPR, UPP, DNR, DNP, RTR, RTP, LTR, LTP;
+	int CTRR, CTRP, CTRDP;
+	int RINC, RDEC, RMAX, RMIN;
+	int GP1POS, GP1NEG, GP2POS, GP2NEG, GP3POS, GP3NEG;
+	int FADEINT;
+} NavKeyStatus;
 
 typedef struct navkey_t
 {
 	i2c bus;
 	int scl;
 	int sda;
+	NavKeyStatus status;
 	uint8_t _add;
 	uint16_t _stat;
 	uint8_t _stat2;
@@ -59,12 +69,13 @@ typedef struct navkey_t
 	union Data_v _tem_data;
 } NavKey;
 
-NavKey *navkey_create(int theSCL, int theSDA, uint8_t addr);
-void navkey_begin(NavKey *navkey, uint8_t conf);
+NavKey *navkey_create(uint8_t addr);
+void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t conf);
 void navkey_reset(NavKey *navkey);
 void navkey_auto_config_interrupt(NavKey *navkey);
 
 /**    Read functions   **/
+void navkey_update_status(NavKey *navkey);
 /** Configuration function **/
 uint8_t navkey_read_gp1_conf(NavKey *navkey);
 uint8_t navkey_read_gp2_conf(NavKey *navkey);
@@ -118,11 +129,11 @@ void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
 /** NavKey functions **/
 void navkey_write_counter(NavKey *navkey, int counter);
 
-void navkey_write_max(NavKey *navkey, float max);
+void navkey_write_max(NavKey *navkey, int max);
 
-void navkey_write_min(NavKey *navkey, float min);
+void navkey_write_min(NavKey *navkey, int min);
 
-void navkey_write_step(NavKey *navkey, float step);
+void navkey_write_step(NavKey *navkey, int step);
 
 /** GP LED Functions **/
 void navkey_write_gp1(NavKey *navkey, uint8_t gp1);

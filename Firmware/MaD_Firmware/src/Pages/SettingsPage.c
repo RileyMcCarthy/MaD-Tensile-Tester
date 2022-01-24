@@ -56,6 +56,8 @@ static bool isFloat(char *string)
 
 static bool check_buttons(SettingsPage *page)
 {
+    display_update_touch(page->display);
+
     if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
@@ -195,9 +197,9 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
-                    if (scale != NULL && isNumber(scale))
+                    if (scale != NULL && isFloat(scale))
                     {
-                        page->machineProfile->configuration->positionEncoderScaleFactor = atoi(scale);
+                        page->machineProfile->configuration->positionEncoderScaleFactor = atof(scale);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -550,7 +552,7 @@ bool settings_page_run(SettingsPage *page)
     int positionEncoderScaleFactorStartY = positionEncoderTypeStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %d", "Encoder Slope", page->machineProfile->configuration->positionEncoderScaleFactor);
+    sprintf(buf, "%s: %0.3f", "Encoder Slope", page->machineProfile->configuration->positionEncoderScaleFactor);
     display_draw_string(page->display, positionEncoderScaleFactorStartX, positionEncoderScaleFactorStartY, buf);
     page->buttons[11].name = BUTTON_CONFIGURATION_POSITIONENCODERSCALEFACTOR;
     page->buttons[11].xmin = positionEncoderScaleFactorStartX;

@@ -13,19 +13,19 @@
 #define MACHINE_CONFIGURATION_FIELD_COUNT 13
 typedef struct MachineConfiguration_s
 {
-    char *motorType;                // Motor used for the machine (model)
-    float maxMotorTorque;           // Maximum torque of the motor (Nm)
-    float maxMotorRPM;              // Maximum RPM of the motor (RPM)
-    float gearDiameter;             // Diameter of the gear (mm)
-    float gearPitch;                // Pitch of the gear (mm)
-    float systemIntertia;           // Total inertia of the system (kgm2)
-    float staticTorque;             // Static torque of the motor (Nm)
-    float load;                     // Estimated load of the system (N)
-    char *positionEncoderType;      // Encoder used for the position measurement (encoder or distance scale)
-    int positionEncoderScaleFactor; // steps per mm of position encoder (step/mm)
-    char *forceGauge;               // Force gauge used (model)
-    float forceGaugeScaleFactor;    // Force scale factor (mN/step)
-    int forceGaugeZeroFactor;       // Force offset (steps)
+    char *motorType;                  // Motor used for the machine (model)
+    float maxMotorTorque;             // Maximum torque of the motor (Nm)
+    float maxMotorRPM;                // Maximum RPM of the motor (RPM)
+    float gearDiameter;               // Diameter of the gear (mm)
+    float gearPitch;                  // Pitch of the gear (mm)
+    float systemIntertia;             // Total inertia of the system (kgm2)
+    float staticTorque;               // Static torque of the motor (Nm)
+    float load;                       // Estimated load of the system (N)
+    char *positionEncoderType;        // Encoder used for the position measurement (encoder or distance scale)
+    float positionEncoderScaleFactor; // steps per mm of position encoder (step/mm)
+    char *forceGauge;                 // Force gauge used (model)
+    float forceGaugeScaleFactor;      // Force scale factor (mN/step)
+    int forceGaugeZeroFactor;         // Force offset (steps)
 } MachineConfiguration;
 
 #define MACHINE_PERFORMANCE_FIELD_COUNT 7

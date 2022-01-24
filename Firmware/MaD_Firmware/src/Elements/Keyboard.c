@@ -64,6 +64,8 @@ static enum keys {
  */
 static bool check_buttons(Keyboard *keyboard)
 {
+    display_update_touch(keyboard->display);
+
     if (display_update_buttons(keyboard->display, keyboard->keys, BUTTONCOUNT) > 0)
     {
         printf("bvutton pressed\n");

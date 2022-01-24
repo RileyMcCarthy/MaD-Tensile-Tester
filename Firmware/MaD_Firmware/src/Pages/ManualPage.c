@@ -19,6 +19,8 @@
  */
 static void checkButtons(ManualPage *page)
 {
+    display_update_touch(page->display);
+
     display_update_buttons(page->display, page->buttons, BUTTONCOUNT);
     for (int i = 0; i < BUTTONCOUNT; i++)
     {

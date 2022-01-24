@@ -1,4 +1,4 @@
-#define P2_TARGET_MHZ 180
+#define P2_TARGET_MHZ 80
 #include <sys/p2es_clock.h>
 #include "MaD.h"
 enum
@@ -15,7 +15,7 @@ enum
 
 int main()
 {
-    // _clkset(_SETFREQ, _CLOCKFREQ);
+    _clkset(_SETFREQ, _CLOCKFREQ);
     mad_begin();
     while (1)
         ;

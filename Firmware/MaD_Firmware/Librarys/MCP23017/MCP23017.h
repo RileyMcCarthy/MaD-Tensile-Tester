@@ -22,13 +22,14 @@ typedef struct MCP23017_t
 {
     I2CBus i2cBus;
     uint8_t writeAddr, readAddr;
+    uint8_t dira, dirb;
 } MCP23017;
 
 MCP23017 *mcp23017_create();
 void mcp32017_destroy();
 
 void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
-
+void mcp_update_register(MCP23017 *mcp23017);
 /**
  * @brief sets the direction of the pins
  *

@@ -1463,27 +1463,26 @@ uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t n
   return retVal;
 }
 
+void display_update_touch(Display *display)
+{
+  display->locationCount = readGT9271TouchLocation(display, display->location, 1);
+}
+
 int display_update_buttons(Display *display, Button *buttons, const int amount)
 {
-  TouchLocation loc[1];
   int amountPressed = 0;
-  if (readGT9271TouchLocation(display, loc, 1) > 0)
+  if (display->locationCount > 0)
   {
-    printf("found touch\n");
-    // printf("found click: %d,%d   %d %d\n", loc[0].x, loc[0].y, (loc[0].x > buttons[i].xmin) && (loc[0].x < buttons[i].xmax), (loc[0].y > buttons[i].ymin) && (loc[0].y < buttons[i].ymax));
     for (int i = 0; i < amount; i++)
     {
       buttons[i].pressed = false;
-      // print("found click: %d,%d   %d %d\n", loc[0].x, loc[0].y, (loc[0].x > buttons[i].xmin) && (loc[0].x < buttons[i].xmax), (loc[0].y > buttons[i].ymin) && (loc[0].y < buttons[i].ymax));
-      // print("button range: %d-%d,%d-%d", buttons[i].xmin, buttons[i].xmax, buttons[i].ymin, buttons[i].ymax);
-      if (((SCREEN_WIDTH - loc[0].x) > buttons[i].xmin) && ((SCREEN_WIDTH - loc[0].x) < buttons[i].xmax))
+      if (((SCREEN_WIDTH - display->location[0].x) > buttons[i].xmin) && ((SCREEN_WIDTH - display->location[0].x) < buttons[i].xmax))
       {
-        if (((SCREEN_HEIGHT - loc[0].y) > buttons[i].ymin) && ((SCREEN_HEIGHT - loc[0].y) < buttons[i].ymax))
+        if (((SCREEN_HEIGHT - display->location[0].y) > buttons[i].ymin) && ((SCREEN_HEIGHT - display->location[0].y) < buttons[i].ymax))
         {
-          printf("Button pressed:%d\n", buttons[i].name);
           if ((_getms() - buttons[i].lastPress) > 200)
           {
-            printf("pressed\n");
+            // printf("pressed\n");
             buttons[i]
                 .lastPress = _getms();
             buttons[i].pressed = true;

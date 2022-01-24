@@ -97,6 +97,7 @@ typedef struct MachineState_t
     MachineCheckParameters machineCheckParameters;
     MotionParameters motionParameters;
     ModeFunctions function;
+    int functionData;
     int cogid;
 } MachineState;
 
@@ -113,6 +114,7 @@ typedef enum parameters_e
     PARAM_MOTION_STATUS,
     PARAM_MOTION_CONDITION,
     PARAM_MOTION_MODE,
+    PARAM_FUNCTION
 } Parameter;
 
 MachineState *machine_state_create();

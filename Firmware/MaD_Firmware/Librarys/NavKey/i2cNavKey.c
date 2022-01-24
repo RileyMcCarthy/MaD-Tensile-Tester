@@ -245,12 +245,11 @@ static void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data)
 
 /*********************************** Public functions *************************************/
 
-NavKey *navkey_create(int theSCL, int theSDA, uint8_t addr)
+NavKey *navkey_create(uint8_t addr)
 {
   NavKey *navkey = malloc(sizeof(NavKey));
-  navkey->_add = (addr << 1);
-  navkey->sda = theSDA;
-  navkey->scl = theSCL;
+  navkey->_add = addr;
+  return navkey;
 }
 
 void navkey_destroy(NavKey *navkey)
@@ -258,10 +257,11 @@ void navkey_destroy(NavKey *navkey)
   free(navkey);
 }
 /** Used for initialize the NavKey **/
-void navkey_begin(NavKey *navkey, uint8_t conf)
+void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t conf)
 {
-  i2c_open(&(navkey->bus), navkey->scl, navkey->sda, 0);
-
+  i2c_open(&(navkey->bus), scl, sda, 0);
+  writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);
+  _waitms(100);
   writeNavKey8(navkey, REG_GCONF, conf);
   navkey->_gconf = conf;
 }
@@ -272,6 +272,27 @@ void navkey_reset(NavKey *navkey)
 }
 
 /*********************************** Read functions *************************************/
+
+void navkey_update_status(NavKey *navkey)
+{
+  int reg = readNavKeyInt(navkey, REG_STATUSB2);
+
+  navkey->status.UPR = reg & UPR;
+  navkey->status.UPP = reg & UPP;
+  navkey->status.DNR = reg & DNR;
+  navkey->status.DNP = reg & DNP;
+  navkey->status.RTR = reg & RTR;
+  navkey->status.RTP = reg & RTP;
+  navkey->status.LTR = reg & LTR;
+  navkey->status.LTP = reg & LTP;
+  navkey->status.CTRR = reg & CTRR;
+  navkey->status.CTRP = reg & CTRP;
+  navkey->status.CTRDP = reg & CTRDP;
+  navkey->status.RINC = reg & RINC;
+  navkey->status.RDEC = reg & RDEC;
+  navkey->status.RMAX = reg & RMAX;
+  navkey->status.RMIN = reg & RMIN;
+}
 
 /** Return the GP1 Configuration**/
 uint8_t navkey_read_gp1_conf(NavKey *navkey)
@@ -297,18 +318,6 @@ uint16_t navkey_read_interrupt_config(NavKey *navkey)
   return ((uint16_t)readNavKeyInt(navkey, REG_INTCONFB2));
 }
 
-/** Return the status of the NavKey **/
-uint16_t navkey_read_status(NavKey *navkey)
-{
-  return navkey->_stat;
-}
-
-/** Return the Int2 status of the NavKey. Before require updateStatus()  **/
-uint8_t navkey_read_int2(NavKey *navkey)
-{
-  return navkey->_stat2;
-}
-
 /** Return Fade process status  **/
 uint8_t navkey_read_fade_status(NavKey *navkey)
 {
@@ -324,7 +333,7 @@ float navkey_read_counter_float(NavKey *navkey)
 /** Return the 32 bit value of the NavKey counter  **/
 int32_t navkey_read_counter_long(NavKey *navkey)
 {
-  return ((int32_t)readNavKeyLong(navkey, REG_CVALB4));
+  return (readNavKeyLong(navkey, REG_CVALB4));
 }
 
 /** Return the 16 bit value of the NavKey counter  **/
@@ -472,21 +481,21 @@ void navkey_write_counter(NavKey *navkey, int value)
 }
 
 /** Write the maximum threshold value **/
-void navkey_write_max(NavKey *navkey, float max)
+void navkey_write_max(NavKey *navkey, int32_t max)
 {
   writeNavKeyFloat(navkey, REG_CMAXB4, max);
 }
 
 /** Write the minimum threshold value **/
-void navkey_write_min(NavKey *navkey, float min)
+void navkey_write_min(NavKey *navkey, int32_t min)
 {
   writeNavKeyFloat(navkey, REG_CMINB4, min);
 }
 
 /** Write the Step increment value **/
-void navkey_write_step(NavKey *navkey, float step)
+void navkey_write_step(NavKey *navkey, int32_t step)
 {
-  writeNavKeyFloat(navkey, REG_ISTEPB4, step);
+  writeNavKey32(navkey, REG_ISTEPB4, step);
 }
 
 /** Write GP1 register, used when GP1 is set to output or PWM **/

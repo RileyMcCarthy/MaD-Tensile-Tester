@@ -1,6 +1,8 @@
 #include "Monitor.h"
 #include "IOBoard.h"
 static long monitor_stack[64 * 4];
+static bool monitorHasNewPosition = false;
+static int monitorNewPosition = 0;
 
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
@@ -9,6 +11,8 @@ static void monitor_cog(Monitor *monitor)
     int lastms = 0;
     int delayms = 1000000 / monitor->sampleRate;
     int delay = 0;
+    Encoder encoder;
+    encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
     while (1)
     {
         /*Delay to run at sampleRate*/
@@ -26,11 +30,17 @@ static void monitor_cog(Monitor *monitor)
         else // Force gauge isnt responding attempt to reconnect
         {
             force_gauge_begin(monitor->forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, monitor->forceGauge->interpolationSlope, monitor->forceGauge->interpolationZero);
-            monitor->dyn4->encoder.stop();
-            monitor->dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
+            encoder.set(0);
+            // monitor->dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
         }
-        monitor->data.position = monitor->dyn4->encoder.value() / 10; // Get Position
-        monitor->data.timems = _getms();                              // Get Time
+        if (monitorHasNewPosition)
+        {
+            printf("new position:%d \n", monitorNewPosition);
+            encoder.set(monitorNewPosition);
+            monitorHasNewPosition = false;
+        }
+        monitor->data.position = encoder.value() / 10; // Get Position
+        monitor->data.timems = _getms();               // Get Time
 
         // Update Buffer
         // circular buffer is faster implementation, this is simple for now
@@ -58,4 +68,10 @@ Monitor *monitor_create()
 void monitor_destroy(Monitor *monitor)
 {
     free(monitor);
+}
+
+void monitor_set_position(int position)
+{
+    monitorNewPosition = position;
+    monitorHasNewPosition = true;
 }

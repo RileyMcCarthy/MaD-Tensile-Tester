@@ -8,6 +8,7 @@
 
 static void check_buttons(StatusPage *page)
 {
+    display_update_touch(page->display);
     if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
@@ -254,8 +255,8 @@ void status_page_run(StatusPage *page)
     display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
-    MotionStateWindow *motionStateWindow = motion_state_window_create(page->display, page->stateMachine, 690, SCREEN_HEIGHT - 90 - 20);
-
+    MotionStateWindow *motionStateWindow = motion_state_window_create(page->display, page->stateMachine, 690, SCREEN_HEIGHT - 90 - 20 - 200 - 20);
+    FunctionWindow *functionWindow = function_window_create(page->display, page->stateMachine, 690, SCREEN_HEIGHT - 200 - 20);
     float *forceLog = __builtin_alloca(sizeof(float) * (forceGraphWidth));
     for (int i = 0; i < forceGraphWidth; i++)
     {
@@ -463,6 +464,8 @@ void status_page_run(StatusPage *page)
         /*Machine Toggle Button*/
 
         motion_state_window_update(motionStateWindow);
+
+        function_window_update(functionWindow);
 
         /*Values*/
         // printf("Position: %d\n", page->data->position);

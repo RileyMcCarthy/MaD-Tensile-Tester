@@ -15,7 +15,7 @@
 
 #define I2C_SCL 28 // clock for general I2C (Output)
 #define I2C_SDA 29 // data for general I2C (Input/Output)
-#define I2C_ADDR 0b0010010
+#define I2C_ADDR 0b00100100
 
 #define DST_A 19 // A for distance differential encoder (Input)
 #define DST_B 20 // B for distance differential encoder (Input)

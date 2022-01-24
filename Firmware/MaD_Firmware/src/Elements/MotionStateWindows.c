@@ -8,9 +8,9 @@
 
 static void check_buttons(MotionStateWindow *window)
 {
-
     if (display_update_buttons(window->display, window->buttons, BUTTONCOUNT) > 0)
     {
+        printf("window checking\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
             if (window->buttons[i].pressed)
@@ -24,6 +24,7 @@ static void check_buttons(MotionStateWindow *window)
                         state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_ENABLED);
                         break;
                     case STATUS_ENABLED:
+                        printf("enableding\n");
                         state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_DISABLED);
                         break;
                     }
@@ -91,7 +92,7 @@ void motion_state_window_destroy(MotionStateWindow *window)
     free(window->buttons);
     free(window);
 }
-motion_state_window_update(MotionStateWindow *window)
+void motion_state_window_update(MotionStateWindow *window)
 {
     check_buttons(window);
 

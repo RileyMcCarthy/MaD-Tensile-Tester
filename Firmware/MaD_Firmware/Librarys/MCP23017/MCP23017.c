@@ -63,9 +63,14 @@ void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
 }
 
+void mcp_update_register(MCP23017 *mcp23017)
+{
+    mcp23017->dira = read_register(mcp23017, REG_GPIOA);
+    mcp23017->dirb = read_register(mcp23017, REG_GPIOB);
+}
+
 void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction)
 {
-
     if (reg == DIRA)
     {
         reg = REG_IODIRA;
@@ -80,16 +85,15 @@ void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t di
 }
 
 uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
-{
+{ // this function is wrong @todo fix
     if (reg == DIRA)
     {
-        reg = REG_IODIRA;
+        return bitRead(mcp23017->dira, pin);
     }
     else
     {
-        reg = REG_IODIRB;
+        return bitRead(mcp23017->dirb, pin);
     }
-    return bitRead(read_register(mcp23017, reg), pin);
 }
 
 void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
@@ -109,16 +113,7 @@ void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 }
 uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 {
-    mcp_set_direction(mcp23017, pin, reg, MCP23017_INPUT);
-    if (reg == DIRA)
-    {
-        reg = REG_GPIOA;
-    }
-    else
-    {
-        reg = REG_GPIOB;
-    }
-    return bitRead(read_register(mcp23017, reg), pin);
+    return bitRead(reg == DIRA ? mcp23017->dira : mcp23017->dirb, pin);
 }
 
 void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)

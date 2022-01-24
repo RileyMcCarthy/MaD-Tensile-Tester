@@ -25,6 +25,8 @@
  */
 static void check_buttons(NavigationPage *page)
 {
+    display_update_touch(page->display);
+
     if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)

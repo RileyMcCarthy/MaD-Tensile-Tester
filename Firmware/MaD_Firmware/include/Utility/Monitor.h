@@ -9,6 +9,7 @@ typedef struct monitor_data_t
 {
     int forceRaw;
     float force;
+    int encoderRaw;
     int position;
     int timems;
 } MonitorData;
@@ -21,10 +22,11 @@ typedef struct monitor_cog_t
     int sampleRate;   // sample rate in hz
     int cogid;
 } Monitor;
+typedef struct __using("jm_quadrature.spin2") Encoder;
 
 Monitor *monitor_create();
 void monitor_destroy(Monitor *monitor);
 
 bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, int sampleRate);
-
+void monitor_set_position(int position);
 #endif

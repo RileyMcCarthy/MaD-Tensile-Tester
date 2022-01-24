@@ -139,40 +139,89 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
     switch (param)
     {
     case PARAM_SELF_CHARGE_PUMP:
-        machineState->selfCheckParameters.chargePump = state;
+        if (machineState->selfCheckParameters.chargePump != state)
+        {
+            machineState->selfCheckParameters.chargePump = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_SWITCHED_POWER:
-        machineState->machineCheckParameters.switchedPower = state;
+        if (machineState->machineCheckParameters.switchedPower != state)
+        {
+            machineState->machineCheckParameters.switchedPower = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_ESD_TRAVEL_LIMIT:
-        machineState->machineCheckParameters.esdTravelLimit = state;
+        if (machineState->machineCheckParameters.esdTravelLimit != state)
+        {
+            machineState->machineCheckParameters.esdTravelLimit = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_ESD_SWITCH:
-        machineState->machineCheckParameters.esdSwitch = state;
+        if (machineState->machineCheckParameters.esdSwitch != state)
+        {
+            machineState->machineCheckParameters.esdSwitch = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_SERVO_OK:
-        machineState->machineCheckParameters.servoOK = state;
+        if (machineState->machineCheckParameters.servoOK != state)
+        {
+            machineState->machineCheckParameters.servoOK = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_FORCE_GAUGE_COM:
-        machineState->machineCheckParameters.forceGaugeCom = state;
+        if (machineState->machineCheckParameters.forceGaugeCom != state)
+        {
+            machineState->machineCheckParameters.forceGaugeCom = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_SERVO_COM:
-        machineState->machineCheckParameters.servoCom = state;
+        if (machineState->machineCheckParameters.servoCom != state)
+        {
+            machineState->machineCheckParameters.servoCom = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MACHINE_RTC_COM:
-        machineState->machineCheckParameters.rtcCom = state;
+        if (machineState->machineCheckParameters.rtcCom != state)
+        {
+            machineState->machineCheckParameters.rtcCom = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MOTION_STATUS:
-        machineState->motionParameters.status = state;
+        if (machineState->motionParameters.status != state)
+        {
+            machineState->motionParameters.status = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MOTION_CONDITION:
-        machineState->motionParameters.condition = state;
+        if (machineState->motionParameters.condition != state)
+        {
+            machineState->motionParameters.condition = state;
+            state_machine_update(machineState);
+        }
         break;
     case PARAM_MOTION_MODE:
-        machineState->motionParameters.mode = state;
+        if (machineState->motionParameters.mode != state)
+        {
+            machineState->motionParameters.mode = state;
+            state_machine_update(machineState);
+        }
+    case PARAM_FUNCTION:
+        if (machineState->function != state)
+        {
+            machineState->function = state;
+            state_machine_update(machineState);
+        }
         break;
     }
-    state_machine_update(machineState);
 }
 
 MachineState *machine_state_create()
@@ -193,5 +242,6 @@ MachineState *machine_state_create()
     machineState->motionParameters.condition = MOTION_STOPPED;
     machineState->motionParameters.mode = MODE_MANUAL;
     machineState->motionParameters.status = STATUS_DISABLED;
+    machineState->function = FUNC_MANUAL_OFF;
     return machineState;
 }

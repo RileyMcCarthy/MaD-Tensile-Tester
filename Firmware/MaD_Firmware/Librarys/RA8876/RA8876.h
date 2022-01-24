@@ -733,6 +733,7 @@ memory size. For example : page_size = 1024*600*2byte(16bpp) = 1228800byte, maxi
 #define COLOR65K_LIGHTMAGENTA 0xfc1f
 #define COLOR65K_DARKMAGENTA 0x8010
 #define COLOR65K_BROWN 0xA145
+#define COLOR65K_ORANGE 0xfbc0
 
 #define COLOR65K_GRAYSCALE1 2113
 #define COLOR65K_GRAYSCALE2 2113 * 2
@@ -814,6 +815,8 @@ typedef struct RA8876_s
     int spi_mosi, spi_miso, spi_clk;
     int i2c_addr_write, i2c_addr_read;
     int reset_mask;
+    TouchLocation location[1];
+    int locationCount;
     I2CBus i2cBus;
 } Display;
 
@@ -905,7 +908,7 @@ uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len
 void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt);
 uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
 uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
-
+void display_update_touch(Display *display);
 /*access*/
 void lcdRegWrite(Display *display, uint8_t reg);
 void lcdDataWrite(Display *display, uint8_t data);

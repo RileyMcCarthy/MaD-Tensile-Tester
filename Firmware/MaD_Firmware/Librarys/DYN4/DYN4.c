@@ -43,7 +43,6 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
     // printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
 
     // start encoder
-    dyn4->encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
 
     return ret;
 }

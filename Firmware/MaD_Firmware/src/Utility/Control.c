@@ -17,32 +17,28 @@ static void control_cog(Control *control)
     mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
 
     /*Initialize NavKey*/
-    NavKey *navkey = navkey_create(I2C_SCL, I2C_SDA, I2C_ADDR);
-    navkey_reset(navkey);
-    navkey_begin(navkey, INT_DATA | WRAP_ENABLE | DIRE_RIGHT | IPUP_ENABLE);
+    NavKey *navkey = navkey_create(I2C_ADDR);
+    navkey_begin(navkey, 29, 28, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
 
-    navkey_write_counter(navkey, (int32_t)0);  /* Reset the counter value */
-    navkey_write_max(navkey, (int32_t)10000);  /* Set the maximum threshold*/
-    navkey_write_min(navkey, (int32_t)-10000); /* Set the minimum threshold */
-    navkey_write_step(navkey, (int32_t)100);   /* Set the step to 1*/
+    navkey_write_counter(navkey, 0);   /* Reset the counter value */
+    navkey_write_max(navkey, 100000);  /* Set the maximum threshold*/
+    navkey_write_min(navkey, -100000); /* Set the minimum threshold */
+    navkey_write_step(navkey, 1);      /* Set the step to 1*/
 
-    navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
+    navkey_write_double_push_period(navkey, 300); /*Set a period for the double push of 300ms */
 
-    int position = control->dyn4->encoder.value();
-    navkey_write_counter(navkey, position); // reset counter to position
+    navkey_write_counter(navkey, 0); // reset counter to position
     MachineState lastState;
 
-    unsigned long timems = _getms();
-    unsigned long intervalDYN4Check = 100;
-    unsigned long intervalDYN4CheckLast = 0;
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
-
+    MonitorData lastData = *control->monitorData;
     while (1)
     {
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
+        mcp_update_register(mcp);
 
         /*Check self check state*/
         // Charge Pump
@@ -143,18 +139,16 @@ static void control_cog(Control *control)
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_COMPRESSION);
         }
-        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 0) // UPPER
+        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1) // UPPER
         {
             // Error machine out of bounds (Upper Limit)
             // Update state machine
-            printf("Upper Limit\n");
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_UPPER);
         }
-        else if (mcp_get_pin(control->stateMachine, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0) // LOWER
+        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1) // LOWER
         {
             // Error machine out of bounds
             // Update state machine
-            printf("lower Limit\n");
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_LOWER);
         }
         else if (false) // Door
@@ -173,8 +167,7 @@ static void control_cog(Control *control)
         {
             if (lastState.state != STATE_MOTION)
             {
-                // mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-                // mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);       // set to low (inverted)
+                // dyn4_send_command(control->dyn4, dyn4_)
             }
             if (currentMachineState.motionParameters.status == STATUS_DISABLED)
             {
@@ -184,18 +177,60 @@ static void control_cog(Control *control)
             {
                 if (lastState.motionParameters.status != STATUS_ENABLED) // Motion enabled initial
                 {
-                    dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1000);
-                    _waitms(300);
-                    dyn4_send_command(control->dyn4, dyn4_sin_wave, 1000);
+                    // dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1000);
+                    // _waitms(300);
+                    // dyn4_send_command(control->dyn4, dyn4_sin_wave, 1000);
                 }
                 if (currentMachineState.motionParameters.mode == MODE_MANUAL)
                 {
                     if (lastState.motionParameters.mode != MODE_MANUAL) //  sync navkey and encoder position
                     {
-                        int position = control->dyn4->encoder.value();
-                        navkey_write_counter(navkey, position);  // reset counter to position
-                        navkey_write_step(navkey, (int32_t)100); // Set increment for manual mode
+                        // navkey_reset(navkey);
+                        // navkey_update_status(navkey);
                     }
+                    /* Set functions based on navkey */
+                    navkey_update_status(navkey); // Update navkey status registers
+                    if (navkey->status.CTRR > 0)  // Center button released
+                    {
+                        printf("CTRR:%d\n", navkey->status.CTRR);
+
+                        if (currentMachineState.motionParameters.condition == MOTION_STOPPED)
+                        {
+                            printf("stopped\n");
+                            switch (currentMachineState.function)
+                            {
+                            case FUNC_MANUAL_OFF:
+                                control->stateMachine->function = FUNC_MANUAL_INCREMENTAL_JOG;
+                                break;
+                            case FUNC_MANUAL_INCREMENTAL_JOG:
+                                control->stateMachine->function = FUNC_MANUAL_CONTINUOUS_JOG;
+                                break;
+                            case FUNC_MANUAL_CONTINUOUS_JOG:
+                                control->stateMachine->function = FUNC_MANUAL_POSITIONAL_MOVE;
+                                break;
+                            case FUNC_MANUAL_POSITIONAL_MOVE:
+                                control->stateMachine->function = FUNC_MANUAL_HOME;
+                                break;
+                            case FUNC_MANUAL_HOME:
+                                control->stateMachine->function = FUNC_MANUAL_OFF;
+                                break;
+                            case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
+                                break;
+                            case FUNC_MANUAL_MOVE_FORCE:
+                                break;
+                            default:
+                                control->stateMachine->function = FUNC_MANUAL_OFF;
+                                break;
+                            }
+                            printf("Function: %d\n", control->stateMachine->function);
+                        }
+                        else if (control->stateMachine->motionParameters.condition == MOTION_MOVING)
+                        {
+                            printf("moving\n");
+                            control->stateMachine->function = FUNC_MANUAL_OFF;
+                        }
+                    }
+
                     // Execute manual mode functions
                     switch (currentMachineState.function)
                     {
@@ -205,29 +240,164 @@ static void control_cog(Control *control)
                     case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
                         if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG)
                         {
-                            navkey_write_step(navkey, (int32_t)100); // Set increment
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            control->stateMachine->functionData = 100; // Default step size
                         }
-                        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop current motion
+                        if (navkey->status.LTR > 0) // Left released
+                        {
+                            control->stateMachine->functionData += 100; // Increase step size by 10
+                        }
+                        if (navkey->status.RTR > 0) // Right released
+                        {
+                            if (control->stateMachine->functionData > 100)
+                            {
+                                control->stateMachine->functionData -= 100; // Decrease step size by 10
+                            }
+                        }
+                        if (navkey->status.UPR > 0) // Up released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData); // Increment by step
+                        }
+                        if (navkey->status.DNR > 0) // Down released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1 * control->stateMachine->functionData); // Increment by step
+                        }
                         break;
                     case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
-                        if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG)
+                        if (lastState.function != FUNC_MANUAL_CONTINUOUS_JOG)
                         {
-                            navkey_write_step(navkey, (int32_t)100); // Set increment for manual mode
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            control->stateMachine->functionData = 100; // Default step size
                         }
-                        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop current motion
+                        if (navkey->status.LTR > 0) // Left released
+                        {
+                            control->stateMachine->functionData += 100; // Increase step size by 10
+                        }
+                        if (navkey->status.RTR > 0) // Right released
+                        {
+                            if (control->stateMachine->functionData > 100)
+                            {
+                                control->stateMachine->functionData -= 100; // Decrease step size by 10
+                            }
+                        }
+                        if (navkey->status.UPP > 0) // Up pressed
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, control->stateMachine->functionData); // Turn CW
+                        }
+                        if (navkey->status.DNP > 0) // Down pressed
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, -1 * control->stateMachine->functionData); // Turn CCW
+                        }
+                        if (navkey->status.UPR > 0) // Up released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop motion
+                        }
+                        if (navkey->status.DNR > 0) // Down released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop motion
+                        }
                         break;
                     case FUNC_MANUAL_POSITIONAL_MOVE:
-                        //
-                        dyn4_send_command(control->dyn4, dyn4_go_abs_pos, 0);
+                        if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE)
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            control->stateMachine->functionData = data.position; // Default position
+                        }
+                        if (navkey->status.LTR > 0) // Left released
+                        {
+                            control->stateMachine->functionData += 100; // Increase position by 10
+                        }
+                        if (navkey->status.RTR > 0) // Right released
+                        {
+                            if (control->stateMachine->functionData > 100)
+                            {
+                                control->stateMachine->functionData -= 100; // Decrease position by 10
+                            }
+                        }
+                        if (navkey->status.UPR > 0) // Up released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData - data.position); // Stop motion
+                        }
+                        if (navkey->status.DNR > 0) // Down released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData - data.position); // Stop motion
+                        }
                         break;
                     case FUNC_MANUAL_HOME:
-                        dyn4_send_command(control->dyn4, dyn4_go_abs_pos, 0);
+                        if (lastState.function != FUNC_MANUAL_HOME)
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            control->stateMachine->functionData = (int)false; // Set to false, will be set to true when home is complete
+                        }
+
+                        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == (int)false) // Wait for limit switch trigger
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            _waitms(100);
+                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, -10); // Turn CWW at homing speeds/10
+
+                            control->stateMachine->functionData = 2; // Set to 2, will be set to 1 when home is complete
+                                                                     // dyn4_send_command(control->dyn4, dyn4_set_origin, 0);
+                        }
+                        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && control->stateMachine->functionData == 2)
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            monitor_set_position(0);
+                            control->stateMachine->functionData = (int)true;
+                        }
+                        if (navkey->status.UPR > 0) // Up released
+                        {
+                            control->stateMachine->functionData = (int)false;               // Set to false, will be set to true when home is complete
+                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // Turn CW at homing speeds
+                        }
+                        if (navkey->status.DNR > 0) // Down released
+                        {
+                            control->stateMachine->functionData = (int)false;               // Set to false, will be set to true when home is complete
+                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // Turn CW at homing speeds
+                        }
                         break;
                     case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
                         dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
                         break;
                     case FUNC_MANUAL_MOVE_FORCE:
-                        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                        if (lastState.function != FUNC_MANUAL_MOVE_FORCE)
+                        {
+                            control->stateMachine->functionData = 0; // Set force to zero
+                        }
+                        if (navkey->status.LTR > 0) // Left released
+                        {
+                            control->stateMachine->functionData += 100; // Increase position by 10
+                        }
+                        if (navkey->status.RTR > 0) // Right released
+                        {
+                            if (control->stateMachine->functionData > 100)
+                            {
+                                control->stateMachine->functionData -= 100; // Decrease position by 10
+                            }
+                        }
+                        if (data.force * 1000 < control->stateMachine->functionData)
+                        {
+                            if (navkey->status.UPP > 0) // Up pressed
+                            {
+                                dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // turn CW
+                            }
+                            if (navkey->status.DNP > 0) // Down pressed
+                            {
+                                dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // turn ccw
+                            }
+                        }
+                        else
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                        }
+                        if (navkey->status.UPR > 0) // Up released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                        }
+                        if (navkey->status.DNR > 0) // Down released
+                        {
+                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                        }
                         break;
                     }
                 }
@@ -251,13 +421,10 @@ static void control_cog(Control *control)
         }
         else
         {
-            // turn off all motion
-            // turn off IO that powers dyn4
-            // mcp_set_direction(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0); // set to output
-            // mcp_set_pin(mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0); // low will enable servo
             dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
         }
         lastState = currentMachineState;
+        lastData = data;
     }
 }
 

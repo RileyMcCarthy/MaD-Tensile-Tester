@@ -6,6 +6,7 @@
 #include "tiny-json.h"
 #include "Images.h"
 #include "DYN4.h"
+#include <stdint.h>
 
 static void write_machine_profile(MachineProfile *profile)
 {
@@ -58,7 +59,7 @@ static MachineProfile *load_machine_profile()
   char *positionEncoderType = "QuadEncoder";
   profile->configuration->positionEncoderType = (char *)malloc(strlen(positionEncoderType) + 1);
   strcpy(profile->configuration->positionEncoderType, positionEncoderType);
-  profile->configuration->positionEncoderScaleFactor = 23;
+  profile->configuration->positionEncoderScaleFactor = (2048 * 4) / (2 * 40); //(LINE_NUM*4steps/rev)/(GEAR_PITCH*GEAR_TEETHmm/rev) = step/mm
   char *forceGauge = "DS2-5N";
   profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);
   strcpy(profile->configuration->forceGauge, forceGauge);
@@ -119,9 +120,38 @@ static void test_mcp23017()
   pause(500);
   mcp_set_pin(mcp, pin, DIRA, 1);
   printf("Output:%d\n", mcp_get_pin(mcp, pin, DIRA));
-  pause(500);
-  // mcp23017_destroy(mcp);
+  while (1)
+  {
+    mcp_update_register(mcp);
+
+    if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1) // LOWER
+    {
+      // Error machine out of bounds
+      // Update state machine
+      printf("lower Limit on\n");
+      // state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_LOWER);
+    }
+    else
+    {
+      printf("lower Limit off\n");
+    }
+    if (mcp_get_pin(mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1) // UPPER
+    {
+      // Error machine out of bounds (Upper Limit)
+      // Update state machine
+      printf("Upper Limit\n");
+    }
+    else
+    {
+      printf("Upper Limit off\n");
+    }
+    _waitms(500);
+  }
   return;
+}
+
+static void endstop_test()
+{
 }
 
 static void dyn4_test()
@@ -154,7 +184,7 @@ static void dyn4_test()
 
   while (1)
   {
-    printf("position:%d\n", dyn4->encoder.value());
+    //    printf("position:%d\n", dyn4->encoder.value());
     while (dyn4_get_status(dyn4, &status) != SUCCESS)
     {
       printf("Error getting status\n");
@@ -165,13 +195,52 @@ static void dyn4_test()
   }
 }
 
+static void navkey_test()
+{
+  NavKey *navkey = navkey_create(I2C_ADDR);
+  navkey_begin(navkey, 29, 28, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
+
+  navkey_write_counter(navkey, 0);  /* Reset the counter value */
+  navkey_write_max(navkey, 10000);  /* Set the maximum threshold*/
+  navkey_write_min(navkey, -10000); /* Set the minimum threshold */
+  navkey_write_step(navkey, 1);     /* Set the step to 100*/
+
+  navkey_write_double_push_period(navkey, 30); /*Set a period for the double push of 300ms */
+
+  navkey_write_counter(navkey, (int)50); // reset counter to position
+
+  while (1)
+  {
+    navkey_update_status(navkey); // this line casuing issuues
+    printf("UPR:%d\n", navkey->status.UPR);
+    printf("UPP:%d\n", navkey->status.UPP);
+    printf("DNR:%d\n", navkey->status.DNR);
+    printf("DNP:%d\n", navkey->status.DNP);
+    printf("RTR:%d\n", navkey->status.RTR);
+    printf("RTP:%d\n", navkey->status.RTP);
+    printf("LTR:%d\n", navkey->status.LTR);
+    printf("LTP:%d\n", navkey->status.LTP);
+    printf("CTRR:%d\n", navkey->status.CTRR);
+    printf("CTRP:%d\n", navkey->status.CTRP);
+    printf("CTRDP:%d\n", navkey->status.CTRDP);
+    printf("RINC:%d\n", navkey->status.RINC);
+    printf("RDEC:%d\n", navkey->status.RDEC);
+    printf("RMAX:%d\n", navkey->status.RMAX);
+    printf("RMIN:%d\n", navkey->status.RMIN);
+
+    printf("position:%d\n", (int)navkey_read_counter_long(navkey));
+    _waitms(1000);
+  }
+}
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
  *
  */
 void mad_begin()
 {
-
+  // navkey_test();
+  // return;
   printf("Starting...\n");
   mount("/sd", _vfs_open_sdcard());
 
@@ -191,7 +260,7 @@ void mad_begin()
   Images *images = create_images();
 
   // Load Assets from SD card
-  image_load_assets(images, display);
+  // image_load_assets(images, display);
 
   // Load Machine Profile
   loading_overlay_display(display, "Loading Machine Profile", OVERLAY_TYPE_LOADING);

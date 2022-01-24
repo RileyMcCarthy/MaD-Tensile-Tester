@@ -306,7 +306,7 @@ static MachineConfiguration *get_machine_configuration()
     configuration->staticTorque = 0.0;
     configuration->load = 0.0;
     configuration->positionEncoderType = NULL;
-    configuration->positionEncoderScaleFactor = 0;
+    configuration->positionEncoderScaleFactor = 0.0;
     configuration->forceGauge = NULL;
     configuration->forceGaugeScaleFactor = 0.0;
     configuration->forceGaugeZeroFactor = 0;
@@ -357,7 +357,7 @@ static void json_to_machine_configuration(FILE *json, MachineConfiguration *conf
     configuration->staticTorque = json_property_to_float(json, "Static Torque");
     configuration->load = json_property_to_float(json, "Load");
     configuration->positionEncoderType = json_property_to_string(json, "Position Encoder Type");
-    configuration->positionEncoderScaleFactor = json_property_to_int(json, "Position Encoder Scale Factor");
+    configuration->positionEncoderScaleFactor = json_property_to_float(json, "Position Encoder Scale Factor");
     configuration->forceGauge = json_property_to_string(json, "Force Gauge");
     configuration->forceGaugeScaleFactor = json_property_to_float(json, "Force Gauge Scale Factor");
     configuration->forceGaugeZeroFactor = json_property_to_int(json, "Force Gauge Zero Factor");
@@ -464,7 +464,7 @@ static char *machine_configuration_to_json(MachineConfiguration *configuration)
     free(encoderTypeJSON);
     strcat(json, ",");
 
-    char *encoderScaleFactorJSON = int_to_json("Position Encoder Scale Factor", configuration->positionEncoderScaleFactor);
+    char *encoderScaleFactorJSON = float_to_json("Position Encoder Scale Factor", configuration->positionEncoderScaleFactor);
     size += strlen(encoderScaleFactorJSON) + 2;
     json = (char *)realloc(json, sizeof(char) * size);
     strcat(json, encoderScaleFactorJSON);
@@ -815,7 +815,7 @@ static void json_print_machine_configuration(MachineConfiguration *configuration
     printf("    staticTorque: %f\n", configuration->staticTorque);
     printf("    load: %f\n", configuration->load);
     printf("    positionEncoderType: %s\n", configuration->positionEncoderType);
-    printf("    positionEncoderScaleFactor: %d\n", configuration->positionEncoderScaleFactor);
+    printf("    positionEncoderScaleFactor: %f\n", configuration->positionEncoderScaleFactor);
     printf("    forceGauge: %s\n", configuration->forceGauge);
     printf("    forceGaugeScaleFactor: %f\n", configuration->forceGaugeScaleFactor);
     printf("    forceGaugeZeroFactor: %d\n", configuration->forceGaugeZeroFactor);
