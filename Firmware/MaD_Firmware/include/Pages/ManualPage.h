@@ -9,6 +9,8 @@
 #include "Monitor.h"
 #include "i2cNavKey.h"
 #include "Images.h"
+#include "Button.h"
+
 /**
  * @brief Runs the UI for manually controlling the machine
  *

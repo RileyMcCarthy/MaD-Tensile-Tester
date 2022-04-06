@@ -3,6 +3,7 @@
 #include "simpletools.h"
 #include "RA8876.h"
 #include "StateMachine.h"
+#include "Button.h"
 
 typedef struct MotionStateWindow_t
 {

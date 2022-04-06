@@ -15,6 +15,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "Images.h"
+#include "Button.h"
 
 /**
  * @brief Runs the UI for running tests

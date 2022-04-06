@@ -96,15 +96,9 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int z
     return SUCCESS;
 }
 
-int force_gauge_get_force(ForceGauge *forceGauge)
+int force_gauge_raw_to_force(int zero, float slope, int raw)
 {
-    int forceRaw = force_gauge_get_raw(forceGauge);
-    return force_gauge_raw_to_force(forceGauge, forceRaw);
-}
-
-float force_gauge_raw_to_force(ForceGauge *forceGauge, int raw)
-{
-    return (float)(raw - forceGauge->interpolationZero) / ((float)forceGauge->interpolationSlope * (float)1000);
+    return (int)(raw - zero) / (slope);
 }
 
 int force_gauge_get_raw(ForceGauge *forceGauge)

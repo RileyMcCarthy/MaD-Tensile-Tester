@@ -25,9 +25,9 @@
  */
 static void check_buttons(NavigationPage *page)
 {
-    display_update_touch(page->display);
+    button_update(page->display);
 
-    if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
+    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -87,7 +87,6 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[0].ymin = 120;
     buttons[0].ymax = buttons[0].ymin + buttonSize;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = PAGE_MANUAL;
@@ -96,7 +95,6 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[1].ymin = 120;
     buttons[1].ymax = buttons[1].ymin + buttonSize;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[2].name = PAGE_AUTOMATIC;
@@ -105,7 +103,6 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[2].ymin = 120;
     buttons[2].ymax = buttons[2].ymin + buttonSize;
     buttons[2].pressed = false;
-    buttons[2].debounceTimems = 100;
     buttons[2].lastPress = 0;
 
     buttons[3].name = PAGE_CALIBRATION;
@@ -114,7 +111,6 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[3].ymin = 120;
     buttons[3].ymax = buttons[2].ymin + buttonSize;
     buttons[3].pressed = false;
-    buttons[3].debounceTimems = 100;
     buttons[3].lastPress = 0;
 
     buttons[4].name = PAGE_SETTINGS;
@@ -123,7 +119,6 @@ Pages navigation_page_run(NavigationPage *page)
     buttons[4].ymin = buttons[0].ymax + 30;
     buttons[4].ymax = buttons[4].ymin + buttonSize;
     buttons[4].pressed = false;
-    buttons[4].debounceTimems = 100;
     buttons[4].lastPress = 0;
 
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);

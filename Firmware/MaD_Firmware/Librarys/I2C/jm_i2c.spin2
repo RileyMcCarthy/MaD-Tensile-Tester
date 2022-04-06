@@ -29,7 +29,7 @@ con { fixed io pins }
 con
 
   #0, PU_NONE, PU_1K5, PU_3K3, PU_15K                           ' pull-up options
-  #0, ACK, NAK
+  #0, ACK, NAK''ACK==0, NAK==1''                                ' I2C acknowledge options
 
 
 var

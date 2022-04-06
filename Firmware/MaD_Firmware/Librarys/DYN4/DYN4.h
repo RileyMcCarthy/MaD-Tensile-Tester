@@ -33,7 +33,7 @@
 #define dyn4_high_speed 0x14
 #define dyn4_high_accel 0x15
 #define dyn4_set_pos_onrange 0x16
-#define dyn4_set_gear_number 0x17
+//#define dyn4_set_gear_number 0x17 gear number also sets line number in byte 2
 #define dyn4_read_main_gain 0x18
 #define dyn4_read_speed_gain 0x19
 #define dyn4_read_int_gain 0x1A
@@ -42,6 +42,11 @@
 #define dyn4_read_high_accel 0x1D
 #define dyn4_read_pos_onrange 0x1E
 #define dyn4_read_gear_number 0x1F
+
+#define dyn4_is_gear_number 0x18
+#define dyn4_is_status 0x19
+#define dyn4_is_config 0x1a
+#define dyn4_is_abs_pos 0x1b
 
 /**Functions**/
 
@@ -83,6 +88,14 @@ typedef struct DYN4_s
     FDS serial;
 } DYN4;
 
+typedef union Data_union
+{
+    float fval;
+    uint16_t wval;
+    int32_t val;
+    uint8_t bval[4];
+} DataUnion;
+
 DYN4 *dyn4_create();
 
 void dyn4_destroy(DYN4 *dyn4);
@@ -92,7 +105,7 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id);
 int dyn4_getPosition(DYN4 *dyn4);
 
 void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data);
-uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size);
+int dyn4_read_command(DYN4 *dyn4, int command);
 Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status);
 
 #endif

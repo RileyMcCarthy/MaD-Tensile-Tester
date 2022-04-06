@@ -1,0 +1,79 @@
+Date : 2022-03-29 18:48:12
+Directory : c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys
+Total : 37 files,  7326 codes, 1661 comments, 1284 blanks, all 10271 lines
+
+Languages
++-------------+------------+------------+------------+------------+------------+
+| language    | files      | code       | comment    | blank      | total      |
++-------------+------------+------------+------------+------------+------------+
+| C           |         14 |      4,490 |        836 |        518 |      5,844 |
+| C++         |         15 |      1,372 |        135 |        226 |      1,733 |
+| spin2       |          7 |      1,339 |        690 |        519 |      2,548 |
+| Objective-C |          1 |        125 |          0 |         21 |        146 |
++-------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                         | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                            |         37 |      7,326 |      1,661 |      1,284 |     10,271 |
+| Communication                                                                                                                |          2 |         18 |          0 |          3 |         21 |
+| DS3231                                                                                                                       |          2 |        142 |         52 |         24 |        218 |
+| DYN4                                                                                                                         |          2 |        191 |         55 |         32 |        278 |
+| ESP32                                                                                                                        |          3 |        684 |        339 |        101 |      1,124 |
+| Encoder                                                                                                                      |          1 |         55 |         57 |         43 |        155 |
+| ForceGauge                                                                                                                   |          2 |        111 |         18 |         26 |        155 |
+| I2C                                                                                                                          |          1 |        180 |         59 |         78 |        317 |
+| JSON                                                                                                                         |          2 |      1,109 |         51 |        160 |      1,320 |
+| MCP23017                                                                                                                     |          2 |        163 |         17 |         25 |        205 |
+| MotionPlanning                                                                                                               |          2 |        227 |          4 |         30 |        261 |
+| MotionPlanningOld                                                                                                            |          6 |        546 |         78 |         73 |        697 |
+| NavKey                                                                                                                       |          2 |        546 |        168 |        106 |        820 |
+| RA8876                                                                                                                       |          6 |      2,460 |        306 |        227 |      2,993 |
+| Serial                                                                                                                       |          2 |        420 |        235 |        297 |        952 |
+| tiny-json                                                                                                                    |          2 |        474 |        222 |         59 |        755 |
++------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------------------------------+-------------+------------+------------+------------+------------+
+| filename                                                                                                                     | language    | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------------+-------------+------------+------------+------------+------------+
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\Communication\list.h                  | C++         |         11 |          0 |          2 |         13 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\Communication\queue.h                 | C++         |          7 |          0 |          1 |          8 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\DS3231\DS3231.c                       | C           |        111 |         48 |         17 |        176 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\DS3231\DS3231.h                       | C++         |         31 |          4 |          7 |         42 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\DYN4\DYN4.c                           | C           |        111 |         39 |         16 |        166 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\DYN4\DYN4.h                           | C++         |         80 |         16 |         16 |        112 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\ESP32\esp32_core.spin2                | spin2       |        224 |        117 |         35 |        376 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\ESP32\esp32_tcpip.spin2               | spin2       |        277 |        140 |         38 |        455 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\ESP32\esp32_wifi.spin2                | spin2       |        183 |         82 |         28 |        293 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\Encoder\jm_quadrature.spin2           | spin2       |         55 |         57 |         43 |        155 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\ForceGauge\ForceGauge.c               | C           |         88 |         18 |         16 |        122 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\ForceGauge\ForceGauge.h               | C++         |         23 |          0 |         10 |         33 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\I2C\jm_i2c.spin2                      | spin2       |        180 |         59 |         78 |        317 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\JSON\JSON.c                           | C           |        987 |         49 |        141 |      1,177 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\JSON\JSON.h                           | C++         |        122 |          2 |         19 |        143 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MCP23017\MCP23017.c                   | C           |        132 |         10 |         13 |        155 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MCP23017\MCP23017.h                   | C++         |         31 |          7 |         12 |         50 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\MotionPlanningold.h | C++         |         10 |          0 |          2 |         12 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\bbpr.c              | C           |        253 |         20 |         24 |        297 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\bbpr.h              | C++         |         11 |         46 |          6 |         63 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\machineProfile.m    | Objective-C |        125 |          0 |         21 |        146 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\motionPlanning.c    | C           |        143 |         12 |         18 |        173 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanningOld\motionPlanning.h    | C++         |          4 |          0 |          2 |          6 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanning\MotionPlanning.c       | C           |        178 |          4 |         23 |        205 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\MotionPlanning\MotionPlanning.h       | C++         |         49 |          0 |          7 |         56 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\NavKey\i2cNavKey.c                    | C           |        442 |        141 |         74 |        657 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\NavKey\i2cNavKey.h                    | C++         |        104 |         27 |         32 |        163 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\Button.c                       | C           |         58 |          1 |          5 |         64 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\Button.h                       | C++         |         19 |          0 |          2 |         21 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\Module.c                       | C           |        308 |          2 |         34 |        344 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\Module.h                       | C++         |         58 |          0 |         13 |         71 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\RA8876.c                       | C           |      1,205 |        270 |         78 |      1,553 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\RA8876\RA8876.h                       | C++         |        812 |         33 |         95 |        940 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\Serial\jm_fullduplexserial.spin2      | spin2       |        298 |        176 |        238 |        712 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\Serial\jm_nstr.spin2                  | spin2       |        122 |         59 |         59 |        240 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\tiny-json\tiny-json.c                 | C           |        391 |        137 |         34 |        562 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\Librarys\tiny-json\tiny-json.h                 | C           |         83 |         85 |         25 |        193 |
+| Total                                                                                                                        |             |      7,326 |      1,661 |      1,284 |     10,271 |
++------------------------------------------------------------------------------------------------------------------------------+-------------+------------+------------+------------+------------+

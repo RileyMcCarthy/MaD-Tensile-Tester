@@ -56,11 +56,21 @@ void mcp23017_destroy(MCP23017 *mcp23017)
  * @param theSDA
  * @param theSCL
  */
-void mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
+bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
 {
     mcp23017->i2cBus.setup(scl, sda, 100, 1); // 1.5k pullup
     mcp23017->writeAddr = ((0x20 | addr) << 1) & 0b11111110;
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
+    int DIRAVALUE = 0b00001111;
+    int DIRBVALUE = 0xFF;
+    write_register(mcp23017, DIRA, DIRAVALUE); // first 4 inputs and last 4 outputs
+    write_register(mcp23017, DIRB, DIRBVALUE); // all inputs
+    if (read_register(mcp23017, DIRA) != DIRAVALUE || read_register(mcp23017, DIRB) != DIRBVALUE)
+    {
+        printf("Error setting up MCP23017\n");
+        return false;
+    }
+    return true;
 }
 
 void mcp_update_register(MCP23017 *mcp23017)
@@ -98,7 +108,7 @@ uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)
 
 void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t state)
 {
-    mcp_set_direction(mcp23017, pin, reg, MCP23017_OUTPUT);
+    // mcp_set_direction(mcp23017, pin, reg, MCP23017_OUTPUT);
     if (reg == DIRA)
     {
         reg = REG_GPIOA;

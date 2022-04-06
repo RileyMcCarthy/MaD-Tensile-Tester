@@ -6,6 +6,15 @@
 #include "StateMachine.h"
 #include "IOBoard.h"
 
+typedef enum homingstate_e
+{
+    HOMING_NONE,
+    HOMING_COMPLETE,
+    HOMING_SEEKING,
+    HOMING_BACKING_OFF,
+    HOMING_SEEKING_SLOW
+} HomingState;
+
 typedef struct control_t
 {
     MachineProfile *machineProfile;
@@ -13,7 +22,7 @@ typedef struct control_t
     NavKey *navkey;
     MCP23017 *mcp;
     MachineState *stateMachine;
-    TestProfile *testProfile;
+    MotionProfile *motionProfile;
     DYN4 *dyn4;
     int cogid;
 } Control;

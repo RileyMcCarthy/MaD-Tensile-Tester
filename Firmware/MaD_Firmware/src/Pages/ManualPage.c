@@ -19,9 +19,9 @@
  */
 static void checkButtons(ManualPage *page)
 {
-    display_update_touch(page->display);
+    button_update(page->display);
 
-    display_update_buttons(page->display, page->buttons, BUTTONCOUNT);
+    button_check(page->display, page->buttons, BUTTONCOUNT);
     for (int i = 0; i < BUTTONCOUNT; i++)
     {
         if (page->buttons[i].pressed)
@@ -104,7 +104,6 @@ void manual_page_run(ManualPage *page)
     buttons[0].ymin = 350;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 200;
     buttons[0].lastPress = 0;
 
     buttons[1].name = BUTTON_CONDITION;
@@ -113,7 +112,6 @@ void manual_page_run(ManualPage *page)
     buttons[1].ymin = 350;
     buttons[1].ymax = buttons[1].ymin + 50;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 200;
     buttons[1].lastPress = 0;
 
     buttons[2].name = BUTTON_NAVIGATION;
@@ -122,7 +120,6 @@ void manual_page_run(ManualPage *page)
     buttons[2].ymin = 0;
     buttons[2].ymax = buttons[2].ymin + 100;
     buttons[2].pressed = false;
-    buttons[2].debounceTimems = 200;
     buttons[2].lastPress = 0;
 
     display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);

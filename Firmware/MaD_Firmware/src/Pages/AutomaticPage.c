@@ -1,5 +1,6 @@
 #include "AutomaticPage.h"
 #include "Monitor.h"
+#include "Button.h"
 
 #define BUTTON_MOTION_MODE 0
 #define BUTTON_CONDITION 1

@@ -1,15 +1,17 @@
-//using pallette https://coolors.co/d3d4d9-4b88a2-bb0a21-252627-fff9fb
+// using pallette https://coolors.co/d3d4d9-4b88a2-bb0a21-252627-fff9fb
 
 #ifndef Style_H
 #define Style_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
-#define MAINCOLOR 0xd69a          //light gray
-#define BACKCOLOR 0x4c54          //blue munsell
-#define SECONDARYCOLOR 0xb844     //fire brick (red)
-#define MAINTEXTCOLOR 0xffdf      //snow
-#define SECONDARYTEXTCOLOR 0x2125 //RESIN BLACK
+
+#include "RA8876.h"
+
+#define MAINCOLOR 0xd69a       // light gray
+#define BACKCOLOR 0x4c54       // blue munsell
+#define SECONDARYCOLOR 0xb844  // fire brick (red)
+#define MAINTEXTCOLOR 0xffdf   // snow
+#define SECONDARYTEXTCOLOR 0x0 // RESIN BLACK
+
+#define ACTIVEBUTTON COLOR65K_LIGHTGREEN
 
 #define DISABLEDBACK 0x0000
 #define DISABLEDTEXT 0xffff
@@ -28,6 +30,5 @@
 
 #define CLICKABLE 0x7e0
 #define LOCKED 0xfd20
-
 
 #endif

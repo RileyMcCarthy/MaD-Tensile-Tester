@@ -8,8 +8,8 @@
 
 static void check_buttons(StatusPage *page)
 {
-    display_update_touch(page->display);
-    if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
+    button_update(page->display);
+    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -221,14 +221,14 @@ void status_page_run(StatusPage *page)
     int forceGraphStartY = forceValStartY + 50;
     int forceGraphStartX = forceValStartX;
     int forceGraphWidth = motionStatusWidth - 40;
-    Graph *forceTimeGraph = graph_create(forceGraphStartX, forceGraphStartY, forceGraphWidth, 100, 2.5, 0, "N", "F vs t");
-    graph_add_marker(forceTimeGraph, 2);
+    // Graph *forceTimeGraph = graph_create(forceGraphStartX, forceGraphStartY, forceGraphWidth, 100, 2.5, 0, "N", "F vs t");
+    // graph_add_marker(forceTimeGraph, 2);
 
     int positionGraphStartY = forceGraphStartY + 150;
     int positionGraphStartX = forceGraphStartX;
     int positionGraphWidth = motionStatusWidth - 40;
-    Graph *positionTimeGraph = graph_create(positionGraphStartX, positionGraphStartY, positionGraphWidth, 100, 200, 0, "mm", "P vs t");
-    graph_add_marker(positionTimeGraph, 150);
+    // Graph *positionTimeGraph = graph_create(positionGraphStartX, positionGraphStartY, positionGraphWidth, 100, 200, 0, "mm", "P vs t");
+    // graph_add_marker(positionTimeGraph, 150);
 
     /*page buttons*/
     Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
@@ -239,7 +239,6 @@ void status_page_run(StatusPage *page)
     buttons[0].ymin = SCREEN_HEIGHT - 50 - 20;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = BUTTON_NAVIGATION;
@@ -248,7 +247,6 @@ void status_page_run(StatusPage *page)
     buttons[1].ymin = 0;
     buttons[1].ymax = buttons[1].ymin + 100;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     Image *navigationImg = page->images->navigationImage;
@@ -468,23 +466,22 @@ void status_page_run(StatusPage *page)
         function_window_update(functionWindow);
 
         /*Values*/
-        // printf("Position: %d\n", page->data->position);
-        sprintf(buf, "%dmm", page->data->position);
+        sprintf(buf, "%dmm", page->data->positionum / 1000);
         display_draw_square_fill(page->display, motionStatusX1 - 12 * 12 - 20, positionStartY, motionStatusX1 - 20, positionStartY + 24, MAINCOLOR);
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, positionStartY, buf);
 
         // printf("Force: %f\n", page->data->force);
-        sprintf(buf, "%0.3fN", page->data->force);
+        sprintf(buf, "%0.3fN", (float)page->data->force / 1000.0);
         display_draw_square_fill(page->display, motionStatusX1 - 12 * 12 - 20, forceValStartY, motionStatusX1 - 20, forceValStartY + 24, MAINCOLOR);
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, motionStatusX1 - strlen(buf) * 12 - 20, forceValStartY, buf);
         // display_draw_square_fill(page->display, forceGraphStartX - 1, forceGraphStartY - 1, forceGraphStartX + forceGraphWidth, forceGraphStartY + 100, MAINCOLOR);
-        graph_draw(forceTimeGraph, page->display, page->data->force);
-        graph_draw(positionTimeGraph, page->display, page->data->position);
+        // graph_draw(forceTimeGraph, page->display, page->data->force);
+        // graph_draw(positionTimeGraph, page->display, page->data->positionum / 1000);
         _waitms(10);
         initial = false;
         previousState = currentState;
     }
-    graph_destroy(forceTimeGraph);
+    // graph_destroy(forceTimeGraph);
 }

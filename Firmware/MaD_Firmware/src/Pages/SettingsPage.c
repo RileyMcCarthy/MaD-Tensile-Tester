@@ -56,9 +56,9 @@ static bool isFloat(char *string)
 
 static bool check_buttons(SettingsPage *page)
 {
-    display_update_touch(page->display);
+    button_update(page->display);
 
-    if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
+    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -199,7 +199,7 @@ static bool check_buttons(SettingsPage *page)
                     char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
                     if (scale != NULL && isFloat(scale))
                     {
-                        page->machineProfile->configuration->positionEncoderScaleFactor = atof(scale);
+                        page->machineProfile->configuration->positionEncoderStepsPerRev = atof(scale);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -365,7 +365,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[0].ymin = 0;
     page->buttons[0].ymax = page->buttons[0].ymin + 100;
     page->buttons[0].pressed = false;
-    page->buttons[0].debounceTimems = 100;
     page->buttons[0].lastPress = 0;
 
     Image *navigationImg = page->images->navigationImage;
@@ -396,7 +395,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[1].ymin = nameStartY;
     page->buttons[1].ymax = page->buttons[1].ymin + 30;
     page->buttons[1].pressed = false;
-    page->buttons[1].debounceTimems = 100;
     page->buttons[1].lastPress = 0;
 
     // Number
@@ -412,7 +410,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[2].ymin = numberStartY;
     page->buttons[2].ymax = page->buttons[2].ymin + 30;
     page->buttons[2].pressed = false;
-    page->buttons[2].debounceTimems = 100;
     page->buttons[2].lastPress = 0;
 
     /*Machine configuration header*/
@@ -439,7 +436,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[3].ymin = motorTypeStartY;
     page->buttons[3].ymax = page->buttons[3].ymin + 30;
     page->buttons[3].pressed = false;
-    page->buttons[3].debounceTimems = 100;
     page->buttons[3].lastPress = 0;
 
     // max motor torque
@@ -455,7 +451,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[4].ymin = maxMotorTorqueStartY;
     page->buttons[4].ymax = page->buttons[4].ymin + 30;
     page->buttons[4].pressed = false;
-    page->buttons[4].debounceTimems = 100;
     page->buttons[4].lastPress = 0;
     // maxMotorRPM
     int maxMotorRPMStartX = maxMotorTorqueStartX;
@@ -470,7 +465,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[5].ymin = maxMotorRPMStartY;
     page->buttons[5].ymax = page->buttons[5].ymin + 30;
     page->buttons[5].pressed = false;
-    page->buttons[5].debounceTimems = 100;
     page->buttons[5].lastPress = 0;
     // gearDiameter
     int gearDiameterStartX = maxMotorRPMStartX;
@@ -485,7 +479,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[6].ymin = gearDiameterStartY;
     page->buttons[6].ymax = page->buttons[6].ymin + 30;
     page->buttons[6].pressed = false;
-    page->buttons[6].debounceTimems = 100;
     page->buttons[6].lastPress = 0;
     // systemIntertia
     int systemIntertiaStartX = gearDiameterStartX;
@@ -500,7 +493,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[7].ymin = systemIntertiaStartY;
     page->buttons[7].ymax = page->buttons[7].ymin + 30;
     page->buttons[7].pressed = false;
-    page->buttons[7].debounceTimems = 100;
     page->buttons[7].lastPress = 0;
     // staticTorque
     int staticTorqueStartX = systemIntertiaStartX;
@@ -515,7 +507,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[8].ymin = staticTorqueStartY;
     page->buttons[8].ymax = page->buttons[8].ymin + 30;
     page->buttons[8].pressed = false;
-    page->buttons[8].debounceTimems = 100;
     page->buttons[8].lastPress = 0;
     // load
     int loadStartX = staticTorqueStartX;
@@ -530,7 +521,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[9].ymin = loadStartY;
     page->buttons[9].ymax = page->buttons[9].ymin + 30;
     page->buttons[9].pressed = false;
-    page->buttons[9].debounceTimems = 100;
     page->buttons[9].lastPress = 0;
     // positionEncoderType
     int positionEncoderTypeStartX = loadStartX;
@@ -545,14 +535,13 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[10].ymin = positionEncoderTypeStartY;
     page->buttons[10].ymax = page->buttons[10].ymin + 30;
     page->buttons[10].pressed = false;
-    page->buttons[10].debounceTimems = 100;
     page->buttons[10].lastPress = 0;
     // positionEncoderScaleFactor
     int positionEncoderScaleFactorStartX = positionEncoderTypeStartX;
     int positionEncoderScaleFactorStartY = positionEncoderTypeStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Encoder Slope", page->machineProfile->configuration->positionEncoderScaleFactor);
+    sprintf(buf, "%s: %0.3f", "Encoder Slope", page->machineProfile->configuration->positionEncoderStepsPerRev);
     display_draw_string(page->display, positionEncoderScaleFactorStartX, positionEncoderScaleFactorStartY, buf);
     page->buttons[11].name = BUTTON_CONFIGURATION_POSITIONENCODERSCALEFACTOR;
     page->buttons[11].xmin = positionEncoderScaleFactorStartX;
@@ -560,7 +549,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[11].ymin = positionEncoderScaleFactorStartY;
     page->buttons[11].ymax = page->buttons[11].ymin + 30;
     page->buttons[11].pressed = false;
-    page->buttons[11].debounceTimems = 100;
     page->buttons[11].lastPress = 0;
     // forceGauge
     int forceGaugeStartX = positionEncoderScaleFactorStartX;
@@ -575,7 +563,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[12].ymin = forceGaugeStartY;
     page->buttons[12].ymax = page->buttons[12].ymin + 30;
     page->buttons[12].pressed = false;
-    page->buttons[12].debounceTimems = 100;
     page->buttons[12].lastPress = 0;
     // forceGaugeScaleFactor
     int forceGaugeScaleFactorStartX = forceGaugeStartX;
@@ -590,7 +577,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[13].ymin = forceGaugeScaleFactorStartY;
     page->buttons[13].ymax = page->buttons[13].ymin + 30;
     page->buttons[13].pressed = false;
-    page->buttons[13].debounceTimems = 100;
     page->buttons[13].lastPress = 0;
     // forceGaugeZeroFactor
     int forceGaugeZeroFactorStartX = forceGaugeScaleFactorStartX;
@@ -605,7 +591,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[14].ymin = forceGaugeZeroFactorStartY;
     page->buttons[14].ymax = page->buttons[14].ymin + 30;
     page->buttons[14].pressed = false;
-    page->buttons[14].debounceTimems = 100;
     page->buttons[14].lastPress = 0;
     // Draw division line
     display_draw_line(page->display, machineProfileX0 + machineProfileWidth / 2, configurationStartY, machineProfileX0 + machineProfileWidth / 2, machineProfileY1 - 20, COLOR65K_BLACK);
@@ -633,7 +618,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[15].ymin = minPositionStartY;
     page->buttons[15].ymax = page->buttons[15].ymin + 30;
     page->buttons[15].pressed = false;
-    page->buttons[15].debounceTimems = 100;
     page->buttons[15].lastPress = 0;
     //  maxPosition
     int maxPositionStartX = minPositionStartX;
@@ -648,7 +632,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[16].ymin = maxPositionStartY;
     page->buttons[16].ymax = page->buttons[16].ymin + 30;
     page->buttons[16].pressed = false;
-    page->buttons[16].debounceTimems = 100;
     page->buttons[16].lastPress = 0;
     //  maxVelocity
     int maxVelocityStartX = maxPositionStartX;
@@ -663,7 +646,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[17].ymin = maxVelocityStartY;
     page->buttons[17].ymax = page->buttons[17].ymin + 30;
     page->buttons[17].pressed = false;
-    page->buttons[17].debounceTimems = 100;
     page->buttons[17].lastPress = 0;
     //  maxAcceleration
     int maxAccelerationStartX = maxVelocityStartX;
@@ -678,7 +660,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[18].ymin = maxAccelerationStartY;
     page->buttons[18].ymax = page->buttons[18].ymin + 30;
     page->buttons[18].pressed = false;
-    page->buttons[18].debounceTimems = 100;
     page->buttons[18].lastPress = 0;
     //  maxForceTensile
     int maxForceTensileStartX = maxAccelerationStartX;
@@ -693,7 +674,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[19].ymin = maxForceTensileStartY;
     page->buttons[19].ymax = page->buttons[19].ymin + 30;
     page->buttons[19].pressed = false;
-    page->buttons[19].debounceTimems = 100;
     page->buttons[19].lastPress = 0;
     // maxForceCompression
     int maxForceCompressionStartX = maxForceTensileStartX;
@@ -708,7 +688,6 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[20].ymin = maxForceCompressionStartY;
     page->buttons[20].ymax = page->buttons[20].ymin + 30;
     page->buttons[20].pressed = false;
-    page->buttons[20].debounceTimems = 100;
     page->buttons[20].lastPress = 0;
     // forceGaugeNeutralOffset
     int forceGaugeNeutralOffsetStartX = maxForceCompressionStartX;
@@ -723,10 +702,9 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[21].ymin = forceGaugeNeutralOffsetStartY;
     page->buttons[21].ymax = page->buttons[21].ymin + 30;
     page->buttons[21].pressed = false;
-    page->buttons[21].debounceTimems = 100;
     page->buttons[21].lastPress = 0;
 
-    display_update_buttons(page->display, page->buttons, BUTTONCOUNT); // Clear button presses
+    button_check(page->display, page->buttons, BUTTONCOUNT); // Clear button presses
     while (!page->complete)
     {
         if (check_buttons(page) && !page->complete)

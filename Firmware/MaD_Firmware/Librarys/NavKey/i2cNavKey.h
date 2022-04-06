@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+typedef struct __using("jm_i2c.spin2") Bus;
+
 /* NavKey configuration bit. Use with GCONF */
 enum GCONF_PARAMETER
 {
@@ -57,7 +59,7 @@ typedef struct navkeystatus_t
 
 typedef struct navkey_t
 {
-	i2c bus;
+	Bus i2cBus;
 	int scl;
 	int sda;
 	NavKeyStatus status;

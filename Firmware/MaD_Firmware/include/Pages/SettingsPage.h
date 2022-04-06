@@ -9,6 +9,7 @@
 #include "JSON.h"
 #include "Keyboard.h"
 #include <stdbool.h>
+#include "Button.h"
 
 typedef struct SettingsPage_s
 {

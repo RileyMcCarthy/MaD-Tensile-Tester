@@ -10,6 +10,7 @@
 #include "Graph.h"
 #include "MotionStateWindow.h"
 #include "FunctionWindow.h"
+#include "Button.h"
 
 typedef struct StatusPage_s
 {

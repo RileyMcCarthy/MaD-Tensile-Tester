@@ -4,7 +4,7 @@
 #include "simpletools.h"
 #include "RA8876.h"
 #include "Images.h"
-
+#include "Button.h"
 typedef struct keyboard_s
 {
     Display *display;

@@ -14,9 +14,9 @@ typedef struct ForceCalibration_s
 
 static void check_buttons(CalibrateForcePage *page)
 {
-    display_update_touch(page->display);
+    button_update(page->display);
 
-    if (display_update_buttons(page->display, page->buttons, BUTTONCOUNT) > 0)
+    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -113,7 +113,6 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
     buttons[1].ymin = 0;
     buttons[1].ymax = buttons[1].ymin + 100;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[0].name = BUTTON_FORCE_NAVIGATION;
@@ -122,7 +121,6 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
     buttons[0].ymin = calibrateY1 - 30 - 100;
     buttons[0].ymax = buttons[0].ymin + 100;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 500;
     buttons[0].lastPress = 0;
 
     Image *navigationImg = page->images->navigationImage;

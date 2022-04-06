@@ -64,9 +64,9 @@ static enum keys {
  */
 static bool check_buttons(Keyboard *keyboard)
 {
-    display_update_touch(keyboard->display);
+    button_update(keyboard->display);
 
-    if (display_update_buttons(keyboard->display, keyboard->keys, BUTTONCOUNT) > 0)
+    if (button_check(keyboard->display, keyboard->keys, BUTTONCOUNT) > 0)
     {
         printf("bvutton pressed\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
@@ -206,10 +206,12 @@ static bool check_buttons(Keyboard *keyboard)
                     strcat(keyboard->keyboard_buffer, ".");
                     break;
                 case key_cancel:
+                {
                     free(keyboard->keyboard_buffer);
                     keyboard->keyboard_buffer = NULL;
                     keyboard->keyboard_complete = true;
                     break;
+                }
                 case key_left:
                     break;
                 case key_space:
@@ -248,7 +250,6 @@ static void createKey(Button *button, int name, int xmin, int ymin, float keySiz
     button->ymin = ymin;
     button->ymax = button->ymin + (int)(54.0 * keySize);
     button->pressed = false;
-    button->debounceTimems = 100;
     button->lastPress = 0;
 }
 
@@ -274,6 +275,7 @@ void keyboard_destroy(Keyboard *keyboard)
  */
 char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
 {
+    printf("keyboard running:%s\n", prompt);
     Image *keyboard = keyboardObj->images->keyboardImage;
     int topBarSize = 32;
     keyboardObj->keyboard_buffer = (char *)malloc(sizeof(char));
@@ -284,11 +286,13 @@ char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
     display_set_text_parameter2(keyboardObj->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
     display_bte_memory_copy(keyboardObj->display, PAGE1_START_ADDR, SCREEN_WIDTH, keyboard->x0, keyboard->y0 - topBarSize, PAGE3_START_ADDR, SCREEN_WIDTH, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+    printf("1\n");
     for (int i = 0; i < keyboard->height; i += 10)
     {
+        printf("height:%d,%d\n", keyboard->height, i);
         display_bte_memory_copy_image(keyboardObj->display, keyboard, keyboard->x0, SCREEN_HEIGHT - i);
     }
+    printf("done animation\n");
     display_bte_memory_copy_image(keyboardObj->display, keyboard, keyboard->x0, keyboard->y0);
     Button keys[BUTTONCOUNT];
     createKey(&keys[0], key_1, keyboard->x0 + 823, keyboard->y0 + 148, 1);
@@ -346,8 +350,9 @@ char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)
     keyboardObj->keys = keys;
 
     keyboardObj->keyboard_complete = false;
+
     bool initial = true;
-    display_update_buttons(keyboardObj->display, keyboardObj->keys, BUTTONCOUNT); // Clear button presses
+    button_check(keyboardObj->display, keyboardObj->keys, BUTTONCOUNT); // Clear button presses
     while (!keyboardObj->keyboard_complete)
     {
         if (check_buttons(keyboardObj) || initial)

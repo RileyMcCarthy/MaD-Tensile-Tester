@@ -8,7 +8,7 @@
 
 static void check_buttons(MotionStateWindow *window)
 {
-    if (display_update_buttons(window->display, window->buttons, BUTTONCOUNT) > 0)
+    if (button_check(window->display, window->buttons, BUTTONCOUNT) > 0)
     {
         printf("window checking\n");
         for (int i = 0; i < BUTTONCOUNT; i++)
@@ -65,7 +65,6 @@ MotionStateWindow *motion_state_window_create(Display *display, MachineState *st
     buttons[0].ymin = window->y + 35;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = BUTTON_CONDITION;
@@ -74,7 +73,6 @@ MotionStateWindow *motion_state_window_create(Display *display, MachineState *st
     buttons[1].ymin = buttons[0].ymin;
     buttons[1].ymax = buttons[1].ymin + 50;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[2].name = BUTTON_MODE;
@@ -83,7 +81,6 @@ MotionStateWindow *motion_state_window_create(Display *display, MachineState *st
     buttons[2].ymin = buttons[0].ymin;
     buttons[2].ymax = buttons[2].ymin + 50;
     buttons[2].pressed = false;
-    buttons[2].debounceTimems = 100;
     buttons[2].lastPress = 0;
     return window;
 }

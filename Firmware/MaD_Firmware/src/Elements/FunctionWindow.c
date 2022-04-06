@@ -1,11 +1,12 @@
 #include "FunctionWindow.h"
-
+#include "Control.h"
 #include "style.h"
 #define BUTTONCOUNT 7
 
 static void check_buttons(FunctionWindow *window)
 {
-    if (display_update_buttons(window->display, window->buttons, BUTTONCOUNT) > 0)
+    button_update(explorer->display);
+    if (button_check(window->display, window->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)
         {
@@ -33,7 +34,6 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[0].ymin = window->y + 35;
     buttons[0].ymax = buttons[0].ymin + 50;
     buttons[0].pressed = false;
-    buttons[0].debounceTimems = 100;
     buttons[0].lastPress = 0;
 
     buttons[1].name = FUNC_MANUAL_INCREMENTAL_JOG;
@@ -42,7 +42,6 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[1].ymin = buttons[0].ymin;
     buttons[1].ymax = buttons[1].ymin + 50;
     buttons[1].pressed = false;
-    buttons[1].debounceTimems = 100;
     buttons[1].lastPress = 0;
 
     buttons[2].name = FUNC_MANUAL_CONTINUOUS_JOG;
@@ -51,7 +50,6 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[2].ymin = buttons[0].ymin;
     buttons[2].ymax = buttons[2].ymin + 50;
     buttons[2].pressed = false;
-    buttons[2].debounceTimems = 100;
     buttons[2].lastPress = 0;
 
     buttons[3].name = FUNC_MANUAL_POSITIONAL_MOVE;
@@ -60,7 +58,6 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[3].ymin = buttons[0].ymax + 5;
     buttons[3].ymax = buttons[3].ymin + 50;
     buttons[3].pressed = false;
-    buttons[3].debounceTimems = 100;
     buttons[3].lastPress = 0;
 
     buttons[4].name = FUNC_MANUAL_HOME;
@@ -69,15 +66,14 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[4].ymin = buttons[3].ymin;
     buttons[4].ymax = buttons[4].ymin + 50;
     buttons[4].pressed = false;
-    buttons[4].debounceTimems = 100;
     buttons[4].lastPress = 0;
+
     buttons[5].name = FUNC_MANUAL_MOVE_GAUGE_LENGTH;
     buttons[5].xmin = buttons[4].xmax + 5;
     buttons[5].xmax = buttons[5].xmin + 100;
     buttons[5].ymin = buttons[4].ymin;
     buttons[5].ymax = buttons[5].ymin + 50;
     buttons[5].pressed = false;
-    buttons[5].debounceTimems = 100;
     buttons[5].lastPress = 0;
 
     buttons[6].name = FUNC_MANUAL_MOVE_FORCE;
@@ -86,7 +82,6 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[6].ymin = buttons[5].ymax + 5;
     buttons[6].ymax = buttons[6].ymin + 50;
     buttons[6].pressed = false;
-    buttons[6].debounceTimems = 100;
     buttons[6].lastPress = 0;
     return window;
 }
@@ -118,24 +113,28 @@ void function_window_update(FunctionWindow *window)
         sprintf(buf, "OFF");
         break;
     case FUNC_MANUAL_INCREMENTAL_JOG:
-        sprintf(buf, "INCREMENTAL JOG: %dmm", window->state->functionData);
+        sprintf(buf, "INCREMENTAL JOG: %0.1fmm", (float)window->state->functionData / 1000.0);
         break;
     case FUNC_MANUAL_CONTINUOUS_JOG:
-        sprintf(buf, "CONTINUOUS JOG: %dmm", window->state->functionData);
+        sprintf(buf, "CONTINUOUS JOG: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_POSITIONAL_MOVE:
-        sprintf(buf, "POSITIONAL MOVE: %dmm", window->state->functionData);
+        sprintf(buf, "POSITIONAL MOVE: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_HOME:
-        if (window->state->functionData == (int)false && window->state->motionParameters.condition == MOTION_STOPPED)
-            sprintf(buf, "HOME", window->state->functionData);
-        else if (window->state->functionData == (int)false && window->state->motionParameters.condition == MOTION_MOVING)
-            sprintf(buf, "HOMING", window->state->functionData);
-        else if (window->state->functionData == (int)true)
-            sprintf(buf, "HOMING COMPLETE", window->state->functionData);
+        if (window->state->functionData == HOMING_NONE)
+            sprintf(buf, "HOME");
+        else if (window->state->functionData == HOMING_SEEKING)
+            sprintf(buf, "HOMING");
+        else if (window->state->functionData == HOMING_SEEKING_SLOW)
+            sprintf(buf, "HOMING SEEKING SLOW");
+        else if (window->state->functionData == HOMING_BACKING_OFF)
+            sprintf(buf, "HOMING BACKING OFF");
+        else if (window->state->functionData == HOMING_COMPLETE)
+            sprintf(buf, "HOMING COMPLETE");
         break;
     case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
-        sprintf(buf, "MOVE GAUGE LENGTH: %dmm", window->state->functionData);
+        sprintf(buf, "MOVE GAUGE LENGTH: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_MOVE_FORCE:
         sprintf(buf, "MOVE GAUGE FORCE: %dmN", window->state->functionData);
@@ -152,7 +151,7 @@ void function_window_update(FunctionWindow *window)
     int textColor = COLOR65K_BLACK;
 
     strcpy(buf, "OFF");
-    if (window->state->state == STATE_MOTION && window->state->motionParameters.status == STATUS_ENABLED)
+    if (window->state->state == STATE_MOTION && window->state->motionParameters.status != STATUS_DISABLED)
     {
         if (window->state->function == FUNC_MANUAL_OFF)
         {
@@ -179,7 +178,7 @@ void function_window_update(FunctionWindow *window)
     display_draw_string(window->display, window->buttons[0].xmin + (window->buttons[0].xmax - window->buttons[0].xmin) / 2 - strlen(buf) * 6, window->buttons[0].ymin + (window->buttons[0].ymax - window->buttons[0].ymin) / 2 - 12, buf);
 
     strcpy(buf, "INCR");
-    if (window->state->state == STATE_MOTION && window->state->motionParameters.condition == MOTION_STOPPED && window->state->motionParameters.status == STATUS_ENABLED)
+    if (window->state->state == STATE_MOTION && window->state->motionParameters.condition != MOTION_MOVING && window->state->motionParameters.status != STATUS_DISABLED)
     {
         if (window->state->function == FUNC_MANUAL_INCREMENTAL_JOG)
         {
@@ -205,7 +204,7 @@ void function_window_update(FunctionWindow *window)
     display_draw_string(window->display, window->buttons[1].xmin + (window->buttons[1].xmax - window->buttons[1].xmin) / 2 - strlen(buf) * 6, window->buttons[1].ymin + (window->buttons[1].ymax - window->buttons[1].ymin) / 2 - 12, buf);
 
     strcpy(buf, "CONT");
-    if (window->state->state == STATE_MOTION && window->state->motionParameters.condition == MOTION_STOPPED && window->state->motionParameters.status == STATUS_ENABLED)
+    if (window->state->state == STATE_MOTION && window->state->motionParameters.condition != MOTION_MOVING && window->state->motionParameters.status != STATUS_DISABLED)
     {
         if (window->state->function == FUNC_MANUAL_CONTINUOUS_JOG)
         {

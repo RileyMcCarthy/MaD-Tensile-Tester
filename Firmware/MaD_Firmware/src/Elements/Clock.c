@@ -16,13 +16,13 @@ void clock_destroy(Clock *clock)
 
 /**
  * @brief Begin method attempts to communicate with the DS3231,
- * if successful the user will be prompt to set the time if not 
+ * if successful the user will be prompt to set the time if not
  * already set.
- * 
+ *
  * @param theDisplay pointer to RA8876 display object to render clock
  * @return Enum Error, RTC_NOT_FOUND if communication fails,
  * RTC_RESET if time is not set (will prompt user to set time),
- * SUCCESS otherwise 
+ * SUCCESS otherwise
  */
 Error clock_begin(Clock *clock, Display *theDisplay)
 {
@@ -31,13 +31,13 @@ Error clock_begin(Clock *clock, Display *theDisplay)
     clock->display = theDisplay;
     error = ds3231_begin(clock->rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
     printf("Error: %d\n", error);
-    if (error == RTC_RESET) //set time
+    if (error == RTC_RESET) // set time
     {
         Time newTime;
-        //newTime = clock_get_date_time(clock);
+        // newTime = clock_get_date_time(clock);
         printf("Setting new time...\n");
-        //add time check here
-        //ds3231_set_time(clock->rtc, &newTime); @todo uncomment this section for setting clock
+        // add time check here
+        // ds3231_set_time(clock->rtc, &newTime); @todo uncomment this section for setting clock
     }
     else if (error == RTC_NOT_FOUND)
     {
@@ -48,7 +48,7 @@ Error clock_begin(Clock *clock, Display *theDisplay)
 
 /**
  * @brief Renders date and time in the top left on the display
- * 
+ *
  * @return Enum Error, RTC_NOT_FOUND if no communication with clock,
  * SUCCESS otherwise.
  */

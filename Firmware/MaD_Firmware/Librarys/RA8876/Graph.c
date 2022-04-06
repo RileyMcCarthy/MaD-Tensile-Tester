@@ -1,8 +1,9 @@
 #include "Graph.h"
-
-Graph *graph_create(int startX, int startY, int width, int height, float maxY, float minY, const char *units, const char *title)
+#include "Module.h"
+Graph *graph_create(Display *display, int startX, int startY, int width, int height, float maxY, float minY, const char *units, const char *title)
 {
     Graph *graph = (Graph *)malloc(sizeof(Graph));
+    graph->display = display;
     graph->startX = startX;
     graph->startY = startY;
     graph->width = width;
@@ -33,6 +34,56 @@ void graph_add_marker(Graph *graph, float value)
         graph->markerY[graph->markerCount] = value;
         graph->markerCount++;
     }
+}
+
+bool graph_draw_static(Graph *graph, double *data, int numdata)
+{
+    // Create Background
+    Module *root = module_create(NULL);
+
+    // Create Window
+    Module *window = module_create(root);
+    module_set_rectangle_circle(window, graph->width, graph->height);
+    module_set_position(window, explorer->x, explorer->y);
+    module_set_padding(window, 10, 10);
+    module_set_color(window, COLOR65K_LIGHTBLUE, COLOR65K_BLUE);
+
+    // Create Title
+    Module *title = module_create(window);
+    module_set_padding(title, 10, 10);
+    module_set_text(title, graph->title);
+    module_set_font(title, RA8876_CHAR_HEIGHT_32);
+    module_set_color(title, COLOR65K_BLACK, title->parent->foregroundColor);
+    module_align_inner_top(title);
+    module_align_center(title);
+    module_add_underline(title);
+
+    // Create Graph Area
+    Module *graphArea = module_create(window);
+    module_align_below(graphArea, title);
+    module_fit_below(graphArea, title);
+    module_fit_width(graphArea);
+    module_align_inner_left(graphArea);
+    module_set_color(graphArea, graphArea->parent->foregroundColor, graphArea->parent->backgroundColor);
+    module_set_padding(graphArea, 0, 0);
+
+    // Create Graph Horizontal Line
+    Module *centerLine = module_create(graphArea);
+    module_set_line(centerLine, 0);
+    module_fit_width(centerLine);
+    module_align_center(centerLine);
+    module_align_middle(centerLine);
+    module_set_color(centerLine, COLOR65K_BLACK, COLOR65K_BLACK);
+
+    // Create Graph Vertical Line
+    Module *verticleLine = module_create(graphArea);
+    module_set_line(verticleLine, 0);
+    module_fit_height(verticleLine);
+    module_align_inner_left(verticleLine);
+    module_set_color(verticleLine, COLOR65K_BLACK, COLOR65K_BLACK);
+
+    module_draw(graph->display, root);
+    module_destroy(root);
 }
 
 // make graph an object so it has memory!

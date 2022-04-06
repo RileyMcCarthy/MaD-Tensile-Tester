@@ -48,7 +48,8 @@ typedef enum MotionCondition_e
 typedef enum MotionMode_e
 {
     MODE_MANUAL, // Manual mode
-    MODE_TEST    // Test mode
+    MODE_TEST,   // Test mode
+    MODE_TEST_RUNNING
 } MotionMode;
 
 typedef enum ModeFunctions_e

@@ -6,6 +6,8 @@
 #include "Style.h"
 #include "StateMachine.h"
 #include "Images.h"
+#include "Button.h"
+
 /**
  * @brief Enumeration representing the pages available to select from navigation
  *

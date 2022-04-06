@@ -4,9 +4,49 @@ static long control_stack[64 * 4];
 
 #define SERVO_CHECK_COUNT_MAX 3
 
-static bool move_servo(DYN4 servo, int type, int position)
+typedef enum homingstate_e
+{
+    HOMING_NONE,
+    HOMING_COMPLETE,
+    HOMING_SEEKING,
+    HOMING_BACKING_OFF,
+    HOMING_SEEKING_SLOW
+} HomingState;
+
+typedef enum movetype_e
+{
+    MOVE_RELATIVE,
+    MOVE_ABSOLUTE,
+    MOVE_SPEED
+} MoveType;
+
+static bool move_servo(Control *control, MoveType type, int value)
 {
     // move servo and check if move is allowed (conditions or machine limits)
+    bool moveAllowed = true;
+    switch (type)
+    {
+    case MOVE_RELATIVE:
+    {
+        // printf("moving relitive\n");
+        int positionSteps = value * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0; // convert um to steps
+        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, positionSteps);
+        break;
+    }
+    case MOVE_ABSOLUTE:
+    {
+        int deltaSteps = (control->monitorData->positionum - value) * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0;
+        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, deltaSteps); // Stop motion
+        break;
+    }
+    case MOVE_SPEED:
+    {
+        int rpm = ((float)value / 1000.0) * (60.0 / 80.0);              // um/s to rpm (mm/s)*((sec/min)/(mm/rev))
+        dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, rpm); // Stop motion (mm/r)*(r/min)/(sec/min)
+        break;
+    }
+    }
+    return true;
 }
 
 /*responsible for moving machine, updating state machine, checking for faults*/
@@ -14,7 +54,10 @@ static void control_cog(Control *control)
 {
     /*Initialize mcp23017*/
     MCP23017 *mcp = mcp23017_create();
-    mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
+    while (!mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL))
+    {
+        _waitms(100);
+    }
 
     /*Initialize NavKey*/
     NavKey *navkey = navkey_create(I2C_ADDR);
@@ -29,8 +72,7 @@ static void control_cog(Control *control)
 
     navkey_write_counter(navkey, 0); // reset counter to position
     MachineState lastState = *(control->stateMachine);
-
-    // dyn4_send_command(control->dyn4, dyn4_set_gear_number, 4096);
+    _waitms(1000);
 
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
@@ -41,7 +83,7 @@ static void control_cog(Control *control)
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
         mcp_update_register(mcp);
-
+        mcp_set_pin(mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 1);
         /*Check self check state*/
         // Charge Pump
         if (currentMachineState.selfCheckParameters.chargePump)
@@ -133,11 +175,11 @@ static void control_cog(Control *control)
         else if (false) // FORCE
         {
         }
-        else if (data.force >= 0 && data.force > machinePerformance.maxForceTensile) // Tension
+        else if (data.force >= 0 && data.force > machinePerformance.maxForceTensile * 1000) // Tension
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_TENSION);
         }
-        else if (data.force < 0 && data.force < -machinePerformance.maxForceCompression) // Compression
+        else if (data.force < 0 && data.force < -machinePerformance.maxForceCompression * 1000) // Compression
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_COMPRESSION);
         }
@@ -173,9 +215,9 @@ static void control_cog(Control *control)
             }
             if (currentMachineState.motionParameters.status == STATUS_DISABLED)
             {
-                dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                move_servo(control, MOVE_RELATIVE, 0);
             }
-            else if (currentMachineState.motionParameters.status == STATUS_ENABLED)
+            else
             {
                 if (lastState.motionParameters.status != STATUS_ENABLED || initial) // Motion enabled initial
                 {
@@ -228,7 +270,6 @@ static void control_cog(Control *control)
                         }
                         else if (control->stateMachine->motionParameters.condition == MOTION_MOVING)
                         {
-                            printf("moving\n");
                             control->stateMachine->function = FUNC_MANUAL_OFF;
                         }
                     }
@@ -237,129 +278,136 @@ static void control_cog(Control *control)
                     switch (currentMachineState.function)
                     {
                     case FUNC_MANUAL_OFF: // Stop current motion
-                        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                        move_servo(control, MOVE_RELATIVE, 0);
                         break;
                     case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
                         if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG || initial)
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
-                            control->stateMachine->functionData = 100; // Default step size
+                            move_servo(control, MOVE_RELATIVE, 0);
+                            control->stateMachine->functionData = 1000; // Default step size in um = 1mm
                         }
                         if (navkey->status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 100; // Increase step size by 10
+                            if (control->stateMachine->functionData < 10000) // No step size above 10mm
+                                control->stateMachine->functionData *= 10;   // Increase step size by multiple of 10
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
-                            if (control->stateMachine->functionData > 100)
+                            if (control->stateMachine->functionData > 10) // No step size below 0.01mm
                             {
-                                control->stateMachine->functionData -= 100; // Decrease step size by 10
+                                control->stateMachine->functionData /= 10; // Decrease step size by multiple of 10
                             }
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData); // Increment by step
+                            move_servo(control, MOVE_RELATIVE, control->stateMachine->functionData);
                         }
                         if (navkey->status.DNR > 0) // Down released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, -1 * control->stateMachine->functionData); // Increment by step
+                            move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->functionData);
                         }
                         break;
                     case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
                         if (lastState.function != FUNC_MANUAL_CONTINUOUS_JOG || initial)
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
-                            control->stateMachine->functionData = 100; // Default step size
+                            move_servo(control, MOVE_RELATIVE, 0);
+                            control->stateMachine->functionData = 10000; // 10000um/s = 10mm/s
                         }
                         if (navkey->status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 100; // Increase step size by 10
+                            control->stateMachine->functionData += 1000; // Increase step size by 1mm
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
-                            if (control->stateMachine->functionData > 100)
-                            {
-                                control->stateMachine->functionData -= 100; // Decrease step size by 10
-                            }
+                            control->stateMachine->functionData -= 1000; // Decrease step size by 1mm
                         }
                         if (navkey->status.UPP > 0) // Up pressed
                         {
-                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, control->stateMachine->functionData); // Turn CW
+                            move_servo(control, MOVE_SPEED, control->stateMachine->functionData);
                         }
                         if (navkey->status.DNP > 0) // Down pressed
                         {
-                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, -1 * control->stateMachine->functionData); // Turn CCW
+                            move_servo(control, MOVE_SPEED, -1 * control->stateMachine->functionData);
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop motion
+                            move_servo(control, MOVE_RELATIVE, 0);
                         }
                         if (navkey->status.DNR > 0) // Down released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // Stop motion
+                            move_servo(control, MOVE_RELATIVE, 0);
                         }
                         break;
                     case FUNC_MANUAL_POSITIONAL_MOVE:
                         if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
-                            control->stateMachine->functionData = data.position; // Default position
+                            move_servo(control, MOVE_RELATIVE, 0);
+                            control->stateMachine->functionData = data.positionum; // Default position in mm
                         }
                         if (navkey->status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 100; // Increase position by 10
+                            control->stateMachine->functionData += 1000; // Increase position by 1mm
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
                             if (control->stateMachine->functionData > 100)
                             {
-                                control->stateMachine->functionData -= 100; // Decrease position by 10
+                                control->stateMachine->functionData -= 1000; // Decrease position by 1mm
                             }
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData - data.position); // Stop motion
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->functionData);
                         }
                         if (navkey->status.DNR > 0) // Down released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, control->stateMachine->functionData - data.position); // Stop motion
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->functionData);
                         }
                         break;
                     case FUNC_MANUAL_HOME:
                         if (lastState.function != FUNC_MANUAL_HOME || initial)
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
-                            control->stateMachine->functionData = (int)false; // Set to false, will be set to true when home is complete
+                            move_servo(control, MOVE_RELATIVE, 0);
+                            control->stateMachine->functionData = HOMING_NONE; // Set to false, will be set to true when home is complete
                         }
 
-                        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == (int)false) // Wait for limit switch trigger
+                        if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == HOMING_SEEKING) // Wait for limit switch trigger
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            move_servo(control, MOVE_RELATIVE, 0);
                             _waitms(100);
-                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, -10); // Turn CWW at homing speeds/10
+                            move_servo(control, MOVE_SPEED, -1500); // Turn CWW at homing speeds/10
 
-                            control->stateMachine->functionData = 2; // Set to 2, will be set to 1 when home is complete
-                                                                     // dyn4_send_command(control->dyn4, dyn4_set_origin, 0);
+                            control->stateMachine->functionData = HOMING_BACKING_OFF; // Set to 2, will be set to 1 when home is complete
+                                                                                      // dyn4_send_command(control->dyn4, dyn4_set_origin, 0);
                         }
-                        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && control->stateMachine->functionData == 2)
+                        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && control->stateMachine->functionData == HOMING_BACKING_OFF)
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                            move_servo(control, MOVE_RELATIVE, 0);
+                            _waitms(100);
+                            move_servo(control, MOVE_SPEED, 1500); // Turn CCW at homing speeds/10
+                            control->stateMachine->functionData = HOMING_SEEKING_SLOW;
+                        }
+                        else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == HOMING_SEEKING_SLOW)
+                        {
+                            move_servo(control, MOVE_RELATIVE, 0);
                             monitor_set_position(0);
-                            control->stateMachine->functionData = (int)true;
+                            _waitms(100);
+                            move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
+                            control->stateMachine->functionData = HOMING_COMPLETE;
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
-                            control->stateMachine->functionData = (int)false;               // Set to false, will be set to true when home is complete
-                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // Turn CW at homing speeds
+                            control->stateMachine->functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                            move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
                         }
                         if (navkey->status.DNR > 0) // Down released
                         {
-                            control->stateMachine->functionData = (int)false;               // Set to false, will be set to true when home is complete
-                            dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // Turn CW at homing speeds
+                            control->stateMachine->functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                            move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
                         }
                         break;
                     case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
-                        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+                        move_servo(control, MOVE_RELATIVE, 0);
                         break;
                     case FUNC_MANUAL_MOVE_FORCE:
                         if (lastState.function != FUNC_MANUAL_MOVE_FORCE || initial)
@@ -381,49 +429,43 @@ static void control_cog(Control *control)
                         {
                             if (navkey->status.UPP > 0) // Up pressed
                             {
-                                dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // turn CW
+                                move_servo(control, MOVE_SPEED, 100); // turn CW
                             }
                             if (navkey->status.DNP > 0) // Down pressed
                             {
-                                dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, 100); // turn ccw
+                                move_servo(control, MOVE_SPEED, 100); // turn ccw
                             }
                         }
                         else
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                            move_servo(control, MOVE_RELATIVE, 0); // stop motion
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                            move_servo(control, MOVE_RELATIVE, 0); // stop motion
                         }
                         if (navkey->status.DNR > 0) // Down released
                         {
-                            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0); // stop motion
+                            move_servo(control, MOVE_RELATIVE, 0); // stop motion
                         }
                         break;
                     }
                 }
                 else if (currentMachineState.motionParameters.mode == MODE_TEST)
                 {
+                }
+                else if (currentMachineState.motionParameters.mode == MODE_TEST_RUNNING)
+                {
                     // Run the loaded test profile
-                    if (control->testProfile != NULL)
+                    if (control->motionProfile != NULL)
                     {
                     }
                 }
             }
-            else if (currentMachineState.motionParameters.status == STATUS_SAMPLE_LIMIT)
-            {
-            }
-            else if (currentMachineState.motionParameters.status == STATUS_MACHINE_LIMIT)
-            {
-            }
-            else if (currentMachineState.motionParameters.status == STATUS_FAULTED)
-            {
-            }
         }
         else
         {
-            dyn4_send_command(control->dyn4, dyn4_go_rel_pos, 0);
+            move_servo(control, MOVE_RELATIVE, 0);
         }
         lastState = currentMachineState;
         lastData = data;
@@ -437,7 +479,7 @@ Control *control_create(MachineProfile *machineProfile, MachineState *stateMachi
     control->machineProfile = machineProfile;
     control->monitorData = monitorData;
     control->stateMachine = stateMachine;
-    control->testProfile = NULL;
+    control->motionProfile = NULL;
     control->dyn4 = dyn4;
     control->cogid = -1;
     return control;

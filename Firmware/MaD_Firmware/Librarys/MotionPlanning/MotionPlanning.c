@@ -1,163 +1,248 @@
 #include "MotionPlanning.h"
+// Needs to know current set, current quartet, quartet execution.
 
-float *motion_profile(float j_max, float a_max, float v_max, float d_max, int points)
+double position_profile(double t, int *currentSet, int *currentQuartet, int *currentExecution, MotionProfile *profile)
 {
-    printf("Planning motion...\n");
-    bool phaseTwo = true;
-    bool phaseFour = true;
-
-    /**This section is to plan the timing need to complete each phase**/
-
-    //Phase 1 constant jerk, increasing acceleration
-    float t1_vmax = sqrtf(v_max / j_max);
-    float t1_amax = a_max / j_max;
-    float t1_dmax = powf(d_max / (2 * j_max), 1.0 / 3.0);
-    printf("phase 1:vmax=%f,amax=%f,dmax=%f\n", t1_vmax, t1_amax, t1_dmax);
-    //Find the lowest t1
-    float t1;
-    if (t1_vmax < t1_amax && t1_vmax < t1_dmax)
+    double position = position_set(t, currentQuartet, currentExecution, &(profile->sets[*currentSet]));
+    if (*currentQuartet > profile->sets[*currentSet].quartetCount)
     {
-        printf("%d is smallest", t1_vmax);
-        phaseTwo = false;
-        phaseFour = true;
-        t1 = t1_vmax;
+        *currentSet = *currentSet + 1;
+        *currentQuartet = 0;
+        *currentExecution = 0;
     }
-    else if (t1_amax < t1_dmax)
+    return position;
+}
+
+double position_set(double t, int *currentQuartet, int *currentExecution, MotionSet *set)
+{
+    double position = position_quartet(t, currentExecution, &(set->quartets[*currentQuartet]));
+    if (*currentExecution >= set->executions)
     {
-        printf("%d is smallest", t1_amax);
-        phaseTwo = true;
-        phaseFour = true;
-        t1 = t1_amax;
+        *currentQuartet = *currentQuartet + 1;
+        *currentExecution = 0;
+    }
+    if (*currentQuartet > set->quartetCount)
+    {
+        *currentQuartet = 0;
+        *currentExecution = 0;
+    }
+}
+
+double position_quartet(double t, int *currentExecution, MotionQuartet *quartet)
+{
+    FunctionInfo *info = get_function_info(quartet->function);
+    double position = info->func(t, quartet->parameters); // Quartet position
+    if (position == quartet->distanceMax)
+    {
+        *currentExecution = *currentExecution + 1;
+    }
+    return position;
+}
+
+// args = [distance, strain rate, error]
+double sigmoid(float t, double *args)
+{
+    double distance = args[0];
+    double strain_rate = args[1];
+    double error = args[2];
+    double E = error;
+    double A = distance;
+    double C = strain_rate * 4 / A;
+    double D = log(A / E - 1) / C;
+    return distance / (1 + expf(-1 * C * (t - D)));
+}
+
+void update_quartet_function(MotionQuartet *quartet)
+{
+    FunctionInfo *info = get_function_info(quartet->function);
+    quartet->parameters = (double *)realloc(quartet->parameters, sizeof(double) * info->args_count);
+    for (int i = 0; i < info->args_count; i++)
+    {
+        quartet->parameters[i] = 0;
+    }
+    free_function_info(info);
+}
+
+FunctionInfo *get_function_info(QuartetFunctions id)
+{
+    FunctionInfo *info = (FunctionInfo *)malloc(sizeof(FunctionInfo));
+    switch (id)
+    {
+    case QUARTET_FUNC_LINE:
+    {
+        info->id = QUARTET_FUNC_LINE;
+
+        char *name = "Line";
+        info->name = (char *)malloc(strlen(name) + 1);
+        strcpy(info->name, name);
+
+        info->func = NULL;
+
+        info->args_count = 2;
+        info->args = (char **)malloc(sizeof(char *) * info->args_count);
+
+        info->args[0] = (char *)malloc(strlen("distance") + 1);
+        strcpy(info->args[0], "distance");
+        info->args[1] = (char *)malloc(strlen("strain rate") + 1);
+        strcpy(info->args[1], "strain rate");
+        break;
+    }
+    case QUARTET_FUNC_SIGMOIDAL:
+    {
+        info->id = QUARTET_FUNC_SIGMOIDAL;
+
+        char *name = "Sigmoid";
+        info->name = (char *)malloc(strlen(name) + 1);
+        strcpy(info->name, name);
+
+        info->func = sigmoid;
+
+        info->args_count = 3;
+        info->args = (char **)malloc(sizeof(char *) * info->args_count);
+
+        info->args[0] = (char *)malloc(strlen("distance") + 1);
+        strcpy(info->args[0], "distance");
+        info->args[1] = (char *)malloc(strlen("strain rate") + 1);
+        strcpy(info->args[1], "strain rate");
+        info->args[2] = (char *)malloc(strlen("error") + 1);
+        strcpy(info->args[2], "error");
+        break;
+    }
+    default:
+        free(info);
+        return NULL;
+        break;
+    }
+    return info;
+}
+
+void free_function_info(FunctionInfo *info)
+{
+    if (info != NULL)
+    {
+        if (info->name != NULL)
+        {
+            free(info->name);
+        }
+        if (info->args != NULL)
+        {
+            for (int i = 0; i < info->args_count; i++)
+            {
+                if (info->args[i] != NULL)
+                {
+                    free(info->args[i]);
+                }
+            }
+            free(info->args);
+        }
+        free(info);
+    }
+}
+
+// Equation to determine position
+static double position(double t, double xi, double vi, double a)
+{
+    return (xi + vi * t + 0.5 * a * powf(t, 2));
+}
+
+static double velocity(double t, double vi, double a)
+{
+    return (vi + a * t);
+}
+
+// computes the position of the setpoint at time t
+static MotionPeriod *compute_period(double x_goal, double x0, double v0, double v_max, double a_max)
+{
+    double x_stop = abs((-1 * v0 + sqrt(powf(v0, 2) - 4 * (-0.5 * a_max) * x0)) / (2 * (-0.5 * a_max)));
+    int d = (x_goal > x_stop) ? 1 : -1;
+    double v = d * v_max;
+    double a_acc = d * a_max;
+    double a_dec = -1 * d * a_max;
+    double T1 = abs((v - v0) / a_acc);
+    double T3 = abs(v / a_dec);
+
+    double X1 = position(T1, 0, v0, a_acc);
+    double X3 = position(T3, 0, v, a_dec);
+
+    double T2 = (x_goal - x0 - X1 - X3) / v;
+
+    if (T2 < 0)
+    {
+        T2 = 0;
+        v = d * sqrtf(d * a_max * (x_goal - x0) + 0.5 * powf(v0, 2));
+        T1 = abs((v - v0) / a_acc);
+        T3 = abs(v / a_dec);
+    }
+    MotionPeriod *periods = malloc(sizeof(MotionPeriod));
+    periods->x_goal = x_goal;
+    periods->x0 = x0;
+    periods->v0 = v0;
+    periods->v_max = v_max;
+    periods->a_max = a_max;
+    periods->T1 = T1;
+    periods->T2 = T2;
+    periods->T3 = T3;
+    periods->a_acc = a_acc;
+    periods->a_dec = a_dec;
+    periods->v = v;
+    return periods;
+}
+
+static void compute_setpoint(SetPoint *setpoint, double t, MotionPeriod *periods)
+{
+    double x1 = position(periods->T1, periods->x0, periods->v0, periods->a_acc);
+    double v2 = periods->v;
+    double x2 = position(periods->T2, x1, v2, 0);
+    if (t <= 0)
+    {
+        setpoint->x = position(0, periods->x0, periods->v0, 0);
+        setpoint->v = velocity(0, periods->v0, 0);
+        setpoint->a = 0;
+    }
+    else if (t < periods->T1)
+    {
+        setpoint->x = position(t, periods->x0, periods->v0, periods->a_acc);
+        setpoint->v = velocity(t, periods->v0, periods->a_acc);
+        setpoint->a = periods->a_acc;
+    }
+    else if (t < periods->T1 + periods->T2)
+    {
+        setpoint->x = position(t - periods->T1, x1, v2, 0);
+        setpoint->v = velocity(t - periods->T1, v2, 0);
+        setpoint->a = 0;
+    }
+    else if (t < periods->T1 + periods->T2 + periods->T3)
+    {
+        setpoint->x = position(t - (periods->T1 + periods->T2), x2, v2, periods->a_dec);
+        setpoint->v = velocity(t - (periods->T1 + periods->T2), v2, periods->a_dec);
+        setpoint->a = periods->a_dec;
     }
     else
     {
-        printf("%d is smallest", t1_dmax);
-        phaseTwo = false;
-        phaseFour = false;
-        t1 = t1_dmax;
+        setpoint->x = periods->x_goal;
+        setpoint->v = 0;
+        setpoint->a = 0;
     }
+}
 
-    /*Phase 2*/
-    float t2;
-    if (phaseTwo)
-    {
-        float t2_vmax = (-2 * j_max * powf(t1, 2) + v_max) / (j_max * t1);
-        float t2_dmax = (2 * sqrtf((j_max * powf(t1, 3)) / 4 + d_max) - 3 * sqrtf(j_max) * powf(t1, 3.0 / 2.0)) / (2 * sqrtf(j_max) * sqrtf(t1));
-        if (t2_vmax > t2_dmax)
-        {
-            phaseFour = false;
-            t2 = t2_dmax;
-        }
-        else
-        {
-            t2 = t2_vmax;
-        }
-        //@todo add check here for negitive time
-    }
-    else
-    {
-        t2 = 0;
-    }
+/*void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, float (*f)(float t, va_list args), ...)
+{
+    va_list args;
+    va_start(args, f);
 
-    /*Phase 3*/
-    float t3 = t1;
+    // Computesetpoint
+    MotionPeriod *motionPeriods = compute_period(sigmoid(t, args), setpoint->x, setpoint->v, v_max, a_max);
+    compute_setpoint(setpoint, t - setpoint->t, motionPeriods);
+    setpoint->t = t;
+    va_end(args);
+}*/
 
-    /*Phase 4*/
-    float t4;
-    if (phaseFour)
-    {
-        t4 = -(2 * (2 * j_max * powf(t1, 3) + 3 * j_max * powf(t1, 2) * t2 + j_max * t1 * powf(t2, 2) - d_max)) / (2 * j_max * powf(t1, 2) + 2 * j_max * t2 * t1);
-        //@todo add check here for negitive time
-    }
-    else
-    {
-        t4 = 0;
-    }
-    //@todo add remaining phases
-    float t5 = t1;
-    float t6 = t2;
-    float t7 = t3;
-    printf("t1:%f,t2:%f,t3:%f,t4:%f\n", t1, t2, t3, t4);
-
-    /**This section is to use the timing calculated previously and calculate the motion**/
-    float time1 = t1;
-    float time2 = time1 + t2;
-    float time3 = time2 + t3;
-    float time4 = time3 + t4;
-    float time5 = time4 + t5;
-    float time6 = time5 + t6;
-    float time7 = time6 + t7;
-    printf("time1:%f,time2:%f,time3:%f,time4:%f\n", time1, time2, time3, time4);
-    /*
-    * Note due to large memory allocation, this section may want to be split into
-    * multiple functions that takes t1,t2,t3,t4 as parameters then we can draw them
-    * on the graph individually
-    */
-    float *distance = (float *)malloc(sizeof(float) * points);
-    //float *acceleration = (float *)malloc(sizeof(float) * points);
-    //float *velocity = (float *)malloc(sizeof(float) * points);
-    //float *jerk = (float *)malloc(sizeof(float) * points);
-    float increment = time7 / points; //@todo this should be total time instead of t4
-    printf("increment:%f\n", increment);
-    for (int i = 0; i < points; i++) //@todo this equations are too large!, lookup good interpolation methods. this is just visualization.
-    {
-        float t_global = increment * ((float)i);
-        float t;
-        int midPos;
-        //printf("time(%d):%f,\n", i, t);
-        if (t_global < time1) //Phase 1
-        {
-            t = t_global;
-            distance[i] = (j_max * powf(t, 3)) / 6;
-        }
-        else if (t_global < time2) //Phase 2
-        {
-            t = t_global - time1;
-            distance[i] = (j_max * powf(t1, 3)) / 6 + (j_max * t * powf(t1, 2)) / 2 + (j_max * t1 * powf(t, 2)) / 2;
-        }
-        else if (t_global < time3) //Phase 3
-        {
-            t = t_global - time2;
-            distance[i] = (j_max * powf(t1, 3)) / 6 + (j_max * t2 * powf(t1, 2)) / 2 + (j_max * t1 * powf(t2, 2)) / 2;
-            distance[i] += (j_max * t * powf(t1, 2)) / 2 + j_max * t1 * t2 * t + (j_max * t1 * powf(t, 2)) / 2 - (j_max * powf(t, 3)) / 6;
-            midPos = i;
-        }
-        else if (t_global < time4) //Phase 4
-        {
-            t = t_global - time3;
-
-            distance[i] = (j_max * powf(t1, 3)) / 6 + t * ((j_max * powf(t1, 2)) / 2 + (j_max * t3 * (2 * t1 - t3)) / 2 + j_max * t1 * t2);
-            distance[i] += (j_max * t3 * (3 * powf(t1, 2) + 3 * t1 * t3 + 6 * t2 * t1 - powf(t3, 2))) / 6 + (j_max * t1 * t2 * (t1 + t2)) / 2;
-            midPos = i;
-        }
-        else if (t_global < time5) //Phase 5
-        {                          //this method is very flawed, will need to use equations
-            t = t_global - time4;
-            distance[i] = (j_max * powf(t1, 3)) / 6 + t4 * ((j_max * powf(t1, 2)) / 2 + (j_max * t3 * (2 * t1 - t3)) / 2 + j_max * t1 * t2);
-            distance[i] += (j_max * t3 * (3 * powf(t1, 2) + 3 * t1 * t3 + 6 * t2 * t1 - powf(t3, 2))) / 6;
-            distance[i] += (j_max * t * (-powf(t, 2) + 3 * powf(t1, 2) + 6 * t1 * t3 + 6 * t2 * t1 - 3 * powf(t3, 2))) / 6 + (j_max * t1 * t2 * (t1 + t2)) / 2;
-            //distance[i] = -distance[i - midPos]; //use this idea for velocity,accel,jerk
-        }
-        else if (t_global < time6) //Phase 6
-        {
-            t = t_global - time5;
-            distance[i] = (j_max * powf(t1, 3)) / 6 + t4 * ((j_max * powf(t1, 2)) / 2 + (j_max * t3 * (2 * t1 - t3)) / 2 + j_max * t1 * t2);
-            distance[i] += -(j_max * powf(t, 2) * t5) / 2 + j_max * t * (t1 * t2 + powf(t1, 2) / 2 - powf(t5, 2) / 2 + (t3 * (2 * t1 - t3)) / 2);
-            distance[i] += (j_max * t3 * (3 * powf(t1, 2) + 3 * t1 * t3 + 6 * t2 * t1 - powf(t3, 2))) / 6;
-            distance[i] += (j_max * t5 * (3 * powf(t1, 2) + 6 * t1 * t3 + 6 * t2 * t1 - 3 * powf(t3, 2) - powf(t5, 2))) / 6 + (j_max * t1 * t2 * (t1 + t2)) / 2;
-        }
-        else if (t_global < time7) //Phase 7
-        {
-            t = t_global - time6;
-            distance[i] = (j_max * powf(t1, 3)) / 6 + t4 * ((j_max * powf(t1, 2)) / 2 + (j_max * t3 * (2 * t1 - t3)) / 2 + j_max * t1 * t2);
-            distance[i] += -(j_max * t5 * powf(t6, 2)) / 2;
-            distance[i] += j_max * t6 * (t1 * t2 + powf(t1, 2) / 2 - powf(t5, 2) / 2 + (t3 * (2 * t1 - t3)) / 2);
-            distance[i] += (j_max * t3 * (3 * powf(t1, 2) + 3 * t1 * t3 + 6 * t2 * t1 - powf(t3, 2))) / 6;
-            distance[i] += (j_max * t5 * (3 * powf(t1, 2) + 6 * t1 * t3 + 6 * t2 * t1 - 3 * powf(t3, 2) - powf(t5, 2))) / 6;
-            distance[i] += (j_max * t * (powf(t, 2) + 3 * powf(t1, 2) + 6 * t1 * t3 + 6 * t2 * t1 - 3 * powf(t3, 2) - 3 * powf(t5, 2) - 6 * t6 * t5)) / 6;
-            distance[i] += (j_max * t1 * t2 * (t1 + t2)) / 2;
-        }
-        printf("%f,", distance[i]);
-    }
-    free(distance);
+SetPoint *create_empty_setpoint()
+{
+    SetPoint *setpoint = malloc(sizeof(SetPoint));
+    setpoint->t = 0;
+    setpoint->x = 0;
+    setpoint->v = 0;
+    setpoint->a = 0;
+    return setpoint;
 }

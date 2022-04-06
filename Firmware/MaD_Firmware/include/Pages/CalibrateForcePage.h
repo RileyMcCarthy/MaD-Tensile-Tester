@@ -9,6 +9,7 @@
 #include "Keyboard.h"
 #include "JSON.h"
 #include "Monitor.h"
+#include "Button.h"
 
 typedef struct CalibrateForcePage_s
 {

@@ -1465,34 +1465,16 @@ uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t n
 
 void display_update_touch(Display *display)
 {
-  display->locationCount = readGT9271TouchLocation(display, display->location, 1);
-}
-
-int display_update_buttons(Display *display, Button *buttons, const int amount)
-{
-  int amountPressed = 0;
-  if (display->locationCount > 0)
+  int touchCount = readGT9271TouchLocation(display, display->location, 1);
+  if (display->lastLocation[0].x != display->location[0].x || display->lastLocation[0].y != display->location[0].y)
   {
-    for (int i = 0; i < amount; i++)
-    {
-      buttons[i].pressed = false;
-      if (((SCREEN_WIDTH - display->location[0].x) > buttons[i].xmin) && ((SCREEN_WIDTH - display->location[0].x) < buttons[i].xmax))
-      {
-        if (((SCREEN_HEIGHT - display->location[0].y) > buttons[i].ymin) && ((SCREEN_HEIGHT - display->location[0].y) < buttons[i].ymax))
-        {
-          if ((_getms() - buttons[i].lastPress) > 200)
-          {
-            // printf("pressed\n");
-            buttons[i]
-                .lastPress = _getms();
-            buttons[i].pressed = true;
-            amountPressed++;
-          }
-        }
-      }
-    }
+    display->locationCount = touchCount;
   }
-  return amountPressed;
+  else
+  {
+    display->locationCount = 0;
+  }
+  display->lastLocation[0] = display->location[0];
 }
 
 /*
@@ -1575,4 +1557,5 @@ void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int
     display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
   }
 }
+
 // display.display_bte_memory_copy(PAGE2_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, 100, 50);

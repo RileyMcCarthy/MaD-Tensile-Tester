@@ -788,16 +788,6 @@ typedef struct TouchLocation_s
     uint16_t y;
 } TouchLocation;
 
-typedef struct Button_s
-{
-    int lastPress;
-    bool pressed;
-    uint16_t xmin, xmax;
-    uint16_t ymin, ymax;
-    int debounceTimems;
-    int name; // use enumeration
-} Button;
-
 typedef struct Image_s
 {
     char *name;
@@ -816,6 +806,7 @@ typedef struct RA8876_s
     int i2c_addr_write, i2c_addr_read;
     int reset_mask;
     TouchLocation location[1];
+    TouchLocation lastLocation[1];
     int locationCount;
     I2CBus i2cBus;
 } Display;
@@ -825,9 +816,6 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
 /*SD Card*/
 void display_load_image(Display *display, Image *image);
 void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos);
-
-/*Touch*/
-int display_update_buttons(Display *display, Button *buttons, const int amount);
 
 void display_on(Display *display, bool on);
 void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height);
@@ -908,6 +896,7 @@ uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len
 void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt);
 uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
 uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
+void button_update(Display *display);
 void display_update_touch(Display *display);
 /*access*/
 void lcdRegWrite(Display *display, uint8_t reg);

@@ -1,0 +1,51 @@
+Date : 2022-03-29 18:48:02
+Directory : c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include
+Total : 23 files,  700 codes, 47 comments, 142 blanks, all 889 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         23 |        700 |         47 |        142 |        889 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                               | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                  |         23 |        700 |         47 |        142 |        889 |
+| Elements                                                                                                           |          6 |        133 |          8 |         25 |        166 |
+| Main                                                                                                               |          1 |         45 |          4 |          7 |         56 |
+| Pages                                                                                                              |          7 |        185 |         16 |         34 |        235 |
+| Utility                                                                                                            |          9 |        337 |         19 |         76 |        432 |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                                           | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\Clock.h             | C++      |         25 |          4 |          5 |         34 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\Explorer.h          | C++      |         29 |          0 |          6 |         35 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\FunctionWindow.h    | C++      |         18 |          0 |          3 |         21 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\Graph.h             | C++      |         25 |          0 |          3 |         28 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\Keyboard.h          | C++      |         18 |          4 |          5 |         27 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Elements\MotionStateWindow.h | C++      |         18 |          0 |          3 |         21 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Main\MaD.h                   | C++      |         45 |          4 |          7 |         56 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\AutomaticPage.h        | C++      |         28 |          4 |          4 |         36 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\CalibrateForcePage.h   | C++      |         27 |          0 |          4 |         31 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\ManualPage.h           | C++      |         24 |          4 |          4 |         32 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\NavigationPage.h       | C++      |         29 |          4 |          8 |         41 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\SettingsPage.h         | C++      |         23 |          0 |          5 |         28 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\StatusPage.h           | C++      |         26 |          4 |          6 |         36 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Pages\TestProfile.h          | C++      |         28 |          0 |          3 |         31 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Control.h            | C++      |         30 |          0 |          5 |         35 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Error.h              | C++      |         30 |          8 |          8 |         46 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\IOBoard.h            | C++      |         80 |          1 |         22 |        103 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Images.h             | C++      |         22 |          4 |          5 |         31 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\LoadingOverlay.h     | C++      |         10 |          0 |          2 |         12 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Monitor.h            | C++      |         30 |          0 |          5 |         35 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Selection.h          | C++      |          7 |          0 |          2 |          9 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\StateMachine.h       | C++      |        106 |          5 |         15 |        126 |
+| c:\Users\riley\Documents\GitHub\Tensile-Testing-Machine\Firmware\MaD_Firmware\include\Utility\Style.h              | C++      |         22 |          1 |         12 |         35 |
+| Total                                                                                                              |          |        700 |         47 |        142 |        889 |
++--------------------------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

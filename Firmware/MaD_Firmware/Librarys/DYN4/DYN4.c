@@ -56,19 +56,18 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
  */
 Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
 {
-    uint8_t *statusReg;
+    uint8_t statusReg;
 
-    dyn4_send_command(dyn4, READ_DRIVE_STATUS, 0xFF);
-    if ((statusReg = dyn4_read_command(dyn4, IS_STATUS, NULL)) == NULL)
+    dyn4_send_command(dyn4, READ_DRIVE_STATUS, 1);
+    if ((statusReg = dyn4_read_command(dyn4, IS_STATUS)) == -1)
     {
         return DYN4_NOT_RESPONDING;
     }
-    status->onRange = (statusReg[0] & (0x01 << STATUS_ONRANGE)) >> STATUS_ONRANGE;
-    status->motorFree = (statusReg[0] & (0x01 << STATUS_MOTORFREE)) >> STATUS_MOTORFREE;
-    status->alarm = (statusReg[0] & (0x07 << STATUS_ALARM)) >> STATUS_ALARM;
-    status->motorBusy = (statusReg[0] & (0x01 << STATUS_MOTORBUSY)) >> STATUS_MOTORBUSY;
-    status->jp3P2Status = (statusReg[0] & (0x01 << STATUS_JP3STATUS)) >> STATUS_JP3STATUS;
-    free(statusReg);
+    status->onRange = (statusReg & (0x01 << STATUS_ONRANGE)) >> STATUS_ONRANGE;
+    status->motorFree = (statusReg & (0x01 << STATUS_MOTORFREE)) >> STATUS_MOTORFREE;
+    status->alarm = (statusReg & (0x07 << STATUS_ALARM)) >> STATUS_ALARM;
+    status->motorBusy = (statusReg & (0x01 << STATUS_MOTORBUSY)) >> STATUS_MOTORBUSY;
+    status->jp3P2Status = (statusReg & (0x01 << STATUS_JP3STATUS)) >> STATUS_JP3STATUS;
     return SUCCESS;
 }
 
@@ -80,7 +79,7 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
  * @param returnData dynamically allocated array of uint8 variables containing the read data (REMEMBER TO FREE)
  * @return int number of bytes recieved
  */
-uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size)
+int dyn4_read_command(DYN4 *dyn4, int command)
 {
     uint8_t byte;
 
@@ -98,24 +97,21 @@ uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size)
     }
     if (byte == -1)
     {
-        return NULL;
+        return -1;
     }
 
     byte = (uint8_t)dyn4->serial.rxtime(200);
 
-    if (byte != (0x80 + command))
+    if (byte != command)
     {
-        return NULL;
+        // return -1;
     }
     int n = ((byte >> 5) & 0x03) + 1;
-    uint8_t *data = (uint8_t *)malloc(sizeof(uint8_t) * n);
-    for (int i = 0; i < n; i++)
+    // printf("n: %d\n", n);
+    int data = 0;
+    for (int i = n - 1; i >= 0; i--)
     {
-        data[i] = (uint8_t)dyn4->serial.rxtime(200);
-    }
-    if (size != NULL)
-    {
-        *size = n;
+        data += ((uint8_t)dyn4->serial.rxtime(200) & 0x7F) << (7 * i);
     }
     return data;
 }
@@ -130,49 +126,40 @@ uint8_t *dyn4_read_command(DYN4 *dyn4, int command, uint8_t *size)
 void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
 {
     int n = 0;
-    if (data > 0x7FFFFFF || data < -0x8000000)
+    if (data > 0xFFFFF || data < -0x100000)
     {
         n = 4;
     }
-    else if (data > 0xFFFFF || data < -0x100000)
+    else if (data > 0x1FFF || data < -0x2000)
     {
         n = 3;
     }
-    else if (data > 0x1FFF || data < -0x2000)
+    else if (data > 0x3F || data < -0x40)
     {
         n = 2;
     }
-    else if (data > 0x3F || data < -0x40)
+    else
     {
         n = 1;
     }
-    else
-    {
-        n = 0;
-    }
-
-    int package_size = 4 + n;
+    int package_size = 3 + n;
     uint8_t *bytes = malloc(sizeof(uint8_t) * package_size);
-    bytes[package_size - 1] = 0x00 | dyn4->device_id;
-    bytes[package_size - 2] = 0x80 + (n << 5) + command; // 0x80 is because the first bit is always 1
-
-    int totalData = 0;
-    for (int i = 0; i <= n; i++)
+    bytes[package_size - 1] = dyn4->device_id;
+    bytes[package_size - 2] = 0x80 + ((n - 1) << 5) + command; // 0x80 is because the first bit is always 1
+    // printf("starting commnad:bytes:%d,data%d\n", n, data);
+    int totalData = bytes[package_size - 1] + bytes[package_size - 2];
+    for (int i = 0; i < n; i++) // send data from msb to lsb
     {
-        int index = package_size - 3 - i;
-        bytes[index] = 0x80 + ((data >> (7 * (n - i))) & 0x007F);
-        totalData += bytes[index];
+        bytes[package_size - 3 - i] = 0x80 + ((data >> ((n - i - 1) * 7)) & 0x7F);
+        //  printf("%d, i=%d\n", bytes[package_size - 3 - i], i);
+        totalData += bytes[package_size - 3 - i];
     }
-    bytes[0] = 0x80 + ((bytes[package_size - 1] + bytes[package_size - 2] + totalData) % 128);
-    dyn4->serial.tx(bytes[4]);
-    dyn4->serial.tx(bytes[3]);
-    dyn4->serial.tx(bytes[2]);
-    dyn4->serial.tx(bytes[1]);
-    dyn4->serial.tx(bytes[0]);
+    bytes[0] = 0x80 + (totalData % 128);
 
     for (int i = package_size - 1; i >= 0; i--)
     {
-        //   dyn4->serial.tx(bytes[i]);
+        dyn4->serial.tx(bytes[i]);
+        //   printf("bytes[%d]=%d\n", i, bytes[i]);
     }
     free(bytes);
 }

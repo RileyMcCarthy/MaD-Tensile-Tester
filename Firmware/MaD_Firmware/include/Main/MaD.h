@@ -4,6 +4,7 @@
 #include <simpletools.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "IOBoard.h"
 #include "MCP23017.h"
@@ -27,6 +28,8 @@
 #include "tiny-json.h"
 #include "Control.h"
 #include "SettingsPage.h"
+#include "Explorer.h"
+#include "TestProfile.h"
 
 #define DISPLAY_SCK 51     // SPI Clock Pin
 #define DISPLAY_MISO 53    // SPI Data Pin
