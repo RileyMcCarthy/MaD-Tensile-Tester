@@ -19,7 +19,8 @@ typedef enum Pages_e
     PAGE_MANUAL,
     PAGE_AUTOMATIC,
     PAGE_SETTINGS,
-    PAGE_CALIBRATION
+    PAGE_CALIBRATION,
+    PAGE_TEST_PROFILE
 } Pages;
 
 typedef struct NavigationPage_s

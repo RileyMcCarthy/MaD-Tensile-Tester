@@ -1,20 +1,15 @@
 #ifndef Clock_H
 #define Clock_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+
 #include "simpletools.h"
 #include "RA8876.h"
 #include "DS3231.h"
-#include "MaD.h"
 #include "Error.h"
 #include "Style.h"
-#include "stdint.h"
-#include "stdio.h"
 
 /**
  * @brief The Clock class uses the DS3231 library to manage and display a clock in the upper left corner.
- * 
+ *
  */
 typedef struct clock_t
 {

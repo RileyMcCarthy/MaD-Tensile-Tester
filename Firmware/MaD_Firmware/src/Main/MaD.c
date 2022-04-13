@@ -9,30 +9,23 @@
 #include <stdint.h>
 #include "MotionPlanning.h"
 
-static void write_machine_profile(MachineProfile *profile)
+void write_machine_profile(MachineProfile *profile)
 {
   mkdir("/sd/settings", 0);
-  chdir("/sd/settings");
-  FILE *file = fopen("Default.mcp", "w");
-  if (file != NULL)
-  {
-    printf("Writing machine profile to settings file\n");
-    machine_profile_to_json(profile, file);
-  }
-  fclose(file);
+  printf("Writing machine profile to settings file\n");
+  machine_profile_to_json(profile, "/sd/settings/Default.mcp");
 }
 
-static MachineProfile *load_machine_profile()
+MachineProfile *load_machine_profile()
 {
   // Check for machine profile in filesystem
-  chdir("/sd/settings");
   // FILE *jsonFile = fopen("Default.mcp", "r+");
-  if (access("Default.mcp", F_OK) == 0)
-
+  if (access("/sd/settings/Default.mcp", F_OK) == 0)
   {
     // FILE *jsonFile = fopen("Default.mcp", "r");
     // printf("Loading machine profile from settings file\n");
-    MachineProfile *profile = json_to_machine_profile("Default.mcp");
+    printf("Opening existing profile\n");
+    MachineProfile *profile = json_to_machine_profile("/sd/settings/Default.mcp");
 
     json_print_machine_profile(profile);
     return profile;
@@ -80,90 +73,7 @@ static MachineProfile *load_machine_profile()
   return profile;
 }
 
-/*static void test_sd_card()
-{
-  int sd = mount("/sd", _vfs_open_sdcard());
-  if (sd == 0)
-  {
-    printf("SD Card Mounted\n");
-    @ @-314, 15 + 405, 29 @ @ static void test_sd_card()
-    {
-      printf("Mount error:%d\n", _geterror());
-    }
-    mkdir("/sd/test_dir");
-    chdir("/sd/test_dir");
-    char *dirName[50];
-    getcwd(dirName, 50);
-    printf("Current Directory:%s\n", dirName);
-    if (strcmp(dirName, "/sd/test_dir") == 0)
-    {
-      printf("Directory Change Successful\n");
-    }
-    else
-    {
-      printf("Directory Change Failed\n");
-    }
-
-    FILE *fp = fopen("test.txt", "w");
-    if (fp == NULL)
-    {
-      printf("Error file could not be opened(Error: %d)\n", _geterror());
-      return;
-    }
-    fprintf(fp, "Hello World\n");
-    fclose(fp);
-    fp = fopen("test.txt", "r");
-    char buffer[100];
-    fgets(buffer, 100, fp);
-    if (strcmp(buffer, "Hello World\n") == 0)
-      @ @-332, 8 + 437, 48 @ @ static void test_sd_card() else
-      {
-        printf("SD card read/write failed\n");
-        return;
-      }
-    fclose(fp);
-
-    char directory[100] = "/sd";
-    while (1)
-    {
-      DIR *dir = opendir(directory);
-      if (dir == NULL)
-      {
-        printf("Error: %d\n", _geterror());
-        return;
-      }
-      struct dirent *dirent;
-      while ((dirent = readdir(dir)) != NULL)
-      {
-        printf("%s\n", dirent->d_name);
-      }
-      printf("-----------------------------------\n");
-      printf("Please type new directory to enter or .. for back:");
-      char newDir[100];
-      scanf("%s", newDir);
-      if (strcmp(newDir, "..") == 0)
-      {
-        for (int i = strlen(directory) - 1; i >= 0; i--)
-        {
-          if (directory[i] == '/')
-          {
-            directory[i] = '\0';
-            break;
-          }
-        }
-      }
-      else
-      {
-        strcat(directory, "/");
-        strcat(directory, newDir);
-      }
-      closedir(dir);
-    }
-
-    // unmount("/sd");
-  }*/
-
-static Display *start_display()
+Display *start_display()
 {
   Error err;
   Display *display = (Display *)malloc(sizeof(Display));
@@ -186,7 +96,7 @@ static Display *start_display()
   return display;
 }
 
-static void test_mcp23017()
+/*static void test_mcp23017()
 {
   MCP23017 *mcp = mcp23017_create();
   mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL);
@@ -232,16 +142,7 @@ static void test_mcp23017()
     _waitms(500);
   }
   return;
-}
-
-static float central_difference_order_two(float d1, float d0, float dn1, float h)
-{
-  return (dn1 - 2 * d0 + d1) / powf(h, 2);
-}
-static float central_difference_order_three(float d2, float d1, float dn1, float dn2, float h)
-{
-  return (-0.5 * dn2 + dn1 - d1 + 0.5 * d2) / powf(h, 3);
-}
+}*/
 
 /*static void test_motion_profile()
 {
@@ -262,16 +163,6 @@ static float central_difference_order_three(float d2, float d1, float dn1, float
   }
   return;
 }*/
-
-// double *args = float distance, float strain_rate, float error
-static double sigmoidTemp(double t, double *args)
-{
-  // double E = args[2];
-  // double A = args[0];
-  // double C = args[1] * 4 / abs(A);
-  // double D = logf(abs(A) / E - 1) / C;
-  // return A / (1 + expf(-1 * C * (t - D)));
-}
 
 /*static void dyn4_test()
 {
@@ -319,8 +210,9 @@ static double sigmoidTemp(double t, double *args)
   return;
 }*/
 
-void test_dyn4_control()
+/*void test_dyn4_control()
 {
+  printf("starting test\n");
   // Create Test Profile
   TestProfile *testProfile = get_test_profile();
   char *testName = "TestProfile001";
@@ -330,113 +222,163 @@ void test_dyn4_control()
 
   MotionProfile *profile = (MotionProfile *)malloc(sizeof(MotionProfile)); //= get_machine_profile();
   profile->number = 1;
-  profile->setCount = 1;
+  profile->setCount = 2;
   profile->sets = (MotionSet *)malloc(sizeof(MotionSet) * profile->setCount);
 
-  /*Creating motion set #1*/
-  char *profileName = "setProfile";
-  profile->sets[0].name = (char *)malloc(sizeof(char) * (strlen(profileName) + 1));
-  strcpy(profile->sets[0].name, profileName);
-  profile->sets[0].number = 1;
-  profile->sets[0].executions = 2;
-  profile->sets[0].quartetCount = 2;
-  profile->sets[0].quartets = (MotionQuartet *)malloc(sizeof(MotionQuartet) * profile->sets[0].quartetCount);
-  // Creating motion set quartet #1
-  char *quartetName11 = "quartetS1Q1";
-  profile->sets[0].quartets[0].name = (char *)malloc(sizeof(char) * (strlen(quartetName11) + 1));
-  strcpy(profile->sets[0].quartets[0].name, quartetName11);
-  profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
-  profile->sets[0].quartets[0].parameters = (double *)malloc(sizeof(double) * 3);
-  profile->sets[0].quartets[0].parameters[0] = 0.5;           // distance
-  profile->sets[0].quartets[0].parameters[1] = 4;             // strain rate
-  profile->sets[0].quartets[0].parameters[2] = 0.00000488281; // error
-  profile->sets[0].quartets[0].distanceMax = profile->sets[0].quartets[0].parameters[0];
-  profile->sets[0].quartets[0].dwell = 1000000; // 1000ms
-  // Creating motion set quartet #2
-  char *quartetName12 = "quartetS1Q2";
-  profile->sets[0].quartets[1].name = (char *)malloc(sizeof(char) * (strlen(quartetName12) + 1));
-  strcpy(profile->sets[0].quartets[1].name, quartetName12);
-  profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
-  profile->sets[0].quartets[1].parameters = (double *)malloc(sizeof(double) * 3);
-  profile->sets[0].quartets[1].parameters[0] = -0.5;          // distance
-  profile->sets[0].quartets[1].parameters[1] = 4;             // strain rate
-  profile->sets[0].quartets[1].parameters[2] = 0.00000488281; // error
-  profile->sets[0].quartets[1].distanceMax = profile->sets[0].quartets[1].parameters[0];
-  profile->sets[0].quartets[1].dwell = 1000000; // 1000ms
+char *profileName = "setProfile";
+profile->sets[0].name = (char *)malloc(sizeof(char) * (strlen(profileName) + 1));
+strcpy(profile->sets[0].name, profileName);
+profile->sets[0].number = 1;
+profile->sets[0].executions = 2;
+profile->sets[0].quartetCount = 2;
+profile->sets[0].quartets = (MotionQuartet *)malloc(sizeof(MotionQuartet) * profile->sets[0].quartetCount);
 
-  /*Run the profile*/
-  DYN4 *dyn4 = dyn4_create();
-  dyn4_begin(dyn4, DYN4_RX, DYN4_TX, 0);
-  dyn4_send_command(dyn4, dyn4_read_drive_config, 0);
-  printf("Drive Config:%d\n", dyn4_read_command(dyn4, dyn4_is_gear_number));
-  dyn4_send_command(dyn4, dyn4_read_drive_id, 1);
-  printf("Drive ID:%d\n", dyn4_read_command(dyn4, dyn4_is_gear_number));
-  _waitms(100);
-  dyn4_send_command(dyn4, dyn4_go_abs_pos, 0);
-  _waitms(2000);
+// Creating motion set quartet #1
+char *quartetName11 = "quartetS1Q1";
+profile->sets[0].quartets[0].name = (char *)malloc(sizeof(char) * (strlen(quartetName11) + 1));
+strcpy(profile->sets[0].quartets[0].name, quartetName11);
+profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+profile->sets[0].quartets[0].parameters = (double *)malloc(sizeof(double) * 3);
+profile->sets[0].quartets[0].parameters[0] = -0.5;          // distance
+profile->sets[0].quartets[0].parameters[1] = 4;             // strain rate
+profile->sets[0].quartets[0].parameters[2] = 0.00000488281; // error
+profile->sets[0].quartets[0].distanceMax = profile->sets[0].quartets[0].parameters[0];
+profile->sets[0].quartets[0].dwell = 1000000; // 1000ms
+// Creating motion set quartet #2
+char *quartetName12 = "quartetS1Q2";
+profile->sets[0].quartets[1].name = (char *)malloc(sizeof(char) * (strlen(quartetName12) + 1));
+strcpy(profile->sets[0].quartets[1].name, quartetName12);
+profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+profile->sets[0].quartets[1].parameters = (double *)malloc(sizeof(double) * 3);
+profile->sets[0].quartets[1].parameters[0] = 5;             // distance
+profile->sets[0].quartets[1].parameters[1] = 4;             // strain rate
+profile->sets[0].quartets[1].parameters[2] = 0.00000488281; // error
+profile->sets[0].quartets[1].distanceMax = profile->sets[0].quartets[1].parameters[0];
+profile->sets[0].quartets[1].dwell = 1000000; // 1000ms
 
-  Encoder encoder;
-  encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000000, 100000000);
+profileName = "setProfile";
+profile->sets[1].name = (char *)malloc(sizeof(char) * (strlen(profileName) + 1));
+strcpy(profile->sets[1].name, profileName);
+profile->sets[1].number = 1;
+profile->sets[1].executions = 2;
+profile->sets[1].quartetCount = 2;
+profile->sets[1].quartets = (MotionQuartet *)malloc(sizeof(MotionQuartet) * profile->sets[1].quartetCount);
+// Creating motion set quartet #1
+quartetName11 = "quartetS2Q1";
+profile->sets[1].quartets[0].name = (char *)malloc(sizeof(char) * (strlen(quartetName11) + 1));
+strcpy(profile->sets[1].quartets[0].name, quartetName11);
+profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+profile->sets[1].quartets[0].parameters = (double *)malloc(sizeof(double) * 3);
+profile->sets[1].quartets[0].parameters[0] = 0.5;           // distance
+profile->sets[1].quartets[0].parameters[1] = 4;             // strain rate
+profile->sets[1].quartets[0].parameters[2] = 0.00000488281; // error
+profile->sets[1].quartets[0].distanceMax = profile->sets[1].quartets[0].parameters[0];
+profile->sets[1].quartets[0].dwell = 1000000; // 1000ms
+// Creating motion set quartet #2
+quartetName12 = "quartetS2Q2";
+profile->sets[1].quartets[1].name = (char *)malloc(sizeof(char) * (strlen(quartetName12) + 1));
+strcpy(profile->sets[1].quartets[1].name, quartetName12);
+profile->sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+profile->sets[1].quartets[1].parameters = (double *)malloc(sizeof(double) * 3);
+profile->sets[1].quartets[1].parameters[0] = -5;            // distance
+profile->sets[1].quartets[1].parameters[1] = 4;             // strain rate
+profile->sets[1].quartets[1].parameters[2] = 0.00000488281; // error
+profile->sets[1].quartets[1].distanceMax = profile->sets[1].quartets[1].parameters[0];
+profile->sets[1].quartets[1].dwell = 1000000; // 1000ms
 
-  int currentSet = 0;
-  int currentQuartet = 0;
-  int currentPosition = 0; // Theoretical Position (not from encoder)
-  printf("Starting profile\n");
-  while (currentSet < profile->setCount)
+printf("running test\n");
+// Run the quartet
+int currentSet = 0;
+int currentExecution = 0;
+int currentQuartet = 0;
+double t = 0;
+double dt = 0.1;
+RunMotionProfile *run = get_run_motion_profile();
+while (!run->profileComplete)
+{
+  int lastQuartet = currentQuartet;
+  double position = position_profile(t, run, profile);
+  if (lastQuartet != currentQuartet)
   {
-    MotionSet set = profile->sets[currentSet];
-
-    /*Run the motion set*/
-    int currentExecution = 0;
-    int currentQuartet = 0;
-    printf("  Starting set %s\n", set.name);
-    while (currentQuartet != set.quartetCount)
-    {
-      MotionQuartet quartet = set.quartets[currentQuartet];
-      float (*f)(float t, double *args) = NULL;
-      switch (quartet.function)
-      {
-      case QUARTET_FUNC_SIGMOIDAL:
-        f = sigmoidTemp;
-        break;
-      }
-
-      /*Run the motion quartet*/
-      unsigned long startus = _getus();
-      long quartetPosition = 0;
-      long setpoint = floor(quartet.distanceMax * 204800.0); // convert m to encoder ticks
-      printf("    starting quartet %s,%ld,%d\n", quartet.name, setpoint, currentExecution);
-      while (quartetPosition != setpoint)
-      {
-        double dt = (_getus() - startus) / 1000000.0;           // Time in seconds
-        quartetPosition = f(dt, quartet.parameters) * 204800.0; // Quartet position (m) in encoder ticks
-        dyn4_send_command(dyn4, dyn4_go_abs_pos, (currentPosition + quartetPosition) / 2);
-        printf("      %f,%ld,%ld,%ld\n", dt, setpoint, encoder.value(), quartetPosition);
-        _waitms(30);
-      }
-
-      // Move motor to quartet end position
-      dyn4_send_command(dyn4, dyn4_go_abs_pos, (currentPosition + quartetPosition) / 2);
-
-      // Dwell for quartet dwell time
-      _waitus(quartet.dwell);
-
-      // Increment quartet and update execution
-      printf("    end of quartet %s\n", quartet.name);
-      currentPosition += setpoint;
-      currentExecution++;
-      if (currentExecution == set.executions)
-      {
-        currentQuartet++;
-        currentExecution = 0;
-      }
-    }
-    // Increment set
-    printf("  End of set %s\n", set.name);
-    currentSet++;
+    t = 0;
   }
-  printf("End of profile\n");
-  // End of motion profile
+  printf("%f,%f\n", t, position);
+  t += dt;
+}
+return;
+
+DYN4 *dyn4 = dyn4_create();
+dyn4_begin(dyn4, DYN4_RX, DYN4_TX, 0);
+dyn4_send_command(dyn4, dyn4_read_drive_config, 0);
+printf("Drive Config:%d\n", dyn4_read_command(dyn4, dyn4_is_gear_number));
+dyn4_send_command(dyn4, dyn4_read_drive_id, 1);
+printf("Drive ID:%d\n", dyn4_read_command(dyn4, dyn4_is_gear_number));
+_waitms(100);
+dyn4_send_command(dyn4, dyn4_go_abs_pos, 0);
+_waitms(2000);
+
+Encoder encoder;
+encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000000, 100000000);
+
+int currentSet = 0;
+int currentQuartet = 0;
+
+int currentPosition = 0; // Theoretical Position (not from encoder)
+printf("Starting profile\n");
+while (currentSet < profile->setCount)
+{
+  MotionSet set = profile->sets[currentSet];
+
+  int currentExecution = 0;
+  int currentQuartet = 0;
+  printf("  Starting set %s\n", set.name);
+  while (currentQuartet != set.quartetCount)
+  {
+    MotionQuartet quartet = set.quartets[currentQuartet];
+    float (*f)(float t, double *args) = NULL;
+    switch (quartet.function)
+    {
+    case QUARTET_FUNC_SIGMOIDAL:
+      f = sigmoidTemp;
+      break;
+    }
+
+    unsigned long startus = _getus();
+    long quartetPosition = 0;
+    long setpoint = floor(quartet.distanceMax * 204800.0); // convert m to encoder ticks
+    printf("    starting quartet %s,%ld,%d\n", quartet.name, setpoint, currentExecution);
+    while (quartetPosition != setpoint)
+    {
+      double dt = (_getus() - startus) / 1000000.0;           // Time in seconds
+      quartetPosition = f(dt, quartet.parameters) * 204800.0; // Quartet position (m) in encoder ticks
+      dyn4_send_command(dyn4, dyn4_go_abs_pos, (currentPosition + quartetPosition) / 2);
+      printf("      %f,%ld,%ld,%ld\n", dt, setpoint, encoder.value(), quartetPosition);
+      _waitms(30);
+    }
+
+    // Move motor to quartet end position
+    dyn4_send_command(dyn4, dyn4_go_abs_pos, (currentPosition + quartetPosition) / 2);
+
+    // Dwell for quartet dwell time
+    _waitus(quartet.dwell);
+
+    // Increment quartet and update execution
+    printf("    end of quartet %s\n", quartet.name);
+    currentPosition += setpoint;
+    currentExecution++;
+    if (currentExecution == set.executions)
+    {
+      currentQuartet++;
+      currentExecution = 0;
+    }
+  }
+  // Increment set
+  printf("  End of set %s\n", set.name);
+  currentSet++;
+}
+printf("End of profile\n");
+* /
+// End of motion profile
 }
 
 void test_quartet()
@@ -448,12 +390,13 @@ void test_quartet()
   strcpy(quartet->name, name);
   quartet->function = QUARTET_FUNC_SIGMOIDAL;
   quartet->parameters = (float *)malloc(sizeof(float) * 3);
-  quartet->parameters[0] = -0.5;          // distance
+  quartet->parameters[0] = 5;             // distance
   quartet->parameters[1] = 4;             // strain rate
   quartet->parameters[2] = 0.00000488281; // error
   quartet->distanceMax = quartet->parameters[0];
   quartet->dwell = 1000000; // 1000ms
 
+  return;
   // Save quartet
   printf("Saving quartet\n");
   motion_quartet_to_json(quartet, quartet->name);
@@ -469,7 +412,7 @@ void test_quartet()
   }
   fseek(file, 0, SEEK_END);
   long fsize = ftell(file);
-  fseek(file, 0, SEEK_SET); /* same as rewind(f); */
+  fseek(file, 0, SEEK_SET); /* same as rewind(f);
 
   char *string = malloc(fsize + 1);
   fread(string, fsize, 1, file);
@@ -477,7 +420,7 @@ void test_quartet()
   printf("Total size of file: %ld\n", fsize);
   string[fsize] = 0;
   printf("JSON:%s\n", string);
-}
+}*/
 
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks
@@ -495,7 +438,6 @@ void mad_begin()
     printf("Error starting display\n");
     return;
   }
-
   loading_overlay_display(display, "Display Initialized!", OVERLAY_TYPE_LOADING);
 
   MachineProfile *machineProfile = load_machine_profile();
@@ -503,7 +445,7 @@ void mad_begin()
   Images *images = create_images();
 
   // Load Assets from SD card
-  // image_load_assets(images, display);
+  image_load_assets(images, display);
 
   // Load Machine Profile
   loading_overlay_display(display, "Loading Machine Profile", OVERLAY_TYPE_LOADING);
@@ -586,29 +528,37 @@ void mad_begin()
     switch (currentPage)
     {
     case PAGE_STATUS:
+    {
       printf("Loading status page\n");
-      /// StatusPage *statusPage = status_page_create(display, machineState, &(monitor->data), images);
-      // status_page_run(statusPage);
-      // status_page_destroy(statusPage);
-      TestProfilePage *page = test_profile_page_create(display, images);
-      test_profile_page_run(page);
-      //  printf("Leaving status page\n");
+      StatusPage *statusPage = status_page_create(display, machineState, &(monitor->data), images);
+      status_page_run(statusPage);
+      status_page_destroy(statusPage);
+
+      printf("Leaving status page\n");
       break;
+    }
     case PAGE_MANUAL:
+    {
       printf("Loading manual page\n");
       ManualPage *manualPage = manual_page_create(display, machineState, images);
       manual_page_run(manualPage);
       manual_page_destroy(manualPage);
       printf("Leaving manual page\n");
       break;
+    }
     case PAGE_AUTOMATIC:
+    {
       printf("Loading automatic page...\n");
-      AutomaticPage *automaticPage = automatic_page_create(display, images);
+      AutomaticPage *automaticPage = automatic_page_create(display, images, machineState);
       automatic_page_run(automaticPage);
       automatic_page_destroy(automaticPage);
+      // TestProfilePage *page = test_profile_page_create(display, images);
+      // test_profile_page_run(page);
       printf("Leaving automatic page\n");
       break;
+    }
     case PAGE_CALIBRATION:
+    {
       printf("Loading force calibration page...\n");
       CalibrateForcePage *calibrateForcePage = calibrate_force_page_create(display, monitor, forceGauge, machineProfile, images);
       bool update = calibrate_force_page_run(calibrateForcePage);
@@ -621,7 +571,9 @@ void mad_begin()
       }
       printf("Leaving force calibration page\n");
       break;
+    }
     case PAGE_SETTINGS:
+    {
       printf("Loading settings page...\n");
       SettingsPage *settingsPage = settings_page_create(display, machineProfile, images);
       while (settings_page_run(settingsPage)) // Keep running settings page until navigation icon selected
@@ -631,6 +583,13 @@ void mad_begin()
       settings_page_destroy(settingsPage);
       printf("Leaving settings page\n");
       break;
+    }
+    case PAGE_TEST_PROFILE:
+    {
+      TestProfilePage *page = test_profile_page_create(display, images);
+      test_profile_page_run(page);
+      break;
+    }
     default:
       break;
     }

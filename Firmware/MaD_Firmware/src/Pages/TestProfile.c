@@ -19,6 +19,12 @@
 #define PROFILE_MOTION 2
 #define PROFILE_TEST 3
 
+static void button_navigation(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+    page->complete = true;
+}
+
 static void button_open(int id, void *arg)
 {
     char *extension[] = {".QRT", ".SET", ".MOT", ".TST"};
@@ -53,7 +59,8 @@ static void button_open(int id, void *arg)
             break;
         }
     }
-
+    printf("Mode:%d\n", page->mode);
+    free(filepath);
     free_motion_quartet(page->quartet);
     free_motion_set(page->set);
     free_motion_profile(page->profile);
@@ -64,6 +71,7 @@ static void button_open(int id, void *arg)
     case PROFILE_QUARTET:
     {
         page->quartet = get_motion_quartet();
+        printf("Quartet from json\n");
         json_to_motion_quartet(filepath, page->quartet);
         break;
     }
@@ -98,6 +106,10 @@ static void button_new(int id, void *arg)
     int newmode = selection_run(page->display, 100, 100, optionNames, PROFILE_TYPES);
 
     Keyboard *keyboard = keyboard_create(page->display, page->images);
+    if (keyboard == NULL)
+    {
+        printf("TestProfile Button new Keyboard could not allocate memory\n");
+    }
     char *filename = keyboard_get_input(keyboard, "Enter file name: ");
     keyboard_destroy(keyboard);
 
@@ -106,12 +118,20 @@ static void button_new(int id, void *arg)
         return;
     }
 
-    page->filename = (char *)malloc(strlen(filename) + strlen(extension[page->mode]) + 1);
+    page->filename = (char *)realloc(page->filename, strlen(filename) + strlen(extension[page->mode]) + 3);
+    if (page->filename == NULL)
+    {
+        printf("Testprofile.c page->filename could not allocate memory\n");
+    }
     strcpy(page->filename, filename);
-    strcat(page->filename, extension[page->mode]);
+    strcat(page->filename, extension[newmode]);
     free(filename);
 
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_DIRECTORY, "/sd");
+    if (explorer == NULL)
+    {
+        printf("Testprofile.c explorer could not allocate memory\n");
+    }
     free(page->path);
     char *newpath = explorer_run(explorer);
     explorer_destroy(explorer);
@@ -133,10 +153,18 @@ static void button_save(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
     char *filepath = (char *)malloc(strlen(page->path) + strlen(page->filename) + 2);
+    if (filepath == NULL)
+    {
+        printf("Testprofile.c filepath could not allocate memory\n");
+    }
     strcpy(filepath, page->path);
     strcat(filepath, "/");
     strcat(filepath, page->filename);
     motion_quartet_to_json(page->quartet, filepath);
+    if (page->quartet == NULL)
+    {
+        printf("Testprofile.c page->quartet could not allocate memory\n");
+    }
     free(filepath);
 }
 
@@ -174,7 +202,7 @@ static void button_simulate(int id, void *arg)
     double t = 0;
     while (abs(d_max - setpoint->x) > error)
     {
-        simulate_profile(setpoint, t, d_max, v_max, a_max, sigmoid, d_max, sr, error);
+        // simulate_profile(setpoint, t, d_max, v_max, a_max, sigmoid, d_max, sr, error);
         printf("%f,%f,%f,%f\n", t + 0.0386, setpoint->x, setpoint->v, setpoint->a);
         t += error * 4;
     }
@@ -292,7 +320,7 @@ void test_profile_page_run(TestProfilePage *page)
     module_set_rectangle_circle(openButton, 100, 50);
     module_set_color(openButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_set_padding(openButton, padding, padding);
-    module_align_center_sector(openButton, 1, 2);
+    module_align_space_even(openButton, 1, 2);
     module_align_inner_top(openButton);
     module_touch_callback(openButton, button_open, 0);
 
@@ -307,7 +335,7 @@ void test_profile_page_run(TestProfilePage *page)
     // Create New Button
     Module *newButton = module_create(editWindow);
     module_copy(newButton, openButton);
-    module_align_center_sector(newButton, 2, 2);
+    module_align_space_even(newButton, 2, 2);
     module_touch_callback(newButton, button_new, 0);
 
     // Create New Text
@@ -332,6 +360,13 @@ void test_profile_page_run(TestProfilePage *page)
     module_align_center(saveText);
     module_align_middle(saveText);
 
+    // Create navigation button
+    Module *navigationButton = module_create(background);
+    module_set_image(navigationButton, page->images->navigationImage);
+    module_align_inner_top(navigationButton);
+    module_align_inner_right(navigationButton);
+    module_touch_callback(navigationButton, button_navigation, 0);
+
     // Create edit window title
     Module *editWindowTitle = module_create(editWindow);
     module_set_padding(editWindowTitle, padding, padding / 2);
@@ -342,24 +377,24 @@ void test_profile_page_run(TestProfilePage *page)
     module_align_center(editWindowTitle);
     module_add_underline(editWindowTitle);
 
-    // Create Graph window
-    Module *graph1Window = module_create(background);
-    module_set_padding(graph1Window, padding, padding);
-    module_set_rectangle_circle(graph1Window, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 3 - graph1Window->py * 3);
-    module_align_right(graph1Window, editWindow);
-    module_set_color(graph1Window, MAINCOLOR, BACKCOLOR);
-    module_align_inner_top(graph1Window);
-
-    // Create Graph window
-    Module *graph2Window = module_create(background);
-    module_copy(graph2Window, graph1Window);
-    module_align_below(graph2Window, graph1Window);
+    double graph1Data[100];
+    for (int i = 0; i < 100; i++)
+    {
+        graph1Data[i] = 0;
+    }
+    Module *graph1 = module_create(background);
+    module_set_graph(graph1, graph1Data, 100, "mm", "Profile");
+    module_set_padding(graph1, padding, padding);
+    module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
+    module_align_right(graph1, editWindow);
+    module_align_inner_top(graph1);
 
     // Create Buttons
 
     int lastMode = -1;
     while (!page->complete)
     {
+        printf("Test profile page running\n");
         Module *subroot = module_create(editWindow);
         module_align_below(subroot, editWindowTitle);
         module_fit_below(subroot, editWindowTitle);
@@ -378,6 +413,7 @@ void test_profile_page_run(TestProfilePage *page)
                 page->quartet->name = (char *)malloc(strlen(page->filename) + 1);
                 strcpy(page->quartet->name, page->filename);
             }
+
             char buf[50];
             printf("Quartet\n");
             module_set_text(editWindowTitle, "Edit Quartet");
@@ -396,6 +432,7 @@ void test_profile_page_run(TestProfilePage *page)
 
             Module *funcModule = module_create(subroot);
             module_copy(funcModule, nameModule);
+
             FunctionInfo *info = get_function_info(page->quartet->function);
             sprintf(buf, "Function: %s", info->name);
             module_set_text(funcModule, buf);
@@ -419,7 +456,32 @@ void test_profile_page_run(TestProfilePage *page)
             }
 
             free_function_info(info);
+            printf("running quartet\n");
+            RunMotionProfile *run = get_run_motion_profile();
 
+            double t = 0;
+            // Find t_max
+            long startTime = _getms();
+            while (!run->quartetComplete)
+            {
+                double distance = position_quartet(t, run, page->quartet);
+                // printf("distance:%f\n", distance);
+                t += 0.01;
+                if ((_getms() - startTime) > 1000) // timeout
+                {
+                    break;
+                }
+            }
+            destroy_run_motion_profile(run);
+            run = get_run_motion_profile();
+            printf("t_max:%f\n", t);
+            double dt = t / 100.0; // Get interval for graph
+            for (int i = 0; i < 100; i++)
+            {
+                graph1Data[i] = position_quartet(i * dt, run, page->quartet);
+                // printf("graph1Data[%d]:%f,%f\n", i, i * dt, graph1Data[i]);
+            }
+            destroy_run_motion_profile(run);
             Module *dwellModule = module_create(subroot);
             module_copy(dwellModule, nameModule);
             sprintf(buf, "Dwell (ms): %0.3f", page->quartet->dwell);

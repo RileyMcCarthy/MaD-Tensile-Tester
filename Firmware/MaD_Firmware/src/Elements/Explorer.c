@@ -192,7 +192,7 @@ char *explorer_run(Explorer *explorer)
     // Create done Button
     Module *done = module_create(window);
     module_copy(done, right);
-    module_align_center_sector(done, 6, 6);
+    module_align_center_sector(done, 5, 6);
     module_set_color(done, COLOR65K_GREEN, done->parent->foregroundColor);
     module_touch_callback(done, button_done, 0);
 
@@ -224,7 +224,7 @@ char *explorer_run(Explorer *explorer)
             module_set_rectangle(file, 100, 100);
             module_set_color(file, COLOR65K_RED, file->parent->foregroundColor);
             module_align_below(file, below);
-            module_align_center_sector(file, (j + 1), FILES_COLUMNS);
+            module_align_space_even(file, (j + 1), FILES_COLUMNS);
             module_set_visable(file, true);
 
             Module *text = module_create(file);
@@ -298,5 +298,6 @@ char *explorer_run(Explorer *explorer)
     strcpy(finalPath, explorer->path);
     free(explorer->path);
     module_destroy(root);
+    printf("Returning %s\n", finalPath);
     return finalPath;
 }

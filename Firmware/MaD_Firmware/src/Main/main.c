@@ -3,7 +3,7 @@
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768 * 4
+    HEAPSIZE = 32768 * 5
 };
 
 /**

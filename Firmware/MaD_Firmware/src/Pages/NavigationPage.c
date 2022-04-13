@@ -2,6 +2,7 @@
 #include "Images.h"
 #include "StatusPage.h"
 #include "ManualPage.h"
+#include "Module.h"
 /**
  * @brief Navigation page shows all available pages to access.
  *
@@ -23,21 +24,11 @@
  *
  * @param button Button that was pressed
  */
-static void check_buttons(NavigationPage *page)
+static void check_buttons(int id, void *arg)
 {
-    button_update(page->display);
-
-    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
-    {
-        for (int i = 0; i < BUTTONCOUNT; i++)
-        {
-            if (page->buttons[i].pressed)
-            {
-                page->complete = true;
-                page->newPage = (Pages)page->buttons[i].name;
-            }
-        }
-    }
+    NavigationPage *page = (NavigationPage *)arg;
+    page->newPage = id;
+    page->complete = true;
 }
 
 NavigationPage *navigation_page_create(Display *display, Images *images)
@@ -64,88 +55,108 @@ Pages navigation_page_run(NavigationPage *page)
     printf("Starting navigation page\n");
     page->complete = false;
 
-    display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
-    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
+    int padding = 20;
+    // Create Background
+    Module *root = module_create(NULL);
+    Module *background = module_create(root);
+    module_set_rectangle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
+    module_set_position(background, 0, 0);
+    module_set_padding(background, padding, padding);
+    module_set_color(background, BACKCOLOR, BACKCOLOR);
 
-    int buttonSize = 200;
+    // Creating status page
+    Module *statusPage = module_create(background);
+    module_set_image(statusPage, page->images->statusPageImage);
+    module_align_inner_top(statusPage);
+    module_align_space_even(statusPage, 1, 4);
+    module_touch_callback(statusPage, check_buttons, PAGE_STATUS);
 
-    char buf[50];
-    strcpy(buf, "Navigation Menu");
-    int titlex = SCREEN_WIDTH / 2 - strlen(buf) * 16;
-    int titley = 30;
-    display_draw_string(page->display, titlex, titley, buf);
+    Module *statusText = module_create(statusPage);
+    module_set_text(statusText, "Status");
+    module_set_font(statusText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(statusText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(statusText, statusText->parent);
+    module_align_center(statusText);
 
-    printf("creating buttons\n");
-    Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
-    page->buttons = buttons;
+    // Creating manual page
+    Module *manualPage = module_create(background);
+    module_set_image(manualPage, page->images->manualPageImage);
+    module_align_inner_top(manualPage);
+    module_align_space_even(manualPage, 2, 4);
+    module_touch_callback(manualPage, check_buttons, PAGE_MANUAL);
 
-    buttons[0].name = PAGE_STATUS;
-    buttons[0].xmin = SCREEN_WIDTH / 6 - buttonSize / 2;
-    buttons[0].xmax = buttons[0].xmin + buttonSize;
-    buttons[0].ymin = 120;
-    buttons[0].ymax = buttons[0].ymin + buttonSize;
-    buttons[0].pressed = false;
-    buttons[0].lastPress = 0;
+    Module *manualText = module_create(manualPage);
+    module_set_text(manualText, "Manual");
+    module_set_font(manualText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(manualText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(manualText, manualText->parent);
+    module_align_center(manualText);
 
-    buttons[1].name = PAGE_MANUAL;
-    buttons[1].xmin = buttons[0].xmax + 30;
-    buttons[1].xmax = buttons[1].xmin + buttonSize;
-    buttons[1].ymin = 120;
-    buttons[1].ymax = buttons[1].ymin + buttonSize;
-    buttons[1].pressed = false;
-    buttons[1].lastPress = 0;
+    // Creating Test page
+    Module *testPage = module_create(background);
+    module_set_image(testPage, page->images->automaticPageImage);
+    module_align_inner_top(testPage);
+    module_align_space_even(testPage, 3, 4);
+    module_touch_callback(testPage, check_buttons, PAGE_AUTOMATIC);
 
-    buttons[2].name = PAGE_AUTOMATIC;
-    buttons[2].xmin = buttons[1].xmax + 30;
-    buttons[2].xmax = buttons[2].xmin + buttonSize;
-    buttons[2].ymin = 120;
-    buttons[2].ymax = buttons[2].ymin + buttonSize;
-    buttons[2].pressed = false;
-    buttons[2].lastPress = 0;
+    Module *testText = module_create(testPage);
+    module_set_text(testText, "Test");
+    module_set_font(testText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(testText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(testText, testText->parent);
+    module_align_center(testText);
 
-    buttons[3].name = PAGE_CALIBRATION;
-    buttons[3].xmin = buttons[2].xmax + 30;
-    buttons[3].xmax = buttons[3].xmin + buttonSize;
-    buttons[3].ymin = 120;
-    buttons[3].ymax = buttons[2].ymin + buttonSize;
-    buttons[3].pressed = false;
-    buttons[3].lastPress = 0;
+    // Creating Calibrate page
+    Module *calibratePage = module_create(background);
+    module_set_image(calibratePage, page->images->calibratePageImage);
+    module_align_inner_top(calibratePage);
+    module_align_space_even(calibratePage, 4, 4);
+    module_touch_callback(calibratePage, check_buttons, PAGE_CALIBRATION);
 
-    buttons[4].name = PAGE_SETTINGS;
-    buttons[4].xmin = buttons[0].xmin;
-    buttons[4].xmax = buttons[4].xmin + buttonSize;
-    buttons[4].ymin = buttons[0].ymax + 30;
-    buttons[4].ymax = buttons[4].ymin + buttonSize;
-    buttons[4].pressed = false;
-    buttons[4].lastPress = 0;
+    Module *calibrateText = module_create(calibratePage);
+    module_set_text(calibrateText, "Calibrate");
+    module_set_font(calibrateText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(calibrateText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(calibrateText, calibrateText->parent);
+    module_align_center(calibrateText);
 
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+    // Creating Settings page
+    Module *settingPage = module_create(background);
+    // module_set_image(settingPage, page->images->calibratePageImage);
+    module_set_rectangle_circle(settingPage, 200, 200);
+    module_set_color(settingPage, COLOR65K_RED, BACKCOLOR);
+    module_align_below(settingPage, statusText);
+    module_align_space_even(settingPage, 1, 4);
+    module_touch_callback(settingPage, check_buttons, PAGE_SETTINGS);
 
-    Image *statusImage = page->images->statusPageImage;
+    Module *settingText = module_create(settingPage);
+    module_set_text(settingText, "Settings");
+    module_set_font(settingText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(settingText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(settingText, settingText->parent);
+    module_align_center(settingText);
 
-    display_bte_memory_copy_image(page->display, statusImage, buttons[0].xmin, buttons[0].ymin);
+    // Creating Test profile page
+    Module *tpPage = module_create(background);
+    // module_set_image(settingPage, page->images->calibratePageImage);
+    module_set_rectangle_circle(tpPage, 200, 200);
+    module_set_color(tpPage, COLOR65K_RED, BACKCOLOR);
+    module_align_below(tpPage, statusText);
+    module_align_space_even(tpPage, 2, 4);
+    module_touch_callback(tpPage, check_buttons, PAGE_TEST_PROFILE);
 
-    Image *manualImg = page->images->manualPageImage;
+    Module *tpText = module_create(tpPage);
+    module_set_text(tpText, "Create Profiles");
+    module_set_font(tpText, RA8876_CHAR_HEIGHT_32);
+    module_set_color(tpText, COLOR65K_BLACK, BACKCOLOR);
+    module_align_below(tpText, tpText->parent);
+    module_align_center(tpText);
 
-    display_bte_memory_copy_image(page->display, manualImg, buttons[1].xmin, buttons[1].ymin);
-
-    Image *automaticImg = page->images->automaticPageImage;
-
-    display_bte_memory_copy_image(page->display, automaticImg, buttons[2].xmin, buttons[2].ymin);
-
-    Image *calibrateImg = page->images->calibratePageImage;
-
-    display_bte_memory_copy_image(page->display, calibrateImg, buttons[3].xmin, buttons[3].ymin);
-
-    display_draw_circle_square_fill(page->display, buttons[4].xmin, buttons[4].ymin, buttons[4].xmax, buttons[4].ymax, 20, 20, COLOR65K_BLACK);
-    display_draw_string(page->display, buttons[4].xmin + 10, buttons[4].ymin + 10, "Settings");
-
+    module_draw(page->display, root);
     while (!page->complete)
     {
-        check_buttons(page);
+        display_update_touch(page->display);
+        module_touch_check(root, page->display, page);
     }
     return page->newPage;
 }

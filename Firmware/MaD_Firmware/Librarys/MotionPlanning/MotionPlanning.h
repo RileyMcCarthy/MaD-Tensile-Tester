@@ -1,10 +1,9 @@
 #ifndef MotionPlanning_H
 #define MotionPlanning_H
-#include <math.h>
-#include <stdarg.h>
 #include <simpletools.h>
 #include <stddef.h>
 #include <JSON.h>
+#include <math.h>
 
 typedef struct motionPeriods_s
 {
@@ -45,11 +44,35 @@ typedef struct functioninfo_s
     char **args;
 } FunctionInfo;
 
+typedef struct RunMotionProfile_s
+{
+    int currentSet;
+    int currentExecution;
+    int currentQuartet;
+
+    bool profileComplete;
+    bool setComplete;
+    bool quartetComplete;
+
+    double lastQuartetTime;
+
+    double lastSetDistance;
+    double lastExecutionDistance;
+    double lastQuartetDistance;
+} RunMotionProfile;
+
+RunMotionProfile *get_run_motion_profile();
+void destroy_run_motion_profile(RunMotionProfile *run);
+
 FunctionInfo *get_function_info(QuartetFunctions id);
 void free_function_info(FunctionInfo *info);
 void update_quartet_function(MotionQuartet *quartet);
 
-double sigmoid(float t, va_list args);
+double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
+double position_set(double t, RunMotionProfile *run, MotionSet *set);
+double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
+
+double sigmoid(float t, double *args);
 void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, float (*f)(float t, va_list args), ...);
 SetPoint *create_empty_setpoint();
 

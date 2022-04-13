@@ -1,5 +1,5 @@
 #include "Module.h"
-
+#include "Graph.h"
 Module *module_create(Module *parent)
 {
     Module *module = (Module *)malloc(sizeof(Module));
@@ -97,12 +97,26 @@ void module_set_rectangle_circle(Module *module, int w, int h)
     module->h = h;
 }
 
-void module_set_graph(Module *module, int w, int h)
+void module_set_graph(Module *module, double *data, int dataCount, const char *units, const char *title)
 {
+    Graph *graph = (Graph *)malloc(sizeof(Graph));
+    graph->data = data;
+    graph->dataCount = dataCount;
+    graph->units = (char *)malloc(strlen(units) + 1);
+    strcpy(graph->units, units);
+    graph->title = (char *)malloc(sizeof(char) * (strlen(title) + 1));
+    strcpy(graph->title, title);
+
     module->type = MODULE_GRAPH;
-    //    module->data = graph_create(module->);
-    module->w = w;
-    module->h = h;
+    module->data = graph;
+}
+
+void module_set_image(Module *module, Image *image)
+{
+    module->type = MODULE_IMAGE;
+    module->data = image;
+    module->w = image->width;
+    module->h = image->height;
 }
 
 void module_add_underline(Module *module)
@@ -206,6 +220,12 @@ void module_set_position(Module *module, int x, int y)
     module->y = y;
 }
 
+void module_set_size(Module *module, int w, int h)
+{
+    module->w = w;
+    module->h = h;
+}
+
 void module_set_color(Module *module, int foreground, int background)
 {
     module->foregroundColor = foreground;
@@ -239,13 +259,17 @@ void module_align_middle(Module *module)
 
 void module_align_center(Module *module)
 {
-    // module->x = module->parent->x + module->parent->w / 2 - module->w / 2;
-    module_align_center_sector(module, 1, 1);
+    module_align_center_sector(module, 1, 2);
 }
 
 void module_align_center_sector(Module *module, int section, int sections)
 {
-    module->x = module->parent->x + section * module->parent->w / (sections + 1) - module->w / 2;
+    module->x = module->parent->x + module->parent->px + section * (module->parent->w - module->parent->px * 2) / sections - module->w / 2;
+}
+
+void module_align_space_even(Module *module, int section, int sections)
+{
+    module->x = module->parent->x + module->parent->px + section * (module->parent->w - 2 * module->parent->px - sections * module->w) / (sections + 1) + (section - 1) * module->w;
 }
 
 void module_align_above(Module *module, Module *ref)
@@ -334,6 +358,12 @@ void module_draw(Display *display, Module *module)
     {
         radius = round(module->w * 0.1);
         display_draw_circle_square_fill(display, module->x, module->y, module->x + module->w, module->y + module->h, radius, radius, module->foregroundColor);
+        break;
+    }
+    case MODULE_GRAPH:
+    {
+        Graph *graph = (Graph *)module->data;
+        graph_draw_static(display, graph, module->x, module->y, module->w, module->h);
         break;
     }
     }

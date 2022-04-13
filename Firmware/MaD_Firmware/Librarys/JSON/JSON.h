@@ -11,6 +11,7 @@
 #include "tiny-json.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 #define MACHINE_CONFIGURATION_FIELD_COUNT 13
 typedef struct MachineConfiguration_s
 {
@@ -59,7 +60,6 @@ typedef struct MotionQuartet_s
     char *name;        // Filename of the motion quartet
     int function;      // Motion function type
     float *parameters; // Parameters of the motion quartet (max 10)
-    float distanceMax; // Maximum distance of the motion quartet (mm)
     float dwell;       // Dwell of the motion quartet (us)
 } MotionQuartet;
 

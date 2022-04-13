@@ -46,6 +46,7 @@
 
 #define MAD_DS3231_SCL 38 // RTC clock pin (Output)
 #define MAD_DS3231_SDA 37 // RTC data pin (bi-directional)
+
 /**
  * @brief Main class responsible for initializing and starting components
  *

@@ -272,6 +272,14 @@ void motion_state_window_update(MotionStateWindow *window)
         conditionTextColor = COLOR65K_BLACK;
         break;
     }
+    case MODE_TEST_RUNNING:
+    {
+        strcpy(buf, " RUN  ");
+        conditionOutlineColor = COLOR65K_MAGENTA;
+        conditionInnerColor = COLOR65K_MAGENTA;
+        conditionTextColor = COLOR65K_BLACK;
+        break;
+    }
     default:
         break;
     }

@@ -8,7 +8,7 @@ typedef struct selection_s
     int selected;
 } Selection;
 
-static int check_buttons(int id, void *arg)
+static void check_buttons(int id, void *arg)
 {
     Selection *selection = (Selection *)arg;
     selection->selected = id;

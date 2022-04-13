@@ -80,7 +80,7 @@ static State state_machine_motion(MachineState *machineState)
         {
             machineState->motionParameters.status = STATUS_DISABLED;
         }
-        // printf("machine check failed\n");
+        printf("machine check failed\n");
         machineState->motionParameters.mode = MODE_MANUAL;
         return newState;
     }
@@ -211,6 +211,12 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
     case PARAM_MOTION_MODE:
         if (machineState->motionParameters.mode != state)
         {
+            if (machineState->motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
+            { // Must be in test mode to run test
+                printf("Must be in test mode to run test\n");
+                break;
+            }
+
             machineState->motionParameters.mode = state;
             state_machine_update(machineState);
         }

@@ -13,6 +13,8 @@ typedef enum graphtype_e
 typedef struct graph_t
 {
     Display *display;
+    int dataCount;
+    double *data;
     int startX;
     int startY;
     int width;
@@ -29,6 +31,7 @@ typedef struct graph_t
 } Graph;
 
 void graph_draw(Graph *graph, Display *display, float newValue);
+bool graph_draw_static(Display *display, Graph *graph, int x, int y, int w, int h);
 void graph_add_marker(Graph *graph, float value);
 Graph *graph_create(Display *display, int startX, int startY, int width, int height, float maxY, float minY, const char *units, const char *title);
 void graph_destroy(Graph *graph);

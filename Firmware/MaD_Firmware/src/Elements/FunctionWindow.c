@@ -5,7 +5,7 @@
 
 static void check_buttons(FunctionWindow *window)
 {
-    button_update(explorer->display);
+    button_update(window->display);
     if (button_check(window->display, window->buttons, BUTTONCOUNT) > 0)
     {
         for (int i = 0; i < BUTTONCOUNT; i++)

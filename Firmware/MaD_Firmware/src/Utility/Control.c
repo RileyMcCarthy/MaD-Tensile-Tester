@@ -1,5 +1,5 @@
 #include "Control.h"
-
+#include "MotionPlanning.h"
 static long control_stack[64 * 4];
 
 #define SERVO_CHECK_COUNT_MAX 3
@@ -52,6 +52,7 @@ static bool move_servo(Control *control, MoveType type, int value)
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(Control *control)
 {
+
     /*Initialize mcp23017*/
     MCP23017 *mcp = mcp23017_create();
     while (!mcp23017_begin(mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL))
@@ -74,11 +75,16 @@ static void control_cog(Control *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
+    // For running test profiles
+    RunMotionProfile *run;
+    long startTime = 0;
+
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
     MonitorData lastData = *control->monitorData;
     while (1)
     {
+
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
@@ -456,9 +462,30 @@ static void control_cog(Control *control)
                 }
                 else if (currentMachineState.motionParameters.mode == MODE_TEST_RUNNING)
                 {
+                    if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
+                    {
+                        printf("running test\n");
+                        run = get_run_motion_profile(); // Create new RunMotionProfile structure
+                        startTime = _getus();
+                    }
                     // Run the loaded test profile
                     if (control->motionProfile != NULL)
                     {
+                        if (!run->profileComplete)
+                        {
+                            double t = (_getus() - startTime) / 1000000.0;
+                            double position = position_profile(t, run, &(control->motionProfile));
+                            // printf("%f,%f\n", t, position);
+                        }
+                        else
+                        {
+                            destroy_run_motion_profile(run);
+                            state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
+                        }
+                    }
+                    else
+                    {
+                        destroy_run_motion_profile(run);
                     }
                 }
             }
@@ -479,6 +506,7 @@ Control *control_create(MachineProfile *machineProfile, MachineState *stateMachi
     control->machineProfile = machineProfile;
     control->monitorData = monitorData;
     control->stateMachine = stateMachine;
+    control->motionProfile = NULL;
     control->motionProfile = NULL;
     control->dyn4 = dyn4;
     control->cogid = -1;

@@ -16,6 +16,7 @@
 #include "stdio.h"
 #include "Images.h"
 #include "Button.h"
+#include "StateMachine.h"
 
 /**
  * @brief Runs the UI for running tests
@@ -26,9 +27,10 @@ typedef struct AutomaticPage_t
     bool complete;
     Display *display;
     Images *images;
+    MachineState *state;
 } AutomaticPage;
 
-AutomaticPage *automatic_page_create(Display *display, Images *images);
+AutomaticPage *automatic_page_create(Display *display, Images *images, MachineState *state);
 void automatic_page_destroy(AutomaticPage *page);
 void automatic_page_run(AutomaticPage *page);
 

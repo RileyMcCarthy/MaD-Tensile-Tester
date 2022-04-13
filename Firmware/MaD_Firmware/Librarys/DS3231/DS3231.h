@@ -3,9 +3,6 @@
 #include "simpletools.h"
 #include "Error.h"
 #include "stdbool.h"
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
 
 typedef struct __using("jm_i2c.spin2") I2CBus;
 

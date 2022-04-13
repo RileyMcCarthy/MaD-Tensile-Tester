@@ -1,5 +1,5 @@
 #include "JSON.h"
-#include "motionPlanning.h"
+#include "MotionPlanning.h"
 // Private Functions
 
 static char *get_string_from_index(FILE *file, int start, int end)
@@ -553,13 +553,13 @@ MotionSet *get_motion_set()
     return set;
 }
 
+// First parameter must be final distance
 MotionQuartet *get_motion_quartet()
 {
     MotionQuartet *quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
     quartet->name = NULL;
-    quartet->function;
-    quartet->parameters = NULL;
-    quartet->distanceMax = 0.0;
+    quartet->function = -1;
+    quartet->parameters = NULL; // Distance, ...
     quartet->dwell = 0.0;
     return quartet;
 }
@@ -1015,13 +1015,14 @@ void json_to_motion_set(char *filename, MotionSet *set)
 
 void json_to_motion_quartet(char *filename, MotionQuartet *quartet)
 {
+    printf("Opening file\n");
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
         printf("Error opening file\n");
         return NULL;
     }
-
+    printf("file opened\n");
     // Read file into string
     fseek(file, 0, SEEK_END);
     long fileSize = ftell(file);
@@ -1033,12 +1034,15 @@ void json_to_motion_quartet(char *filename, MotionQuartet *quartet)
     // Use tiny-json to parse the string
     json_t mem[MOTION_QUARTET_FIELD_COUNT];
     const json_t *parser = json_create(quartetStr, mem, sizeof(mem) / sizeof(*mem));
-
+    printf("parsing name\n");
     quartet->name = json_property_to_string(parser, "Name");
+    printf("parsing Function\n");
     quartet->function = json_property_to_int(parser, "Function");
+    printf("parsing Parameters\n");
     quartet->parameters = json_property_to_float_array(parser, "Parameters", NULL);
-    quartet->distanceMax = json_property_to_float(parser, "Distance");
+    printf("parsing Dwell\n");
     quartet->dwell = json_property_to_float(parser, "Dwell");
+    printf("done\n");
     fclose(file);
 }
 

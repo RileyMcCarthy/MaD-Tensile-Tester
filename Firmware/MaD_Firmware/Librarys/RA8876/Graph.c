@@ -36,15 +36,16 @@ void graph_add_marker(Graph *graph, float value)
     }
 }
 
-bool graph_draw_static(Graph *graph, double *data, int numdata)
+// Data length must match width of graph
+bool graph_draw_static(Display *display, Graph *graph, int x, int y, int w, int h)
 {
     // Create Background
     Module *root = module_create(NULL);
 
     // Create Window
     Module *window = module_create(root);
-    module_set_rectangle_circle(window, graph->width, graph->height);
-    module_set_position(window, explorer->x, explorer->y);
+    module_set_rectangle_circle(window, w, h);
+    module_set_position(window, x, y);
     module_set_padding(window, 10, 10);
     module_set_color(window, COLOR65K_LIGHTBLUE, COLOR65K_BLUE);
 
@@ -69,7 +70,7 @@ bool graph_draw_static(Graph *graph, double *data, int numdata)
 
     // Create Graph Horizontal Line
     Module *centerLine = module_create(graphArea);
-    module_set_line(centerLine, 0);
+    module_set_rectangle(centerLine, 0, 0);
     module_fit_width(centerLine);
     module_align_center(centerLine);
     module_align_middle(centerLine);
@@ -77,12 +78,43 @@ bool graph_draw_static(Graph *graph, double *data, int numdata)
 
     // Create Graph Vertical Line
     Module *verticleLine = module_create(graphArea);
-    module_set_line(verticleLine, 0);
+    module_set_rectangle(verticleLine, 0, 0);
     module_fit_height(verticleLine);
     module_align_inner_left(verticleLine);
+    module_align_inner_top(verticleLine);
     module_set_color(verticleLine, COLOR65K_BLACK, COLOR65K_BLACK);
+    int useableWidth = centerLine->w;
 
-    module_draw(graph->display, root);
+    double factor = (double)useableWidth / (double)graph->dataCount;
+
+    graph->maxY = graph->data[0];
+    graph->minY = graph->data[0];
+    for (int i = 0; i < graph->dataCount; i++)
+    {
+        if (graph->data[i] > graph->maxY)
+        {
+            graph->maxY = graph->data[i];
+        }
+        if (graph->data[i] < graph->minY)
+        {
+            graph->minY = graph->data[i];
+        }
+    }
+
+    int lastX = centerLine->x;
+    for (int i = 0; i < graph->dataCount; i++)
+    {
+        int x = centerLine->x + (int)(i * factor);
+        int y = centerLine->y - (int)(graph->data[i] * (double)((verticleLine->h / 2) / (graph->maxY - graph->minY)));
+        Module *point = module_create(graphArea);
+        module_set_rectangle(point, x - lastX, 1);
+        module_set_position(point, lastX, y);
+        module_set_color(point, COLOR65K_GREEN, COLOR65K_GREEN);
+        // printf("creating point at: %d, %d,%d\n", x, y, graph->data[i]);
+        lastX = x;
+    }
+
+    module_draw(display, root);
     module_destroy(root);
 }
 
