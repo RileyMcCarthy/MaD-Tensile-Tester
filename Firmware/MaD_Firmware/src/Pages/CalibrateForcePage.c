@@ -211,7 +211,7 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
                 char *forceValue = keyboard_get_input(keyboard, "Force:");
                 float forceFloat = atof(forceValue);
                 printf("force value:%s\n", forceValue);
-                if (forceValue == NULL || forceFloat > 5000 || forceFloat < -5000)
+                if (forceValue == NULL || forceFloat > 5 || forceFloat < -5)
                 {
                     page->state--;
                 }
