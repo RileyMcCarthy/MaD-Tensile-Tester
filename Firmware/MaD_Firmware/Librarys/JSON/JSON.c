@@ -77,9 +77,10 @@ static char *string_to_json(const char *name, const char *value)
 static char *json_property_to_string(const json_t *parser, const char *name)
 {
     json_t const *property = json_getProperty(parser, name);
-    if (!property || JSON_TEXT != json_getType(property))
+    printf("the type is: %d\n", json_getType(property));
+    if (property == NULL)
     {
-        printf("Error, the %s property is not found.", name);
+        printf("Error, the %s property is not found.\n", name);
     }
     char const *value = json_getValue(property);
     char *valueMem = (char *)malloc(sizeof(char) * (strlen(value) + 1));
@@ -92,7 +93,7 @@ static int json_property_to_int(const json_t *parser, const char *name)
     json_t const *property = json_getProperty(parser, name);
     if (!property || JSON_INTEGER != json_getType(property))
     {
-        printf("Error, the %s property is not found.", name);
+        printf("Error, the %s property is not found.\n", name);
     }
     return (int)json_getInteger(property);
 }
@@ -845,11 +846,24 @@ MachineProfile *json_to_machine_profile(const char *filename)
     fseek(file, 0, SEEK_SET);
     char *profileStr = malloc(fileSize + 1);
     fread(profileStr, fileSize, 1, file);
+    fclose(file);
     profileStr[fileSize] = '\0';
-
+    printf("%s\n", profileStr);
     // Use tiny-json to parse the string
-    json_t mem[MACHINE_PROFILE_FIELD_COUNT];
-    const json_t *parser = json_create(profileStr, mem, sizeof(mem) / sizeof(*mem));
+    json_t *mem = malloc(sizeof(json_t) * MAX_TOKENS);
+    if (mem == NULL)
+    {
+        printf("Error allocating memory\n");
+        return NULL;
+    }
+
+    json_t *parser = json_create(profileStr, mem, MAX_TOKENS);
+
+    if (!parser || JSON_OBJ != json_getType(parser))
+    {
+        printf("Error, the  JSON cannot be parsed.\n");
+        return NULL;
+    }
 
     MachineProfile *settings = get_machine_profile();
     settings->name = json_property_to_string(parser, "Name");
@@ -858,18 +872,17 @@ MachineProfile *json_to_machine_profile(const char *filename)
     const json_t *mcParser = json_getProperty(parser, "Configuration");
     if (!mcParser || JSON_OBJ != json_getType(mcParser))
     {
-        printf("Error, the  Machine Configuration  property is not found.");
+        printf("Error, the  Machine Configuration  property is not found.\n");
     }
     json_to_machine_configuration(mcParser, settings->configuration);
 
     const json_t *mpParser = json_getProperty(parser, "Performance");
     if (!mpParser || JSON_OBJ != json_getType(mpParser))
     {
-        printf("Error, the  Machine Profile  property is not found.");
+        printf("Error, the  Machine Profile  property is not found.\n");
     }
     json_to_machine_performance(mpParser, settings->performance);
     free(profileStr);
-    fclose(file);
     return settings;
 }
 

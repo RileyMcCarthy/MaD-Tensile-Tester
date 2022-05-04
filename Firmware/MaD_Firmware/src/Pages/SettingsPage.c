@@ -31,7 +31,7 @@ static bool isNumber(char *string)
     int i = 0;
     while (string[i] != '\0')
     {
-        if (!isdigit(string[i]))
+        if (!isdigit(string[i]) && string[i] != '-')
         {
             return false;
         }
@@ -45,7 +45,7 @@ static bool isFloat(char *string)
     int i = 0;
     while (string[i] != '\0')
     {
-        if (!isdigit(string[i]) && string[i] != '.')
+        if (!isdigit(string[i]) && string[i] != '.' && string[i] != '-')
         {
             return false;
         }

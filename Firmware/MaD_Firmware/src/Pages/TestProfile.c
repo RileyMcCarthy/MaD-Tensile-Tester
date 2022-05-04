@@ -519,4 +519,5 @@ void test_profile_page_run(TestProfilePage *page)
         module_trim(subroot); // Remove subroot from tree
         module_destroy(subroot);
     }
+    module_destroy(root);
 }

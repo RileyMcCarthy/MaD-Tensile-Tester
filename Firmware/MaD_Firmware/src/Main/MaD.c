@@ -14,7 +14,7 @@
  *
  * @param profile machine profile to write
  */
-static void write_machine_profile(MachineProfile *profile)
+void write_machine_profile(MachineProfile *profile)
 {
   mkdir("/sd/settings", 0);
   printf("Writing machine profile to settings file\n");
@@ -27,20 +27,19 @@ static void write_machine_profile(MachineProfile *profile)
  * @return MachineProfile* pointer to the machine profile object that was loaded or created
  *
  */
-static MachineProfile *load_machine_profile()
+MachineProfile *load_machine_profile()
 {
   if (access("/sd/settings/Default.mcp", F_OK) == 0) // Check for machine profile in filesyste
   {
     printf("Opening existing profile\n");
     MachineProfile *profile = json_to_machine_profile("/sd/settings/Default.mcp"); // Load machine profile from file
-
-    json_print_machine_profile(profile); // Print machine profile to console
+    json_print_machine_profile(profile);                                           // Print machine profile to console
     return profile;
   }
 
   printf("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
 
-  MachineProfile *profile = = get_machine_profile(); // Get empty machine profile
+  MachineProfile *profile = get_machine_profile(); // Get empty machine profile
 
   // MachineSettings
 

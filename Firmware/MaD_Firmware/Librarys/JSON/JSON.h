@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_TOKENS 200
+
 #define MACHINE_CONFIGURATION_FIELD_COUNT 13
 typedef struct MachineConfiguration_s
 {

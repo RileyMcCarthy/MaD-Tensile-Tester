@@ -31,6 +31,113 @@
 #include <ctype.h>
 #include "tiny-json.h"
 
+/** Checks whether an character belongs to set.
+ * @param ch Character value to be checked.
+ * @param set Set of characters. It is just a null-terminated string.
+ * @return true or false there is membership or not. */
+bool isOneOfThem(char ch, char const *set)
+{
+    while (*set != '\0')
+    {
+        if (ch == *set++)
+            return true;
+    }
+    return false;
+}
+
+/** Increases a pointer while it points to a character that belongs to a set.
+ * @param str The initial pointer value.
+ * @param set Set of characters. It is just a null-terminated string.
+ * @return The final pointer value or null pointer if the null character was found. */
+char *goWhile(char *str, char const *set)
+{
+    for (; *str != '\0'; ++str)
+    {
+        if (!isOneOfThem(*str, set))
+            return str;
+    }
+    return 0;
+}
+
+/** Increases a pointer while it points to a white space character.
+ * @param str The initial pointer value.
+ * @return The final pointer value or null pointer if the null character was found. */
+char *goBlank(char *str)
+{
+    return goWhile(str, " \n\r\t\f");
+}
+
+/** Increases a pointer while it points to a decimal digit character.
+ * @param str The initial pointer value.
+ * @return The final pointer value or null pointer if the null character was found. */
+char *goNum(char *str)
+{
+    for (; *str != '\0'; ++str)
+    {
+        if (!isdigit((int)(*str)))
+            return str;
+    }
+    return 0;
+}
+
+/** Set of characters that defines the end of an array or a JSON object. */
+
+/** Set a char to '\0' and increase its pointer if the char is different to '}' or ']'.
+ * @param ch Pointer to character.
+ * @return  Final value pointer. */
+char *setToNull(char *ch)
+{
+    if (!isOneOfThem(*ch, "}]"))
+        *ch++ = '\0';
+    return ch;
+}
+
+/** Indicate if a character is the end of a primitive value. */
+bool isEndOfPrimitive(char ch)
+{
+    return ch == ',' || isOneOfThem(ch, " \n\r\t\f") || isOneOfThem(ch, "}]");
+}
+
+char *json_getName(json_t const *json)
+{
+    return json->name;
+}
+
+char *json_getValue(json_t const *property)
+{
+    return property->u.value;
+}
+
+jsonType_t json_getType(json_t const *json)
+{
+    return json->type;
+}
+
+json_t *json_getSibling(json_t const *json)
+{
+    return json->sibling;
+}
+
+json_t *json_getChild(json_t const *json)
+{
+    return json->u.c.child;
+}
+
+bool json_getBoolean(json_t const *property)
+{
+    return *property->u.value == 't';
+}
+
+int64_t json_getInteger(json_t const *property)
+{
+    return atof(property->u.value);
+}
+
+float json_getReal(json_t const *property)
+{
+    return atof(property->u.value);
+}
+
 /** Structure to handle a heap of JSON properties. */
 typedef struct jsonStaticPool_s
 {
@@ -62,33 +169,30 @@ char const *json_getPropertyValue(json_t const *obj, char const *property)
     return json_getValue(field);
 }
 
-/* Internal prototypes: */
-static char *goBlank(char *str);
-static char *goNum(char *str);
-static json_t *poolInit(jsonPool_t *pool);
-static json_t *poolAlloc(jsonPool_t *pool);
-static char *objValue(char *ptr, json_t *obj, jsonPool_t *pool);
-static char *setToNull(char *ch);
-static bool isEndOfPrimitive(char ch);
-
 /* Parse a string to get a json. */
 json_t const *json_createWithPool(char *str, jsonPool_t *pool)
 {
     char *ptr = goBlank(str);
     if (!ptr || (*ptr != '{' && *ptr != '['))
+    {
+        printf("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
         return 0;
+    }
     json_t *obj = pool->init(pool);
     obj->name = 0;
     obj->sibling = 0;
     obj->u.c.child = 0;
     ptr = objValue(ptr, obj, pool);
     if (!ptr)
+    {
+        printf("Error: json_createWithPool: invalid json string.\n");
         return 0;
+    }
     return obj;
 }
 
 /* Parse a string to get a json. */
-json_t const *json_create(char *str, json_t mem[], unsigned int qty)
+json_t const *json_create(char *str, json_t *mem, unsigned int qty)
 {
     jsonStaticPool_t spool;
     spool.mem = mem;
@@ -102,7 +206,7 @@ json_t const *json_create(char *str, json_t mem[], unsigned int qty)
  * 'b' -> '\\b', 'n' -> '\\n', 't' -> '\\t'
  * @param ch The escape character.
  * @retval  The character code. */
-static char getEscape(char ch)
+char getEscape(char ch)
 {
     static struct
     {
@@ -129,7 +233,7 @@ static char getEscape(char ch)
  * @param str Pointer to  first digit.
  * @retval '?' If the four characters are hexadecimal digits.
  * @retval '\0' In other cases. */
-static unsigned char getCharFromUnicode(unsigned char const *str)
+unsigned char getCharFromUnicode(unsigned char const *str)
 {
     unsigned int i;
     for (i = 0; i < 4; ++i)
@@ -143,7 +247,7 @@ static unsigned char getCharFromUnicode(unsigned char const *str)
  * @param str Pointer to first character.
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *parseString(char *str)
+char *parseString(char *str)
 {
     unsigned char *head = (unsigned char *)str;
     unsigned char *tail = (unsigned char *)str;
@@ -183,7 +287,7 @@ static char *parseString(char *str)
  * @param property The property to assign the name.
  * @retval Pointer to first of property value. If success.
  * @retval Null pointer if any error occur. */
-static char *propertyName(char *ptr, json_t *property)
+char *propertyName(char *ptr, json_t *property)
 {
     property->name = ++ptr;
     ptr = parseString(ptr);
@@ -202,7 +306,7 @@ static char *propertyName(char *ptr, json_t *property)
  * @param property The property to assign the name.
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *textValue(char *ptr, json_t *property)
+char *textValue(char *ptr, json_t *property)
 {
     ++property->u.value;
     ptr = parseString(++ptr);
@@ -217,7 +321,7 @@ static char *textValue(char *ptr, json_t *property)
  * @param str main string
  * @retval Pointer to next character.
  * @retval Null pointer if any error occur. */
-static char *checkStr(char *ptr, char const *str)
+char *checkStr(char *ptr, char const *str)
 {
     while (*str)
         if (*ptr++ != *str++)
@@ -233,7 +337,7 @@ static char *checkStr(char *ptr, char const *str)
  * @param type The code of the type. ( JSON_BOOLEAN or JSON_NULL )
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *primitiveValue(char *ptr, json_t *property, char const *value, jsonType_t type)
+char *primitiveValue(char *ptr, json_t *property, char const *value, jsonType_t type)
 {
     ptr = checkStr(ptr, value);
     if (!ptr || !isEndOfPrimitive(*ptr))
@@ -249,7 +353,7 @@ static char *primitiveValue(char *ptr, json_t *property, char const *value, json
  * @param property Property handler to set the value and the type, (true, false or null).
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *trueValue(char *ptr, json_t *property)
+char *trueValue(char *ptr, json_t *property)
 {
     return primitiveValue(ptr, property, "true", JSON_BOOLEAN);
 }
@@ -260,7 +364,7 @@ static char *trueValue(char *ptr, json_t *property)
  * @param property Property handler to set the value and the type, (true, false or null).
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *falseValue(char *ptr, json_t *property)
+char *falseValue(char *ptr, json_t *property)
 {
     return primitiveValue(ptr, property, "false", JSON_BOOLEAN);
 }
@@ -271,7 +375,7 @@ static char *falseValue(char *ptr, json_t *property)
  * @param property Property handler to set the value and the type, (true, false or null).
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *nullValue(char *ptr, json_t *property)
+char *nullValue(char *ptr, json_t *property)
 {
     return primitiveValue(ptr, property, "null", JSON_NULL);
 }
@@ -280,7 +384,7 @@ static char *nullValue(char *ptr, json_t *property)
  * @param ptr Pointer to first character.
  * @retval Pointer to first non numerical after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *expValue(char *ptr)
+char *expValue(char *ptr)
 {
     if (*ptr == '-' || *ptr == '+')
         ++ptr;
@@ -294,7 +398,7 @@ static char *expValue(char *ptr)
  * @param ptr Pointer to first character.
  * @retval Pointer to first non numerical after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *fraqValue(char *ptr)
+char *fraqValue(char *ptr)
 {
     if (!isdigit((int)(*ptr)))
         return 0;
@@ -310,7 +414,7 @@ static char *fraqValue(char *ptr)
  * @param property Property handler to set the value and the type: JSON_REAL or JSON_INTEGER.
  * @retval Pointer to first non white space after the string. If success.
  * @retval Null pointer if any error occur. */
-static char *numValue(char *ptr, json_t *property)
+char *numValue(char *ptr, json_t *property)
 {
     if (*ptr == '-')
         ++ptr;
@@ -368,7 +472,7 @@ static char *numValue(char *ptr, json_t *property)
 /** Add a property to a JSON object or array.
  * @param obj The handler of the JSON object or array.
  * @param property The handler of the property to be added. */
-static void add(json_t *obj, json_t *property)
+void add(json_t *obj, json_t *property)
 {
     property->sibling = 0;
     if (!obj->u.c.child)
@@ -389,8 +493,10 @@ static void add(json_t *obj, json_t *property)
  * @param pool The handler of a json pool for creating json instances.
  * @retval Pointer to first character after the value. If success.
  * @retval Null pointer if any error occur. */
-static char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
+char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
 {
+    // printf("%c", *ptr);
+
     obj->type = *ptr == '{' ? JSON_OBJ : JSON_ARRAY;
     obj->u.c.child = 0;
     obj->sibling = 0;
@@ -398,14 +504,20 @@ static char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
     for (;;)
     {
         ptr = goBlank(ptr);
+        // printf("after go blank:%c\n", *ptr);
+
         if (!ptr)
+        {
+            printf("Error: Unexpected goblank error.\n");
             return 0;
+        }
         if (*ptr == ',')
         {
             ++ptr;
             continue;
         }
-        char const endchar = (obj->type == JSON_OBJ) ? '}' : ']';
+        char endchar = (obj->type == JSON_OBJ) ? '}' : ']';
+        // printf("endchar:%c\n", endchar);
         if (*ptr == endchar)
         {
             *ptr = '\0';
@@ -419,14 +531,24 @@ static char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
         }
         json_t *property = pool->alloc(pool);
         if (!property)
+        {
+            printf("Error: Unexpected allocation error.\n");
             return 0;
+        }
         if (obj->type != JSON_ARRAY)
         {
+            // printf("befpore quite check:%c\n", *ptr);
             if (*ptr != '\"')
+            {
+                printf("Error: Unexpected quote missing.\n");
                 return 0;
+            }
             ptr = propertyName(ptr, property);
             if (!ptr)
+            {
+                printf("Error: property name does not exist.\n");
                 return 0;
+            }
         }
         else
             property->name = 0;
@@ -465,14 +587,17 @@ static char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
             break;
         }
         if (!ptr)
+        {
+            printf("Error: unable to parse value.\n");
             return 0;
+        }
     }
 }
 
 /** Initialize a json pool.
  * @param pool The handler of the pool.
  * @return a instance of a json. */
-static json_t *poolInit(jsonPool_t *pool)
+json_t *poolInit(jsonPool_t *pool)
 {
     jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
     spool->nextFree = 1;
@@ -483,79 +608,10 @@ static json_t *poolInit(jsonPool_t *pool)
  * @param pool The handler of the pool.
  * @retval The handler of the new instance if success.
  * @retval Null pointer if the pool was empty. */
-static json_t *poolAlloc(jsonPool_t *pool)
+json_t *poolAlloc(jsonPool_t *pool)
 {
     jsonStaticPool_t *spool = json_containerOf(pool, jsonStaticPool_t, pool);
     if (spool->nextFree >= spool->qty)
         return 0;
     return spool->mem + spool->nextFree++;
-}
-
-/** Checks whether an character belongs to set.
- * @param ch Character value to be checked.
- * @param set Set of characters. It is just a null-terminated string.
- * @return true or false there is membership or not. */
-static bool isOneOfThem(char ch, char const *set)
-{
-    while (*set != '\0')
-        if (ch == *set++)
-            return true;
-    return false;
-}
-
-/** Increases a pointer while it points to a character that belongs to a set.
- * @param str The initial pointer value.
- * @param set Set of characters. It is just a null-terminated string.
- * @return The final pointer value or null pointer if the null character was found. */
-static char *goWhile(char *str, char const *set)
-{
-    for (; *str != '\0'; ++str)
-    {
-        if (!isOneOfThem(*str, set))
-            return str;
-    }
-    return 0;
-}
-
-/** Set of characters that defines a blank. */
-static char const *const blank = " \n\r\t\f";
-
-/** Increases a pointer while it points to a white space character.
- * @param str The initial pointer value.
- * @return The final pointer value or null pointer if the null character was found. */
-static char *goBlank(char *str)
-{
-    return goWhile(str, blank);
-}
-
-/** Increases a pointer while it points to a decimal digit character.
- * @param str The initial pointer value.
- * @return The final pointer value or null pointer if the null character was found. */
-static char *goNum(char *str)
-{
-    for (; *str != '\0'; ++str)
-    {
-        if (!isdigit((int)(*str)))
-            return str;
-    }
-    return 0;
-}
-
-/** Set of characters that defines the end of an array or a JSON object. */
-static char const *const endofblock = "}]";
-
-/** Set a char to '\0' and increase its pointer if the char is different to '}' or ']'.
- * @param ch Pointer to character.
- * @return  Final value pointer. */
-static char *setToNull(char *ch)
-{
-    if (!isOneOfThem(*ch, endofblock))
-        *ch++ = '\0';
-    return ch;
-}
-
-/** Indicate if a character is the end of a primitive value. */
-static bool isEndOfPrimitive(char ch)
-{
-    return ch == ',' || isOneOfThem(ch, blank) || isOneOfThem(ch, endofblock);
 }

@@ -116,15 +116,13 @@ Images *create_images()
 
 void image_load_assets(Images *images, Display *display)
 {
-    printf("Image width:%d\n", images->statusPageImage->width);
     loading_overlay_display(display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
-    printf("Image name:%s\n", images->statusPageImage->name);
     display_load_image(display, images->navigationImage);
 
-    loading_overlay_display(display, "Loading Image: keyboard", OVERLAY_TYPE_LOADING);
-    printf("Image name:%s\n", images->keyboardImage->name);
-    display_load_image(display, images->keyboardImage);
-    printf("Image name:%s\n", images->keyboardImage->name);
+    // loading_overlay_display(display, "Loading Image: keyboard", OVERLAY_TYPE_LOADING);
+    // printf("Image name:%s\n", images->keyboardImage->name);
+    // display_load_image(display, images->keyboardImage);
+
     loading_overlay_display(display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
     display_load_image(display, images->manualPageImage);
 
