@@ -62,6 +62,125 @@ void status_page_destroy(StatusPage *page)
 void status_page_run(StatusPage *page)
 {
     printf("Status page running\n");
+
+    int padding = 8;
+    // Create Background
+    Module *root = module_create(NULL);
+    Module *background = module_create(root);
+    module_set_rectangle_circle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
+    module_set_position(background, 0, 0);
+    module_set_padding(background, padding, padding);
+    module_set_color(background, BACKCOLOR, BACKCOLOR);
+
+    // Create machine state window
+    Module *machineStateWindow = module_create(background);
+    module_set_rectangle_circle(machineStateWindow, SCREEN_WIDTH / 3 - padding * 3, 0);
+    module_fit_height(machineStateWindow);
+    module_set_padding(machineStateWindow, padding, padding);
+    module_set_color(machineStateWindow, MAINCOLOR, BACKCOLOR);
+    module_align_space_even(machineStateWindow, 1, 3);
+    module_align_inner_top(machineStateWindow);
+
+    // Create machine state window title
+    Module *machineStateWindowTitle = module_create(machineStateWindow);
+    module_set_padding(machineStateWindowTitle, padding, padding);
+    module_set_text(machineStateWindowTitle, "Machine State");
+    module_set_font(machineStateWindowTitle, RA8876_CHAR_HEIGHT_32);
+    module_set_color(machineStateWindowTitle, COLOR65K_BLACK, MAINCOLOR);
+    module_align_inner_top(machineStateWindowTitle);
+    module_align_center(machineStateWindowTitle);
+    module_add_underline(machineStateWindowTitle);
+
+    Module *chargePumpText = module_create(machineStateWindow);
+    module_set_padding(chargePumpText, padding, padding);
+    module_set_text(chargePumpText, "Charge Pump");
+    module_set_font(chargePumpText, RA8876_CHAR_HEIGHT_24);
+    module_set_color(chargePumpText, COLOR65K_BLACK, MAINCOLOR);
+    module_align_below(chargePumpText, machineStateWindowTitle);
+    module_align_inner_left(chargePumpText);
+
+    Module *switchedPowerText = module_create(machineStateWindow);
+    module_copy(switchedPowerText, chargePumpText);
+    module_set_text(switchedPowerText, "Switched Power");
+    module_align_below(switchedPowerText, chargePumpText);
+
+    Module *estSwitchText = module_create(machineStateWindow);
+    module_copy(estSwitchText, chargePumpText);
+    module_set_text(estSwitchText, "ESD Switch");
+    module_align_below(estSwitchText, switchedPowerText);
+
+    Module *esdUpperText = module_create(machineStateWindow);
+    module_copy(esdUpperText, chargePumpText);
+    module_set_text(esdUpperText, "ESD Upper");
+    module_align_below(esdUpperText, estSwitchText);
+
+    Module *estLowerText = module_create(machineStateWindow);
+    module_copy(estLowerText, chargePumpText);
+    module_set_text(estLowerText, "ESD Lower");
+    module_align_below(estLowerText, esdUpperText);
+
+    Module *servoReadyText = module_create(machineStateWindow);
+    module_copy(servoReadyText, chargePumpText);
+    module_set_text(servoReadyText, "Servo Ready");
+    module_align_below(servoReadyText, estLowerText);
+
+    Module *forceGaugeComText = module_create(machineStateWindow);
+    module_copy(forceGaugeComText, chargePumpText);
+    module_set_text(forceGaugeComText, "Force Comm");
+    module_align_below(forceGaugeComText, servoReadyText);
+
+    Module *servoComText = module_create(machineStateWindow);
+    module_copy(servoComText, chargePumpText);
+    module_set_text(servoComText, "Servo Comm");
+    module_align_below(servoComText, forceGaugeComText);
+
+    Module *forceGaugeText = module_create(machineStateWindow);
+    module_copy(forceGaugeText, chargePumpText);
+    module_set_text(forceGaugeText, "Force Gauge");
+    module_align_below(forceGaugeText, servoComText);
+
+    // Create machine info window
+    Module *machineInfoWindow = module_create(background);
+    module_set_rectangle_circle(machineInfoWindow, SCREEN_WIDTH / 3 - padding * 3, 0);
+    module_fit_height(machineInfoWindow);
+    module_set_padding(machineInfoWindow, padding, padding);
+    module_set_color(machineInfoWindow, MAINCOLOR, BACKCOLOR);
+    module_align_space_even(machineInfoWindow, 2, 3);
+    module_align_inner_top(machineInfoWindow);
+
+    // Create machine info window title
+    Module *machineInfoWindowTitle = module_create(machineInfoWindow);
+    module_set_padding(machineInfoWindowTitle, padding, padding);
+    module_set_text(machineInfoWindowTitle, "Machine Info");
+    module_set_font(machineInfoWindowTitle, RA8876_CHAR_HEIGHT_32);
+    module_set_color(machineInfoWindowTitle, COLOR65K_BLACK, MAINCOLOR);
+    module_align_inner_top(machineInfoWindowTitle);
+    module_align_center(machineInfoWindowTitle);
+    module_add_underline(machineInfoWindowTitle);
+
+    Module *forceText = module_create(machineInfoWindow);
+    module_set_padding(forceText, padding, padding);
+    module_set_text(forceText, "Force (N)");
+    module_set_font(forceText, RA8876_CHAR_HEIGHT_24);
+    module_set_color(forceText, COLOR65K_BLACK, MAINCOLOR);
+    module_align_below(forceText, machineInfoWindowTitle);
+    module_align_inner_left(forceText);
+
+    Module *positionText = module_create(machineInfoWindow);
+    module_copy(positionText, forceText);
+    module_set_text(positionText, "Position (mm)");
+    module_align_below(positionText, forceText);
+
+    module_draw(page->display, root);
+
+    while (page->complete == false)
+    {
+    }
+}
+
+void status_page_run_old(StatusPage *page)
+{
+    printf("Status page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
