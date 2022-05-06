@@ -217,7 +217,7 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
                 }
                 else
                 {
-                    forceCalibration.slope = (float)(force - forceCalibration.zero) / forceFloat; // steps/mN
+                    forceCalibration.slope = (float)(force - forceCalibration.zero) / (1000 * forceFloat); // steps/mN
                     strcpy(buf, "Update new values?");
                     actionStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
                     actionStartY = calibrateStartY + 35;
