@@ -134,6 +134,38 @@ static void state_machine_update(MachineState *machineState)
     machineState->state = state_machine_motion(machineState);
 }
 
+bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2)
+{
+    return selfCheckParameters1->chargePump == selfCheckParameters2->chargePump;
+}
+
+bool state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2)
+{
+    return motionParameters1->switchedPower == motionParameters2->switchedPower &&
+           motionParameters1->esdTravelLimit == motionParameters2->esdTravelLimit &&
+           motionParameters1->esdSwitch == motionParameters2->esdSwitch &&
+           motionParameters1->servoOK == motionParameters2->servoOK &&
+           motionParameters1->forceGaugeCom == motionParameters2->forceGaugeCom &&
+           motionParameters1->servoCom == motionParameters2->servoCom &&
+           motionParameters1->rtcCom == motionParameters2->rtcCom;
+}
+
+bool state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2)
+{
+    return motionParameters1->status == motionParameters2->status &&
+           motionParameters1->mode == motionParameters2->mode &&
+           motionParameters1->condition == motionParameters2->condition;
+}
+
+bool state_machine_equal(MachineState *machineState1, MachineState *machineState2)
+{
+    return state_machine_self_check_equal(&machineState1->selfCheckParameters, &machineState2->selfCheckParameters) &&
+           state_machine_check_equal(&machineState1->machineCheckParameters, &machineState2->machineCheckParameters) &&
+           state_machine_motion_equal(&machineState1->motionParameters, &machineState2->motionParameters) &&
+           machineState1->state == machineState2->state &&
+           machineState1->function == machineState2->function &&
+           machineState1->functionData == machineState2->functionData;
+}
 void state_machine_set(MachineState *machineState, Parameter param, int state)
 {
     switch (param)

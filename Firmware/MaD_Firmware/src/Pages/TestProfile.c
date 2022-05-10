@@ -1,7 +1,6 @@
 #include "TestProfile.h"
 #include "Explorer.h"
 #include "motionPlanning.h"
-#include "Graph.h"
 
 #define BUTTONCOUNT 3
 #define BUTTON_NAVIGATION 0
@@ -383,11 +382,11 @@ void test_profile_page_run(TestProfilePage *page)
         graph1Data[i] = 0;
     }
     Module *graph1 = module_create(background);
-    module_set_graph(graph1, graph1Data, 100, "mm", "Profile");
-    module_set_padding(graph1, padding, padding);
-    module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
-    module_align_right(graph1, editWindow);
-    module_align_inner_top(graph1);
+    /*    module_set_graph(graph1, graph1Data, 100, "mm", "Profile");
+        module_set_padding(graph1, padding, padding);
+        module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
+        module_align_right(graph1, editWindow);
+        module_align_inner_top(graph1);*/
 
     // Create Buttons
 

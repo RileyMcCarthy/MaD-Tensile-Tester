@@ -4,17 +4,15 @@
 #include "RA8876.h"
 #include "StateMachine.h"
 #include "Button.h"
+#include "Module.h"
 
 typedef struct FunctionWindow_t
 {
     Display *display;
-    Button *buttons;
-    int x, y;
     MachineState *state;
-    MachineState lastState;
 } FunctionWindow;
 
-FunctionWindow *function_window_create(Display *display, MachineState *state, int x, int y);
+void function_window_create(Module *container, MachineState *state);
 void function_window_destroy(FunctionWindow *window);
 void function_window_update(FunctionWindow *window);
 

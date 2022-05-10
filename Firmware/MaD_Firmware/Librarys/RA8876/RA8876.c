@@ -825,7 +825,6 @@ void display_bte_memory_copy_with_chroma_key(Display *display, uint32_t s0_addr,
   lcdRegDataWrite(display, RA8876_BTE_CTRL0, RA8876_BTE_ENABLE << 4);                                                                                    // 90h
   check2dBusy(display);
 }
-
 //**************************************************************//
 // write data after setting
 //**************************************************************//
@@ -1463,7 +1462,7 @@ uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t n
   return retVal;
 }
 
-void display_update_touch(Display *display)
+int display_update_touch(Display *display)
 {
   int touchCount = readGT9271TouchLocation(display, display->location, 1);
   if (display->lastLocation[0].x != display->location[0].x || display->lastLocation[0].y != display->location[0].y)
@@ -1475,6 +1474,7 @@ void display_update_touch(Display *display)
     display->locationCount = 0;
   }
   display->lastLocation[0] = display->location[0];
+  return touchCount;
 }
 
 /*
@@ -1547,7 +1547,6 @@ void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int
   default:
     break;
   }
-
   if (image->backgroundColor != NULL)
   {
     display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->backgroundColor);

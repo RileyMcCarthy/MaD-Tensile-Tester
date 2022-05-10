@@ -1,5 +1,5 @@
 #include "Module.h"
-#include "Graph.h"
+
 Module *module_create(Module *parent)
 {
     Module *module = (Module *)malloc(sizeof(Module));
@@ -35,12 +35,19 @@ int module_touch_check(Module *root, Display *display, void *arg)
     {
         return 0;
     }
+    if (root->type == MODULE_WINDOW)
+    {
+        arg = root->data;
+    }
     int touchCount = 0;
     for (int i = 0; i < root->numChildren; i++)
     {
         touchCount += module_touch_check(root->child[i], display, arg);
     }
-
+    if (root->onTouch == NULL)
+    {
+        return 0;
+    }
     if (((SCREEN_WIDTH - display->location[0].x) > root->x) && ((SCREEN_WIDTH - display->location[0].x) < (root->x + root->w)))
     {
         if (((SCREEN_HEIGHT - display->location[0].y) > root->y) && ((SCREEN_HEIGHT - display->location[0].y) < (root->y + root->h)))
@@ -74,11 +81,43 @@ void module_copy(Module *to, Module *from)
     to->foregroundColor = from->foregroundColor;
 }
 
+void module_save(Module *module, Display *display)
+{
+    display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, module->x, module->y, PAGE3_START_ADDR, SCREEN_WIDTH, module->x, module->y, module->w, module->h);
+}
+
+void module_paste(Module *module, Display *display)
+{
+    display_bte_memory_copy(display, PAGE3_START_ADDR, SCREEN_WIDTH, module->x, module->y, PAGE1_START_ADDR, SCREEN_WIDTH, module->x, module->y, module->w, module->h);
+}
+
+void module_graph_add_marker(Module *module, float value)
+{
+    Graph *graph = (Graph *)module->data;
+    if (graph->markerCount < MAX_GRAPH_MARKERS)
+    {
+        graph->markerY[graph->markerCount] = value;
+        graph->markerCount++;
+    }
+}
+
+void module_set_window(Module *module, void *window)
+{
+    module->type = MODULE_WINDOW;
+    module->data = window;
+}
+
 void module_set_line(Module *module, int w)
+{
+    module_set_line_one(module, w, 0);
+}
+
+void module_set_line_one(Module *module, int x, int y)
 {
     module->type = MODULE_LINE;
     module->data = NULL;
-    module->w = w;
+    module->w = x;
+    module->h = y;
 }
 
 void module_set_rectangle(Module *module, int w, int h)
@@ -97,18 +136,80 @@ void module_set_rectangle_circle(Module *module, int w, int h)
     module->h = h;
 }
 
-void module_set_graph(Module *module, double *data, int dataCount, const char *units, const char *title)
+// Makes a empty window a graph, have position and size already defined
+// Creates an empty graph that has data of size of the centerLine in pixels
+void module_set_graph(Module *window)
 {
-    Graph *graph = (Graph *)malloc(sizeof(Graph));
-    graph->data = data;
-    graph->dataCount = dataCount;
-    graph->units = (char *)malloc(strlen(units) + 1);
-    strcpy(graph->units, units);
-    graph->title = (char *)malloc(sizeof(char) * (strlen(title) + 1));
-    strcpy(graph->title, title);
+    window->type = MODULE_GRAPH;
 
-    module->type = MODULE_GRAPH;
-    module->data = graph;
+    Graph *graph = (Graph *)malloc(sizeof(Graph));
+
+    // Create Title
+    Module *title = module_create(window);
+    module_set_padding(title, 10, 10);
+    module_set_text(title, graph->title);
+    module_set_font(title, RA8876_CHAR_HEIGHT_32);
+    module_set_color(title, COLOR65K_BLACK, title->parent->foregroundColor);
+    module_align_inner_top(title);
+    module_align_center(title);
+    module_add_underline(title);
+
+    // Create Graph Area
+    Module *graphArea = module_create(window);
+    module_align_below(graphArea, title);
+    module_fit_below(graphArea, title);
+    module_fit_width(graphArea);
+    module_fit_height(graphArea);
+    module_align_inner_left(graphArea);
+    module_set_color(graphArea, graphArea->parent->foregroundColor, graphArea->parent->backgroundColor);
+    module_set_padding(graphArea, 0, 0);
+
+    // Create Graph Horizontal Line
+    Module *centerLine = module_create(graphArea);
+    module_set_rectangle(centerLine, 0, 0);
+    module_fit_width(centerLine);
+    module_align_center(centerLine);
+    module_align_middle(centerLine);
+    module_set_color(centerLine, COLOR65K_BLACK, COLOR65K_BLACK);
+
+    // Create Graph Vertical Line
+    Module *verticleLine = module_create(graphArea);
+    module_set_rectangle(verticleLine, 0, 0);
+    module_fit_height(verticleLine);
+    module_align_inner_left(verticleLine);
+    module_align_inner_top(verticleLine);
+    module_set_color(verticleLine, COLOR65K_BLACK, COLOR65K_BLACK);
+
+    graph->graphArea = graphArea;
+    graph->dataCount = 0; // Start Graph with no data
+
+    window->data = graph;
+}
+
+void module_graph_insert(Module *module, double value)
+{
+    Graph *graph = (Graph *)module->data;
+    if (graph->dataCount < graph->graphArea->w) // If there is space in the graph, insert at end
+    {
+        graph->data = realloc(graph->data, (graph->dataCount + 1) * sizeof(double));
+        graph->data[graph->dataCount] = value;
+        graph->dataCount++;
+    }
+    else // If there is no space in the graph, remove the first value and insert at end
+    {
+        for (int i = 0; i < graph->dataCount - 1; i++)
+        {
+            graph->data[i] = graph->data[i + 1];
+        }
+        graph->data[graph->dataCount - 1] = value;
+    }
+}
+
+void module_graph_set_range(Module *module, float maxY, float minY)
+{
+    Graph *graph = (Graph *)module->data;
+    graph->maxY = maxY;
+    graph->minY = minY;
 }
 
 void module_set_image(Module *module, Image *image)
@@ -153,7 +254,7 @@ void module_set_font(Module *module, int font)
     }
     case RA8876_CHAR_HEIGHT_24:
     {
-        module->h = 32;
+        module->h = 24;
         module->w = 12 * strlen((char *)module->data);
         break;
     }
@@ -272,6 +373,11 @@ void module_align_space_even(Module *module, int section, int sections)
     module->x = module->parent->x + module->parent->px + section * (module->parent->w - 2 * module->parent->px - sections * module->w) / (sections + 1) + (section - 1) * module->w;
 }
 
+void module_align_space_even_verticle(Module *module, int section, int sections)
+{
+    module->y = module->parent->y + module->parent->py + section * (module->parent->h - 2 * module->parent->py - sections * module->h) / (sections + 1) + (section - 1) * module->h;
+}
+
 void module_align_above(Module *module, Module *ref)
 {
     module->y = ref->y - module->h - ref->py;
@@ -292,6 +398,16 @@ void module_align_right(Module *module, Module *ref)
     module->x = ref->x + ref->w + ref->px;
 }
 
+void module_fit_space_even(Module *module, int sections)
+{
+    module->w = (module->parent->w - 2 * module->parent->px - (sections - 0) * module->px) / sections;
+}
+
+void module_fit_space_even_verticle(Module *module, int sections)
+{
+    module->h = (module->parent->h - 2 * module->parent->py - (sections - 0) * module->py) / sections;
+}
+
 void module_fit_height(Module *module)
 {
     module->h = module->parent->h - module->parent->py - module->parent->py;
@@ -299,8 +415,8 @@ void module_fit_height(Module *module)
 
 void module_fit_below(Module *module, Module *ref)
 {
-    module->y = ref->y + ref->h + ref->py;
-    module->h = module->parent->h - module->parent->py - ref->y - ref->h - ref->py;
+    module_align_below(module, ref);
+    module->h = module->parent->h - 2 * module->parent->py - ref->h - ref->py;
 }
 
 void module_fit_width(Module *module)
@@ -342,6 +458,33 @@ void module_draw(Display *display, Module *module)
     case MODULE_IMAGE:
     {
         display_bte_memory_copy_image(display, (Image *)module->data, module->x, module->y);
+        /*int pageAddr = 0;
+        switch (image->page)
+        {
+        case 1:
+            pageAddr = PAGE1_START_ADDR;
+            break;
+        case 2:
+            pageAddr = PAGE2_START_ADDR;
+            break;
+        case 3:
+            pageAddr = PAGE3_START_ADDR;
+            break;
+        default:
+            break;
+        }
+        if (module->backgroundColor != NULL)
+        {
+            display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, module->x, module->y, image->width, image->height, image->backgroundColor);
+        }
+        else
+        {
+            display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
+        }
+        if (module->foregroundColor != NULL)
+        {
+            display_bte_mpu_write_color_expansion_with_chroma_key(display, pageAddr, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->foregroundColor, image->backgroundColor)
+        }*/
         break;
     }
     case MODULE_LINE:
@@ -363,7 +506,20 @@ void module_draw(Display *display, Module *module)
     case MODULE_GRAPH:
     {
         Graph *graph = (Graph *)module->data;
-        graph_draw_static(display, graph, module->x, module->y, module->w, module->h);
+
+        double factor = (double)graph->graphArea->w / (double)graph->dataCount;
+        double range = graph->maxY - graph->minY;
+        int lastX = graph->graphArea->x + (0 * factor);
+        int lastY = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / range));
+        for (int i = 1; i < graph->dataCount; i++)
+        {
+            int x = graph->graphArea->x + (i * factor);
+            int y = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[i] * (double)((graph->graphArea->h / 2) / range));
+            display_draw_line(display, lastX, lastY, x, y, COLOR65K_RED);
+            // printf("creating point at: %d, %d,%f\n", x, y, graph->data[i]);
+            lastX = x;
+            lastY = y;
+        }
         break;
     }
     }
@@ -372,6 +528,17 @@ void module_draw(Display *display, Module *module)
     {
         module_draw(display, module->child[i]);
     }
+}
+
+void module_destroy_children(Module *module)
+{
+    for (int i = 0; i < module->numChildren; i++)
+    {
+        Module *toDestroy = module->child[i];
+        module_trim(toDestroy);    // Remove child from parent
+        module_destroy(toDestroy); // Destroy child
+    }
+    module->numChildren = 0;
 }
 
 void module_trim(Module *module)

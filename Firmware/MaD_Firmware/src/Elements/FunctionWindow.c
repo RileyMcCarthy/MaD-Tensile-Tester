@@ -3,7 +3,7 @@
 #include "style.h"
 #define BUTTONCOUNT 7
 
-static void check_buttons(FunctionWindow *window)
+/*static void check_buttons(FunctionWindow *window)
 {
     button_update(window->display);
     if (button_check(window->display, window->buttons, BUTTONCOUNT) > 0)
@@ -16,19 +16,95 @@ static void check_buttons(FunctionWindow *window)
             }
         }
     }
+}*/
+
+static void button_set_function(int id, void *arg)
+{
+    FunctionWindow *window = (FunctionWindow *)arg;
+    state_machine_set(window->state, PARAM_FUNCTION, id);
 }
 
-FunctionWindow *function_window_create(Display *display, MachineState *state, int x, int y)
+void function_window_create(Module *container, MachineState *state)
 {
-    FunctionWindow *window = (FunctionWindow *)malloc(sizeof(FunctionWindow));
-    window->display = display;
-    window->state = state;
-    window->x = x;
-    window->y = y;
-    Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
-    window->buttons = buttons;
 
-    buttons[0].name = FUNC_MANUAL_OFF;
+    FunctionWindow *window = (FunctionWindow *)malloc(sizeof(FunctionWindow));
+    window->state = state;
+
+    int padding = 8;
+
+    module_set_window(container, window);
+
+    // Create edit window
+    Module *functionWindow = module_create(container);
+    module_set_rectangle_circle(functionWindow, 0, 0);
+    module_fit_height(functionWindow);
+    module_fit_width(functionWindow);
+    module_set_padding(functionWindow, 0, 0);
+    module_set_color(functionWindow, MAINCOLOR, BACKCOLOR);
+    module_align_inner_left(functionWindow);
+    module_align_inner_top(functionWindow);
+
+    // Create Function Header
+    Module *functionHeader = module_create(functionWindow);
+    module_set_padding(functionHeader, padding, padding);
+    module_set_text(functionHeader, "Off");
+    module_set_font(functionHeader, RA8876_CHAR_HEIGHT_24);
+    module_set_color(functionHeader, COLOR65K_BLACK, functionHeader->parent->foregroundColor);
+    module_align_center(functionHeader);
+    module_align_inner_top(functionHeader);
+
+    // Create Button Area
+    Module *buttonArea = module_create(functionWindow);
+    module_set_padding(buttonArea, 0, 0);
+    module_fit_width(buttonArea);
+    module_fit_below(buttonArea, functionHeader);
+    module_align_inner_left(buttonArea);
+    module_align_below(buttonArea, functionHeader);
+
+    // Create Open Button
+    Module *offButton = module_create(buttonArea);
+    module_set_rectangle_circle(offButton, 0, 0);
+    module_set_color(offButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_set_padding(offButton, padding, padding);
+    module_fit_space_even(offButton, 3);
+    module_fit_space_even_verticle(offButton, 3);
+    module_align_space_even(offButton, 1, 3);
+    module_align_inner_top(offButton);
+    module_touch_callback(offButton, button_set_function, FUNC_MANUAL_OFF);
+
+    // Create Incremental Jog Button
+    Module *incrementalButton = module_create(buttonArea);
+    module_copy(incrementalButton, offButton);
+    module_align_space_even(incrementalButton, 2, 3);
+
+    // Create Continuous Jog Button
+    Module *continuousButton = module_create(buttonArea);
+    module_copy(continuousButton, offButton);
+    module_align_space_even(continuousButton, 3, 3);
+
+    // Create Position Move Button
+    Module *positionalMoveButton = module_create(buttonArea);
+    module_copy(positionalMoveButton, offButton);
+    module_align_space_even(positionalMoveButton, 1, 3);
+    module_align_below(positionalMoveButton, offButton);
+
+    // Create Home Button
+    Module *homeButton = module_create(buttonArea);
+    module_copy(homeButton, positionalMoveButton);
+    module_align_space_even(homeButton, 2, 3);
+
+    // Create Gauge Force Button
+    Module *gaugeForceButton = module_create(buttonArea);
+    module_copy(gaugeForceButton, homeButton);
+    module_align_space_even(gaugeForceButton, 3, 3);
+
+    // Create Gauge Length Button
+    Module *gaugeLengthButton = module_create(buttonArea);
+    module_copy(gaugeLengthButton, offButton);
+    module_align_space_even(gaugeLengthButton, 1, 3);
+    module_align_below(gaugeLengthButton, positionalMoveButton);
+
+    /*buttons[0].name = FUNC_MANUAL_OFF;
     buttons[0].xmin = window->x + 5;
     buttons[0].xmax = buttons[0].xmin + 100;
     buttons[0].ymin = window->y + 35;
@@ -82,15 +158,13 @@ FunctionWindow *function_window_create(Display *display, MachineState *state, in
     buttons[6].ymin = buttons[5].ymax + 5;
     buttons[6].ymax = buttons[6].ymin + 50;
     buttons[6].pressed = false;
-    buttons[6].lastPress = 0;
-    return window;
+    buttons[6].lastPress = 0;*/
 }
 void function_window_destroy(FunctionWindow *window)
 {
-    free(window->buttons);
     free(window);
 }
-void function_window_update(FunctionWindow *window)
+/*void function_window_update(FunctionWindow *window)
 {
     check_buttons(window);
 
@@ -103,6 +177,9 @@ void function_window_update(FunctionWindow *window)
         return;
 
     display_draw_circle_square_fill(window->display, window->x, window->y, window->x + 320, window->y + 200, 20, 20, MAINCOLOR);
+
+    display_set_text_parameter1(window->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(window->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
 
     display_text_color(window->display, MAINTEXTCOLOR, MAINCOLOR);
 
@@ -145,7 +222,6 @@ void function_window_update(FunctionWindow *window)
     }
     display_draw_string(window->display, window->x + 10, window->y + 10, buf);
 
-    /*Machine Toggle Button*/
     int outlineColor = COLOR65K_BLACK;
     int innerColor = COLOR65K_BLACK;
     int textColor = COLOR65K_BLACK;
@@ -336,3 +412,4 @@ void function_window_update(FunctionWindow *window)
 
     window->lastState = *window->state;
 }
+*/

@@ -67,7 +67,7 @@ MachineProfile *load_machine_profile()
   profile->configuration->positionEncoderType = (char *)malloc(strlen(positionEncoderType) + 1);
   strcpy(profile->configuration->positionEncoderType, positionEncoderType);
 
-  profile->configuration->positionEncoderStepsPerRev = (4095 * 4); //(LINE_NUM*4steps/rev)/(GEAR_PITCH*GEAR_TEETHmm/rev) = step/mm
+  profile->configuration->positionEncoderStepsPerRev = 100; //(LINE_NUM*4steps/rev)/(GEAR_PITCH*GEAR_TEETHmm/rev) = step/mm
 
   char *forceGauge = "DS2-5N";
   profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);

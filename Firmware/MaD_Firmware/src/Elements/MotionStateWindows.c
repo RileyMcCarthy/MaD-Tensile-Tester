@@ -100,6 +100,9 @@ void motion_state_window_update(MotionStateWindow *window)
         return;
     display_draw_circle_square_fill(window->display, window->x, window->y, window->x + 320, window->y + 90, 20, 20, MAINCOLOR);
 
+    display_set_text_parameter1(window->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
+    display_set_text_parameter2(window->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+
     display_text_color(window->display, MAINTEXTCOLOR, MAINCOLOR);
     display_draw_string(window->display, window->buttons[0].xmin + 20, window->y + 5, "Status");
     display_draw_string(window->display, window->buttons[1].xmin, window->y + 5, "Condition");

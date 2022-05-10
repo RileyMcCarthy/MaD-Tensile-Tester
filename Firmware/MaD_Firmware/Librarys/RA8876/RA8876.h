@@ -897,7 +897,7 @@ void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uin
 uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
 uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
 void button_update(Display *display);
-void display_update_touch(Display *display);
+int display_update_touch(Display *display);
 /*access*/
 void lcdRegWrite(Display *display, uint8_t reg);
 void lcdDataWrite(Display *display, uint8_t data);
