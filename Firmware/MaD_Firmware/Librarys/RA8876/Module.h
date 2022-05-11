@@ -33,6 +33,7 @@ typedef struct Module_s
     int debouncems;
     int touchId;
     void (*onTouch)(int id, void *arg);
+    void (*onUpdate)(struct Module_s *module, void *arg);
 } Module;
 
 typedef struct graph_t
@@ -49,6 +50,9 @@ typedef struct graph_t
 } Graph;
 
 Module *module_create(Module *parent);
+
+void module_update_callback(Module *module, void (*onUpdate)(Module *module, void *arg));
+void module_update_check(Module *module, void *arg);
 
 void module_touch_callback(Module *module, void (*onTouch)(int id, void *page), int id);
 int module_touch_check(Module *root, Display *display, void *arg);

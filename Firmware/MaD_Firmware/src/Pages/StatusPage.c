@@ -263,13 +263,22 @@ void status_page_run(StatusPage *page)
     // Create Function Window Container
     Module *functionWindow = module_create(background);
     module_set_padding(functionWindow, padding, padding);
-    // module_set_rectangle_circle(functionWindow, 0, 0);
-    // module_set_color(functionWindow, MAINCOLOR, BACKCOLOR);
     module_set_size(functionWindow, 0, 200);
     module_fit_space_even(functionWindow, 3);
     module_align_space_even(functionWindow, 3, 3);
     module_align_inner_bottom(functionWindow);
+
     function_window_create(functionWindow, page->stateMachine);
+
+    // Create Function Window Container
+    Module *motionStateWindow = module_create(background);
+    module_set_padding(motionStateWindow, padding, padding);
+    module_set_size(motionStateWindow, 0, 100);
+    module_fit_space_even(motionStateWindow, 3);
+    module_align_space_even(motionStateWindow, 3, 3);
+    module_align_above(motionStateWindow, functionWindow);
+
+    motion_state_window_create(motionStateWindow, page->stateMachine);
 
     module_draw(page->display, root);
 
@@ -394,9 +403,14 @@ void status_page_run(StatusPage *page)
         }
 
         module_touch_check(root, page->display, page); // Check for button presses
+        module_update_check(root, page);
 
         module_draw(page->display, positionGraph);
         module_draw(page->display, machineStateImages);
+
+        module_draw(page->display, functionWindow);
+        module_draw(page->display, motionStateWindow);
+
         if (updateMachineState)
         {
             module_draw(page->display, machineStateWindow);

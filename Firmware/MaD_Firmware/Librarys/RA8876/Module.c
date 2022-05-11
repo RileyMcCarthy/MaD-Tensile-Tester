@@ -23,6 +23,27 @@ Module *module_create(Module *parent)
     return module;
 }
 
+void module_update_callback(Module *module, void (*onUpdate)(Module *module, void *arg))
+{
+    module->onUpdate = onUpdate;
+}
+
+void module_update_check(Module *module, void *arg)
+{
+    if (module->type == MODULE_WINDOW)
+    {
+        arg = module->data;
+    }
+    for (int i = 0; i < module->numChildren; i++)
+    {
+        module_update_check(module->child[i], arg);
+    }
+    if (module->onUpdate != NULL)
+    {
+        module->onUpdate(module, arg);
+    }
+}
+
 void module_touch_callback(Module *module, void (*onTouch)(int id, void *page), int id)
 {
     module->onTouch = onTouch;
@@ -46,7 +67,7 @@ int module_touch_check(Module *root, Display *display, void *arg)
     }
     if (root->onTouch == NULL)
     {
-        return 0;
+        // return 0;
     }
     if (((SCREEN_WIDTH - display->location[0].x) > root->x) && ((SCREEN_WIDTH - display->location[0].x) < (root->x + root->w)))
     {
@@ -416,7 +437,7 @@ void module_fit_height(Module *module)
 void module_fit_below(Module *module, Module *ref)
 {
     module_align_below(module, ref);
-    module->h = module->parent->h - 2 * module->parent->py - ref->h - ref->py;
+    module->h = module->parent->h - 2 * module->parent->py - ref->h - 2 * ref->py;
 }
 
 void module_fit_width(Module *module)
@@ -458,33 +479,6 @@ void module_draw(Display *display, Module *module)
     case MODULE_IMAGE:
     {
         display_bte_memory_copy_image(display, (Image *)module->data, module->x, module->y);
-        /*int pageAddr = 0;
-        switch (image->page)
-        {
-        case 1:
-            pageAddr = PAGE1_START_ADDR;
-            break;
-        case 2:
-            pageAddr = PAGE2_START_ADDR;
-            break;
-        case 3:
-            pageAddr = PAGE3_START_ADDR;
-            break;
-        default:
-            break;
-        }
-        if (module->backgroundColor != NULL)
-        {
-            display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, module->x, module->y, image->width, image->height, image->backgroundColor);
-        }
-        else
-        {
-            display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
-        }
-        if (module->foregroundColor != NULL)
-        {
-            display_bte_mpu_write_color_expansion_with_chroma_key(display, pageAddr, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->foregroundColor, image->backgroundColor)
-        }*/
         break;
     }
     case MODULE_LINE:

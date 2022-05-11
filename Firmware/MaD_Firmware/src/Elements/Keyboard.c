@@ -120,6 +120,7 @@ static bool key_pressed(int id, void *arg)
 {
     Keyboard *keyboard = (Keyboard *)arg;
     keyboard->keyboard_buffer = (char *)realloc(keyboard->keyboard_buffer, strlen(keyboard->keyboard_buffer) + 2);
+    printf("%s\n", keyboard->keyboard_buffer);
     switch (id)
     {
     case key_del:
@@ -317,6 +318,7 @@ char *keyboard_get_input(Keyboard *keyboard, const char *prompt)
         strcpy(temp, prompt);
         strcat(temp, keyboard->keyboard_buffer);
         module_set_text(topBarText, temp);
+        module_set_font(topBarText, RA8876_CHAR_HEIGHT_32);
         module_align_center(topBarText);
         module_align_middle(topBarText);
         free(temp);

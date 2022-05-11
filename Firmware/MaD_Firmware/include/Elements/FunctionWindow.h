@@ -8,7 +8,6 @@
 
 typedef struct FunctionWindow_t
 {
-    Display *display;
     MachineState *state;
 } FunctionWindow;
 
