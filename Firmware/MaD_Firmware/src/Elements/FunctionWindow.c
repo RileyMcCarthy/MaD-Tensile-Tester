@@ -57,10 +57,10 @@ static void update_header(Display *display, Module *module, void *arg)
             sprintf(buf, "HOMING COMPLETE");
         break;
     case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
-        sprintf(buf, "MOVE GAUGE LENGTH: %dmm", window->state->functionData / 1000);
+        sprintf(buf, "GAUGE LENGTH: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_MOVE_FORCE:
-        sprintf(buf, "MOVE GAUGE FORCE: %dmN", window->state->functionData);
+        sprintf(buf, "GAUGE FORCE: %dmN", window->state->functionData);
         break;
     default:
         sprintf(buf, "OFF");
@@ -70,9 +70,6 @@ static void update_header(Display *display, Module *module, void *arg)
     if (strcmp(buf, module->data) != 0)
     {
         module_set_text(module, buf);
-        module_set_font(module, RA8876_CHAR_HEIGHT_24);
-        module_align_center(module);
-        module_align_inner_top(module);
         module_draw(display, module);
     }
 }
@@ -385,10 +382,11 @@ void function_window_create(Module *container, MachineState *state)
     // Create Function Header
     Module *functionHeader = module_create(functionWindow);
     module_set_padding(functionHeader, padding, padding);
-    module_set_text_box(functionHeader, "Off", 20);
+    module_set_text(functionHeader, "Off");
+    module_text_max_char(functionHeader, 20);
     module_set_font(functionHeader, RA8876_CHAR_HEIGHT_24);
     module_set_color(functionHeader, COLOR65K_BLACK, functionHeader->parent->foregroundColor);
-    module_align_center(functionHeader);
+    module_text_align(functionHeader, MODULE_TEXT_ALIGN_CENTER); // used for dynamic updating of alignment
     module_align_inner_top(functionHeader);
     module_update_callback(functionHeader, update_header);
 

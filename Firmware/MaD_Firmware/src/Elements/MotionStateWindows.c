@@ -42,119 +42,14 @@ static void button_callback(int id, void *arg)
     }
 }
 
-void motion_state_window_create(Module *container, MachineState *state)
+static void update_status(Display *display, Module *module, void *arg)
 {
-    MotionStateWindow *window = (MotionStateWindow *)malloc(sizeof(MotionStateWindow));
-    window->state = state;
+    MotionStateWindow *window = (MotionStateWindow *)arg;
 
-    module_set_window(container, window);
-
-    int padding = 8;
-
-    // Create edit window
-    Module *motionStateWindow = module_create(container);
-    module_set_rectangle_circle(motionStateWindow, 0, 0);
-    module_fit_height(motionStateWindow);
-    module_fit_width(motionStateWindow);
-    module_set_padding(motionStateWindow, 0, 0);
-    module_set_color(motionStateWindow, MAINCOLOR, BACKCOLOR);
-    module_align_inner_left(motionStateWindow);
-    module_align_inner_top(motionStateWindow);
-
-    // Create Status Header
-    Module *statusHeader = module_create(motionStateWindow);
-    module_set_padding(statusHeader, padding, padding);
-    module_set_text(statusHeader, "Status");
-    module_set_font(statusHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(statusHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
-    module_align_space_even(statusHeader, 1, 3);
-    module_align_inner_top(statusHeader);
-
-    // Create Condition Header
-    Module *conditionHeader = module_create(motionStateWindow);
-    module_set_padding(conditionHeader, padding, padding);
-    module_set_text(conditionHeader, "Condition");
-    module_set_font(conditionHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(conditionHeader, COLOR65K_BLACK, conditionHeader->parent->foregroundColor);
-    module_align_space_even(conditionHeader, 2, 3);
-    module_align_inner_top(conditionHeader);
-
-    // Create Mode Header
-    Module *modeHeader = module_create(motionStateWindow);
-    module_set_padding(modeHeader, padding, padding);
-    module_set_text(modeHeader, "Manual");
-    module_set_font(modeHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(modeHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
-    module_align_space_even(modeHeader, 3, 3);
-    module_align_inner_top(modeHeader);
-
-    // Create status Button
-    Module *statusButton = module_create(motionStateWindow);
-    module_set_rectangle_circle(statusButton, 0, 0);
-    module_set_color(statusButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(statusButton, padding, padding);
-    module_fit_space_even(statusButton, 3);
-    module_fit_below(statusButton, statusHeader);
-    module_align_space_even(statusButton, 1, 3);
-    module_touch_callback(statusButton, button_callback, BUTTON_STATUS);
-
-    // Create status Button Text
-    Module *statusButtonText = module_create(statusButton);
-    module_set_padding(statusButtonText, 0, 0);
-    module_set_text(statusButtonText, "");
-    module_set_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(statusButtonText, COLOR65K_BLACK, statusButtonText->parent->foregroundColor);
-    module_align_center(statusButtonText);
-    module_align_middle(statusButtonText);
-
-    // Create Condition Button
-    Module *conditionButton = module_create(motionStateWindow);
-    module_set_rectangle_circle(conditionButton, 0, 0);
-    module_set_color(conditionButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(conditionButton, padding, padding);
-    module_fit_space_even(conditionButton, 3);
-    module_fit_below(conditionButton, statusHeader);
-    module_align_space_even(conditionButton, 2, 3);
-
-    // Create condition Button Text
-    Module *conditionButtonText = module_create(conditionButton);
-    module_set_padding(conditionButtonText, 0, 0);
-    module_set_text(conditionButtonText, "");
-    module_set_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(conditionButtonText, COLOR65K_BLACK, conditionButtonText->parent->foregroundColor);
-    module_align_center(conditionButtonText);
-    module_align_middle(conditionButtonText);
-
-    // Create Mode Button
-    Module *modeButton = module_create(motionStateWindow);
-    module_set_rectangle_circle(modeButton, 0, 0);
-    module_set_color(modeButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(modeButton, padding, padding);
-    module_fit_space_even(modeButton, 3);
-    module_fit_below(modeButton, statusHeader);
-    module_align_space_even(modeButton, 3, 3);
-    module_touch_callback(modeButton, button_callback, BUTTON_MODE);
-
-    // Create Mode Button Text
-    Module *modeButtonText = module_create(modeButton);
-    module_set_padding(modeButtonText, 0, 0);
-    module_set_text(modeButtonText, "");
-    module_set_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(modeButtonText, COLOR65K_BLACK, modeButtonText->parent->foregroundColor);
-    module_align_center(modeButtonText);
-    module_align_middle(modeButtonText);
-
-    // Update Button Text and Color
-    char buf[50];
     int statusOutlineColor = COLOR65K_BLACK;
     int statusInnerColor = COLOR65K_BLACK;
     int statusTextColor = COLOR65K_BLACK;
-    int conditionOutlineColor = COLOR65K_BLACK;
-    int conditionInnerColor = COLOR65K_BLACK;
-    int conditionTextColor = COLOR65K_BLACK;
-    int modeOutlineColor = COLOR65K_BLACK;
-    int modeInnerColor = COLOR65K_BLACK;
-    int modeTextColor = COLOR65K_BLACK;
+    char buf[50];
     switch (window->state->motionParameters.status)
     {
     case STATUS_DISABLED:
@@ -210,12 +105,135 @@ void motion_state_window_create(Module *container, MachineState *state)
         break;
     }
 
-    module_set_text(statusButtonText, buf);
+    if (module->foregroundColor == statusOutlineColor &&
+        module->child[0]->backgroundColor == statusInnerColor &&
+        module->child[0]->foregroundColor == statusTextColor)
+    {
+        return;
+    }
+    module_set_color(module, statusOutlineColor, statusOutlineColor);
+    module_set_color(module->child[0], statusTextColor, statusInnerColor);
+    module_set_text(module->child[0], buf);
+    module_draw(display, module);
+}
+
+void motion_state_window_create(Module *container, MachineState *state)
+{
+    MotionStateWindow *window = (MotionStateWindow *)malloc(sizeof(MotionStateWindow));
+    window->state = state;
+
+    module_set_window(container, window);
+
+    int padding = 8;
+
+    // Create edit window
+    Module *motionStateWindow = module_create(container);
+    module_set_rectangle_circle(motionStateWindow, 0, 0);
+    module_fit_height(motionStateWindow);
+    module_fit_width(motionStateWindow);
+    module_set_padding(motionStateWindow, 0, 0);
+    module_set_color(motionStateWindow, MAINCOLOR, BACKCOLOR);
+    module_align_inner_left(motionStateWindow);
+    module_align_inner_top(motionStateWindow);
+
+    // Create Status Header
+    Module *statusHeader = module_create(motionStateWindow);
+    module_set_padding(statusHeader, padding, padding);
+    module_set_text(statusHeader, "Status");
+    module_set_font(statusHeader, RA8876_CHAR_HEIGHT_24);
+    module_set_color(statusHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
+    module_align_space_even(statusHeader, 1, 3);
+    module_align_inner_top(statusHeader);
+
+    // Create Condition Header
+    Module *conditionHeader = module_create(motionStateWindow);
+    module_set_padding(conditionHeader, padding, padding);
+    module_set_text(conditionHeader, "Condition");
+    module_set_font(conditionHeader, RA8876_CHAR_HEIGHT_24);
+    module_set_color(conditionHeader, COLOR65K_BLACK, conditionHeader->parent->foregroundColor);
+    module_align_space_even(conditionHeader, 2, 3);
+    module_align_inner_top(conditionHeader);
+
+    // Create Mode Header
+    Module *modeHeader = module_create(motionStateWindow);
+    module_set_padding(modeHeader, padding, padding);
+    module_set_text(modeHeader, "Mode");
+    module_set_font(modeHeader, RA8876_CHAR_HEIGHT_24);
+    module_set_color(modeHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
+    module_align_space_even(modeHeader, 3, 3);
+    module_align_inner_top(modeHeader);
+
+    // Create status Button
+    Module *statusButton = module_create(motionStateWindow);
+    module_set_rectangle_circle(statusButton, 0, 0);
+    module_set_color(statusButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_set_padding(statusButton, padding, padding);
+    module_fit_space_even(statusButton, 3);
+    module_fit_below(statusButton, statusHeader);
+    module_align_space_even(statusButton, 1, 3);
+    module_touch_callback(statusButton, button_callback, BUTTON_STATUS);
+    module_update_callback(statusButton, update_status);
+
+    // Create status Button Text
+    Module *statusButtonText = module_create(statusButton);
+    module_set_padding(statusButtonText, 0, 0);
+    module_set_text(statusButtonText, "");
+    module_text_max_char(statusButtonText, 8);
     module_set_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
-    module_align_center(statusButtonText);
-    module_align_inner_top(statusButtonText);
-    module_set_color(statusButton, statusOutlineColor, statusOutlineColor);
-    module_set_color(statusButtonText, statusTextColor, statusInnerColor);
+    module_set_color(statusButtonText, COLOR65K_BLACK, statusButtonText->parent->foregroundColor);
+    module_text_align(statusButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_align_middle(statusButtonText);
+
+    // Create Condition Button
+    Module *conditionButton = module_create(motionStateWindow);
+    module_set_rectangle_circle(conditionButton, 0, 0);
+    module_set_color(conditionButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_set_padding(conditionButton, padding, padding);
+    module_fit_space_even(conditionButton, 3);
+    module_fit_below(conditionButton, statusHeader);
+    module_align_space_even(conditionButton, 2, 3);
+
+    // Create condition Button Text
+    Module *conditionButtonText = module_create(conditionButton);
+    module_set_padding(conditionButtonText, 0, 0);
+    module_set_text(conditionButtonText, "");
+    module_text_max_char(conditionButtonText, 8);
+    module_set_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
+    module_set_color(conditionButtonText, COLOR65K_BLACK, conditionButtonText->parent->foregroundColor);
+    module_text_align(conditionButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_align_middle(conditionButtonText);
+
+    // Create Mode Button
+    Module *modeButton = module_create(motionStateWindow);
+    module_set_rectangle_circle(modeButton, 0, 0);
+    module_set_color(modeButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_set_padding(modeButton, padding, padding);
+    module_fit_space_even(modeButton, 3);
+    module_fit_below(modeButton, statusHeader);
+    module_align_space_even(modeButton, 3, 3);
+    module_touch_callback(modeButton, button_callback, BUTTON_MODE);
+
+    // Create Mode Button Text
+    Module *modeButtonText = module_create(modeButton);
+    module_set_padding(modeButtonText, 0, 0);
+    module_set_text(modeButtonText, "");
+    module_text_max_char(modeButtonText, 8);
+    module_set_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
+    module_set_color(modeButtonText, COLOR65K_BLACK, modeButtonText->parent->foregroundColor);
+    module_text_align(modeButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_align_middle(modeButtonText);
+
+    // Update Button Text and Color
+    char buf[50];
+    int statusOutlineColor = COLOR65K_BLACK;
+    int statusInnerColor = COLOR65K_BLACK;
+    int statusTextColor = COLOR65K_BLACK;
+    int conditionOutlineColor = COLOR65K_BLACK;
+    int conditionInnerColor = COLOR65K_BLACK;
+    int conditionTextColor = COLOR65K_BLACK;
+    int modeOutlineColor = COLOR65K_BLACK;
+    int modeInnerColor = COLOR65K_BLACK;
+    int modeTextColor = COLOR65K_BLACK;
 
     switch (window->state->motionParameters.condition)
     {

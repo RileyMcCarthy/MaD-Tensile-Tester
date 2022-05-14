@@ -253,29 +253,34 @@ void module_add_underline(Module *module)
 
 void module_set_text(Module *module, const char *text)
 {
-    ModuleText *textModule = (ModuleText *)malloc(sizeof(ModuleText));
-    textModule->text = (char *)malloc(strlen(text) + 1);
-    textModule->maxChar = strlen(text);
-    strcpy(textModule->text, text);
-
     module->type = MODULE_TEXT;
 
-    if (module->data != NULL)
+    if (module->data != NULL) // Update text only
     {
-        ModuleText *oldTextModule = (ModuleText *)module->data;
+        ModuleText *textModule = (ModuleText *)module->data;
+        free(textModule->text);
+        textModule->text = (char *)malloc(strlen(text) + 1);
+        strcpy(textModule->text, text);
+
         module->data = textModule;
-        module_set_font(module, oldTextModule->font); // Recalculate size
-        module_text_destroy(oldTextModule);
+        module_set_font(module, textModule->font); // Recalculate size
     }
     else
     {
+        ModuleText *textModule = (ModuleText *)malloc(sizeof(ModuleText));
+        textModule->text = (char *)malloc(strlen(text) + 1);
+        strcpy(textModule->text, text);
+        textModule->maxChar = 0;
+        textModule->font = RA8876_CHAR_HEIGHT_24; // Default font
+        textModule->alignment = MODULE_TEXT_ALIGN_NONE;
+
         module->data = textModule;
+        module_set_font(module, textModule->font); // Recalculate size
     }
 }
 
-void module_set_text_box(Module *module, const char *text, int maxChar)
+void module_text_max_char(Module *module, int maxChar)
 {
-    module_set_text(module, text);
     ((ModuleText *)module->data)->maxChar = maxChar;
 }
 
@@ -495,20 +500,51 @@ void module_draw(Display *display, Module *module)
     {
         ModuleText *moduleText = (ModuleText *)module->data;
 
-        display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, moduleText->font, RA8876_SELECT_8859_1);
-        display_set_text_parameter2(display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
-        display_text_color(display, module->foregroundColor, module->backgroundColor);
-        if (moduleText->maxChar != strlen(moduleText->text))
+        // Blank module to avoid flickering
+        Module *blank = module_create(module->parent);
+        if (moduleText->maxChar != 0)
         {
+            module_copy(blank, module);
+
             char *emptyString = (char *)malloc(moduleText->maxChar + 1);
             strcpy(emptyString, "");
             for (int i = 0; i < moduleText->maxChar; i++)
             {
                 strcat(emptyString, " ");
             }
-            display_draw_string(display, module->x, module->y, emptyString);
+            printf(",%s,\n", emptyString);
+            module_set_text(blank, emptyString);
+            module_set_font(blank, moduleText->font);
             free(emptyString);
         }
+
+        // Testing dynamic alignment during the drawing phase, only Text modules are supported
+        module_set_font(module, moduleText->font); // Recalculate w,h
+        switch (moduleText->alignment)
+        {
+        case MODULE_TEXT_ALIGN_LEFT:
+            module_align_inner_left(module);
+            module_align_inner_left(blank);
+            break;
+        case MODULE_TEXT_ALIGN_CENTER:
+            module_align_center(module);
+            module_align_center(blank);
+            break;
+        case MODULE_TEXT_ALIGN_RIGHT:
+            module_align_inner_right(module);
+            module_align_inner_right(blank);
+            break;
+        }
+
+        display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, moduleText->font, RA8876_SELECT_8859_1);
+        display_set_text_parameter2(display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
+        display_text_color(display, module->foregroundColor, module->backgroundColor);
+
+        // Draw blank string to remove previous text (dynamic alignment only)
+        module_draw(display, blank);
+        module_trim(blank);
+        module_destroy(blank);
+
         display_draw_string(display, module->x, module->y, moduleText->text);
         break;
     }

@@ -38,6 +38,7 @@ typedef struct Module_s
 
 typedef enum ModuleTextAignType_e
 {
+    MODULE_TEXT_ALIGN_NONE,
     MODULE_TEXT_ALIGN_LEFT,
     MODULE_TEXT_ALIGN_CENTER,
     MODULE_TEXT_ALIGN_RIGHT
@@ -92,7 +93,7 @@ void module_set_image(Module *module, Image *image);
 void module_add_underline(Module *module);
 
 void module_set_text(Module *module, char *text);
-void module_set_text_box(Module *module, const char *text, int maxChar);
+void module_text_max_char(Module *module, int maxChar);
 void module_set_font(Module *module, int font);
 void module_text_align(Module *module, ModuleTextAignType alignment);
 
