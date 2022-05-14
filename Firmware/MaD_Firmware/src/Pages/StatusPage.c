@@ -131,6 +131,7 @@ void status_page_run(StatusPage *page)
     Module *switchedPowerText = module_create(machineStateWindow);
     module_copy(switchedPowerText, chargePumpText);
     module_set_text(switchedPowerText, "Switched Power");
+    module_set_font(switchedPowerText, RA8876_CHAR_HEIGHT_24);
     module_align_below(switchedPowerText, chargePumpText);
 
     Module *switchedPowerImage = module_create(machineStateImages);
@@ -142,6 +143,7 @@ void status_page_run(StatusPage *page)
     Module *estSwitchText = module_create(machineStateWindow);
     module_copy(estSwitchText, chargePumpText);
     module_set_text(estSwitchText, "ESD Switch");
+    module_set_font(estSwitchText, RA8876_CHAR_HEIGHT_24);
     module_align_below(estSwitchText, switchedPowerText);
 
     Module *estSwitchImage = module_create(machineStateImages);
@@ -153,6 +155,7 @@ void status_page_run(StatusPage *page)
     Module *esdUpperText = module_create(machineStateWindow);
     module_copy(esdUpperText, chargePumpText);
     module_set_text(esdUpperText, "ESD Upper");
+    module_set_font(esdUpperText, RA8876_CHAR_HEIGHT_24);
     module_align_below(esdUpperText, estSwitchText);
 
     Module *esdUpperImage = module_create(machineStateImages);
@@ -164,6 +167,7 @@ void status_page_run(StatusPage *page)
     Module *estLowerText = module_create(machineStateWindow);
     module_copy(estLowerText, chargePumpText);
     module_set_text(estLowerText, "ESD Lower");
+    module_set_font(estLowerText, RA8876_CHAR_HEIGHT_24);
     module_align_below(estLowerText, esdUpperText);
 
     Module *estLowerImage = module_create(machineStateImages);
@@ -175,6 +179,7 @@ void status_page_run(StatusPage *page)
     Module *servoReadyText = module_create(machineStateWindow);
     module_copy(servoReadyText, chargePumpText);
     module_set_text(servoReadyText, "Servo Ready");
+    module_set_font(servoReadyText, RA8876_CHAR_HEIGHT_24);
     module_align_below(servoReadyText, estLowerText);
 
     Module *servoReadyImage = module_create(machineStateImages);
@@ -186,6 +191,7 @@ void status_page_run(StatusPage *page)
     Module *forceGaugeComText = module_create(machineStateWindow);
     module_copy(forceGaugeComText, chargePumpText);
     module_set_text(forceGaugeComText, "Force Comm");
+    module_set_font(forceGaugeComText, RA8876_CHAR_HEIGHT_24);
     module_align_below(forceGaugeComText, servoReadyText);
 
     Module *forceGaugeComImage = module_create(machineStateImages);
@@ -197,6 +203,7 @@ void status_page_run(StatusPage *page)
     Module *servoComText = module_create(machineStateWindow);
     module_copy(servoComText, chargePumpText);
     module_set_text(servoComText, "Servo Comm");
+    module_set_font(servoComText, RA8876_CHAR_HEIGHT_24);
     module_align_below(servoComText, forceGaugeComText);
 
     Module *servoComImage = module_create(machineStateImages);
@@ -403,13 +410,13 @@ void status_page_run(StatusPage *page)
         }
 
         module_touch_check(root, page->display, page); // Check for button presses
-        module_update_check(root, page);
+        module_update_check(page->display, root, page);
 
-        module_draw(page->display, positionGraph);
-        module_draw(page->display, machineStateImages);
+        // module_draw(page->display, positionGraph);
+        // module_draw(page->display, machineStateImages);
 
-        module_draw(page->display, functionWindow);
-        module_draw(page->display, motionStateWindow);
+        // module_draw(page->display, functionWindow);
+        // module_draw(page->display, motionStateWindow);
 
         if (updateMachineState)
         {

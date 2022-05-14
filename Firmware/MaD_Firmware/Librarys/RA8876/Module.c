@@ -23,12 +23,12 @@ Module *module_create(Module *parent)
     return module;
 }
 
-void module_update_callback(Module *module, void (*onUpdate)(Module *module, void *arg))
+void module_update_callback(Module *module, void (*onUpdate)(Display *display, Module *module, void *arg))
 {
     module->onUpdate = onUpdate;
 }
 
-void module_update_check(Module *module, void *arg)
+void module_update_check(Display *display, Module *module, void *arg)
 {
     if (module->type == MODULE_WINDOW)
     {
@@ -36,11 +36,11 @@ void module_update_check(Module *module, void *arg)
     }
     for (int i = 0; i < module->numChildren; i++)
     {
-        module_update_check(module->child[i], arg);
+        module_update_check(display, module->child[i], arg);
     }
     if (module->onUpdate != NULL)
     {
-        module->onUpdate(module, arg);
+        module->onUpdate(display, module, arg);
     }
 }
 
@@ -253,36 +253,65 @@ void module_add_underline(Module *module)
 
 void module_set_text(Module *module, const char *text)
 {
+    ModuleText *textModule = (ModuleText *)malloc(sizeof(ModuleText));
+    textModule->text = (char *)malloc(strlen(text) + 1);
+    textModule->maxChar = strlen(text);
+    strcpy(textModule->text, text);
+
     module->type = MODULE_TEXT;
+
     if (module->data != NULL)
     {
-        free(module->data);
+        ModuleText *oldTextModule = (ModuleText *)module->data;
+        module->data = textModule;
+        module_set_font(module, oldTextModule->font); // Recalculate size
+        module_text_destroy(oldTextModule);
     }
-    module->data = (char *)malloc(strlen(text) + 1);
-    strcpy(module->data, text);
+    else
+    {
+        module->data = textModule;
+    }
+}
+
+void module_set_text_box(Module *module, const char *text, int maxChar)
+{
+    module_set_text(module, text);
+    ((ModuleText *)module->data)->maxChar = maxChar;
+}
+
+void module_text_align(Module *module, ModuleTextAignType alignment)
+{
+    if (module->type != MODULE_TEXT)
+        return;
+    ModuleText *textModule = (ModuleText *)module->data;
+    textModule->alignment = alignment;
 }
 
 // Sets modules w/h from font size. Font size: 32,24,16 or -1 for auto
 void module_set_font(Module *module, int font)
 {
+    ModuleText *textModule = (ModuleText *)module->data;
     switch (font)
     {
     case RA8876_CHAR_HEIGHT_32:
     {
         module->h = 32;
-        module->w = 16 * strlen((char *)module->data);
+        module->w = 16 * strlen(textModule->text);
+        textModule->font = RA8876_CHAR_HEIGHT_32;
         break;
     }
     case RA8876_CHAR_HEIGHT_24:
     {
         module->h = 24;
-        module->w = 12 * strlen((char *)module->data);
+        module->w = 12 * strlen(textModule->text);
+        textModule->font = RA8876_CHAR_HEIGHT_24;
         break;
     }
     case RA8876_CHAR_HEIGHT_16:
     {
         module->h = 16;
-        module->w = 8 * strlen((char *)module->data);
+        module->w = 8 * strlen(textModule->text);
+        textModule->font = RA8876_CHAR_HEIGHT_16;
         break;
     }
     default:
@@ -290,40 +319,46 @@ void module_set_font(Module *module, int font)
         if (module->parent->h > 32)
         {
             int width;
-            if (module->parent->w > (width = strlen((char *)module->data) * 16))
+            if (module->parent->w > (width = strlen(textModule->text) * 16))
             {
                 module->h = 32;
                 module->w = width;
+                textModule->font = RA8876_CHAR_HEIGHT_32;
             }
-            else if (module->parent->w > (width = strlen((char *)module->data) * 12))
+            else if (module->parent->w > (width = strlen(textModule->text) * 12))
             {
-                module->h = 12;
+                module->h = 24;
                 module->w = width;
+                textModule->font = RA8876_CHAR_HEIGHT_24;
             }
             else
             {
-                module->h = 8;
-                module->w = strlen((char *)module->data) * 8;
+                module->h = 16;
+                module->w = strlen(textModule->text) * 8;
+                textModule->font = RA8876_CHAR_HEIGHT_16;
             }
         }
         else if (module->parent->h > 24)
         {
             int width;
-            if (module->parent->w > (width = strlen((char *)module->data) * 12))
+            if (module->parent->w > (width = strlen(textModule->text) * 12))
             {
-                module->h = 12;
+                module->h = 24;
                 module->w = width;
+                textModule->font = RA8876_CHAR_HEIGHT_24;
             }
             else
             {
-                module->h = 8;
-                module->w = strlen((char *)module->data) * 8;
+                module->h = 16;
+                module->w = strlen(textModule->text) * 8;
+                textModule->font = RA8876_CHAR_HEIGHT_16;
             }
         }
         else
         {
-            module->h = 8;
-            module->w = strlen((char *)module->data) * 8;
+            module->h = 16;
+            module->w = strlen(textModule->text) * 8;
+            textModule->font = RA8876_CHAR_HEIGHT_16;
         }
         break;
     }
@@ -458,22 +493,23 @@ void module_draw(Display *display, Module *module)
     {
     case MODULE_TEXT:
     {
-        if (module->h == 32)
-        {
-            charH = RA8876_CHAR_HEIGHT_32;
-        }
-        else if (module->h == 24)
-        {
-            charH = RA8876_CHAR_HEIGHT_24;
-        }
-        else // 16pp
-        {
-            charH = RA8876_CHAR_HEIGHT_16;
-        }
-        display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, charH, RA8876_SELECT_8859_1);
+        ModuleText *moduleText = (ModuleText *)module->data;
+
+        display_set_text_parameter1(display, RA8876_SELECT_INTERNAL_CGROM, moduleText->font, RA8876_SELECT_8859_1);
         display_set_text_parameter2(display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
         display_text_color(display, module->foregroundColor, module->backgroundColor);
-        display_draw_string(display, module->x, module->y, (char *)module->data);
+        if (moduleText->maxChar != strlen(moduleText->text))
+        {
+            char *emptyString = (char *)malloc(moduleText->maxChar + 1);
+            strcpy(emptyString, "");
+            for (int i = 0; i < moduleText->maxChar; i++)
+            {
+                strcat(emptyString, " ");
+            }
+            display_draw_string(display, module->x, module->y, emptyString);
+            free(emptyString);
+        }
+        display_draw_string(display, module->x, module->y, moduleText->text);
         break;
     }
     case MODULE_IMAGE:
@@ -493,7 +529,7 @@ void module_draw(Display *display, Module *module)
     }
     case MODULE_RECTANGLE_CIRCLE:
     {
-        radius = round(module->w * 0.1);
+        radius = round(module->w * 0.07);
         display_draw_circle_square_fill(display, module->x, module->y, module->x + module->w, module->y + module->h, radius, radius, module->foregroundColor);
         break;
     }
@@ -556,6 +592,12 @@ void module_trim(Module *module)
     }
 }
 
+void module_text_destroy(ModuleText *text)
+{
+    free(text->text);
+    free(text);
+}
+
 void module_destroy(Module *root)
 {
 
@@ -567,7 +609,18 @@ void module_destroy(Module *root)
     }
 
     // Free module
-    free(root->data);
+    switch (root->type)
+    {
+    case MODULE_TEXT:
+    {
+        module_text_destroy(root->data);
+        break;
+    }
+    default:
+        free(root->data);
+        break;
+    }
+
     free(root->child);
     free(root);
 }

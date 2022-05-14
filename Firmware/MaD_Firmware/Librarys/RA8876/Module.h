@@ -33,8 +33,23 @@ typedef struct Module_s
     int debouncems;
     int touchId;
     void (*onTouch)(int id, void *arg);
-    void (*onUpdate)(struct Module_s *module, void *arg);
+    void (*onUpdate)(Display *display, struct Module_s *module, void *arg);
 } Module;
+
+typedef enum ModuleTextAignType_e
+{
+    MODULE_TEXT_ALIGN_LEFT,
+    MODULE_TEXT_ALIGN_CENTER,
+    MODULE_TEXT_ALIGN_RIGHT
+} ModuleTextAignType;
+
+typedef struct ModuleText_s
+{
+    char *text;
+    int font;
+    int maxChar;
+    ModuleTextAignType alignment;
+} ModuleText;
 
 typedef struct graph_t
 {
@@ -51,8 +66,8 @@ typedef struct graph_t
 
 Module *module_create(Module *parent);
 
-void module_update_callback(Module *module, void (*onUpdate)(Module *module, void *arg));
-void module_update_check(Module *module, void *arg);
+void module_update_callback(Module *module, void (*onUpdate)(Display *display, Module *module, void *arg));
+void module_update_check(Display *display, Module *module, void *arg);
 
 void module_touch_callback(Module *module, void (*onTouch)(int id, void *page), int id);
 int module_touch_check(Module *root, Display *display, void *arg);
@@ -77,7 +92,10 @@ void module_set_image(Module *module, Image *image);
 void module_add_underline(Module *module);
 
 void module_set_text(Module *module, char *text);
+void module_set_text_box(Module *module, const char *text, int maxChar);
 void module_set_font(Module *module, int font);
+void module_text_align(Module *module, ModuleTextAignType alignment);
+
 void module_set_padding(Module *module, int px, int py);
 void module_set_color(Module *module, int foreground, int background);
 void module_set_position(Module *module, int x, int y);
@@ -108,5 +126,6 @@ void module_draw(Display *display, Module *module);
 
 void module_destroy_children(Module *module);
 void module_trim(Module *module);
+void module_text_destroy(ModuleText *text);
 void module_destroy(Module *root);
 #endif

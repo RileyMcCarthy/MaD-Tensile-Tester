@@ -24,7 +24,7 @@ static void button_set_function(int id, void *arg)
     state_machine_set(window->state, PARAM_FUNCTION, id);
 }
 
-static void update_header(Module *module, void *arg)
+static void update_header(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -36,13 +36,13 @@ static void update_header(Module *module, void *arg)
         sprintf(buf, "OFF");
         break;
     case FUNC_MANUAL_INCREMENTAL_JOG:
-        sprintf(buf, "INCREMENTAL JOG: %0.1fmm", (float)window->state->functionData / 1000.0);
+        sprintf(buf, "INCR JOG: %0.1fmm", (float)window->state->functionData / 1000.0);
         break;
     case FUNC_MANUAL_CONTINUOUS_JOG:
-        sprintf(buf, "CONTINUOUS JOG: %dmm", window->state->functionData / 1000);
+        sprintf(buf, "CONT JOG: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_POSITIONAL_MOVE:
-        sprintf(buf, "POSITIONAL MOVE: %dmm", window->state->functionData / 1000);
+        sprintf(buf, "POSN MOVE: %dmm", window->state->functionData / 1000);
         break;
     case FUNC_MANUAL_HOME:
         if (window->state->functionData == HOMING_NONE)
@@ -66,20 +66,25 @@ static void update_header(Module *module, void *arg)
         sprintf(buf, "OFF");
         break;
     }
-    module_set_text(module, buf);
-    module_set_font(module, RA8876_CHAR_HEIGHT_24);
-    module_align_center(module);
-    module_align_inner_top(module);
+    bool update = false;
+    if (strcmp(buf, module->data) != 0)
+    {
+        module_set_text(module, buf);
+        module_set_font(module, RA8876_CHAR_HEIGHT_24);
+        module_align_center(module);
+        module_align_inner_top(module);
+        module_draw(display, module);
+    }
 }
 
-static void update_off(Module *module, void *arg)
+static void update_off(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
     int outlineColor = COLOR65K_BLACK;
     int innerColor = COLOR65K_BLACK;
     int textColor = COLOR65K_BLACK;
-
+    printf("%d\n", window->state->function);
     if (window->state->state == STATE_MOTION && window->state->motionParameters.status != STATUS_DISABLED)
     {
         if (window->state->function == FUNC_MANUAL_OFF)
@@ -102,11 +107,18 @@ static void update_off(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_incremental(Module *module, void *arg)
+static void update_incremental(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -136,11 +148,18 @@ static void update_incremental(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_continuous(Module *module, void *arg)
+static void update_continuous(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -170,11 +189,18 @@ static void update_continuous(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_positional(Module *module, void *arg)
+static void update_positional(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -204,11 +230,18 @@ static void update_positional(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_home(Module *module, void *arg)
+static void update_home(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -238,11 +271,18 @@ static void update_home(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_length(Module *module, void *arg)
+static void update_length(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -271,12 +311,18 @@ static void update_length(Module *module, void *arg)
         innerColor = COLOR65K_BLACK;
         textColor = COLOR65K_WHITE;
     }
-
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
-static void update_force(Module *module, void *arg)
+static void update_force(Display *display, Module *module, void *arg)
 {
     FunctionWindow *window = (FunctionWindow *)arg;
 
@@ -306,8 +352,15 @@ static void update_force(Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
+    if (module->foregroundColor == outlineColor &&
+        module->child[0]->backgroundColor == innerColor &&
+        module->child[0]->foregroundColor == textColor)
+    {
+        return;
+    }
     module_set_color(module, outlineColor, outlineColor);
-    module_set_color(module, textColor, innerColor);
+    module_set_color(module->child[0], textColor, innerColor);
+    module_draw(display, module);
 }
 
 void function_window_create(Module *container, MachineState *state)
@@ -332,8 +385,8 @@ void function_window_create(Module *container, MachineState *state)
     // Create Function Header
     Module *functionHeader = module_create(functionWindow);
     module_set_padding(functionHeader, padding, padding);
-    module_set_text(functionHeader, "Off");
-    module_set_font(functionHeader, RA8876_CHAR_HEIGHT_32);
+    module_set_text_box(functionHeader, "Off", 20);
+    module_set_font(functionHeader, RA8876_CHAR_HEIGHT_24);
     module_set_color(functionHeader, COLOR65K_BLACK, functionHeader->parent->foregroundColor);
     module_align_center(functionHeader);
     module_align_inner_top(functionHeader);
