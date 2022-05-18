@@ -24,6 +24,7 @@ typedef struct monitor_cog_t
     int sampleRate;   // sample rate in hz
     int cogid;
 } Monitor;
+
 typedef struct __using("jm_quadrature.spin2") Encoder;
 
 Monitor *monitor_create();

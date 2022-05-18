@@ -76,7 +76,7 @@ static void control_cog(Control *control)
     _waitms(1000);
 
     // For running test profiles
-    RunMotionProfile *run;
+    RunMotionProfile *run = NULL;
     long startTime = 0;
 
     bool initial = true;
@@ -474,7 +474,7 @@ static void control_cog(Control *control)
                         if (!run->profileComplete)
                         {
                             double t = (_getus() - startTime) / 1000000.0;
-                            double position = position_profile(t, run, &(control->motionProfile));
+                            double position = position_profile(t, run, control->motionProfile);
                             // printf("%f,%f\n", t, position);
                         }
                         else

@@ -135,6 +135,8 @@ void mad_begin()
   }
   loading_overlay_display(display, "Display Initialized!", OVERLAY_TYPE_LOADING);
 
+  _waitms(200);
+
   // Load machine profile from SD card
   MachineProfile *machineProfile = load_machine_profile();
   loading_overlay_display(display, "Loaded Machine Profile", OVERLAY_TYPE_LOADING);

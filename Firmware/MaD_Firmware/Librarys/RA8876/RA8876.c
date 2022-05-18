@@ -1511,7 +1511,7 @@ void display_load_image(Display *display, Image *image)
 
   display_put_picture_16bpp(display, image->x0, image->y0, image->width, image->height);
   int data;
-  int limit = image->width * image->height * 2;
+  int limit = image->width * image->height * 2 + 10;
   int count = 0;
   while ((data = fgetc(fp)) != EOF)
   {

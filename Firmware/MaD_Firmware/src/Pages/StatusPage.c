@@ -243,8 +243,9 @@ void status_page_run(StatusPage *page)
     Module *forceValue = module_create(machineInfoWindow);
     module_copy(forceValue, forceText);
     module_set_text(forceValue, "0.00");
+    module_text_max_char(forceValue, 10);
     module_set_font(forceValue, RA8876_CHAR_HEIGHT_24);
-    module_align_inner_right(forceValue);
+    module_text_align(forceValue, MODULE_TEXT_ALIGN_RIGHT);
 
     Module *positionText = module_create(machineInfoWindow);
     module_copy(positionText, forceText);
@@ -255,8 +256,9 @@ void status_page_run(StatusPage *page)
     Module *positionValue = module_create(machineInfoWindow);
     module_copy(positionValue, positionText);
     module_set_text(positionValue, "0.00");
+    module_text_max_char(positionValue, 10);
     module_set_font(positionValue, RA8876_CHAR_HEIGHT_24);
-    module_align_inner_right(positionValue);
+    module_text_align(positionValue, MODULE_TEXT_ALIGN_RIGHT);
 
     Module *positionGraph = module_create(machineInfoWindow);
     module_set_padding(positionGraph, padding, padding);
@@ -266,6 +268,15 @@ void status_page_run(StatusPage *page)
     module_fit_width(positionGraph);
     module_set_graph(positionGraph);
     module_graph_set_range(positionGraph, -100, 100);
+
+    Module *forceGraph = module_create(machineInfoWindow);
+    module_set_padding(forceGraph, padding, padding);
+    module_align_below(forceGraph, positionGraph);
+    module_align_inner_left(forceGraph);
+    module_set_size(forceGraph, 0, 200);
+    module_fit_width(forceGraph);
+    module_set_graph(forceGraph);
+    module_graph_set_range(forceGraph, -5, 5);
 
     // Create Function Window Container
     Module *functionWindow = module_create(background);
@@ -292,6 +303,9 @@ void status_page_run(StatusPage *page)
     MachineState previousState = *(page->stateMachine);
     bool initial = true;
     bool updateMachineState = true;
+
+    long lastDataUpdate = 0;
+
     while (page->complete == false)
     {
         MachineState currentState = *(page->stateMachine);
@@ -426,8 +440,22 @@ void status_page_run(StatusPage *page)
 
         while (display_update_touch(page->display) == 0 && state_machine_equal(page->stateMachine, &currentState))
         {
+            if ((_getms() - lastDataUpdate) > 100)
+            {
+                lastDataUpdate = _getms();
+                char buf[10];
+                sprintf(buf, "%0.3fmm", page->data->positionum / 1000.0);
+                module_set_text(positionValue, buf);
+                sprintf(buf, "%0.3fN", page->data->force / 1000.0);
+                module_set_text(forceValue, buf);
+                module_draw(page->display, forceValue);
+                module_draw(page->display, positionValue);
+            }
             module_graph_insert(positionGraph, page->data->positionum / 1000.0);
+            module_draw(page->display, positionGraph);
 
+            module_graph_insert(forceGraph, page->data->force / 1000.0);
+            module_draw(page->display, forceGraph);
         } // Update touch register
 
         previousState = currentState;

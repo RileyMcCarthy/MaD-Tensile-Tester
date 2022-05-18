@@ -119,10 +119,6 @@ void image_load_assets(Images *images, Display *display)
     loading_overlay_display(display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
     display_load_image(display, images->navigationImage);
 
-    // loading_overlay_display(display, "Loading Image: keyboard", OVERLAY_TYPE_LOADING);
-    // printf("Image name:%s\n", images->keyboardImage->name);
-    // display_load_image(display, images->keyboardImage);
-
     loading_overlay_display(display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
     display_load_image(display, images->manualPageImage);
 

@@ -116,7 +116,7 @@ static char *key_name[] = {
  * @param key The Button that was pressed
  * @returns if submit was pressed
  */
-static bool key_pressed(int id, void *arg)
+static void key_pressed(int id, void *arg)
 {
     Keyboard *keyboard = (Keyboard *)arg;
     keyboard->keyboard_buffer = (char *)realloc(keyboard->keyboard_buffer, strlen(keyboard->keyboard_buffer) + 2);
@@ -163,7 +163,7 @@ static Module *createKey(Module *background, int name, Module *left, Module *abo
 {
     Module *key = module_create(background);
     module_set_rectangle_circle(key, KEY_UNIT_WIDTH * keySize, KEY_UNIT_HEIGHT);
-    module_set_color(key, COLOR65K_BLUE);
+    module_set_color(key, COLOR65K_BLUE, COLOR65K_BLUE);
     module_set_padding(key, 14, 14);
     module_touch_callback(key, key_pressed, name);
 

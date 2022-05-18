@@ -210,7 +210,14 @@ void module_set_graph(Module *window)
 void module_graph_insert(Module *module, double value)
 {
     Graph *graph = (Graph *)module->data;
-    if (graph->dataCount < graph->graphArea->w) // If there is space in the graph, insert at end
+    if (value > graph->maxY || value < graph->minY)
+    {
+        return;
+    }
+    double temp = graph->data[0];
+    graph->data[1] = temp;
+    graph->data[0] = value;
+    /*if (graph->dataCount < graph->graphArea->w) // If there is space in the graph, insert at end
     {
         graph->data = realloc(graph->data, (graph->dataCount + 1) * sizeof(double));
         graph->data[graph->dataCount] = value;
@@ -223,7 +230,7 @@ void module_graph_insert(Module *module, double value)
             graph->data[i] = graph->data[i + 1];
         }
         graph->data[graph->dataCount - 1] = value;
-    }
+    }*/
 }
 
 void module_graph_set_range(Module *module, float maxY, float minY)
@@ -575,17 +582,11 @@ void module_draw(Display *display, Module *module)
 
         double factor = (double)graph->graphArea->w / (double)graph->dataCount;
         double range = graph->maxY - graph->minY;
-        int lastX = graph->graphArea->x + (0 * factor);
-        int lastY = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / range));
-        for (int i = 1; i < graph->dataCount; i++)
-        {
-            int x = graph->graphArea->x + (i * factor);
-            int y = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[i] * (double)((graph->graphArea->h / 2) / range));
-            display_draw_line(display, lastX, lastY, x, y, COLOR65K_RED);
-            // printf("creating point at: %d, %d,%f\n", x, y, graph->data[i]);
-            lastX = x;
-            lastY = y;
-        }
+        display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 4, graph->graphArea->y, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 2, graph->graphArea->y, graph->graphArea->w - 2, graph->graphArea->h);
+        display_draw_square_fill(display, graph->graphArea->x + graph->graphArea->w, graph->graphArea->y, graph->graphArea->x + graph->graphArea->w + 2, graph->graphArea->y + graph->graphArea->h, module->parent->foregroundColor);
+        int y = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / (range / 2)));
+        int lastY = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[1] * (double)((graph->graphArea->h / 2) / (range / 2)));
+        display_draw_line(display, graph->graphArea->x + graph->graphArea->w, lastY, graph->graphArea->x + graph->graphArea->w + 2, y, COLOR65K_RED);
         break;
     }
     }
