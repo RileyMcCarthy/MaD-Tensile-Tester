@@ -79,7 +79,7 @@ void module_copy(Module *to, Module *from);
 void module_save(Module *module, Display *display);
 void module_paste(Module *module, Display *display);
 
-void module_set_graph(Module *window);
+void module_set_graph(Module *window, const char *title, const char *units);
 void module_graph_add_marker(Module *module, float value);
 void module_graph_insert(Module *module, double value);
 void module_graph_set_range(Module *module, float maxY, float minY);
@@ -122,6 +122,7 @@ void module_fit_space_even(Module *module, int sections);
 void module_fit_space_even_verticle(Module *module, int sections);
 void module_fit_height(Module *module);
 void module_fit_below(Module *module, Module *ref);
+void module_fit_right(Module *module, Module *ref);
 
 void module_draw(Display *display, Module *module);
 

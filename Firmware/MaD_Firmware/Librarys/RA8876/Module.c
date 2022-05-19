@@ -159,11 +159,14 @@ void module_set_rectangle_circle(Module *module, int w, int h)
 
 // Makes a empty window a graph, have position and size already defined
 // Creates an empty graph that has data of size of the centerLine in pixels
-void module_set_graph(Module *window)
+void module_set_graph(Module *window, const char *titleName, const char *units)
 {
     window->type = MODULE_GRAPH;
 
     Graph *graph = (Graph *)malloc(sizeof(Graph));
+
+    graph->title = titleName;
+    graph->units = units;
 
     // Create Title
     Module *title = module_create(window);
@@ -175,15 +178,55 @@ void module_set_graph(Module *window)
     module_align_center(title);
     module_add_underline(title);
 
+    // Create min
+    char buf[15];
+    Module *minText = module_create(window);
+    module_set_padding(minText, 3, 3);
+    sprintf(buf, "%.2f", graph->minY);
+    module_set_text(minText, buf);
+    module_set_font(minText, RA8876_CHAR_HEIGHT_16);
+    module_set_color(minText, COLOR65K_BLACK, minText->parent->foregroundColor);
+    module_align_inner_bottom(minText);
+    module_align_inner_left(minText);
+
     // Create Graph Area
     Module *graphArea = module_create(window);
     module_align_below(graphArea, title);
     module_fit_below(graphArea, title);
-    module_fit_width(graphArea);
-    module_fit_height(graphArea);
-    module_align_inner_left(graphArea);
+    module_fit_right(graphArea, minText);
+    module_align_right(graphArea, minText);
     module_set_color(graphArea, graphArea->parent->foregroundColor, graphArea->parent->backgroundColor);
     module_set_padding(graphArea, 0, 0);
+
+    // Create Units
+    Module *units_module = module_create(window);
+    module_set_padding(units_module, 10, 10);
+    module_set_text(units_module, graph->units);
+    module_set_font(units_module, RA8876_CHAR_HEIGHT_32);
+    module_set_color(units_module, COLOR65K_BLACK, units_module->parent->foregroundColor);
+    module_align_above(units_module, graphArea);
+    module_align_inner_left(units_module);
+
+    // Create zero
+    char buf[15];
+    Module *zeroText = module_create(graphArea);
+    module_set_padding(zeroText, 3, 3);
+    module_set_text(zeroText, "0");
+    module_set_font(zeroText, RA8876_CHAR_HEIGHT_16);
+    module_set_color(zeroText, COLOR65K_BLACK, zeroText->parent->foregroundColor);
+    module_align_left(zeroText, graphArea);
+    module_align_middle(zeroText);
+
+    // Create max
+    char buf[15];
+    Module *maxText = module_create(graphArea);
+    module_set_padding(maxText, 3, 3);
+    sprintf(buf, "%.2f", graph->maxY);
+    module_set_text(maxText, buf);
+    module_set_font(maxText, RA8876_CHAR_HEIGHT_16);
+    module_set_color(maxText, COLOR65K_BLACK, maxText->parent->foregroundColor);
+    module_align_inner_top(maxText);
+    module_align_left(maxText, graphArea);
 
     // Create Graph Horizontal Line
     Module *centerLine = module_create(graphArea);
@@ -453,7 +496,7 @@ void module_align_above(Module *module, Module *ref)
 
 void module_align_left(Module *module, Module *ref)
 {
-    module->y = ref->x - module->w - ref->px;
+    module->x = ref->x - module->w - module->px;
 }
 
 void module_align_below(Module *module, Module *ref)
@@ -490,6 +533,11 @@ void module_fit_below(Module *module, Module *ref)
 void module_fit_width(Module *module)
 {
     module->w = module->parent->w - module->parent->px - module->parent->px;
+}
+
+void module_fit_right(Module *module, Module *ref)
+{
+    module->w = module->parent->w - 2 * module->parent->px - ref->w - 2 * ref->px;
 }
 
 void module_draw(Display *display, Module *module)

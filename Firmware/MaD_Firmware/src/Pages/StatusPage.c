@@ -261,21 +261,24 @@ void status_page_run(StatusPage *page)
     module_text_align(positionValue, MODULE_TEXT_ALIGN_RIGHT);
 
     Module *positionGraph = module_create(machineInfoWindow);
-    module_set_padding(positionGraph, padding, padding);
+    module_set_padding(positionGraph, 0, 0);
+    module_set_size(positionGraph, 0, 200);
     module_align_below(positionGraph, positionText);
     module_align_inner_left(positionGraph);
-    module_set_size(positionGraph, 0, 200);
+    module_set_color(positionGraph, positionGraph->parent->foregroundColor, positionGraph->parent->backgroundColor);
     module_fit_width(positionGraph);
-    module_set_graph(positionGraph);
+    module_set_graph(positionGraph, "Position", "mm");
     module_graph_set_range(positionGraph, -100, 100);
 
     Module *forceGraph = module_create(machineInfoWindow);
-    module_set_padding(forceGraph, padding, padding);
-    module_align_below(forceGraph, positionGraph);
-    module_align_inner_left(forceGraph);
+    module_set_padding(forceGraph, 0, 0);
     module_set_size(forceGraph, 0, 200);
+    module_align_below(forceGraph, positionGraph);
+    forceGraph->y += 10;
+    module_align_inner_left(forceGraph);
+    module_set_color(forceGraph, forceGraph->parent->foregroundColor, forceGraph->parent->backgroundColor);
     module_fit_width(forceGraph);
-    module_set_graph(forceGraph);
+    module_set_graph(forceGraph, "Force", "N");
     module_graph_set_range(forceGraph, -5, 5);
 
     // Create Function Window Container
