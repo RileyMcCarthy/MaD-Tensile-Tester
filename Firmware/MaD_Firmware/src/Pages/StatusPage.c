@@ -61,7 +61,6 @@ StatusPage *status_page_create(Display *display, MachineState *machineState, Mon
 
 void status_page_destroy(StatusPage *page)
 {
-    free(page->buttons);
     free(page);
 }
 
@@ -245,7 +244,7 @@ void status_page_run(StatusPage *page)
     module_set_text(forceValue, "0.00");
     module_text_max_char(forceValue, 10);
     module_set_font(forceValue, RA8876_CHAR_HEIGHT_24);
-    module_text_align(forceValue, MODULE_TEXT_ALIGN_RIGHT);
+    module_text_align(forceValue, MODULE_TEXT_ALIGN_INNER_RIGHT);
 
     Module *positionText = module_create(machineInfoWindow);
     module_copy(positionText, forceText);
@@ -258,7 +257,7 @@ void status_page_run(StatusPage *page)
     module_set_text(positionValue, "0.00");
     module_text_max_char(positionValue, 10);
     module_set_font(positionValue, RA8876_CHAR_HEIGHT_24);
-    module_text_align(positionValue, MODULE_TEXT_ALIGN_RIGHT);
+    module_text_align(positionValue, MODULE_TEXT_ALIGN_INNER_RIGHT);
 
     Module *positionGraph = module_create(machineInfoWindow);
     module_set_padding(positionGraph, 0, 0);
@@ -268,7 +267,7 @@ void status_page_run(StatusPage *page)
     module_set_color(positionGraph, positionGraph->parent->foregroundColor, positionGraph->parent->backgroundColor);
     module_fit_width(positionGraph);
     module_set_graph(positionGraph, "Position", "mm");
-    module_graph_set_range(positionGraph, -100, 100);
+    module_graph_set_range(positionGraph, 10.0, -10.0);
 
     Module *forceGraph = module_create(machineInfoWindow);
     module_set_padding(forceGraph, 0, 0);
@@ -279,7 +278,7 @@ void status_page_run(StatusPage *page)
     module_set_color(forceGraph, forceGraph->parent->foregroundColor, forceGraph->parent->backgroundColor);
     module_fit_width(forceGraph);
     module_set_graph(forceGraph, "Force", "N");
-    module_graph_set_range(forceGraph, -5, 5);
+    module_graph_set_range(forceGraph, 5.0, -5.0);
 
     // Create Function Window Container
     Module *functionWindow = module_create(background);
@@ -464,4 +463,5 @@ void status_page_run(StatusPage *page)
         previousState = currentState;
         initial = false;
     }
+    // module_destroy(root);
 }

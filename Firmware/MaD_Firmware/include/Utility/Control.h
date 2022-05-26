@@ -25,6 +25,7 @@ typedef struct control_t
     MotionProfile *motionProfile;
     DYN4 *dyn4;
     int cogid;
+    long setpointum;
 } Control;
 
 Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);

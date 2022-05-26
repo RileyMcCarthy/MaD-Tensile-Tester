@@ -1,12 +1,14 @@
 #include "Monitor.h"
 #include "IOBoard.h"
 
-static long monitor_stack[64 * 4];
+static long monitor_stack[64 * 10];
 static bool monitorHasNewPosition = false;
 static int monitorNewPosition = 0;
+bool monitorWriteData;
 
 /*responsible for reading/writing data to buffer/test output*/
-static void monitor_cog(Monitor *monitor)
+static void
+monitor_cog(Monitor *monitor)
 {
     int sampleCount = 0;
     int lastus = 0;
@@ -14,6 +16,10 @@ static void monitor_cog(Monitor *monitor)
     int delay = 0;
     Encoder encoder;
     encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
+    monitorWriteData = false;
+    FILE *file = NULL;
+    mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
+    int startTimems = 0;
     while (1)
     {
         /*Delay to run at sampleRate*/
@@ -37,8 +43,35 @@ static void monitor_cog(Monitor *monitor)
             encoder.set(monitorNewPosition);
             monitorHasNewPosition = false;
         }
-        monitor->data.positionum = (1000 * encoder.value()) / monitor->profile->configuration->positionEncoderStepsPerRev; // Get Position in um
-        monitor->data.timems = _getms();                                                                                   // Get Time
+        monitor->data.positionum = (1000 * steps_to_mm(encoder.value(), monitor->profile->configuration)); // Get Position in um
+        monitor->data.timems = _getms();
+        if (monitorWriteData)
+        {
+            if (file == NULL)
+            {
+                startTimems = _getms();
+                file = fopen("/da/raw1.txt", "w");
+                if (file == NULL)
+                {
+                    printf("Failed to open file for writing\n");
+                }
+                else
+                {
+                    printf("Opened file for writing\n");
+                    fprintf(file, "time (ms),forceRaw,force (mN), encoderRaw,position (um)\n");
+                }
+            }
+            // printf("%d,%d,%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.force, encoder.value(), monitor->data.positionum);
+            fprintf(file, "%d,%d,%d,%d,%d\n", monitor->data.timems - startTimems, monitor->data.forceRaw, monitor->data.force, monitor->data.encoderRaw, monitor->data.positionum);
+        }
+        else
+        {
+            if (file != NULL)
+            {
+                fclose(file);
+                file = NULL;
+            }
+        }
 
         //  Update Buffer
         //  circular buffer is faster implementation, this is simple for now

@@ -67,7 +67,7 @@ MachineProfile *load_machine_profile()
   profile->configuration->positionEncoderType = (char *)malloc(strlen(positionEncoderType) + 1);
   strcpy(profile->configuration->positionEncoderType, positionEncoderType);
 
-  profile->configuration->positionEncoderStepsPerRev = 100; //(LINE_NUM*4steps/rev)/(GEAR_PITCH*GEAR_TEETHmm/rev) = step/mm
+  profile->configuration->positionEncoderStepsPerRev = 4 * 2048; //(LINE_NUM*4steps/rev)/(GEAR_PITCH*GEAR_TEETHmm/rev) = step/mm
 
   char *forceGauge = "DS2-5N";
   profile->configuration->forceGauge = (char *)malloc(strlen(forceGauge) + 1);
@@ -86,6 +86,97 @@ MachineProfile *load_machine_profile()
   profile->performance->forceGaugeNeutralOffset = 0.5;
 
   write_machine_profile(profile); // Write machine profile to file
+  return profile;
+}
+
+static MotionProfile *static_test_profile()
+{
+  char buf[50] = '\0';
+  MotionProfile *profile = get_motion_profile();
+
+  char *name = "Tensile_Test_1";
+  profile->name = (char *)malloc(strlen(name) + 1);
+  strcpy(profile->name, name);
+
+  profile->number = 1;
+  profile->setCount = 2;
+  profile->sets = (MotionSet *)malloc(sizeof(MotionSet) * profile->setCount);
+
+  // Create first set
+  char *set1Name = "Set_1";
+  profile->sets[0].name = (char *)malloc(strlen(set1Name) + 1);
+  strcpy(profile->sets[0].name, set1Name);
+
+  profile->sets[0].number = 1;
+  profile->sets[0].executions = 1;
+  profile->sets[0].quartetCount = 2;
+  profile->sets[0].quartets = (MotionQuartet *)malloc(sizeof(MotionQuartet) * profile->sets[0].quartetCount);
+
+  // Create first quartet
+  char *quartet1Name = "Quartet_1";
+  profile->sets[0].quartets[0].name = (char *)malloc(strlen(quartet1Name) + 1);
+  strcpy(profile->sets[0].quartets[0].name, quartet1Name);
+
+  profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  update_quartet_function(&(profile->sets[0].quartets[0]));
+
+  profile->sets[0].quartets[0].parameters[0] = 5;     // Distance
+  profile->sets[0].quartets[0].parameters[1] = 4;     // Strain rate
+  profile->sets[0].quartets[0].parameters[2] = 0.001; // Error
+
+  profile->sets[0].quartets[0].dwell = 500; // 500ms
+
+  // Create second quartet
+  char *quartet2Name = "Quartet_2";
+  profile->sets[0].quartets[1].name = (char *)malloc(strlen(quartet2Name) + 1);
+  strcpy(profile->sets[0].quartets[1].name, quartet2Name);
+
+  profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  update_quartet_function(&(profile->sets[0].quartets[1]));
+
+  profile->sets[0].quartets[1].parameters[0] = -5;    // Distance (m)
+  profile->sets[0].quartets[1].parameters[1] = 4;     // Strain rate (m/s)
+  profile->sets[0].quartets[1].parameters[2] = 0.001; // Error (m)
+
+  profile->sets[0].quartets[1].dwell = 500; // us
+
+  // Create second set
+  char *set2Name = "Set_2";
+  profile->sets[1].name = (char *)malloc(strlen(set2Name) + 1);
+  strcpy(profile->sets[1].name, set2Name);
+
+  profile->sets[1].number = 2;
+  profile->sets[1].executions = 1;
+  profile->sets[1].quartetCount = 2;
+  profile->sets[1].quartets = (MotionQuartet *)malloc(sizeof(MotionQuartet) * profile->sets[1].quartetCount);
+
+  // Create first quartet
+  char *quartet3Name = "Quartet_3";
+  profile->sets[1].quartets[0].name = (char *)malloc(strlen(quartet3Name) + 1);
+  strcpy(profile->sets[1].quartets[0].name, quartet3Name);
+
+  profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  update_quartet_function(&(profile->sets[1].quartets[0]));
+
+  profile->sets[1].quartets[0].parameters[0] = 5;     // Distance
+  profile->sets[1].quartets[0].parameters[1] = 4;     // Strain rate
+  profile->sets[1].quartets[0].parameters[2] = 0.001; // Error
+
+  profile->sets[1].quartets[0].dwell = 500; // 500ms
+
+  // Create second quartet
+  char *quartet4Name = "Quartet_4";
+  profile->sets[1].quartets[1].name = (char *)malloc(strlen(quartet4Name) + 1);
+  strcpy(profile->sets[1].quartets[1].name, quartet4Name);
+
+  profile->sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  update_quartet_function(&(profile->sets[1].quartets[1]));
+
+  profile->sets[1].quartets[1].parameters[0] = -5;    // Distance
+  profile->sets[1].quartets[1].parameters[1] = 4;     // Strain rate
+  profile->sets[1].quartets[1].parameters[2] = 0.001; // Error
+
+  profile->sets[1].quartets[1].dwell = 500; // 500ms
   return profile;
 }
 
@@ -211,6 +302,7 @@ void mad_begin()
   if (control_begin(control))
   {
     loading_overlay_display(display, "Control Started", OVERLAY_TYPE_LOADING);
+    control->motionProfile = static_test_profile(); // Set dummy test profile
   }
   else
   {
@@ -286,12 +378,12 @@ void mad_begin()
     {
       TestProfilePage *page = test_profile_page_create(display, images);
       test_profile_page_run(page);
+      test_profile_page_destroy(page);
       break;
     }
     default:
       break;
     }
-
     printf("Selecting new page\n");
     NavigationPage *navigationPage = navigation_page_create(display, images);
     currentPage = navigation_page_run(navigationPage);

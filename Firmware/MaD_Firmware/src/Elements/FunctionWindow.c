@@ -386,7 +386,7 @@ void function_window_create(Module *container, MachineState *state)
     module_text_max_char(functionHeader, 20);
     module_set_font(functionHeader, RA8876_CHAR_HEIGHT_24);
     module_set_color(functionHeader, COLOR65K_BLACK, functionHeader->parent->foregroundColor);
-    module_text_align(functionHeader, MODULE_TEXT_ALIGN_CENTER); // used for dynamic updating of alignment
+    module_text_align(functionHeader, MODULE_TEXT_ALIGN_INNER_CENTER); // used for dynamic updating of alignment
     module_align_inner_top(functionHeader);
     module_update_callback(functionHeader, update_header);
 

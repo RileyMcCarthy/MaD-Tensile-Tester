@@ -181,7 +181,7 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_text_max_char(statusButtonText, 8);
     module_set_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
     module_set_color(statusButtonText, COLOR65K_BLACK, statusButtonText->parent->foregroundColor);
-    module_text_align(statusButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_text_align(statusButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
     module_align_middle(statusButtonText);
 
     // Create Condition Button
@@ -200,7 +200,7 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_text_max_char(conditionButtonText, 8);
     module_set_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
     module_set_color(conditionButtonText, COLOR65K_BLACK, conditionButtonText->parent->foregroundColor);
-    module_text_align(conditionButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_text_align(conditionButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
     module_align_middle(conditionButtonText);
 
     // Create Mode Button
@@ -220,7 +220,7 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_text_max_char(modeButtonText, 8);
     module_set_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
     module_set_color(modeButtonText, COLOR65K_BLACK, modeButtonText->parent->foregroundColor);
-    module_text_align(modeButtonText, MODULE_TEXT_ALIGN_CENTER);
+    module_text_align(modeButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
     module_align_middle(modeButtonText);
 
     // Update Button Text and Color

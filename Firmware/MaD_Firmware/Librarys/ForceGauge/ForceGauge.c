@@ -62,14 +62,14 @@ void force_gauge_destroy(ForceGauge *forceGauge)
 Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int zero)
 {
     _waitms(100);
-    int configData1 = 0b11001000;
+    int configData1 = 0b11011000;
     int configData2 = 0b01000000;
     int configData4 = 0b01110111;
 
     forceGauge->interpolationSlope = slope;
     forceGauge->interpolationZero = zero;
 
-    forceGauge->serial.start(rx, tx, 3, 19200);
+    forceGauge->serial.start(rx, tx, 3, 38400);
     forceGauge->serial.tx(0x55); // Synchronization word
     forceGauge->serial.tx(0x06); // Reset
     _waitms(100);

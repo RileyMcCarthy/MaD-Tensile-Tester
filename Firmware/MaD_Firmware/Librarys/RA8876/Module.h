@@ -39,9 +39,9 @@ typedef struct Module_s
 typedef enum ModuleTextAignType_e
 {
     MODULE_TEXT_ALIGN_NONE,
-    MODULE_TEXT_ALIGN_LEFT,
-    MODULE_TEXT_ALIGN_CENTER,
-    MODULE_TEXT_ALIGN_RIGHT
+    MODULE_TEXT_ALIGN_INNER_LEFT,
+    MODULE_TEXT_ALIGN_INNER_CENTER,
+    MODULE_TEXT_ALIGN_INNER_RIGHT
 } ModuleTextAignType;
 
 typedef struct ModuleText_s
@@ -82,7 +82,8 @@ void module_paste(Module *module, Display *display);
 void module_set_graph(Module *window, const char *title, const char *units);
 void module_graph_add_marker(Module *module, float value);
 void module_graph_insert(Module *module, double value);
-void module_graph_set_range(Module *module, float maxY, float minY);
+void module_graph_set_range(Module *module, double maxY, double minY);
+int module_graph_get_max_data(Module *module);
 
 void module_set_window(Module *module, void *window);
 void module_set_line(Module *module, int w);

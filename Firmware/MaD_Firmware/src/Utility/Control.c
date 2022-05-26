@@ -4,6 +4,8 @@ static long control_stack[64 * 4];
 
 #define SERVO_CHECK_COUNT_MAX 3
 
+extern bool monitorWriteData;
+
 typedef enum homingstate_e
 {
     HOMING_NONE,
@@ -29,23 +31,24 @@ static bool move_servo(Control *control, MoveType type, int value)
     case MOVE_RELATIVE:
     {
         // printf("moving relitive\n");
-        int positionSteps = value * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0; // convert um to steps
-        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, positionSteps);
+        // int positionSteps = value * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0; // convert um to steps
+        int positionSteps = mm_to_steps((control->monitorData->positionum + value) / 1000.0, control->machineProfile->configuration);
+        dyn4_send_command(control->dyn4, dyn4_go_abs_pos, positionSteps);
         break;
     }
     case MOVE_ABSOLUTE:
     {
-        int deltaSteps = (control->monitorData->positionum - value) * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0;
-        dyn4_send_command(control->dyn4, dyn4_go_rel_pos, deltaSteps); // Stop motion
+        int deltaSteps = mm_to_steps((value) / 1000.0, control->machineProfile->configuration);
+        dyn4_send_command(control->dyn4, dyn4_go_abs_pos, deltaSteps);
         break;
     }
     case MOVE_SPEED:
     {
         int rpm = ((float)value / 1000.0) * (60.0 / 80.0);              // um/s to rpm (mm/s)*((sec/min)/(mm/rev))
-        dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, rpm); // Stop motion (mm/r)*(r/min)/(sec/min)
-        break;
+        dyn4_send_command(control->dyn4, dyn4_rotate_const_speed, rpm); // Stop motion (mm/r)*(r/min)/(sec/min)        break;
     }
     }
+
     return true;
 }
 
@@ -75,16 +78,19 @@ static void control_cog(Control *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
+    monitor_set_position(0);
+    dyn4_send_command(control->dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
+
     // For running test profiles
     RunMotionProfile *run = NULL;
     long startTime = 0;
+    int lastPosition = 0;
 
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
     MonitorData lastData = *control->monitorData;
     while (1)
     {
-
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
         MachinePerformance machinePerformance = *(control->machineProfile->performance);
@@ -98,7 +104,7 @@ static void control_cog(Control *control)
         }
         else
         {
-            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 1);
+            mcp_set_pin(mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
         }
 
         /*Update Machine Check State parameters*/
@@ -295,13 +301,13 @@ static void control_cog(Control *control)
                         if (navkey->status.LTR > 0) // Left released
                         {
                             if (control->stateMachine->functionData < 10000) // No step size above 10mm
-                                control->stateMachine->functionData *= 10;   // Increase step size by multiple of 10
+                                control->stateMachine->functionData /= 10;   // Increase step size by multiple of 10
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
                             if (control->stateMachine->functionData > 10) // No step size below 0.01mm
                             {
-                                control->stateMachine->functionData /= 10; // Decrease step size by multiple of 10
+                                control->stateMachine->functionData *= 10; // Decrease step size by multiple of 10
                             }
                         }
                         if (navkey->status.UPR > 0) // Up released
@@ -321,11 +327,11 @@ static void control_cog(Control *control)
                         }
                         if (navkey->status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 1000; // Increase step size by 1mm
+                            control->stateMachine->functionData -= 1000; // Increase step size by 1mm
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
-                            control->stateMachine->functionData -= 1000; // Decrease step size by 1mm
+                            control->stateMachine->functionData += 1000; // Decrease step size by 1mm
                         }
                         if (navkey->status.UPP > 0) // Up pressed
                         {
@@ -348,18 +354,15 @@ static void control_cog(Control *control)
                         if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
                         {
                             move_servo(control, MOVE_RELATIVE, 0);
-                            control->stateMachine->functionData = data.positionum; // Default position in mm
+                            control->stateMachine->functionData = 1000 * round(data.positionum / 1000.0); // Default position in mm
                         }
                         if (navkey->status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 1000; // Increase position by 1mm
+                            control->stateMachine->functionData -= 1000; // Increase position by 1mm
                         }
                         if (navkey->status.RTR > 0) // Right released
                         {
-                            if (control->stateMachine->functionData > 100)
-                            {
-                                control->stateMachine->functionData -= 1000; // Decrease position by 1mm
-                            }
+                            control->stateMachine->functionData += 1000; // Decrease position by 1mm
                         }
                         if (navkey->status.UPR > 0) // Up released
                         {
@@ -396,9 +399,10 @@ static void control_cog(Control *control)
                         else if (mcp_get_pin(mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == HOMING_SEEKING_SLOW)
                         {
                             move_servo(control, MOVE_RELATIVE, 0);
+                            _waitms(1000);
+                            dyn4_send_command(control->dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
                             monitor_set_position(0);
-                            _waitms(100);
-                            move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
+                            // move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
                             control->stateMachine->functionData = HOMING_COMPLETE;
                         }
                         if (navkey->status.UPR > 0) // Up released
@@ -467,6 +471,7 @@ static void control_cog(Control *control)
                         printf("running test\n");
                         run = get_run_motion_profile(); // Create new RunMotionProfile structure
                         startTime = _getus();
+                        monitorWriteData = true;
                     }
                     // Run the loaded test profile
                     if (control->motionProfile != NULL)
@@ -475,10 +480,13 @@ static void control_cog(Control *control)
                         {
                             double t = (_getus() - startTime) / 1000000.0;
                             double position = position_profile(t, run, control->motionProfile);
-                            // printf("%f,%f\n", t, position);
+                            // printf("%f,%f,%f\n", t, position, control->monitorData->positionum / 1000.0);
+                            move_servo(control, MOVE_ABSOLUTE, position * 1000);
+                            lastPosition = position;
                         }
                         else
                         {
+                            monitorWriteData = false;
                             destroy_run_motion_profile(run);
                             state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                         }

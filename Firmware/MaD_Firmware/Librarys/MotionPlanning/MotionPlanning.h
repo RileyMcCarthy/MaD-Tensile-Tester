@@ -59,6 +59,8 @@ typedef struct RunMotionProfile_s
     double lastSetDistance;
     double lastExecutionDistance;
     double lastQuartetDistance;
+
+    double dwellTime;
 } RunMotionProfile;
 
 RunMotionProfile *get_run_motion_profile();
@@ -76,4 +78,6 @@ double sigmoid(float t, double *args);
 void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, float (*f)(float t, va_list args), ...);
 SetPoint *create_empty_setpoint();
 
+double steps_to_mm(int steps, MachineConfiguration *config);
+int mm_to_steps(double mm, MachineConfiguration *config);
 #endif

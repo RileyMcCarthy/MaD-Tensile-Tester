@@ -12,6 +12,11 @@
 #define BUTTON_QUARTET_FUNC 1
 #define BUTTON_QUARTET_DWELL 2
 
+#define BUTTON_SET_COUNT 3
+#define BUTTON_SET_NAME 0
+#define BUTTON_SET_EXECUTIONS 1
+#define BUTTON_SET_QUARTETS 2
+
 #define PROFILE_TYPES 4
 #define PROFILE_QUARTET 0
 #define PROFILE_SET 1
@@ -274,6 +279,94 @@ static void button_quartet_parameters(int id, void *arg)
     free(param);
 }
 
+static void button_set(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+    switch (id)
+    {
+    case BUTTON_SET_NAME:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *filename = keyboard_get_input(keyboard, "Enter file name: ");
+        keyboard_destroy(keyboard);
+        free(page->set->name);
+        page->set->name = (char *)malloc(strlen(page->path) + strlen(filename) + strlen(".set") + 2);
+        strcpy(page->set->name, page->path);
+        strcat(page->set->name, "/");
+        strcat(page->set->name, filename);
+        strcat(page->set->name, ".set");
+        free(filename);
+        break;
+    }
+    case BUTTON_SET_EXECUTIONS:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *executions = keyboard_get_input(keyboard, "Executions: ");
+        page->set->executions = atoi(executions);
+        keyboard_destroy(keyboard);
+        free(executions);
+        break;
+    }
+    case BUTTON_SET_QUARTETS:
+    {
+        char *optionNames[] = {"Add", "Remove"};
+        int newmode = selection_run(page->display, 100, 100, optionNames, 2);
+        if (newmode == 0) // Add
+        {
+            Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_FILE, "/sd");
+            if (explorer == NULL)
+            {
+                printf("Testprofile.c explorer could not allocate memory\n");
+            }
+
+            char *newfile = explorer_run(explorer);
+            explorer_destroy(explorer);
+
+            if (newfile != NULL)
+            {
+                page->set->quartetCount++;
+                page->set->quartets = (MotionQuartet *)realloc(page->set->quartets, sizeof(MotionQuartet) * page->set->quartetCount);
+                json_to_motion_quartet(newfile, &(page->set->quartets[page->set->quartetCount - 1]));
+            }
+            else
+            {
+                return;
+            }
+        }
+        else if (newmode == 1) // Remove
+        {
+            char **optionNames = (char **)malloc(sizeof(char *) * page->set->quartetCount);
+            for (int i = 0; i < page->set->quartetCount; i++)
+            {
+                optionNames[i] = (char *)malloc(strlen(page->set->quartets[i].name) + 1);
+                strcpy(optionNames[i], page->set->quartets[i]);
+            }
+            int index = selection_run(page->display, 100, 100, optionNames, 2);
+
+            // Free option names
+            for (int i = 0; i < page->set->quartetCount; i++)
+            {
+                free(optionNames[i]);
+            }
+            free(optionNames);
+
+            // Remove index for quartets
+            free_motion_quartet(&(page->set->quartets[index]));
+            for (int i = index; i < page->set->quartetCount - 1; i++)
+            {
+                page->set->quartets[i] = page->set->quartets[i + 1];
+            }
+            page->set->quartetCount--;
+            page->set->quartets = realloc(page->set->quartets, sizeof(MotionQuartet) * page->set->quartetCount);
+        }
+        else
+        {
+            printf("something is wrong:%d\n", newmode);
+        }
+    }
+    }
+}
+
 TestProfilePage *test_profile_page_create(Display *display, Images *images)
 {
     TestProfilePage *page = (TestProfilePage *)malloc(sizeof(TestProfilePage));
@@ -297,6 +390,7 @@ void test_profile_page_run(TestProfilePage *page)
 {
     printf("Test profile page running\n");
     int padding = 20;
+
     // Create Background
     Module *root = module_create(NULL);
     Module *background = module_create(root);
@@ -376,20 +470,16 @@ void test_profile_page_run(TestProfilePage *page)
     module_align_center(editWindowTitle);
     module_add_underline(editWindowTitle);
 
-    double graph1Data[100];
-    for (int i = 0; i < 100; i++)
-    {
-        graph1Data[i] = 0;
-    }
     Module *graph1 = module_create(background);
-    /*    module_set_graph(graph1, graph1Data, 100, "mm", "Profile");
-        module_set_padding(graph1, padding, padding);
-        module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
-        module_align_right(graph1, editWindow);
-        module_align_inner_top(graph1);*/
+    module_set_padding(graph1, 0, 0);
+    module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
+    module_align_right(graph1, editWindow);
+    module_align_inner_top(graph1);
+    module_set_color(graph1, graph1->parent->foregroundColor, graph1->parent->backgroundColor);
+    module_set_graph(graph1, "Position Vs. Time", "mm");
+    module_graph_set_range(graph1, 5, -5);
 
-    // Create Buttons
-
+    module_draw(page->display, root);
     int lastMode = -1;
     while (!page->complete)
     {
@@ -461,25 +551,43 @@ void test_profile_page_run(TestProfilePage *page)
             double t = 0;
             // Find t_max
             long startTime = _getms();
+            double d_max = 0;
+            double d_min = 0;
             while (!run->quartetComplete)
             {
                 double distance = position_quartet(t, run, page->quartet);
                 // printf("distance:%f\n", distance);
                 t += 0.01;
+                if (distance > d_max)
+                {
+                    d_max = distance;
+                }
+                if (distance < d_min)
+                {
+                    d_min = distance;
+                }
                 if ((_getms() - startTime) > 1000) // timeout
                 {
+                    printf("Timeout\n");
                     break;
                 }
             }
             destroy_run_motion_profile(run);
+
+            module_graph_set_range(graph1, 10, -10);
             run = get_run_motion_profile();
             printf("t_max:%f\n", t);
-            double dt = t / 100.0; // Get interval for graph
-            for (int i = 0; i < 100; i++)
+            int dataPoints = module_graph_get_max_data(graph1);
+            printf("dataPoints:%d\n", dataPoints);
+            double dt = t * 1000 / (double)dataPoints; // Get interval for graph
+            for (int i = 0; i < dataPoints; i++)
             {
-                graph1Data[i] = position_quartet(i * dt, run, page->quartet);
-                // printf("graph1Data[%d]:%f,%f\n", i, i * dt, graph1Data[i]);
+                double position = position_quartet(i * dt / 1000.0, run, page->quartet);
+                module_graph_insert(graph1, position);
+                module_draw(page->display, graph1);
+                // printf("graph1Data%f,%f\n", position, i * dt);
             }
+            printf("total time:%f\n", t);
             destroy_run_motion_profile(run);
             Module *dwellModule = module_create(subroot);
             module_copy(dwellModule, nameModule);
@@ -508,6 +616,19 @@ void test_profile_page_run(TestProfilePage *page)
             module_set_font(editWindowTitle, RA8876_CHAR_HEIGHT_32);
             module_align_center(editWindowTitle);
             module_add_underline(editWindowTitle);
+
+            char buf[50];
+            Module *nameModule = module_create(subroot);
+            sprintf(buf, "Name: %s", page->set->name);
+            module_set_text(nameModule, buf);
+            module_set_font(nameModule, RA8876_CHAR_HEIGHT_24);
+            module_align_inner_left(nameModule);
+            module_align_inner_top(nameModule);
+            module_set_color(nameModule, SECONDARYTEXTCOLOR, nameModule->parent->foregroundColor);
+            module_touch_callback(nameModule, button_set, BUTTON_SET_NAME);
+
+            Module *funcModule = module_create(subroot);
+            module_copy(funcModule, nameModule);
             break;
         }
         case PROFILE_MOTION:
@@ -522,7 +643,7 @@ void test_profile_page_run(TestProfilePage *page)
             break;
         }
 
-        module_draw(page->display, root);
+        module_draw(page->display, subroot);
         do
         {
             display_update_touch(page->display);

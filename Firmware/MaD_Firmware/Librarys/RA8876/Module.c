@@ -182,12 +182,24 @@ void module_set_graph(Module *window, const char *titleName, const char *units)
     char buf[15];
     Module *minText = module_create(window);
     module_set_padding(minText, 3, 3);
-    sprintf(buf, "%.2f", graph->minY);
-    module_set_text(minText, buf);
+    module_set_text(minText, "00.00");
+    module_text_max_char(minText, 5);
     module_set_font(minText, RA8876_CHAR_HEIGHT_16);
     module_set_color(minText, COLOR65K_BLACK, minText->parent->foregroundColor);
     module_align_inner_bottom(minText);
     module_align_inner_left(minText);
+    module_text_align(minText, MODULE_TEXT_ALIGN_INNER_LEFT);
+
+    // Create max
+    Module *maxText = module_create(window);
+    module_set_padding(maxText, 3, 3);
+    module_set_text(maxText, "00.00");
+    module_text_max_char(maxText, 5);
+    module_set_font(maxText, RA8876_CHAR_HEIGHT_16);
+    module_align_inner_left(maxText);
+    module_text_align(maxText, MODULE_TEXT_ALIGN_INNER_LEFT);
+    module_set_color(maxText, COLOR65K_BLACK, maxText->parent->foregroundColor);
+    module_align_below(maxText, title);
 
     // Create Graph Area
     Module *graphArea = module_create(window);
@@ -208,25 +220,13 @@ void module_set_graph(Module *window, const char *titleName, const char *units)
     module_align_inner_left(units_module);
 
     // Create zero
-    char buf[15];
-    Module *zeroText = module_create(graphArea);
+    /*Module *zeroText = module_create(graphArea);
     module_set_padding(zeroText, 3, 3);
     module_set_text(zeroText, "0");
     module_set_font(zeroText, RA8876_CHAR_HEIGHT_16);
     module_set_color(zeroText, COLOR65K_BLACK, zeroText->parent->foregroundColor);
     module_align_left(zeroText, graphArea);
-    module_align_middle(zeroText);
-
-    // Create max
-    char buf[15];
-    Module *maxText = module_create(graphArea);
-    module_set_padding(maxText, 3, 3);
-    sprintf(buf, "%.2f", graph->maxY);
-    module_set_text(maxText, buf);
-    module_set_font(maxText, RA8876_CHAR_HEIGHT_16);
-    module_set_color(maxText, COLOR65K_BLACK, maxText->parent->foregroundColor);
-    module_align_inner_top(maxText);
-    module_align_left(maxText, graphArea);
+    module_align_middle(zeroText);*/
 
     // Create Graph Horizontal Line
     Module *centerLine = module_create(graphArea);
@@ -260,27 +260,19 @@ void module_graph_insert(Module *module, double value)
     double temp = graph->data[0];
     graph->data[1] = temp;
     graph->data[0] = value;
-    /*if (graph->dataCount < graph->graphArea->w) // If there is space in the graph, insert at end
-    {
-        graph->data = realloc(graph->data, (graph->dataCount + 1) * sizeof(double));
-        graph->data[graph->dataCount] = value;
-        graph->dataCount++;
-    }
-    else // If there is no space in the graph, remove the first value and insert at end
-    {
-        for (int i = 0; i < graph->dataCount - 1; i++)
-        {
-            graph->data[i] = graph->data[i + 1];
-        }
-        graph->data[graph->dataCount - 1] = value;
-    }*/
 }
 
-void module_graph_set_range(Module *module, float maxY, float minY)
+void module_graph_set_range(Module *module, double maxY, double minY)
 {
     Graph *graph = (Graph *)module->data;
     graph->maxY = maxY;
     graph->minY = minY;
+}
+
+int module_graph_get_max_data(Module *module)
+{
+    Graph *graph = (Graph *)module->data;
+    return graph->graphArea->w / 2;
 }
 
 void module_set_image(Module *module, Image *image)
@@ -567,7 +559,6 @@ void module_draw(Display *display, Module *module)
             {
                 strcat(emptyString, " ");
             }
-            printf(",%s,\n", emptyString);
             module_set_text(blank, emptyString);
             module_set_font(blank, moduleText->font);
             free(emptyString);
@@ -577,15 +568,15 @@ void module_draw(Display *display, Module *module)
         module_set_font(module, moduleText->font); // Recalculate w,h
         switch (moduleText->alignment)
         {
-        case MODULE_TEXT_ALIGN_LEFT:
+        case MODULE_TEXT_ALIGN_INNER_LEFT:
             module_align_inner_left(module);
             module_align_inner_left(blank);
             break;
-        case MODULE_TEXT_ALIGN_CENTER:
+        case MODULE_TEXT_ALIGN_INNER_CENTER:
             module_align_center(module);
             module_align_center(blank);
             break;
-        case MODULE_TEXT_ALIGN_RIGHT:
+        case MODULE_TEXT_ALIGN_INNER_RIGHT:
             module_align_inner_right(module);
             module_align_inner_right(blank);
             break;
@@ -632,9 +623,10 @@ void module_draw(Display *display, Module *module)
         double range = graph->maxY - graph->minY;
         display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 4, graph->graphArea->y, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 2, graph->graphArea->y, graph->graphArea->w - 2, graph->graphArea->h);
         display_draw_square_fill(display, graph->graphArea->x + graph->graphArea->w, graph->graphArea->y, graph->graphArea->x + graph->graphArea->w + 2, graph->graphArea->y + graph->graphArea->h, module->parent->foregroundColor);
-        int y = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / (range / 2)));
-        int lastY = graph->graphArea->y + graph->graphArea->h / 2 + (int)(graph->data[1] * (double)((graph->graphArea->h / 2) / (range / 2)));
+        int y = graph->graphArea->y + graph->graphArea->h / 2 - (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / (range / 2)));
+        int lastY = graph->graphArea->y + graph->graphArea->h / 2 - (int)(graph->data[1] * (double)((graph->graphArea->h / 2) / (range / 2)));
         display_draw_line(display, graph->graphArea->x + graph->graphArea->w, lastY, graph->graphArea->x + graph->graphArea->w + 2, y, COLOR65K_RED);
+        // printf("max:%f\n", graph->maxY);
         break;
     }
     }
@@ -685,7 +677,6 @@ void module_text_destroy(ModuleText *text)
 
 void module_destroy(Module *root)
 {
-
     // Free module children
     int children = root->numChildren;
     for (int i = 0; i < children; i++)
@@ -699,6 +690,14 @@ void module_destroy(Module *root)
     case MODULE_TEXT:
     {
         module_text_destroy(root->data);
+        break;
+    }
+    case MODULE_GRAPH:
+    {
+        Graph *graph = (Graph *)root->data;
+        // free(graph->title);
+        // free(graph->units);
+        // free(graph);
         break;
     }
     default:

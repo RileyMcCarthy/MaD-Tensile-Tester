@@ -1497,9 +1497,15 @@ void display_load_image(Display *display, Image *image)
   {
     display_canvas_image_start_address(display, PAGE3_START_ADDR);
   }
+
   mkdir("/sd/img", 0);
   chdir("/sd/img");
   FILE *fp = fopen(image->name, "r");
+  if (fp == NULL)
+  {
+    printf("Error opening file %s\n", image->name);
+    return;
+  }
   if (fp == NULL)
   {
     printf("Error opening file(%s): %d\n", image->name, _geterror());

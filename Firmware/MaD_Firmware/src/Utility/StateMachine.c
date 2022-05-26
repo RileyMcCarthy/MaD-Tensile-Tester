@@ -87,6 +87,7 @@ static State state_machine_motion(MachineState *machineState)
 
     // Check internal parameters
     if (machineState->motionParameters.status != STATUS_DISABLED)
+    {
         switch (machineState->motionParameters.condition) // Update status based on condition
         {
         case MOTION_LENGTH:
@@ -125,6 +126,11 @@ static State state_machine_motion(MachineState *machineState)
             }
             break;
         }
+    }
+    else
+    {
+        machineState->motionParameters.mode = MODE_MANUAL;
+    }
 
     return STATE_MOTION;
 }

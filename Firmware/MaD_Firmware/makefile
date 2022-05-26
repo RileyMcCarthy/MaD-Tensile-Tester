@@ -11,7 +11,6 @@
  SOURCE = $(foreach dir,$(SOURCEDIR),$(wildcard $(dir)/*.c))
  SOURCE_CPP = $(foreach dir,$(SOURCEDIR),$(wildcard $(dir)/*.cpp))
 
-
  OBJECTS := $(addprefix $(BIN)/,$(SOURCE:.c=.o)) $(addprefix $(BIN)/,$(SOURCE_CPP:.cpp=.o))
  INC := $(addprefix -I ,$(INCLUDE))
  $(info VAR="$(OBJECTS)")

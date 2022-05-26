@@ -15,7 +15,6 @@ typedef struct TestProfilePage_s
 {
     bool complete;
     Display *display;
-    Button *buttons;
     Images *images;
     int mode;
     char *path;

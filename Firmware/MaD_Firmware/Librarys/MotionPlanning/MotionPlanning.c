@@ -313,3 +313,13 @@ SetPoint *create_empty_setpoint()
     setpoint->a = 0;
     return setpoint;
 }
+
+double steps_to_mm(int steps, MachineConfiguration *config)
+{
+    return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
+}
+
+int mm_to_steps(double mm, MachineConfiguration *config)
+{
+    return (int)round(mm * config->positionEncoderStepsPerRev / (config->gearDiameter * 3.14159));
+}
