@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include "MotionPlanning.h"
 
+Display display;
+
 /**
  * @brief writes a machine profile object to a json file in /sd/settings/
  *
@@ -188,10 +190,9 @@ static MotionProfile *static_test_profile()
 Display *start_display()
 {
   Error err;
-  Display *display = (Display *)malloc(sizeof(Display));
 
   // turn on diplay
-  if ((err = display_begin(display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
+  if ((err = display_begin(DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
   {
     printf("Error starting display:%d\n", err);
     return NULL;
@@ -312,7 +313,7 @@ void mad_begin()
   machineState->selfCheckParameters.chargePump = true;
 
   // Begin main loop
-  Pages currentPage = PAGE_STATUS;
+  Pages currentPage = PAGE_SETTINGS;
   while (1)
   {
     switch (currentPage)
@@ -388,5 +389,6 @@ void mad_begin()
     NavigationPage *navigationPage = navigation_page_create(display, images);
     currentPage = navigation_page_run(navigationPage);
     navigation_page_destroy(navigationPage);
+    //_gc_collect();
   }
 }

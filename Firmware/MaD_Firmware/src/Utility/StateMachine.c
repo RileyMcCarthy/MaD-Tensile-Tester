@@ -80,7 +80,7 @@ static State state_machine_motion(MachineState *machineState)
         {
             machineState->motionParameters.status = STATUS_DISABLED;
         }
-        printf("machine check failed\n");
+        // printf("machine check failed\n");
         machineState->motionParameters.mode = MODE_MANUAL;
         return newState;
     }

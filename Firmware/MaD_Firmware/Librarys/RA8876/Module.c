@@ -165,8 +165,11 @@ void module_set_graph(Module *window, const char *titleName, const char *units)
 
     Graph *graph = (Graph *)malloc(sizeof(Graph));
 
-    graph->title = titleName;
-    graph->units = units;
+    graph->title = malloc(strlen(titleName) + 1);
+    strcpy(graph->title, titleName);
+
+    graph->units = malloc(strlen(units) + 1);
+    strcpy(graph->units, units);
 
     // Create Title
     Module *title = module_create(window);
@@ -245,7 +248,6 @@ void module_set_graph(Module *window, const char *titleName, const char *units)
     module_set_color(verticleLine, COLOR65K_BLACK, COLOR65K_BLACK);
 
     graph->graphArea = graphArea;
-    graph->dataCount = 0; // Start Graph with no data
 
     window->data = graph;
 }
@@ -257,8 +259,7 @@ void module_graph_insert(Module *module, double value)
     {
         return;
     }
-    double temp = graph->data[0];
-    graph->data[1] = temp;
+    graph->data[1] = graph->data[0];
     graph->data[0] = value;
 }
 
@@ -619,7 +620,6 @@ void module_draw(Display *display, Module *module)
     {
         Graph *graph = (Graph *)module->data;
 
-        double factor = (double)graph->graphArea->w / (double)graph->dataCount;
         double range = graph->maxY - graph->minY;
         display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 4, graph->graphArea->y, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 2, graph->graphArea->y, graph->graphArea->w - 2, graph->graphArea->h);
         display_draw_square_fill(display, graph->graphArea->x + graph->graphArea->w, graph->graphArea->y, graph->graphArea->x + graph->graphArea->w + 2, graph->graphArea->y + graph->graphArea->h, module->parent->foregroundColor);
@@ -677,6 +677,7 @@ void module_text_destroy(ModuleText *text)
 
 void module_destroy(Module *root)
 {
+    return;
     // Free module children
     int children = root->numChildren;
     for (int i = 0; i < children; i++)
@@ -694,10 +695,10 @@ void module_destroy(Module *root)
     }
     case MODULE_GRAPH:
     {
-        Graph *graph = (Graph *)root->data;
-        // free(graph->title);
-        // free(graph->units);
-        // free(graph);
+        Graph *graph = (Graph *)(root->data);
+        free(graph->title);
+        free(graph->units);
+        free(graph);
         break;
     }
     default:

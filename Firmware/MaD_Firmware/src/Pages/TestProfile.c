@@ -546,7 +546,7 @@ void test_profile_page_run(TestProfilePage *page)
 
             free_function_info(info);
             printf("running quartet\n");
-            RunMotionProfile *run = get_run_motion_profile();
+            /*RunMotionProfile *run = get_run_motion_profile();
 
             double t = 0;
             // Find t_max
@@ -556,7 +556,7 @@ void test_profile_page_run(TestProfilePage *page)
             while (!run->quartetComplete)
             {
                 double distance = position_quartet(t, run, page->quartet);
-                // printf("distance:%f\n", distance);
+                printf("distance:%f\n", distance);
                 t += 0.01;
                 if (distance > d_max)
                 {
@@ -588,7 +588,8 @@ void test_profile_page_run(TestProfilePage *page)
                 // printf("graph1Data%f,%f\n", position, i * dt);
             }
             printf("total time:%f\n", t);
-            destroy_run_motion_profile(run);
+            destroy_run_motion_profile(run);*/
+
             Module *dwellModule = module_create(subroot);
             module_copy(dwellModule, nameModule);
             sprintf(buf, "Dwell (ms): %0.3f", page->quartet->dwell);

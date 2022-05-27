@@ -54,7 +54,6 @@ typedef struct ModuleText_s
 
 typedef struct graph_t
 {
-    int dataCount;
     double data[2];
     double maxY;
     double minY;

@@ -1,6 +1,7 @@
 #include "Control.h"
 #include "MotionPlanning.h"
-static long control_stack[64 * 4];
+#define CONTROL_MEMORY_SIZE 32768
+static long control_stack[CONTROL_MEMORY_SIZE];
 
 #define SERVO_CHECK_COUNT_MAX 3
 
@@ -248,11 +249,11 @@ static void control_cog(Control *control)
                     navkey_update_status(navkey); // Update navkey status registers
                     if (navkey->status.CTRR > 0)  // Center button released
                     {
-                        printf("CTRR:%d\n", navkey->status.CTRR);
+                        // printf("CTRR:%d\n", navkey->status.CTRR);
 
                         if (currentMachineState.motionParameters.condition == MOTION_STOPPED)
                         {
-                            printf("stopped\n");
+                            // printf("stopped\n");
                             switch (currentMachineState.function)
                             {
                             case FUNC_MANUAL_OFF:
@@ -278,7 +279,7 @@ static void control_cog(Control *control)
                                 control->stateMachine->function = FUNC_MANUAL_OFF;
                                 break;
                             }
-                            printf("Function: %d\n", control->stateMachine->function);
+                            // printf("Function: %d\n", control->stateMachine->function);
                         }
                         else if (control->stateMachine->motionParameters.condition == MOTION_MOVING)
                         {
@@ -468,7 +469,7 @@ static void control_cog(Control *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        printf("running test\n");
+                        // printf("running test\n");
                         run = get_run_motion_profile(); // Create new RunMotionProfile structure
                         startTime = _getus();
                         monitorWriteData = true;
@@ -522,7 +523,7 @@ Control *control_create(MachineProfile *machineProfile, MachineState *stateMachi
 }
 bool control_begin(Control *control)
 {
-    control->cogid = _cogstart_C(control_cog, control, &control_stack[0], sizeof(control_stack));
+    control->cogid = _cogstart_C(control_cog, control, &control_stack[0], sizeof(long) * CONTROL_MEMORY_SIZE);
     if (control->cogid != -1)
     {
         return true;

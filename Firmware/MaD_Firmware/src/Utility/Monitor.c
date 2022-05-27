@@ -1,7 +1,7 @@
 #include "Monitor.h"
 #include "IOBoard.h"
-
-static long monitor_stack[64 * 10];
+#define MONITOR_MEMORY_SIZE 64 * 64
+static long monitor_stack[MONITOR_MEMORY_SIZE];
 static bool monitorHasNewPosition = false;
 static int monitorNewPosition = 0;
 bool monitorWriteData;
@@ -84,7 +84,7 @@ bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, Machine
     monitor->forceGauge = forceGauge;
     monitor->profile = profile;
     monitor->sampleRate = sampleRate;
-    monitor->cogid = _cogstart_C(monitor_cog, monitor, &monitor_stack[0], sizeof(long) * 64);
+    monitor->cogid = _cogstart_C(monitor_cog, monitor, &monitor_stack[0], sizeof(long) * MONITOR_MEMORY_SIZE);
     if (monitor->cogid != -1)
     {
         return true;

@@ -463,5 +463,5 @@ void status_page_run(StatusPage *page)
         previousState = currentState;
         initial = false;
     }
-    // module_destroy(root);
+    module_destroy(root);
 }

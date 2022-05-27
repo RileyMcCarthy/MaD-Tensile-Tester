@@ -158,5 +158,6 @@ Pages navigation_page_run(NavigationPage *page)
         display_update_touch(page->display);
         module_touch_check(root, page->display, page);
     }
+    module_destroy(root);
     return page->newPage;
 }
