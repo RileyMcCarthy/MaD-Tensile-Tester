@@ -23,7 +23,7 @@ typedef struct CalibrateForcePage_s
     int state;
 } CalibrateForcePage;
 
-CalibrateForcePage *calibrate_force_page_create(Display *display, Monitor *monitor, ForceGauge *forceGauge, Images *images);
+void calibrate_force_page_init(CalibrateForcePage *page, Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images);
 void calibrate_force_page_destroy(CalibrateForcePage *page);
 bool calibrate_force_page_run(CalibrateForcePage *page);
 

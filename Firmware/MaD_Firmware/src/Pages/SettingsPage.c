@@ -323,9 +323,8 @@ static bool check_buttons(SettingsPage *page)
     }
 }
 
-SettingsPage *settings_page_create(Display *display, MachineProfile *machineProfile, Images *images)
+void settings_page_init(SettingsPage *page, Display *display, MachineProfile *machineProfile, Images *images)
 {
-    SettingsPage *page = (SettingsPage *)malloc(sizeof(SettingsPage));
     page->display = display;
     page->images = images;
     page->machineProfile = machineProfile;

@@ -24,7 +24,7 @@ typedef struct ManualPage_t
     Images *images;
 } ManualPage;
 
-ManualPage *manual_page_create(Display *display, MachineState *machineState, Images *images);
+void manual_page_init(ManualPage *page, Display *display, MachineState *machineState, Images *images);
 void manual_page_destroy(ManualPage *page);
 void manual_page_run(ManualPage *page);
 

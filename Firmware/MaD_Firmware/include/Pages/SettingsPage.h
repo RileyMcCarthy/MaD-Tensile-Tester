@@ -20,7 +20,7 @@ typedef struct SettingsPage_s
     Images *images;
 } SettingsPage;
 
-SettingsPage *settings_page_create(Display *display, MachineProfile *machineProfile, Images *images);
+void settings_page_init(SettingsPage *page, Display *display, MachineProfile *machineProfile, Images *images);
 void settings_page_destroy(SettingsPage *page);
 bool settings_page_run(SettingsPage *page);
 

@@ -27,9 +27,9 @@ typedef struct monitor_cog_t
 
 typedef struct __using("jm_quadrature.spin2") Encoder;
 
-Monitor *monitor_create();
+void monitor_init(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate);
 void monitor_destroy(Monitor *monitor);
 
-bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate);
+bool monitor_begin(Monitor *monitor);
 void monitor_set_position(int position);
 #endif

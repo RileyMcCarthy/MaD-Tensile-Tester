@@ -113,17 +113,6 @@ double sigmoid(double t, double *args)
     return dir * position;
 }
 
-void update_quartet_function(MotionQuartet *quartet)
-{
-    FunctionInfo *info = get_function_info(quartet->function);
-    quartet->parameters = (double *)realloc(quartet->parameters, sizeof(double) * info->args_count);
-    for (int i = 0; i < info->args_count; i++)
-    {
-        quartet->parameters[i] = 0;
-    }
-    free_function_info(info);
-}
-
 FunctionInfo *get_function_info(QuartetFunctions id)
 {
     FunctionInfo *info = (FunctionInfo *)malloc(sizeof(FunctionInfo));

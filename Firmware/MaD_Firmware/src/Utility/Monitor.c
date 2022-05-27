@@ -78,12 +78,8 @@ monitor_cog(Monitor *monitor)
     }
 }
 
-bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate)
+bool monitor_begin(Monitor *monitor)
 {
-    monitor->dyn4 = dyn4;
-    monitor->forceGauge = forceGauge;
-    monitor->profile = profile;
-    monitor->sampleRate = sampleRate;
     monitor->cogid = _cogstart_C(monitor_cog, monitor, &monitor_stack[0], sizeof(long) * MONITOR_MEMORY_SIZE);
     if (monitor->cogid != -1)
     {
@@ -92,9 +88,12 @@ bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, Machine
     return false;
 }
 
-Monitor *monitor_create()
+void monitor_init(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate)
 {
-    return (Monitor *)malloc(sizeof(Monitor));
+    monitor->dyn4 = dyn4;
+    monitor->forceGauge = forceGauge;
+    monitor->profile = profile;
+    monitor->sampleRate = sampleRate;
 }
 
 void monitor_destroy(Monitor *monitor)

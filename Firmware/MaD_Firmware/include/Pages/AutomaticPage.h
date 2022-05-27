@@ -30,7 +30,7 @@ typedef struct AutomaticPage_t
     MachineState *state;
 } AutomaticPage;
 
-AutomaticPage *automatic_page_create(Display *display, Images *images, MachineState *state);
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state);
 void automatic_page_destroy(AutomaticPage *page);
 void automatic_page_run(AutomaticPage *page);
 

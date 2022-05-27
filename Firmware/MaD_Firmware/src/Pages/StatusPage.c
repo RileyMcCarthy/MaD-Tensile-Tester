@@ -48,9 +48,8 @@ static void drawFailIndicator(StatusPage *page, int x, int y)
     display_bte_memory_copy_image(page->display, ex, x, y);
 }
 
-StatusPage *status_page_create(Display *display, MachineState *machineState, MonitorData *data, Images *images)
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images)
 {
-    StatusPage *page = malloc(sizeof(StatusPage));
     page->display = display;
     page->stateMachine = machineState;
     page->complete = false;

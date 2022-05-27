@@ -25,7 +25,7 @@ typedef struct TestProfilePage_s
     TestProfile *test;
 } TestProfilePage;
 
-TestProfilePage *test_profile_page_create(Display *display, Images *images);
+void test_profile_page_init(TestProfilePage *page, Display *display, Images *images);
 void test_profile_page_destroy(TestProfilePage *page);
 void test_profile_page_run(TestProfilePage *page);
 #endif

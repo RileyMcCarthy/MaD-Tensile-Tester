@@ -509,7 +509,7 @@ static void control_cog(Control *control)
     }
 }
 
-Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData)
+void control_init(Control *control, MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData)
 {
     Control *control = (Control *)malloc(sizeof(Control));
     control->machineProfile = machineProfile;
@@ -519,7 +519,6 @@ Control *control_create(MachineProfile *machineProfile, MachineState *stateMachi
     control->motionProfile = NULL;
     control->dyn4 = dyn4;
     control->cogid = -1;
-    return control;
 }
 bool control_begin(Control *control)
 {

@@ -68,7 +68,6 @@ void destroy_run_motion_profile(RunMotionProfile *run);
 
 FunctionInfo *get_function_info(QuartetFunctions id);
 void free_function_info(FunctionInfo *info);
-void update_quartet_function(MotionQuartet *quartet);
 
 double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
 double position_set(double t, RunMotionProfile *run, MotionSet *set);

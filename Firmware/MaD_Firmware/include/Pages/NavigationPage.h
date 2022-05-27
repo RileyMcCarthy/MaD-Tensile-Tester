@@ -21,21 +21,21 @@ typedef enum Pages_e
     PAGE_SETTINGS,
     PAGE_CALIBRATION,
     PAGE_TEST_PROFILE
-} Pages;
+} Page;
 
 typedef struct NavigationPage_s
 {
     bool complete;
     Display *display;
     Button *buttons;
-    Pages newPage;
+    Page newPage;
     Images *images;
 } NavigationPage;
 
-NavigationPage *navigation_page_create(Display *display, Images *images);
+void navigation_page_init(NavigationPage *page, Display *display, Images *images);
 
 void navigation_page_destroy(NavigationPage *page);
 
-Pages navigation_page_run(NavigationPage *page);
+Page navigation_page_run(NavigationPage *page);
 
 #endif

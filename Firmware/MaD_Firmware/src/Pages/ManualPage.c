@@ -44,9 +44,8 @@ static void checkButtons(ManualPage *page)
     }
 }
 
-ManualPage *manual_page_create(Display *display, MachineState *machineState, Images *images)
+void manual_page_init(ManualPage *page, Display *display, MachineState *machineState, Images *images)
 {
-    ManualPage *page = (ManualPage *)malloc(sizeof(ManualPage));
     page->display = display;
     page->complete = false;
     page->machineState = machineState;

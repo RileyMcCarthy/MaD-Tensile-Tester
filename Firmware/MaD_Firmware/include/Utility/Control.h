@@ -28,7 +28,7 @@ typedef struct control_t
     long setpointum;
 } Control;
 
-Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
+void control_init(Control *control, MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
 void control_destry(Control *control);
 bool control_begin(Control *control);
 

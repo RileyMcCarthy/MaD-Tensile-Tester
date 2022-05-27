@@ -38,7 +38,7 @@ static void check_buttons(CalibrateForcePage *page)
     }
 }
 
-CalibrateForcePage *calibrate_force_page_create(Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
+void calibrate_force_page_init(CalibrateForcePage *page, Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
 {
     CalibrateForcePage *page = malloc(sizeof(CalibrateForcePage));
     page->display = display;

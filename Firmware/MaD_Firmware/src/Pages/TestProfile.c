@@ -367,9 +367,8 @@ static void button_set(int id, void *arg)
     }
 }
 
-TestProfilePage *test_profile_page_create(Display *display, Images *images)
+void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)
 {
-    TestProfilePage *page = (TestProfilePage *)malloc(sizeof(TestProfilePage));
     page->complete = false;
     page->display = display;
     page->images = images;
@@ -379,7 +378,6 @@ TestProfilePage *test_profile_page_create(Display *display, Images *images)
     page->profile = NULL;
     page->test = NULL;
     page->filename = NULL;
-    return page;
 }
 
 void test_profile_page_destroy(TestProfilePage *page)

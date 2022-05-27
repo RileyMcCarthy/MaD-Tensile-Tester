@@ -31,13 +31,11 @@ static void check_buttons(int id, void *arg)
     page->complete = true;
 }
 
-NavigationPage *navigation_page_create(Display *display, Images *images)
+void navigation_page_init(NavigationPage *page, Display *display, Images *images)
 {
-    NavigationPage *page = malloc(sizeof(NavigationPage));
     page->display = display;
     page->complete = false;
     page->images = images;
-    return page;
 }
 
 void navigation_page_destroy(NavigationPage *page)
@@ -50,7 +48,7 @@ void navigation_page_destroy(NavigationPage *page)
  * @brief Starts navigation page
  *
  */
-Pages navigation_page_run(NavigationPage *page)
+Page navigation_page_run(NavigationPage *page)
 {
     printf("Starting navigation page\n");
     page->complete = false;

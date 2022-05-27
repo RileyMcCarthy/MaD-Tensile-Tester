@@ -21,7 +21,7 @@ typedef struct StatusPage_s
     Images *images;
 } StatusPage;
 
-StatusPage *status_page_create(Display *display, MachineState *machineState, MonitorData *data, Images *images);
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images);
 
 void status_page_destroy(StatusPage *statusPage);
 

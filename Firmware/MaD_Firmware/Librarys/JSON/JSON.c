@@ -830,7 +830,7 @@ void json_print_machine_profile(MachineProfile *profile)
  * @param json A JSON string containing a machine profile.
  * @return A MachineProfile structure containing the machine profile from JSON.
  */
-MachineProfile *json_to_machine_profile(const char *filename)
+void json_to_machine_profile(MachineProfile *profile, const char *filename)
 {
     FILE *file = fopen(filename, "r");
 
@@ -865,25 +865,24 @@ MachineProfile *json_to_machine_profile(const char *filename)
         return NULL;
     }
 
-    MachineProfile *settings = get_machine_profile();
-    settings->name = json_property_to_string(parser, "Name");
-    settings->number = json_property_to_int(parser, "Number");
+    MachineProfile *profile = get_machine_profile();
+    profile->name = json_property_to_string(parser, "Name");
+    profile->number = json_property_to_int(parser, "Number");
 
     const json_t *mcParser = json_getProperty(parser, "Configuration");
     if (!mcParser || JSON_OBJ != json_getType(mcParser))
     {
         printf("Error, the  Machine Configuration  property is not found.\n");
     }
-    json_to_machine_configuration(mcParser, settings->configuration);
+    json_to_machine_configuration(mcParser, profile->configuration);
 
     const json_t *mpParser = json_getProperty(parser, "Performance");
     if (!mpParser || JSON_OBJ != json_getType(mpParser))
     {
         printf("Error, the  Machine Profile  property is not found.\n");
     }
-    json_to_machine_performance(mpParser, settings->performance);
+    json_to_machine_performance(mpParser, profile->performance);
     free(profileStr);
-    return settings;
 }
 
 SampleProfile *json_to_sample_profile(char *filename)

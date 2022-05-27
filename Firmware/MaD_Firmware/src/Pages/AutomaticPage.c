@@ -41,14 +41,12 @@ static void draw_graph(AutomaticPage *page)
 
 // Public Functions
 
-AutomaticPage *automatic_page_create(Display *display, Images *images, MachineState *state)
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state)
 {
-    AutomaticPage *page = (AutomaticPage *)malloc(sizeof(AutomaticPage));
     page->state = state;
     page->display = display;
     page->complete = false;
     page->images = images;
-    return page;
 }
 
 void automatic_page_destroy(AutomaticPage *page)
