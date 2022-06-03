@@ -23,10 +23,12 @@
 #define PROFILE_MOTION 2
 #define PROFILE_TEST 3
 
+static bool complete;
+
 static void button_navigation(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
-    page->complete = true;
+    complete = true;
 }
 
 static void button_open(int id, void *arg)
@@ -65,35 +67,35 @@ static void button_open(int id, void *arg)
     }
     printf("Mode:%d\n", page->mode);
     free(filepath);
-    free_motion_quartet(page->quartet);
-    free_motion_set(page->set);
-    free_motion_profile(page->profile);
-    free_test_profile(page->test);
+    free(page->quartet);
+    free(page->set);
+    free(page->profile);
+    free(page->test);
 
     switch (page->mode)
     {
     case PROFILE_QUARTET:
     {
-        page->quartet = get_motion_quartet();
+        page->quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
         printf("Quartet from json\n");
         json_to_motion_quartet(filepath, page->quartet);
         break;
     }
     case PROFILE_SET:
     {
-        page->set = get_motion_set();
+        page->set = (MotionSet *)malloc(sizeof(MotionSet));
         json_to_motion_set(filepath, page->set);
         break;
     }
     case PROFILE_MOTION:
     {
-        page->profile = get_motion_profile();
+        page->profile = (MotionProfile *)malloc(sizeof(MotionProfile));
         json_to_motion_profile(filepath, page->profile);
         break;
     }
     case PROFILE_TEST:
     {
-        page->test = get_test_profile();
+        page->test = (TestProfile *)malloc(sizeof(TestProfile));
         json_to_test_profile(filepath, page->test);
         break;
     }
@@ -147,10 +149,10 @@ static void button_new(int id, void *arg)
     page->mode = newmode;
     page->path = newpath;
 
-    free_motion_quartet(page->quartet);
-    free_motion_set(page->set);
-    free_motion_profile(page->profile);
-    free_test_profile(page->test);
+    free(page->quartet);
+    free(page->set);
+    free(page->profile);
+    free(page->test);
 }
 
 static void button_save(int id, void *arg)
@@ -223,7 +225,6 @@ static void button_quartet(int id, void *arg)
         char *filename = keyboard_get_input(keyboard, "Enter file name: ");
         keyboard_destroy(keyboard);
         free(page->quartet->name);
-        page->quartet->name = (char *)malloc(strlen(page->path) + strlen(filename) + strlen(".qrt") + 2);
         strcpy(page->quartet->name, page->path);
         strcat(page->quartet->name, "/");
         strcat(page->quartet->name, filename);
@@ -236,18 +237,17 @@ static void button_quartet(int id, void *arg)
         char *optionNames[FUNCTION_COUNT];
         for (int i = 0; i < FUNCTION_COUNT; i++)
         {
-            FunctionInfo *info = get_function_info(i);
-            printf("function:%d,name:%s\n", i, info->name);
-            optionNames[i] = (char *)malloc(strlen(info->name) + 1);
-            strcpy(optionNames[i], info->name);
-            free_function_info(info);
+            FunctionInfo info;
+            get_function_info(&info, i);
+            printf("function:%d,name:%s\n", i, info.name);
+            optionNames[i] = (char *)malloc(strlen(info.name) + 1);
+            strcpy(optionNames[i], info.name);
         }
         page->quartet->function = selection_run(page->display, 300, 150, optionNames, FUNCTION_COUNT);
         for (int i = 0; i < FUNCTION_COUNT; i++)
         {
             free(optionNames[i]);
         }
-        update_quartet_function(page->quartet);
         break;
     }
     case BUTTON_QUARTET_DWELL:
@@ -267,10 +267,11 @@ static void button_quartet(int id, void *arg)
 static void button_quartet_parameters(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
-    FunctionInfo *info = get_function_info(page->quartet->function);
+    FunctionInfo info;
+    get_function_info(&info, page->quartet->function);
     Keyboard *keyboard = keyboard_create(page->display, page->images);
-    char *prompt = (char *)malloc(strlen(info->args[id]) + strlen(": ") + 1);
-    strcpy(prompt, info->args[id]);
+    char *prompt = (char *)malloc(strlen(info.args[id]) + strlen(": ") + 1);
+    strcpy(prompt, info.args[id]);
     strcat(prompt, ": ");
     char *param = keyboard_get_input(keyboard, prompt);
     free(prompt);
@@ -290,7 +291,6 @@ static void button_set(int id, void *arg)
         char *filename = keyboard_get_input(keyboard, "Enter file name: ");
         keyboard_destroy(keyboard);
         free(page->set->name);
-        page->set->name = (char *)malloc(strlen(page->path) + strlen(filename) + strlen(".set") + 2);
         strcpy(page->set->name, page->path);
         strcat(page->set->name, "/");
         strcat(page->set->name, filename);
@@ -325,7 +325,6 @@ static void button_set(int id, void *arg)
             if (newfile != NULL)
             {
                 page->set->quartetCount++;
-                page->set->quartets = (MotionQuartet *)realloc(page->set->quartets, sizeof(MotionQuartet) * page->set->quartetCount);
                 json_to_motion_quartet(newfile, &(page->set->quartets[page->set->quartetCount - 1]));
             }
             else
@@ -351,13 +350,12 @@ static void button_set(int id, void *arg)
             free(optionNames);
 
             // Remove index for quartets
-            free_motion_quartet(&(page->set->quartets[index]));
+            free(&(page->set->quartets[index]));
             for (int i = index; i < page->set->quartetCount - 1; i++)
             {
                 page->set->quartets[i] = page->set->quartets[i + 1];
             }
             page->set->quartetCount--;
-            page->set->quartets = realloc(page->set->quartets, sizeof(MotionQuartet) * page->set->quartetCount);
         }
         else
         {
@@ -369,7 +367,6 @@ static void button_set(int id, void *arg)
 
 void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)
 {
-    page->complete = false;
     page->display = display;
     page->images = images;
     page->mode = -1;
@@ -386,6 +383,7 @@ void test_profile_page_destroy(TestProfilePage *page)
 }
 void test_profile_page_run(TestProfilePage *page)
 {
+    complete = false;
     printf("Test profile page running\n");
     int padding = 20;
 
@@ -453,7 +451,7 @@ void test_profile_page_run(TestProfilePage *page)
 
     // Create navigation button
     Module *navigationButton = module_create(background);
-    module_set_image(navigationButton, page->images->navigationImage);
+    module_set_image(navigationButton, &(page->images->navigationImage));
     module_align_inner_top(navigationButton);
     module_align_inner_right(navigationButton);
     module_touch_callback(navigationButton, button_navigation, 0);
@@ -479,7 +477,7 @@ void test_profile_page_run(TestProfilePage *page)
 
     module_draw(page->display, root);
     int lastMode = -1;
-    while (!page->complete)
+    while (!complete)
     {
         printf("Test profile page running\n");
         Module *subroot = module_create(editWindow);
@@ -495,9 +493,7 @@ void test_profile_page_run(TestProfilePage *page)
         {
             if (page->quartet == NULL)
             {
-                page->quartet = get_motion_quartet();
-                update_quartet_function(page->quartet);
-                page->quartet->name = (char *)malloc(strlen(page->filename) + 1);
+                page->quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
                 strcpy(page->quartet->name, page->filename);
             }
 
@@ -520,21 +516,22 @@ void test_profile_page_run(TestProfilePage *page)
             Module *funcModule = module_create(subroot);
             module_copy(funcModule, nameModule);
 
-            FunctionInfo *info = get_function_info(page->quartet->function);
-            sprintf(buf, "Function: %s", info->name);
+            FunctionInfo info;
+            get_function_info(&info, page->quartet->function);
+            sprintf(buf, "Function: %s", info.name);
             module_set_text(funcModule, buf);
             module_set_font(funcModule, RA8876_CHAR_HEIGHT_24);
             module_align_below(funcModule, nameModule);
             module_touch_callback(funcModule, button_quartet, BUTTON_QUARTET_FUNC);
 
-            int params = info->args_count;
-            printf("info->args_count:%d\n", info->args_count);
+            int params = info.args_count;
+            printf("info->args_count:%d\n", info.args_count);
             Module *below = funcModule;
             for (int i = 0; i < params; i++) //[distance, strain rate, error]
             {
                 Module *paramModule = module_create(subroot);
                 module_copy(paramModule, nameModule);
-                sprintf(buf, "%s: %0.3f", info->args[i], page->quartet->parameters[i]);
+                sprintf(buf, "%s: %0.3f", info.args[i], page->quartet->parameters[i]);
                 module_set_text(paramModule, buf);
                 module_set_font(paramModule, RA8876_CHAR_HEIGHT_24);
                 module_align_below(paramModule, below);
@@ -542,7 +539,6 @@ void test_profile_page_run(TestProfilePage *page)
                 below = paramModule;
             }
 
-            free_function_info(info);
             printf("running quartet\n");
             /*RunMotionProfile *run = get_run_motion_profile();
 
@@ -607,8 +603,7 @@ void test_profile_page_run(TestProfilePage *page)
     MotionQuartet *quartets; // List of quartets to execute (max 10)*/
             if (page->set == NULL)
             {
-                page->set = get_motion_set();
-                page->set->name = (char *)malloc(strlen(page->filename) + 1);
+                page->set = (MotionSet *)malloc(sizeof(MotionSet));
                 strcpy(page->set->name, page->filename);
             }
             module_set_text(editWindowTitle, "Edit Set");

@@ -16,6 +16,7 @@ typedef enum ModuleType_e
     MODULE_RECTANGLE,
     MODULE_RECTANGLE_CIRCLE,
     MODULE_GRAPH,
+    MODULE_KEYBOARD,
     MODULE_WINDOW
 } ModuleType;
 
@@ -34,6 +35,7 @@ typedef struct Module_s
     int touchId;
     void (*onTouch)(int id, void *arg);
     void (*onUpdate)(Display *display, struct Module_s *module, void *arg);
+    void (*draw)(Display *display, struct Module_s *module);
 } Module;
 
 typedef enum ModuleTextAignType_e
@@ -51,18 +53,6 @@ typedef struct ModuleText_s
     int maxChar;
     ModuleTextAignType alignment;
 } ModuleText;
-
-typedef struct graph_t
-{
-    double data[2];
-    double maxY;
-    double minY;
-    Module *graphArea;
-    float markerY[MAX_GRAPH_MARKERS];
-    int markerCount;
-    char *title;
-    char *units;
-} Graph;
 
 Module *module_create(Module *parent);
 
@@ -92,6 +82,7 @@ void module_set_rectangle_circle(Module *module, int w, int h);
 void module_set_image(Module *module, Image *image);
 void module_add_underline(Module *module);
 
+const char *module_get_text(Module *module);
 void module_set_text(Module *module, char *text);
 void module_text_max_char(Module *module, int maxChar);
 void module_set_font(Module *module, int font);

@@ -790,7 +790,7 @@ typedef struct TouchLocation_s
 
 typedef struct Image_s
 {
-    char *name;
+    char name[20]; // 8.3 format
     int page;
     int x0;
     int y0;

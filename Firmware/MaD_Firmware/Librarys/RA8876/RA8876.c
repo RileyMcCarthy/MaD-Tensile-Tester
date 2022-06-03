@@ -1500,6 +1500,7 @@ void display_load_image(Display *display, Image *image)
 
   mkdir("/sd/img", 0);
   chdir("/sd/img");
+  printf("Loading image %s\n", image->name);
   FILE *fp = fopen(image->name, "r");
   if (fp == NULL)
   {

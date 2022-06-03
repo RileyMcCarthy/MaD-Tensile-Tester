@@ -98,12 +98,12 @@ bool isEndOfPrimitive(char ch)
     return ch == ',' || isOneOfThem(ch, " \n\r\t\f") || isOneOfThem(ch, "}]");
 }
 
-char *json_getName(json_t const *json)
+const char *json_getName(json_t const *json)
 {
     return json->name;
 }
 
-char *json_getValue(json_t const *property)
+const char *json_getValue(json_t const *property)
 {
     return property->u.value;
 }
@@ -128,12 +128,12 @@ bool json_getBoolean(json_t const *property)
     return *property->u.value == 't';
 }
 
-int64_t json_getInteger(json_t const *property)
+int json_getInteger(json_t const *property)
 {
-    return atof(property->u.value);
+    return atoi(property->u.value);
 }
 
-float json_getReal(json_t const *property)
+double json_getReal(json_t const *property)
 {
     return atof(property->u.value);
 }

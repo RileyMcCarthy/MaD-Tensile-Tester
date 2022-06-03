@@ -105,17 +105,14 @@ Error ds3231_begin(DS3231 *ds3231, int scl, int sda)
     ds3231->bus.setup(scl, sda, 100, 1); // 1.5k pullup
 
     uint8_t status = read_register(ds3231, REG_STATUS);
-    printf("Status: %d\n", status);
     if ((status & STATUS_RST) != 0)
     {
         // oscillator is stopped, time must be set again
-        printf("Reset\n", status);
         error = RTC_RESET;
     }
     if (!write_register(ds3231, REG_CONTROL, 0x00))
     {
         error = RTC_NOT_FOUND;
-        printf("Not found\n", status);
         return error;
     }
     status &= ~0x08; // sets bit 3 in status register to zero (disable 32khz output)
@@ -123,9 +120,7 @@ Error ds3231_begin(DS3231 *ds3231, int scl, int sda)
     if (!write_register(ds3231, REG_STATUS, status))
     {
         error = RTC_NOT_FOUND;
-        return error;
     }
-    printf("leaving\n", status);
     return error;
 }
 

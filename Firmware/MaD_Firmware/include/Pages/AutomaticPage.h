@@ -16,6 +16,7 @@
 #include "stdio.h"
 #include "Images.h"
 #include "Button.h"
+#include "Control.h"
 #include "StateMachine.h"
 
 /**
@@ -28,9 +29,10 @@ typedef struct AutomaticPage_t
     Display *display;
     Images *images;
     MachineState *state;
+    Control *control;
 } AutomaticPage;
 
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state);
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, Control *control);
 void automatic_page_destroy(AutomaticPage *page);
 void automatic_page_run(AutomaticPage *page);
 

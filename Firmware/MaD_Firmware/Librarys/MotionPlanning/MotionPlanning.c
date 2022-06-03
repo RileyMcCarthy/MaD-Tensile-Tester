@@ -63,21 +63,25 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
 
 double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
 {
-    FunctionInfo *info = get_function_info(quartet->function);
-    // printf("Function:%s\n", info->name);
-    if (info->func == NULL)
+    FunctionInfo info;
+    get_function_info(&info, quartet->function);
+    // printf("Function:%s\n", info.name);
+    // printf("Args:%s\n", info.args[0]);
+    // printf("Args:%s\n", info.args[1]);
+    // printf("Args:%s\n", info.args[2]);
+    // printf("params:%f\n", quartet->parameters[0]);
+    if (info.func == NULL)
     {
-        printf("no function for %s\n", info->name);
+        // printf("no function for %s\n", info.name);
         run->lastQuartetTime = t;
         run->lastQuartetDistance += quartet->parameters[0];
         run->quartetComplete = true;
-        free_function_info(info);
         return 0;
     }
-    double position = info->func(t - run->lastQuartetTime, quartet->parameters); // Quartet position
+    double position = info.func(t - run->lastQuartetTime, quartet->parameters); // Quartet position
     // printf("Position:%f\n", position);
     double lastQuartetDistance = run->lastQuartetDistance;
-    free_function_info(info);
+
     if (position == quartet->parameters[0]) // Still need to add Dwell
     {
         run->lastQuartetTime = t;
@@ -113,88 +117,46 @@ double sigmoid(double t, double *args)
     return dir * position;
 }
 
-FunctionInfo *get_function_info(QuartetFunctions id)
+void get_function_info(FunctionInfo *info, QuartetFunctions id)
 {
-    FunctionInfo *info = (FunctionInfo *)malloc(sizeof(FunctionInfo));
     switch (id)
     {
     case QUARTET_FUNC_LINE:
     {
         info->id = QUARTET_FUNC_LINE;
 
-        char *name = "Line";
-        info->name = (char *)malloc(strlen(name) + 1);
-        strcpy(info->name, name);
+        strncpy(info->name, "Line", FUNCTION_MAX_NAME_LENGTH);
 
         info->func = NULL;
 
         info->args_count = 2;
-        info->args = (char **)malloc(sizeof(char *) * info->args_count);
-
-        info->args[0] = (char *)malloc(strlen("distance") + 1);
-        strcpy(info->args[0], "distance");
-        info->args[1] = (char *)malloc(strlen("strain rate") + 1);
-        strcpy(info->args[1], "strain rate");
+        strncpy(info->args[0], "distance", FUNCTION_MAX_ARG_LENGTH);
+        strncpy(info->args[1], "strain rate", FUNCTION_MAX_ARG_LENGTH);
         break;
     }
     case QUARTET_FUNC_SIGMOIDAL:
     {
         info->id = QUARTET_FUNC_SIGMOIDAL;
 
-        char *name = "Sigmoid";
-        info->name = (char *)malloc(strlen(name) + 1);
-        strcpy(info->name, name);
+        strncpy(info->name, "Sigmoid", FUNCTION_MAX_NAME_LENGTH);
 
         info->func = sigmoid;
 
         info->args_count = 3;
-        info->args = (char **)malloc(sizeof(char *) * info->args_count);
-
-        info->args[0] = (char *)malloc(strlen("distance") + 1);
-        strcpy(info->args[0], "distance");
-        info->args[1] = (char *)malloc(strlen("strain rate") + 1);
-        strcpy(info->args[1], "strain rate");
-        info->args[2] = (char *)malloc(strlen("error") + 1);
-        strcpy(info->args[2], "error");
+        strncpy(info->args[0], "distance", FUNCTION_MAX_ARG_LENGTH);
+        strncpy(info->args[1], "strain rate", FUNCTION_MAX_ARG_LENGTH);
+        strncpy(info->args[2], "error", FUNCTION_MAX_ARG_LENGTH);
         break;
     }
     default:
         info->id = QUARTET_FUNC_SIGMOIDAL;
 
-        char *name = "";
-        info->name = (char *)malloc(strlen(name) + 1);
-        strcpy(info->name, name);
+        strcpy(info->name, "");
 
         info->func = NULL;
 
         info->args_count = 0;
-        info->args = NULL;
-        return info;
         break;
-    }
-    return info;
-}
-
-void free_function_info(FunctionInfo *info)
-{
-    if (info != NULL)
-    {
-        if (info->name != NULL)
-        {
-            free(info->name);
-        }
-        if (info->args != NULL)
-        {
-            for (int i = 0; i < info->args_count; i++)
-            {
-                if (info->args[i] != NULL)
-                {
-                    free(info->args[i]);
-                }
-            }
-            free(info->args);
-        }
-        free(info);
     }
 }
 

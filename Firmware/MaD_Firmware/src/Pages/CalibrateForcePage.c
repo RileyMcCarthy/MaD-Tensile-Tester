@@ -6,6 +6,8 @@
 #define BUTTON_NAVIGATION 0
 #define BUTTON_FORCE_NAVIGATION 1
 
+static bool complete;
+
 typedef struct ForceCalibration_s
 {
     int zero;
@@ -25,7 +27,7 @@ static void check_buttons(CalibrateForcePage *page)
                 switch (page->buttons[i].name)
                 {
                 case BUTTON_NAVIGATION:
-                    page->complete = true;
+                    complete = true;
                     break;
                 case BUTTON_FORCE_NAVIGATION:
                     page->state++;
@@ -40,19 +42,11 @@ static void check_buttons(CalibrateForcePage *page)
 
 void calibrate_force_page_init(CalibrateForcePage *page, Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
 {
-    CalibrateForcePage *page = malloc(sizeof(CalibrateForcePage));
     page->display = display;
     page->monitor = monitor;
     page->forceGauge = forceGauge;
     page->machineProfile = machineProfile;
     page->images = images;
-    return page;
-}
-
-void calibrate_force_page_destroy(CalibrateForcePage *page)
-{
-    free(page->buttons);
-    free(page);
 }
 
 // returns 1 if someting is updated
@@ -65,7 +59,7 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-    page->complete = false;
+    complete = false;
 
     char buf[50];
     strcpy(buf, "Calibrate");
@@ -123,8 +117,8 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
     buttons[0].pressed = false;
     buttons[0].lastPress = 0;
 
-    Image *navigationImg = page->images->navigationImage;
-    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
+    Image navigationImg = page->images->navigationImage;
+    display_bte_memory_copy_image(page->display, &navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
     page->state = 0;
@@ -133,7 +127,7 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
     int currentMills = 0;
     int lastMills = 0;
     int currentForce = 0;
-    while (!page->complete)
+    while (!complete)
     {
         if (page->state > 10)
         {
@@ -146,7 +140,6 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
             //     ;
             lastMills = currentMills;
             currentForce = page->monitor->data.forceRaw;
-            printf("Force: %d\n", currentForce);
         }
         check_buttons(page);
         int actionStartX;
@@ -234,8 +227,8 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
         }
         else if (page->state == 4)
         {
-            page->machineProfile->configuration->forceGaugeScaleFactor = forceCalibration.slope;
-            page->machineProfile->configuration->forceGaugeZeroFactor = forceCalibration.zero;
+            page->machineProfile->configuration.forceGaugeScaleFactor = forceCalibration.slope;
+            page->machineProfile->configuration.forceGaugeZeroFactor = forceCalibration.zero;
             page->state = 10;
             infoUpdated = true;
         }
@@ -258,19 +251,19 @@ bool calibrate_force_page_run(CalibrateForcePage *page)
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, slopePointStartX, slopePointStartY, buf);
 
-        sprintf(buf, "Zero: %d", page->machineProfile->configuration->forceGaugeZeroFactor);
+        sprintf(buf, "Zero: %d", page->machineProfile->configuration.forceGaugeZeroFactor);
         int forceZeroStartX = calibrateX0 + 10;
         int forceZeroStartY = machineStartY + 35;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, forceZeroStartX, forceZeroStartY, buf);
 
-        sprintf(buf, "Slope: %0.3f", page->machineProfile->configuration->forceGaugeScaleFactor); // need to add it machine configuration
+        sprintf(buf, "Slope: %0.3f", page->machineProfile->configuration.forceGaugeScaleFactor); // need to add it machine configuration
         int forceSlopeStartX = calibrateX0 + 10;
         int forceSlopeStartY = forceZeroStartY + 30;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, forceSlopeStartX, forceSlopeStartY, buf);
 
-        sprintf(buf, "Force: %0.3fN", ((float)(force - page->machineProfile->configuration->forceGaugeZeroFactor) / (page->machineProfile->configuration->forceGaugeScaleFactor * (float)1000))); // need to add it machine configuration
+        sprintf(buf, "Force: %0.3fN", ((float)(force - page->machineProfile->configuration.forceGaugeZeroFactor) / (page->machineProfile->configuration.forceGaugeScaleFactor * (float)1000))); // need to add it machine configuration
         int forceRealStartX = calibrateX0 + 10;
         int forceRealStartY = forceSlopeStartY + 30;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);

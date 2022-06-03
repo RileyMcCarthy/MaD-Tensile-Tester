@@ -165,9 +165,9 @@ bool state_machine_motion_equal(MotionParameters *motionParameters1, MotionParam
 
 bool state_machine_equal(MachineState *machineState1, MachineState *machineState2)
 {
-    return state_machine_self_check_equal(&machineState1->selfCheckParameters, &machineState2->selfCheckParameters) &&
-           state_machine_check_equal(&machineState1->machineCheckParameters, &machineState2->machineCheckParameters) &&
-           state_machine_motion_equal(&machineState1->motionParameters, &machineState2->motionParameters) &&
+    return state_machine_self_check_equal(&(machineState1->selfCheckParameters), &(machineState2->selfCheckParameters)) &&
+           state_machine_check_equal(&(machineState1->machineCheckParameters), &(machineState2->machineCheckParameters)) &&
+           state_machine_motion_equal(&(machineState1->motionParameters), &(machineState2->motionParameters)) &&
            machineState1->state == machineState2->state &&
            machineState1->function == machineState2->function &&
            machineState1->functionData == machineState2->functionData;
@@ -268,9 +268,8 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
     }
 }
 
-MachineState *machine_state_create()
+void machine_state_init(MachineState *machineState)
 {
-    MachineState *machineState = (MachineState *)malloc(sizeof(MachineState));
     machineState->state = STATE_SELFCHECK;
 
     machineState->selfCheckParameters.chargePump = false;
@@ -287,5 +286,4 @@ MachineState *machine_state_create()
     machineState->motionParameters.mode = MODE_MANUAL;
     machineState->motionParameters.status = STATUS_DISABLED;
     machineState->function = FUNC_MANUAL_OFF;
-    return machineState;
 }

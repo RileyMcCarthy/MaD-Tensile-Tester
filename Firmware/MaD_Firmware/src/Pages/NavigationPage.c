@@ -3,6 +3,9 @@
 #include "StatusPage.h"
 #include "ManualPage.h"
 #include "Module.h"
+
+static bool complete;
+
 /**
  * @brief Navigation page shows all available pages to access.
  *
@@ -28,13 +31,12 @@ static void check_buttons(int id, void *arg)
 {
     NavigationPage *page = (NavigationPage *)arg;
     page->newPage = id;
-    page->complete = true;
+    complete = true;
 }
 
 void navigation_page_init(NavigationPage *page, Display *display, Images *images)
 {
     page->display = display;
-    page->complete = false;
     page->images = images;
 }
 
@@ -51,7 +53,7 @@ void navigation_page_destroy(NavigationPage *page)
 Page navigation_page_run(NavigationPage *page)
 {
     printf("Starting navigation page\n");
-    page->complete = false;
+    complete = false;
 
     int padding = 20;
     // Create Background
@@ -64,7 +66,7 @@ Page navigation_page_run(NavigationPage *page)
 
     // Creating status page
     Module *statusPage = module_create(background);
-    module_set_image(statusPage, page->images->statusPageImage);
+    module_set_image(statusPage, &(page->images->statusPageImage));
     module_align_inner_top(statusPage);
     module_align_space_even(statusPage, 1, 4);
     module_touch_callback(statusPage, check_buttons, PAGE_STATUS);
@@ -78,7 +80,7 @@ Page navigation_page_run(NavigationPage *page)
 
     // Creating manual page
     Module *manualPage = module_create(background);
-    module_set_image(manualPage, page->images->manualPageImage);
+    module_set_image(manualPage, &(page->images->manualPageImage));
     module_align_inner_top(manualPage);
     module_align_space_even(manualPage, 2, 4);
     module_touch_callback(manualPage, check_buttons, PAGE_MANUAL);
@@ -92,7 +94,7 @@ Page navigation_page_run(NavigationPage *page)
 
     // Creating Test page
     Module *testPage = module_create(background);
-    module_set_image(testPage, page->images->automaticPageImage);
+    module_set_image(testPage, &(page->images->automaticPageImage));
     module_align_inner_top(testPage);
     module_align_space_even(testPage, 3, 4);
     module_touch_callback(testPage, check_buttons, PAGE_AUTOMATIC);
@@ -106,7 +108,7 @@ Page navigation_page_run(NavigationPage *page)
 
     // Creating Calibrate page
     Module *calibratePage = module_create(background);
-    module_set_image(calibratePage, page->images->calibratePageImage);
+    module_set_image(calibratePage, &(page->images->calibratePageImage));
     module_align_inner_top(calibratePage);
     module_align_space_even(calibratePage, 4, 4);
     module_touch_callback(calibratePage, check_buttons, PAGE_CALIBRATION);
@@ -151,7 +153,7 @@ Page navigation_page_run(NavigationPage *page)
     module_align_center(tpText);
 
     module_draw(page->display, root);
-    while (!page->complete)
+    while (!complete)
     {
         display_update_touch(page->display);
         module_touch_check(root, page->display, page);

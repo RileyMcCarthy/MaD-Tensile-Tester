@@ -11,7 +11,7 @@
 
 DYN4 *dyn4_create()
 {
-    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4));
+    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4) * 2);
     return dyn4;
 }
 
@@ -85,7 +85,9 @@ int dyn4_read_command(DYN4 *dyn4, int command)
 
     for (int i = 0; i < 10; i++)
     {
+        // printf("getting info\n");
         byte = (uint8_t)dyn4->serial.rxtime(100);
+        // printf("got info\n");
         if (byte == dyn4->device_id)
         {
             break;

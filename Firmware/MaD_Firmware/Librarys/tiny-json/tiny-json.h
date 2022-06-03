@@ -83,13 +83,13 @@ json_t const *json_create(char *str, json_t *mem, unsigned int qty);
  * @param json A valid handler of a json property.
  * @retval Pointer to null-terminated if property has name.
  * @retval Null pointer if the property is unnamed. */
-char *json_getName(json_t const *json);
+const char *json_getName(json_t const *json);
 
 /** Get the value of a json property.
  * The type of property cannot be JSON_OBJ or JSON_ARRAY.
  * @param property A valid handler of a json property.
  * @return Pointer to null-terminated string with the value. */
-char *json_getValue(json_t const *property);
+const char *json_getValue(json_t const *property);
 
 /** Get the type of a json property.
  * @param json A valid handler of a json property.
@@ -131,11 +131,11 @@ bool json_getBoolean(json_t const *property);
 /** Get the value of a json integer property.
  * @param property A valid handler of a json object. Its type must be JSON_INTEGER.
  * @return The value stdint. */
-int64_t json_getInteger(json_t const *property);
+int json_getInteger(json_t const *property);
 /** Get the value of a json real property.
  * @param property A valid handler of a json object. Its type must be JSON_REAL.
  * @return The value. */
-float json_getReal(json_t const *property);
+double json_getReal(json_t const *property);
 
 /** Structure to handle a heap of JSON properties. */
 typedef struct jsonPool_s jsonPool_t;

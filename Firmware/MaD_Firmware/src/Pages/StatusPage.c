@@ -6,65 +6,39 @@
 #define BUTTON_MACHINE 0
 #define BUTTON_NAVIGATION 1
 
+static bool complete = false;
+
 static void button_navigation(int id, void *arg)
 {
     StatusPage *page = (StatusPage *)arg;
-    page->complete = true;
-}
-
-static void check_buttons(StatusPage *page)
-{
-    button_update(page->display);
-    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
-    {
-        for (int i = 0; i < BUTTONCOUNT; i++)
-        {
-            if (page->buttons[i].pressed)
-            {
-                switch (page->buttons[i].name)
-                {
-                case BUTTON_NAVIGATION:
-                    page->complete = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
+    complete = true;
 }
 
 static void drawSuccessIndicator(StatusPage *page, int x, int y)
 {
-    Image *check = page->images->successImage;
-    display_draw_square_fill(page->display, x, y, x + check->width - 1, y + check->height - 1, MAINCOLOR);
-    display_bte_memory_copy_image(page->display, check, x, y);
+    Image check = page->images->successImage;
+    display_draw_square_fill(page->display, x, y, x + check.width - 1, y + check.height - 1, MAINCOLOR);
+    display_bte_memory_copy_image(page->display, &check, x, y);
 }
 
 static void drawFailIndicator(StatusPage *page, int x, int y)
 {
-    Image *ex = page->images->failImage;
-    display_draw_square_fill(page->display, x, y, x + ex->width - 1, y + ex->height - 1, MAINCOLOR);
-    display_bte_memory_copy_image(page->display, ex, x, y);
+    Image ex = page->images->failImage;
+    display_draw_square_fill(page->display, x, y, x + ex.width - 1, y + ex.height - 1, MAINCOLOR);
+    display_bte_memory_copy_image(page->display, &ex, x, y);
 }
 
 void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images)
 {
     page->display = display;
     page->stateMachine = machineState;
-    page->complete = false;
     page->data = data;
     page->images = images;
-    return page;
-}
-
-void status_page_destroy(StatusPage *page)
-{
-    free(page);
 }
 
 void status_page_run(StatusPage *page)
 {
+    complete = false;
     printf("Status page running\n");
 
     int padding = 8;
@@ -78,7 +52,7 @@ void status_page_run(StatusPage *page)
 
     // Create navigation button
     Module *navigationButton = module_create(background);
-    module_set_image(navigationButton, page->images->navigationImage);
+    module_set_image(navigationButton, &(page->images->navigationImage));
     module_align_inner_top(navigationButton);
     module_align_inner_right(navigationButton);
     module_touch_callback(navigationButton, button_navigation, 0);
@@ -121,7 +95,7 @@ void status_page_run(StatusPage *page)
     module_align_inner_left(chargePumpText);
 
     Module *chargePumpImage = module_create(machineStateImages);
-    module_set_image(chargePumpImage, page->images->failImage);
+    module_set_image(chargePumpImage, &(page->images->failImage));
     module_align_below(chargePumpImage, machineStateWindowTitle);
     module_align_inner_right(chargePumpImage);
 
@@ -133,7 +107,7 @@ void status_page_run(StatusPage *page)
     module_align_below(switchedPowerText, chargePumpText);
 
     Module *switchedPowerImage = module_create(machineStateImages);
-    module_set_image(switchedPowerImage, page->images->failImage);
+    module_set_image(switchedPowerImage, &(page->images->failImage));
     module_align_below(switchedPowerImage, chargePumpText);
     module_align_inner_right(switchedPowerImage);
 
@@ -145,7 +119,7 @@ void status_page_run(StatusPage *page)
     module_align_below(estSwitchText, switchedPowerText);
 
     Module *estSwitchImage = module_create(machineStateImages);
-    module_set_image(estSwitchImage, page->images->failImage);
+    module_set_image(estSwitchImage, &(page->images->failImage));
     module_align_below(estSwitchImage, switchedPowerText);
     module_align_inner_right(estSwitchImage);
 
@@ -157,7 +131,7 @@ void status_page_run(StatusPage *page)
     module_align_below(esdUpperText, estSwitchText);
 
     Module *esdUpperImage = module_create(machineStateImages);
-    module_set_image(esdUpperImage, page->images->failImage);
+    module_set_image(esdUpperImage, &(page->images->failImage));
     module_align_below(esdUpperImage, estSwitchText);
     module_align_inner_right(esdUpperImage);
 
@@ -169,7 +143,7 @@ void status_page_run(StatusPage *page)
     module_align_below(estLowerText, esdUpperText);
 
     Module *estLowerImage = module_create(machineStateImages);
-    module_set_image(estLowerImage, page->images->failImage);
+    module_set_image(estLowerImage, &(page->images->failImage));
     module_align_below(estLowerImage, esdUpperText);
     module_align_inner_right(estLowerImage);
 
@@ -181,7 +155,7 @@ void status_page_run(StatusPage *page)
     module_align_below(servoReadyText, estLowerText);
 
     Module *servoReadyImage = module_create(machineStateImages);
-    module_set_image(servoReadyImage, page->images->failImage);
+    module_set_image(servoReadyImage, &(page->images->failImage));
     module_align_below(servoReadyImage, estLowerText);
     module_align_inner_right(servoReadyImage);
 
@@ -193,7 +167,7 @@ void status_page_run(StatusPage *page)
     module_align_below(forceGaugeComText, servoReadyText);
 
     Module *forceGaugeComImage = module_create(machineStateImages);
-    module_set_image(forceGaugeComImage, page->images->failImage);
+    module_set_image(forceGaugeComImage, &(page->images->failImage));
     module_align_below(forceGaugeComImage, servoReadyText);
     module_align_inner_right(forceGaugeComImage);
 
@@ -205,7 +179,7 @@ void status_page_run(StatusPage *page)
     module_align_below(servoComText, forceGaugeComText);
 
     Module *servoComImage = module_create(machineStateImages);
-    module_set_image(servoComImage, page->images->failImage);
+    module_set_image(servoComImage, &(page->images->failImage));
     module_align_below(servoComImage, forceGaugeComText);
     module_align_inner_right(servoComImage);
 
@@ -307,7 +281,7 @@ void status_page_run(StatusPage *page)
 
     long lastDataUpdate = 0;
 
-    while (page->complete == false)
+    while (!complete)
     {
         MachineState currentState = *(page->stateMachine);
 
@@ -318,11 +292,11 @@ void status_page_run(StatusPage *page)
             updateMachineState = true;
             if (currentState.selfCheckParameters.chargePump)
             {
-                module_set_image(chargePumpImage, page->images->successImage);
+                module_set_image(chargePumpImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(chargePumpImage, page->images->failImage);
+                module_set_image(chargePumpImage, &(page->images->failImage));
             }
         }
 
@@ -334,11 +308,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.switchedPower)
             {
-                module_set_image(switchedPowerImage, page->images->successImage);
+                module_set_image(switchedPowerImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(switchedPowerImage, page->images->failImage);
+                module_set_image(switchedPowerImage, &(page->images->failImage));
             }
         }
 
@@ -348,19 +322,19 @@ void status_page_run(StatusPage *page)
             updateMachineState = true;
             if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_OK)
             {
-                module_set_image(esdUpperImage, page->images->successImage);
-                module_set_image(estLowerImage, page->images->successImage);
+                module_set_image(esdUpperImage, &(page->images->successImage));
+                module_set_image(estLowerImage, &(page->images->successImage));
             }
             else if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_LOWER)
             {
 
-                module_set_image(esdUpperImage, page->images->successImage);
-                module_set_image(estLowerImage, page->images->failImage);
+                module_set_image(esdUpperImage, &(page->images->successImage));
+                module_set_image(estLowerImage, &(page->images->failImage));
             }
             else if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_UPPER)
             {
-                module_set_image(esdUpperImage, page->images->failImage);
-                module_set_image(estLowerImage, page->images->successImage);
+                module_set_image(esdUpperImage, &(page->images->failImage));
+                module_set_image(estLowerImage, &(page->images->successImage));
             }
         }
 
@@ -371,11 +345,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.esdSwitch)
             {
-                module_set_image(estSwitchImage, page->images->successImage);
+                module_set_image(estSwitchImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(estSwitchImage, page->images->failImage);
+                module_set_image(estSwitchImage, &(page->images->failImage));
             }
         }
 
@@ -386,11 +360,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.servoOK)
             {
-                module_set_image(servoReadyImage, page->images->successImage);
+                module_set_image(servoReadyImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(servoReadyImage, page->images->failImage);
+                module_set_image(servoReadyImage, &(page->images->failImage));
             }
         }
 
@@ -401,11 +375,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.forceGaugeCom)
             {
-                module_set_image(forceGaugeComImage, page->images->successImage);
+                module_set_image(forceGaugeComImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(forceGaugeComImage, page->images->failImage);
+                module_set_image(forceGaugeComImage, &(page->images->failImage));
             }
         }
 
@@ -416,11 +390,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.servoCom)
             {
-                module_set_image(servoComImage, page->images->successImage);
+                module_set_image(servoComImage, &(page->images->successImage));
             }
             else
             {
-                module_set_image(servoComImage, page->images->failImage);
+                module_set_image(servoComImage, &(page->images->failImage));
             }
         }
 
@@ -432,16 +406,14 @@ void status_page_run(StatusPage *page)
 
         // module_draw(page->display, functionWindow);
         // module_draw(page->display, motionStateWindow);
-
         if (updateMachineState)
         {
             module_draw(page->display, machineStateWindow);
             updateMachineState = false;
         }
-
         while (display_update_touch(page->display) == 0 && state_machine_equal(page->stateMachine, &currentState))
         {
-            if ((_getms() - lastDataUpdate) > 100)
+            if ((_getms() - lastDataUpdate) > 1000)
             {
                 lastDataUpdate = _getms();
                 char buf[10];

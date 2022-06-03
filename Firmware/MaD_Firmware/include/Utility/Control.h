@@ -19,16 +19,14 @@ typedef struct control_t
 {
     MachineProfile *machineProfile;
     MonitorData *monitorData;
-    NavKey *navkey;
-    MCP23017 *mcp;
     MachineState *stateMachine;
-    MotionProfile *motionProfile;
+    MotionProfile motionProfile;
     DYN4 *dyn4;
     int cogid;
     long setpointum;
 } Control;
 
-void control_init(Control *control, MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
+Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
 void control_destry(Control *control);
 bool control_begin(Control *control);
 

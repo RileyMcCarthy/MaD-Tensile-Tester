@@ -35,13 +35,17 @@ typedef enum quartetFunc_s
     QUARTET_FUNC_SIGMOIDAL,
 } QuartetFunctions;
 
+#define FUNCTION_MAX_NAME_LENGTH 10
+#define FUNCTION_MAX_ARGS 10
+#define FUNCTION_MAX_ARG_LENGTH 20
+
 typedef struct functioninfo_s
 {
     int id;
-    char *name;
+    char name[20];
     double (*func)(double, void *args);
     int args_count;
-    char **args;
+    char args[FUNCTION_MAX_ARGS * 2][FUNCTION_MAX_ARG_LENGTH]; // max 10 args with 20 chars each
 } FunctionInfo;
 
 typedef struct RunMotionProfile_s
@@ -66,8 +70,7 @@ typedef struct RunMotionProfile_s
 RunMotionProfile *get_run_motion_profile();
 void destroy_run_motion_profile(RunMotionProfile *run);
 
-FunctionInfo *get_function_info(QuartetFunctions id);
-void free_function_info(FunctionInfo *info);
+void get_function_info(FunctionInfo *info, QuartetFunctions id);
 
 double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
 double position_set(double t, RunMotionProfile *run, MotionSet *set);

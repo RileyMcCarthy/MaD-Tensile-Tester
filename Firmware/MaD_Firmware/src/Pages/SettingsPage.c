@@ -26,6 +26,8 @@
 #define BUTTON_PERFORMANCE_MAXFORCECOMPRESSION 21
 #define BUTTON_PERFORMANCE_FORCEGAUGENEUTRALOFFSET 22
 
+static bool complete;
+
 static bool isNumber(char *string)
 {
     int i = 0;
@@ -67,7 +69,7 @@ static bool check_buttons(SettingsPage *page)
                 switch (page->buttons[i].name)
                 {
                 case BUTTON_NAVIGATION:
-                    page->complete = true;
+                    complete = true;
                     break;
                 case BUTTON_NAME:
                 {
@@ -75,7 +77,6 @@ static bool check_buttons(SettingsPage *page)
                     char *name = keyboard_get_input(keyboard, "Name: ");
                     if (name != NULL && strlen(name) > 0)
                     {
-                        page->machineProfile->name = (char *)realloc(page->machineProfile->name, strlen(name) + 1);
                         strcpy(page->machineProfile->name, name);
                     }
                     keyboard_destroy(keyboard);
@@ -98,8 +99,7 @@ static bool check_buttons(SettingsPage *page)
                     char *type = keyboard_get_input(keyboard, "Motor Type: ");
                     if (type != NULL && strlen(type) > 0)
                     {
-                        page->machineProfile->configuration->motorType = (char *)realloc(page->machineProfile->configuration->motorType, strlen(type) + 1);
-                        strcpy(page->machineProfile->configuration->motorType, type);
+                        strcpy(page->machineProfile->configuration.motorType, type);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -110,7 +110,7 @@ static bool check_buttons(SettingsPage *page)
                     char *torque = keyboard_get_input(keyboard, "Max Torque: ");
                     if (torque != NULL && isFloat(torque))
                     {
-                        page->machineProfile->configuration->maxMotorTorque = atof(torque);
+                        page->machineProfile->configuration.maxMotorTorque = atof(torque);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -121,7 +121,7 @@ static bool check_buttons(SettingsPage *page)
                     char *rpm = keyboard_get_input(keyboard, "Max RPM: ");
                     if (rpm != NULL && isFloat(rpm))
                     {
-                        page->machineProfile->configuration->maxMotorRPM = atof(rpm);
+                        page->machineProfile->configuration.maxMotorRPM = atof(rpm);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -132,7 +132,7 @@ static bool check_buttons(SettingsPage *page)
                     char *diameter = keyboard_get_input(keyboard, "Gear Diameter: ");
                     if (diameter != NULL && isFloat(diameter))
                     {
-                        page->machineProfile->configuration->gearDiameter = atof(diameter);
+                        page->machineProfile->configuration.gearDiameter = atof(diameter);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -143,7 +143,7 @@ static bool check_buttons(SettingsPage *page)
                     char *pitch = keyboard_get_input(keyboard, "Gear Pitch: ");
                     if (pitch != NULL && isFloat(pitch))
                     {
-                        page->machineProfile->configuration->gearPitch = atof(pitch);
+                        page->machineProfile->configuration.gearPitch = atof(pitch);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -154,7 +154,7 @@ static bool check_buttons(SettingsPage *page)
                     char *inertia = keyboard_get_input(keyboard, "Inertia: ");
                     if (inertia != NULL && isFloat(inertia))
                     {
-                        page->machineProfile->configuration->systemIntertia = atof(inertia);
+                        page->machineProfile->configuration.systemIntertia = atof(inertia);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -165,7 +165,7 @@ static bool check_buttons(SettingsPage *page)
                     char *torque = keyboard_get_input(keyboard, "Static Torque: ");
                     if (torque != NULL && isFloat(torque))
                     {
-                        page->machineProfile->configuration->staticTorque = atof(torque);
+                        page->machineProfile->configuration.staticTorque = atof(torque);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -176,7 +176,7 @@ static bool check_buttons(SettingsPage *page)
                     char *load = keyboard_get_input(keyboard, "Load: ");
                     if (load != NULL && isFloat(load))
                     {
-                        page->machineProfile->configuration->load = atof(load);
+                        page->machineProfile->configuration.load = atof(load);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -187,8 +187,7 @@ static bool check_buttons(SettingsPage *page)
                     char *encoder = keyboard_get_input(keyboard, "Encoder Type: ");
                     if (encoder != NULL && strlen(encoder) > 0)
                     {
-                        page->machineProfile->configuration->positionEncoderType = (char *)realloc(page->machineProfile->configuration->positionEncoderType, strlen(encoder) + 1);
-                        strcpy(page->machineProfile->configuration->positionEncoderType, encoder);
+                        strcpy(page->machineProfile->configuration.positionEncoderType, encoder);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -199,7 +198,7 @@ static bool check_buttons(SettingsPage *page)
                     char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
                     if (scale != NULL && isFloat(scale))
                     {
-                        page->machineProfile->configuration->positionEncoderStepsPerRev = atof(scale);
+                        page->machineProfile->configuration.positionEncoderStepsPerRev = atof(scale);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -210,8 +209,7 @@ static bool check_buttons(SettingsPage *page)
                     char *forcegauge = keyboard_get_input(keyboard, "Force Gauge: ");
                     if (forcegauge != NULL && strlen(forcegauge) > 0)
                     {
-                        page->machineProfile->configuration->forceGauge = (char *)realloc(page->machineProfile->configuration->forceGauge, strlen(forcegauge) + 1);
-                        strcpy(page->machineProfile->configuration->forceGauge, forcegauge);
+                        strcpy(page->machineProfile->configuration.forceGauge, forcegauge);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -222,7 +220,7 @@ static bool check_buttons(SettingsPage *page)
                     char *scale = keyboard_get_input(keyboard, "Scale: ");
                     if (scale != NULL && isFloat(scale))
                     {
-                        page->machineProfile->configuration->forceGaugeScaleFactor = atof(scale);
+                        page->machineProfile->configuration.forceGaugeScaleFactor = atof(scale);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -233,7 +231,7 @@ static bool check_buttons(SettingsPage *page)
                     char *zero = keyboard_get_input(keyboard, "Force Zero: ");
                     if (zero != NULL && isNumber(zero))
                     {
-                        page->machineProfile->configuration->forceGaugeZeroFactor = atoi(zero);
+                        page->machineProfile->configuration.forceGaugeZeroFactor = atoi(zero);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -244,7 +242,7 @@ static bool check_buttons(SettingsPage *page)
                     char *minpos = keyboard_get_input(keyboard, "Minimum Position: ");
                     if (minpos != NULL && isFloat(minpos))
                     {
-                        page->machineProfile->performance->minPosition = atof(minpos);
+                        page->machineProfile->performance.minPosition = atof(minpos);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -255,7 +253,7 @@ static bool check_buttons(SettingsPage *page)
                     char *maxpos = keyboard_get_input(keyboard, "Maximum Position: ");
                     if (maxpos != NULL && isFloat(maxpos))
                     {
-                        page->machineProfile->performance->maxPosition = atof(maxpos);
+                        page->machineProfile->performance.maxPosition = atof(maxpos);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -266,7 +264,7 @@ static bool check_buttons(SettingsPage *page)
                     char *maxvel = keyboard_get_input(keyboard, "Maximum Velocity: ");
                     if (maxvel != NULL && isFloat(maxvel))
                     {
-                        page->machineProfile->performance->maxVelocity = atof(maxvel);
+                        page->machineProfile->performance.maxVelocity = atof(maxvel);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -277,7 +275,7 @@ static bool check_buttons(SettingsPage *page)
                     char *maxaccel = keyboard_get_input(keyboard, "Maximum Acceleration: ");
                     if (maxaccel != NULL && isFloat(maxaccel))
                     {
-                        page->machineProfile->performance->maxAcceleration = atof(maxaccel);
+                        page->machineProfile->performance.maxAcceleration = atof(maxaccel);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -288,7 +286,7 @@ static bool check_buttons(SettingsPage *page)
                     char *maxtensile = keyboard_get_input(keyboard, "Maximum Tensile: ");
                     if (maxtensile != NULL && isFloat(maxtensile))
                     {
-                        page->machineProfile->performance->maxForceTensile = atof(maxtensile);
+                        page->machineProfile->performance.maxForceTensile = atof(maxtensile);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -299,7 +297,7 @@ static bool check_buttons(SettingsPage *page)
                     char *maxcompression = keyboard_get_input(keyboard, "Maximum Compression: ");
                     if (maxcompression != NULL && isFloat(maxcompression))
                     {
-                        page->machineProfile->performance->maxForceCompression = atof(maxcompression);
+                        page->machineProfile->performance.maxForceCompression = atof(maxcompression);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -310,7 +308,7 @@ static bool check_buttons(SettingsPage *page)
                     char *neutral = keyboard_get_input(keyboard, "Force Offset: ");
                     if (neutral != NULL && isFloat(neutral))
                     {
-                        page->machineProfile->performance->forceGaugeNeutralOffset = atof(neutral);
+                        page->machineProfile->performance.forceGaugeNeutralOffset = atof(neutral);
                     }
                     keyboard_destroy(keyboard);
                     break;
@@ -328,20 +326,12 @@ void settings_page_init(SettingsPage *page, Display *display, MachineProfile *ma
     page->display = display;
     page->images = images;
     page->machineProfile = machineProfile;
-    page->complete = false;
     page->buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
-    return page;
-}
-
-void settings_page_destroy(SettingsPage *page)
-{
-    free(page->buttons);
-    free(page);
 }
 
 bool settings_page_run(SettingsPage *page)
 {
-    page->complete = false;
+    complete = false;
     printf("Settings page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
@@ -366,8 +356,8 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[0].pressed = false;
     page->buttons[0].lastPress = 0;
 
-    Image *navigationImg = page->images->navigationImage;
-    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
+    Image navigationImg = page->images->navigationImage;
+    display_bte_memory_copy_image(page->display, &navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
 
     /*Machine profile header*/
@@ -426,7 +416,7 @@ bool settings_page_run(SettingsPage *page)
     int motorTypeStartY = configurationStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %s", "Motor", page->machineProfile->configuration->motorType);
+    sprintf(buf, "%s: %s", "Motor", page->machineProfile->configuration.motorType);
     display_draw_string(page->display, motorTypeStartX, motorTypeStartY, buf);
 
     page->buttons[3].name = BUTTON_CONFIGURATION_MOTORTYPE;
@@ -442,7 +432,7 @@ bool settings_page_run(SettingsPage *page)
     int maxMotorTorqueStartY = motorTypeStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Torque", page->machineProfile->configuration->maxMotorTorque);
+    sprintf(buf, "%s: %0.3f", "Max Torque", page->machineProfile->configuration.maxMotorTorque);
     display_draw_string(page->display, maxMotorTorqueStartX, maxMotorTorqueStartY, buf);
     page->buttons[4].name = BUTTON_CONFIGURATION_MAXMOTORTORQUE;
     page->buttons[4].xmin = maxMotorTorqueStartX;
@@ -456,7 +446,7 @@ bool settings_page_run(SettingsPage *page)
     int maxMotorRPMStartY = maxMotorTorqueStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max RPM", page->machineProfile->configuration->maxMotorRPM);
+    sprintf(buf, "%s: %0.3f", "Max RPM", page->machineProfile->configuration.maxMotorRPM);
     display_draw_string(page->display, maxMotorRPMStartX, maxMotorRPMStartY, buf);
     page->buttons[5].name = BUTTON_CONFIGURATION_MAXMOTORRPM;
     page->buttons[5].xmin = maxMotorRPMStartX;
@@ -470,7 +460,7 @@ bool settings_page_run(SettingsPage *page)
     int gearDiameterStartY = maxMotorRPMStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Gear Diameter", page->machineProfile->configuration->gearDiameter);
+    sprintf(buf, "%s: %0.3f", "Gear Diameter", page->machineProfile->configuration.gearDiameter);
     display_draw_string(page->display, gearDiameterStartX, gearDiameterStartY, buf);
     page->buttons[6].name = BUTTON_CONFIGURATION_GEARDIAMETER;
     page->buttons[6].xmin = gearDiameterStartX;
@@ -484,7 +474,7 @@ bool settings_page_run(SettingsPage *page)
     int systemIntertiaStartY = gearDiameterStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Intertia", page->machineProfile->configuration->systemIntertia);
+    sprintf(buf, "%s: %0.3f", "Intertia", page->machineProfile->configuration.systemIntertia);
     display_draw_string(page->display, systemIntertiaStartX, systemIntertiaStartY, buf);
     page->buttons[7].name = BUTTON_CONFIGURATION_SYSTEMINTERTIA;
     page->buttons[7].xmin = systemIntertiaStartX;
@@ -498,7 +488,7 @@ bool settings_page_run(SettingsPage *page)
     int staticTorqueStartY = systemIntertiaStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Static Torque", page->machineProfile->configuration->staticTorque);
+    sprintf(buf, "%s: %0.3f", "Static Torque", page->machineProfile->configuration.staticTorque);
     display_draw_string(page->display, staticTorqueStartX, staticTorqueStartY, buf);
     page->buttons[8].name = BUTTON_CONFIGURATION_STATICTORQUE;
     page->buttons[8].xmin = staticTorqueStartX;
@@ -512,7 +502,7 @@ bool settings_page_run(SettingsPage *page)
     int loadStartY = staticTorqueStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Load", page->machineProfile->configuration->load);
+    sprintf(buf, "%s: %0.3f", "Load", page->machineProfile->configuration.load);
     display_draw_string(page->display, loadStartX, loadStartY, buf);
     page->buttons[9].name = BUTTON_CONFIGURATION_LOAD;
     page->buttons[9].xmin = loadStartX;
@@ -526,7 +516,7 @@ bool settings_page_run(SettingsPage *page)
     int positionEncoderTypeStartY = loadStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %s", "Encoder", page->machineProfile->configuration->positionEncoderType);
+    sprintf(buf, "%s: %s", "Encoder", page->machineProfile->configuration.positionEncoderType);
     display_draw_string(page->display, positionEncoderTypeStartX, positionEncoderTypeStartY, buf);
     page->buttons[10].name = BUTTON_CONFIGURATION_POSITIONENCODERTYPE;
     page->buttons[10].xmin = positionEncoderTypeStartX;
@@ -540,7 +530,7 @@ bool settings_page_run(SettingsPage *page)
     int positionEncoderScaleFactorStartY = positionEncoderTypeStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Encoder Slope", page->machineProfile->configuration->positionEncoderStepsPerRev);
+    sprintf(buf, "%s: %0.3f", "Encoder Slope", page->machineProfile->configuration.positionEncoderStepsPerRev);
     display_draw_string(page->display, positionEncoderScaleFactorStartX, positionEncoderScaleFactorStartY, buf);
     page->buttons[11].name = BUTTON_CONFIGURATION_POSITIONENCODERSCALEFACTOR;
     page->buttons[11].xmin = positionEncoderScaleFactorStartX;
@@ -554,7 +544,7 @@ bool settings_page_run(SettingsPage *page)
     int forceGaugeStartY = positionEncoderScaleFactorStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %s", "Force Gauge", page->machineProfile->configuration->forceGauge);
+    sprintf(buf, "%s: %s", "Force Gauge", page->machineProfile->configuration.forceGauge);
     display_draw_string(page->display, forceGaugeStartX, forceGaugeStartY, buf);
     page->buttons[12].name = BUTTON_CONFIGURATION_FORCEGAUGE;
     page->buttons[12].xmin = forceGaugeStartX;
@@ -568,7 +558,7 @@ bool settings_page_run(SettingsPage *page)
     int forceGaugeScaleFactorStartY = forceGaugeStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Force Slope", page->machineProfile->configuration->forceGaugeScaleFactor);
+    sprintf(buf, "%s: %0.3f", "Force Slope", page->machineProfile->configuration.forceGaugeScaleFactor);
     display_draw_string(page->display, forceGaugeScaleFactorStartX, forceGaugeScaleFactorStartY, buf);
     page->buttons[13].name = BUTTON_CONFIGURATION_FORCEGAUGESCALEFACTOR;
     page->buttons[13].xmin = forceGaugeScaleFactorStartX;
@@ -582,7 +572,7 @@ bool settings_page_run(SettingsPage *page)
     int forceGaugeZeroFactorStartY = forceGaugeScaleFactorStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %d", "Force Zero", page->machineProfile->configuration->forceGaugeZeroFactor);
+    sprintf(buf, "%s: %d", "Force Zero", page->machineProfile->configuration.forceGaugeZeroFactor);
     display_draw_string(page->display, forceGaugeZeroFactorStartX, forceGaugeZeroFactorStartY, buf);
     page->buttons[14].name = BUTTON_CONFIGURATION_FORCEGAUGENEUTRALOFFSET;
     page->buttons[14].xmin = forceGaugeZeroFactorStartX;
@@ -609,7 +599,7 @@ bool settings_page_run(SettingsPage *page)
     int minPositionStartY = performanceStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Min Position", page->machineProfile->performance->minPosition);
+    sprintf(buf, "%s: %0.3f", "Min Position", page->machineProfile->performance.minPosition);
     display_draw_string(page->display, minPositionStartX, minPositionStartY, buf);
     page->buttons[15].name = BUTTON_PERFORMANCE_MINPOSITION;
     page->buttons[15].xmin = minPositionStartX;
@@ -623,7 +613,7 @@ bool settings_page_run(SettingsPage *page)
     int maxPositionStartY = minPositionStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Position", page->machineProfile->performance->maxPosition);
+    sprintf(buf, "%s: %0.3f", "Max Position", page->machineProfile->performance.maxPosition);
     display_draw_string(page->display, maxPositionStartX, maxPositionStartY, buf);
     page->buttons[16].name = BUTTON_PERFORMANCE_MAXPOSITION;
     page->buttons[16].xmin = maxPositionStartX;
@@ -637,7 +627,7 @@ bool settings_page_run(SettingsPage *page)
     int maxVelocityStartY = maxPositionStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Velocity", page->machineProfile->performance->maxVelocity);
+    sprintf(buf, "%s: %0.3f", "Max Velocity", page->machineProfile->performance.maxVelocity);
     display_draw_string(page->display, maxVelocityStartX, maxVelocityStartY, buf);
     page->buttons[17].name = BUTTON_PERFORMANCE_MAXVELOCITY;
     page->buttons[17].xmin = maxVelocityStartX;
@@ -651,7 +641,7 @@ bool settings_page_run(SettingsPage *page)
     int maxAccelerationStartY = maxVelocityStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Acceleration", page->machineProfile->performance->maxAcceleration);
+    sprintf(buf, "%s: %0.3f", "Max Acceleration", page->machineProfile->performance.maxAcceleration);
     display_draw_string(page->display, maxAccelerationStartX, maxAccelerationStartY, buf);
     page->buttons[18].name = BUTTON_PERFORMANCE_MAXACCELERATION;
     page->buttons[18].xmin = maxAccelerationStartX;
@@ -665,7 +655,7 @@ bool settings_page_run(SettingsPage *page)
     int maxForceTensileStartY = maxAccelerationStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Tensile", page->machineProfile->performance->maxForceTensile);
+    sprintf(buf, "%s: %0.3f", "Max Tensile", page->machineProfile->performance.maxForceTensile);
     display_draw_string(page->display, maxForceTensileStartX, maxForceTensileStartY, buf);
     page->buttons[19].name = BUTTON_PERFORMANCE_MAXFORCETENSILE;
     page->buttons[19].xmin = maxForceTensileStartX;
@@ -679,7 +669,7 @@ bool settings_page_run(SettingsPage *page)
     int maxForceCompressionStartY = maxForceTensileStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Max Compression", page->machineProfile->performance->maxForceCompression);
+    sprintf(buf, "%s: %0.3f", "Max Compression", page->machineProfile->performance.maxForceCompression);
     display_draw_string(page->display, maxForceCompressionStartX, maxForceCompressionStartY, buf);
     page->buttons[20].name = BUTTON_PERFORMANCE_MAXFORCECOMPRESSION;
     page->buttons[20].xmin = maxForceCompressionStartX;
@@ -693,7 +683,7 @@ bool settings_page_run(SettingsPage *page)
     int forceGaugeNeutralOffsetStartY = maxForceCompressionStartY + 30;
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
     display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    sprintf(buf, "%s: %0.3f", "Force Neutral", page->machineProfile->performance->forceGaugeNeutralOffset);
+    sprintf(buf, "%s: %0.3f", "Force Neutral", page->machineProfile->performance.forceGaugeNeutralOffset);
     display_draw_string(page->display, forceGaugeNeutralOffsetStartX, forceGaugeNeutralOffsetStartY, buf);
     page->buttons[21].name = BUTTON_PERFORMANCE_FORCEGAUGENEUTRALOFFSET;
     page->buttons[21].xmin = forceGaugeNeutralOffsetStartX;
@@ -704,14 +694,15 @@ bool settings_page_run(SettingsPage *page)
     page->buttons[21].lastPress = 0;
 
     button_check(page->display, page->buttons, BUTTONCOUNT); // Clear button presses
-    while (!page->complete)
+    while (!complete)
     {
-        if (check_buttons(page) && !page->complete)
+        if (check_buttons(page) && !complete)
         {
             printf("reloading page\n");
             return true; // reload page
         }
     }
     printf("exiting page\n");
+    free(page->buttons);
     return false; // exit page
 }

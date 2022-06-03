@@ -54,7 +54,7 @@ static void button_done(int id, void *arg)
 static void button_files(int id, void *arg)
 {
     Explorer *explorer = (Explorer *)arg;
-    char *newpath = explorer->files[id];
+    const char *newpath = explorer->files[id];
     for (int i = 0; i < strlen(newpath); i++)
     {
         if (newpath[i] == '.') // File type
@@ -74,7 +74,7 @@ static void button_files(int id, void *arg)
     strcat(explorer->path, newpath);
 }
 
-Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, char *path)
+Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path)
 {
     Explorer *explorer = (Explorer *)malloc(sizeof(Explorer));
     explorer->display = display;
@@ -111,7 +111,6 @@ char *explorer_run(Explorer *explorer)
 
     // Create Background
     Module *root = module_create(NULL);
-
     // Create Window
     Module *window = module_create(root);
     module_set_rectangle_circle(window, EXPLORER_WIDTH, EXPLORER_HEIGHT);

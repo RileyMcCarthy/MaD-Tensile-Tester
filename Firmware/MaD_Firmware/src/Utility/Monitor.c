@@ -1,6 +1,6 @@
 #include "Monitor.h"
 #include "IOBoard.h"
-#define MONITOR_MEMORY_SIZE 64 * 64
+#define MONITOR_MEMORY_SIZE 4096 * 3
 static long monitor_stack[MONITOR_MEMORY_SIZE];
 static bool monitorHasNewPosition = false;
 static int monitorNewPosition = 0;
@@ -18,8 +18,9 @@ monitor_cog(Monitor *monitor)
     encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
     monitorWriteData = false;
     FILE *file = NULL;
-    mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
+
     int startTimems = 0;
+    // mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
     while (1)
     {
         /*Delay to run at sampleRate*/
@@ -31,38 +32,44 @@ monitor_cog(Monitor *monitor)
         if (forceRawTemp != NULL)
         {
             monitor->data.forceRaw = forceRawTemp;
-            monitor->data.force = force_gauge_raw_to_force(monitor->profile->configuration->forceGaugeZeroFactor, monitor->profile->configuration->forceGaugeScaleFactor, forceRawTemp);
+            monitor->data.force = force_gauge_raw_to_force(monitor->profile->configuration.forceGaugeZeroFactor, monitor->profile->configuration.forceGaugeScaleFactor, forceRawTemp);
         }
         else // Force gauge isnt responding attempt to reconnect
         {
             force_gauge_begin(monitor->forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, monitor->forceGauge->interpolationSlope, monitor->forceGauge->interpolationZero);
             encoder.set(0);
         }
+
         if (monitorHasNewPosition)
         {
             encoder.set(monitorNewPosition);
             monitorHasNewPosition = false;
         }
-        monitor->data.positionum = (1000 * steps_to_mm(encoder.value(), monitor->profile->configuration)); // Get Position in um
+        monitor->data.positionum = (1000 * steps_to_mm(encoder.value(), &(monitor->profile->configuration))); // Get Position in um
         monitor->data.timems = _getms();
         if (monitorWriteData)
         {
             if (file == NULL)
             {
+                // _umount("/sd");                                    // Mount SD card using default pins
+                // mount("/host", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
                 startTimems = _getms();
                 file = fopen("/da/raw1.txt", "w");
                 if (file == NULL)
                 {
-                    printf("Failed to open file for writing\n");
+                    // printf("Failed to open file for writing\n");
                 }
                 else
                 {
-                    printf("Opened file for writing\n");
-                    fprintf(file, "time (ms),forceRaw,force (mN), encoderRaw,position (um)\n");
+                    //  printf("Opened file for writing\n");
+                    //  fprintf(file, "time (ms),forceRaw,force (mN),encoderRaw,position (um)\n");
                 }
             }
-            // printf("%d,%d,%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.force, encoder.value(), monitor->data.positionum);
-            fprintf(file, "%d,%d,%d,%d,%d\n", monitor->data.timems - startTimems, monitor->data.forceRaw, monitor->data.force, monitor->data.encoderRaw, monitor->data.positionum);
+            else
+            {
+                // printf("%d,%d,%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.force, encoder.value(), monitor->data.positionum);
+                //  fprintf(file, "%d,%d,%d,%d,%d\n", monitor->data.timems - startTimems, monitor->data.forceRaw, monitor->data.force, monitor->data.encoderRaw, monitor->data.positionum);
+            }
         }
         else
         {
@@ -71,6 +78,8 @@ monitor_cog(Monitor *monitor)
                 fclose(file);
                 file = NULL;
             }
+            //_umount("/host");                 // Mount data card using default pins
+            // mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
         }
 
         //  Update Buffer
@@ -78,8 +87,12 @@ monitor_cog(Monitor *monitor)
     }
 }
 
-bool monitor_begin(Monitor *monitor)
+bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate)
 {
+    monitor->dyn4 = dyn4;
+    monitor->forceGauge = forceGauge;
+    monitor->profile = profile;
+    monitor->sampleRate = sampleRate;
     monitor->cogid = _cogstart_C(monitor_cog, monitor, &monitor_stack[0], sizeof(long) * MONITOR_MEMORY_SIZE);
     if (monitor->cogid != -1)
     {
@@ -88,12 +101,9 @@ bool monitor_begin(Monitor *monitor)
     return false;
 }
 
-void monitor_init(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate)
+Monitor *monitor_create()
 {
-    monitor->dyn4 = dyn4;
-    monitor->forceGauge = forceGauge;
-    monitor->profile = profile;
-    monitor->sampleRate = sampleRate;
+    return (Monitor *)malloc(sizeof(Monitor));
 }
 
 void monitor_destroy(Monitor *monitor)

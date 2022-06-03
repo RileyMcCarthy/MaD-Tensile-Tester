@@ -7,6 +7,8 @@
 #define BUTTON_CONDITION 1
 #define BUTTON_NAVIGATION 2
 
+static bool complete;
+
 /**
  * @brief Manual page contains information and controls for running in manual mode
  *
@@ -35,7 +37,7 @@ static void checkButtons(ManualPage *page)
                 /* code */
                 break;
             case BUTTON_NAVIGATION:
-                page->complete = true;
+                complete = true;
                 break;
             default:
                 break;
@@ -47,16 +49,8 @@ static void checkButtons(ManualPage *page)
 void manual_page_init(ManualPage *page, Display *display, MachineState *machineState, Images *images)
 {
     page->display = display;
-    page->complete = false;
     page->machineState = machineState;
     page->images = images;
-    return page;
-}
-
-void manual_page_destroy(ManualPage *page)
-{
-    free(page->buttons);
-    free(page);
 }
 
 /**
@@ -65,6 +59,7 @@ void manual_page_destroy(ManualPage *page)
  */
 void manual_page_run(ManualPage *page)
 {
+    complete = false;
     printf("Manual page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
@@ -123,12 +118,12 @@ void manual_page_run(ManualPage *page)
 
     display_draw_square_fill(page->display, buttons[0].xmin, buttons[0].ymin, buttons[0].xmax, buttons[0].ymax, COLOR65K_GREEN);
     display_draw_square_fill(page->display, buttons[1].xmin, buttons[1].ymin, buttons[1].xmax, buttons[1].ymax, COLOR65K_RED);
-    Image *navigationImg = page->images->navigationImage;
-    display_bte_memory_copy_image(page->display, navigationImg, SCREEN_WIDTH - navigationImg->width - 5, 5);
+    Image navigationImg = page->images->navigationImage;
+    display_bte_memory_copy_image(page->display, &navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     bool initialRender = true;
     printf("Manual page finished loading\n");
     MachineState previousState = *(page->machineState);
-    while (!page->complete)
+    while (!complete)
     {
         MachineState currentState = *(page->machineState);
         checkButtons(page);

@@ -1,6 +1,6 @@
 #include "Control.h"
 #include "MotionPlanning.h"
-#define CONTROL_MEMORY_SIZE 32768
+#define CONTROL_MEMORY_SIZE 4096 * 4
 static long control_stack[CONTROL_MEMORY_SIZE];
 
 #define SERVO_CHECK_COUNT_MAX 3
@@ -32,14 +32,14 @@ static bool move_servo(Control *control, MoveType type, int value)
     case MOVE_RELATIVE:
     {
         // printf("moving relitive\n");
-        // int positionSteps = value * control->machineProfile->configuration->positionEncoderStepsPerRev / 1000.0; // convert um to steps
-        int positionSteps = mm_to_steps((control->monitorData->positionum + value) / 1000.0, control->machineProfile->configuration);
+        // int positionSteps = value * control->machineProfile.configuration->positionEncoderStepsPerRev / 1000.0; // convert um to steps
+        int positionSteps = mm_to_steps((control->monitorData->positionum + value) / 1000.0, &(control->machineProfile->configuration));
         dyn4_send_command(control->dyn4, dyn4_go_abs_pos, positionSteps);
         break;
     }
     case MOVE_ABSOLUTE:
     {
-        int deltaSteps = mm_to_steps((value) / 1000.0, control->machineProfile->configuration);
+        int deltaSteps = mm_to_steps((value) / 1000.0, &(control->machineProfile->configuration));
         dyn4_send_command(control->dyn4, dyn4_go_abs_pos, deltaSteps);
         break;
     }
@@ -94,7 +94,7 @@ static void control_cog(Control *control)
     {
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
-        MachinePerformance machinePerformance = *(control->machineProfile->performance);
+        MachinePerformance machinePerformance = control->machineProfile->performance;
         mcp_update_register(mcp);
         mcp_set_pin(mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 1);
         /*Check self check state*/
@@ -472,29 +472,26 @@ static void control_cog(Control *control)
                         // printf("running test\n");
                         run = get_run_motion_profile(); // Create new RunMotionProfile structure
                         startTime = _getus();
-                        monitorWriteData = true;
+                        printf("start time: %d\n", startTime);
+                        // json_print_motion_profile(&(control->motionProfile));
+                        //  monitorWriteData = true;
                     }
                     // Run the loaded test profile
-                    if (control->motionProfile != NULL)
+
+                    if (!run->profileComplete)
                     {
-                        if (!run->profileComplete)
-                        {
-                            double t = (_getus() - startTime) / 1000000.0;
-                            double position = position_profile(t, run, control->motionProfile);
-                            // printf("%f,%f,%f\n", t, position, control->monitorData->positionum / 1000.0);
-                            move_servo(control, MOVE_ABSOLUTE, position * 1000);
-                            lastPosition = position;
-                        }
-                        else
-                        {
-                            monitorWriteData = false;
-                            destroy_run_motion_profile(run);
-                            state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
-                        }
+                        double t = (_getus() - startTime) / 1000000.0;
+                        double position = position_profile(t, run, &(control->motionProfile));
+                        // printf("%f,%f,%f\n", t, position, control->monitorData->positionum / 1000.0);
+                        move_servo(control, MOVE_ABSOLUTE, position * 1000);
+                        lastPosition = position;
                     }
                     else
                     {
+                        printf("test complete\n");
+                        monitorWriteData = false;
                         destroy_run_motion_profile(run);
+                        state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }
                 }
             }
@@ -509,16 +506,15 @@ static void control_cog(Control *control)
     }
 }
 
-void control_init(Control *control, MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData)
+Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData)
 {
     Control *control = (Control *)malloc(sizeof(Control));
     control->machineProfile = machineProfile;
     control->monitorData = monitorData;
     control->stateMachine = stateMachine;
-    control->motionProfile = NULL;
-    control->motionProfile = NULL;
     control->dyn4 = dyn4;
     control->cogid = -1;
+    return control;
 }
 bool control_begin(Control *control)
 {

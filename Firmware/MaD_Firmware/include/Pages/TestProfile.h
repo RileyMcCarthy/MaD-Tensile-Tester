@@ -10,6 +10,7 @@
 #include "Keyboard.h"
 #include "Selection.h"
 #include "JSON.h"
+#include "Graph.h"
 
 typedef struct TestProfilePage_s
 {

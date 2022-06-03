@@ -11,21 +11,18 @@
 
 static Display display;
 static MachineProfile machineProfile;
-static DYN4 dyn4;
 static MachineState machineState;
 static DS3231 clock;
-static ForceGauge forceGauge;
 static Images images;
-static Monitor monitor;
-static Control control;
 
 // Pages
 static StatusPage statusPage;
 static ManualPage manualPage;
 static AutomaticPage automaticPage;
-static CalibrateForcePage calibratePage;
+static CalibrateForcePage calibrateForcePage;
 static SettingsPage settingsPage;
 static TestProfilePage testProfilePage;
+static NavigationPage navigationPage;
 
 static void load_images()
 {
@@ -102,29 +99,29 @@ static void load_images()
   images.failImage.y0 = 225;
   images.failImage.backgroundColor = 0x07e0;
 
-  loading_overlay_display(display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.navigationImage);
+  loading_overlay_display(&display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.navigationImage));
 
-  loading_overlay_display(display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.manualPageImage);
+  loading_overlay_display(&display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.manualPageImage));
 
-  loading_overlay_display(display, "Loading Image: automatic page", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.automaticPageImage);
+  loading_overlay_display(&display, "Loading Image: automatic page", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.automaticPageImage));
 
-  loading_overlay_display(display, "Loading Image: status page", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.statusPageImage);
+  loading_overlay_display(&display, "Loading Image: status page", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.statusPageImage));
 
-  loading_overlay_display(display, "Loading Image: calibrate page", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.calibratePageImage);
+  loading_overlay_display(&display, "Loading Image: calibrate page", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.calibratePageImage));
 
-  loading_overlay_display(display, "Loading Image: files page", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.filesPageImage);
+  loading_overlay_display(&display, "Loading Image: files page", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.filesPageImage));
 
-  loading_overlay_display(display, "Loading Image: check status", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.successImage);
+  loading_overlay_display(&display, "Loading Image: check status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.successImage));
 
-  loading_overlay_display(display, "Loading Image: fail status", OVERLAY_TYPE_LOADING);
-  display_load_image(display, images.failImage);
+  loading_overlay_display(&display, "Loading Image: fail status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.failImage));
 }
 
 /**
@@ -152,6 +149,7 @@ static void load_machine_profile()
     printf("Opening existing profile\n");
     json_to_machine_profile(&machineProfile, "/sd/settings/Default.mcp"); // Load machine profile from file
     json_print_machine_profile(&machineProfile);                          // Print machine profile to console
+    return;
   }
 
   printf("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
@@ -193,72 +191,87 @@ static void load_machine_profile()
   write_machine_profile(&machineProfile); // Write machine profile to file
 }
 
-static MotionProfile static_test_profile()
+static MotionProfile *static_test_profile()
 {
-  MotionProfile profile;
-  strcpy(profile.name, "Tensile_Test_1");
+  mkdir("/sd/profiles", 0);
+  MotionProfile *profile = (MotionProfile *)malloc(sizeof(MotionProfile));
+  strcpy(profile->name, "/sd/profiles/Test1.mp");
 
-  profile.number = 1;
-  profile.setCount = 2;
+  profile->number = 1;
+  profile->setCount = 2;
 
   // Create first set
-  strcpy(profile.sets[0].name, "Set_1");
+  strcpy(profile->sets[0].name, "/sd/profiles/Set_1.set");
 
-  profile.sets[0].number = 1;
-  profile.sets[0].executions = 1;
-  profile.sets[0].quartetCount = 2;
+  profile->sets[0].number = 1;
+  profile->sets[0].executions = 1;
+  profile->sets[0].quartetCount = 2;
 
   // Create first quartet
-  strcpy(profile.sets[0].quartets[0].name, "Quartet_1");
+  strcpy(profile->sets[0].quartets[0].name, "/sd/profiles/qrt1.qrt");
 
-  profile.sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile.sets[0].quartets[0].parameters[0] = 5;     // Distance
-  profile.sets[0].quartets[0].parameters[1] = 4;     // Strain rate
-  profile.sets[0].quartets[0].parameters[2] = 0.001; // Error
+  profile->sets[0].quartets[0].parameters[0] = 10;    // Distance
+  profile->sets[0].quartets[0].parameters[1] = 20;    // Strain rate
+  profile->sets[0].quartets[0].parameters[2] = 0.001; // Error
 
-  profile.sets[0].quartets[0].dwell = 500; // 500ms
+  profile->sets[0].quartets[0].dwell = 500; // 500ms
 
   // Create second quartet
-  strcpy(profile.sets[0].quartets[1].name, "Quartet_2");
+  strcpy(profile->sets[0].quartets[1].name, "/sd/profiles/qrt2.qrt");
 
-  profile.sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile.sets[0].quartets[1].parameters[0] = -5;    // Distance (m)
-  profile.sets[0].quartets[1].parameters[1] = 4;     // Strain rate (m/s)
-  profile.sets[0].quartets[1].parameters[2] = 0.001; // Error (m)
+  profile->sets[0].quartets[1].parameters[0] = -10;   // Distance (m)
+  profile->sets[0].quartets[1].parameters[1] = 10;    // Strain rate (m/s)
+  profile->sets[0].quartets[1].parameters[2] = 0.001; // Error (m)
 
-  profile.sets[0].quartets[1].dwell = 500; // us
+  profile->sets[0].quartets[1].dwell = 500; // us
 
   // Create second set
-  strcpy(profile.sets[1].name, "Set_2");
+  strcpy(profile->sets[1].name, "/sd/profiles/Set_2.set");
 
-  profile.sets[1].number = 2;
-  profile.sets[1].executions = 1;
-  profile.sets[1].quartetCount = 2;
+  profile->sets[1].number = 2;
+  profile->sets[1].executions = 1;
+  profile->sets[1].quartetCount = 2;
 
   // Create first quartet
-  strcpy(profile.sets[1].quartets[0].name, "Quartet_3");
+  strcpy(profile->sets[1].quartets[0].name, "/sd/profiles/qrt3.qrt");
 
-  profile.sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile.sets[1].quartets[0].parameters[0] = 5;     // Distance
-  profile.sets[1].quartets[0].parameters[1] = 4;     // Strain rate
-  profile.sets[1].quartets[0].parameters[2] = 0.001; // Error
+  profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
+  profile->sets[1].quartets[0].parameters[1] = 30;    // Strain rate
+  profile->sets[1].quartets[0].parameters[2] = 0.001; // Error
 
-  profile.sets[1].quartets[0].dwell = 500; // 500ms
+  profile->sets[1].quartets[0].dwell = 500; // 500ms
 
   // Create second quartet
-  strcpy(profile.sets[1].quartets[1].name, "Quartet_4");
+  strcpy(profile->sets[1].quartets[1].name, "/sd/profiles/qrt4.qrt");
 
-  profile.sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile.sets[1].quartets[1].parameters[0] = -5;    // Distance
-  profile.sets[1].quartets[1].parameters[1] = 4;     // Strain rate
-  profile.sets[1].quartets[1].parameters[2] = 0.001; // Error
+  profile->sets[1].quartets[1].parameters[0] = -10;   // Distance
+  profile->sets[1].quartets[1].parameters[1] = 10;    // Strain rate
+  profile->sets[1].quartets[1].parameters[2] = 0.001; // Error
 
-  profile.sets[1].quartets[1].dwell = 500; // 500ms
-  return profile;
+  profile->sets[1].quartets[1].dwell = 500; // 500ms
+
+  motion_profile_to_json(profile, profile->name);
+  motion_set_to_json(&(profile->sets[0]), profile->sets[0].name);
+  motion_set_to_json(&(profile->sets[1]), profile->sets[1].name);
+  motion_quartet_to_json(&(profile->sets[0].quartets[0]), profile->sets[0].quartets[0].name);
+  motion_quartet_to_json(&(profile->sets[0].quartets[1]), profile->sets[0].quartets[1].name);
+  motion_quartet_to_json(&(profile->sets[1].quartets[0]), profile->sets[1].quartets[0].name);
+  motion_quartet_to_json(&(profile->sets[1].quartets[1]), profile->sets[1].quartets[1].name);
+  json_print_motion_profile(profile);
+
+  // MotionProfile profile2;
+  // json_to_motion_profile(profile->name, &profile2);
+  // json_print_motion_profile(&profile2);
+
+  return NULL;
 }
 
 /**
@@ -295,9 +308,7 @@ static bool start_display()
 void mad_begin()
 {
   printf("Starting...\n");
-  mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
-
-  //  Begin the display
+  //   Begin the display
   if (!start_display())
   {
     printf("Error starting display\n");
@@ -309,32 +320,28 @@ void mad_begin()
 
   // Load machine profile from SD card
   load_machine_profile();
+
   loading_overlay_display(&display, "Loaded Machine Profile", OVERLAY_TYPE_LOADING);
 
   // Load Assets from SD card to display memory
   load_images();
   loading_overlay_display(&display, "All Images Loaded", OVERLAY_TYPE_LOADING);
 
+  machine_state_init(&machineState);
   // Create DYN4 object and check for communication
-  if (dyn4_begin(&dyn4, DYN4_RX, DYN4_TX, 0) != SUCCESS)
+  DYN4 *dyn4 = dyn4_create();
+  if (dyn4_begin(dyn4, DYN4_RX, DYN4_TX, 0) != SUCCESS)
   {
     loading_overlay_display(&display, "DYN4 Comm Error", OVERLAY_TYPE_LOADING);
+    _waitms(500);
   }
   else
   {
     loading_overlay_display(&display, "DYN4 Connected", OVERLAY_TYPE_LOADING);
   }
 
-  // Start state machine
-  if (machineState == NULL)
-  {
-    loading_overlay_display(&display, "State Machine Failed. Please Reset", OVERLAY_TYPE_LOADING);
-    return; // Something went wrong, exit.
-  }
-  loading_overlay_display(&display, "State Machine Running", OVERLAY_TYPE_LOADING);
-
   // Connect to RTC
-  Error status = ds3231_begin(&rtc, MAD_DS3231_SCL, MAD_DS3231_SDA);
+  Error status = ds3231_begin(&clock, MAD_DS3231_SCL, MAD_DS3231_SDA);
 
   if (status != SUCCESS)
   {
@@ -348,7 +355,8 @@ void mad_begin()
   }
 
   // Connect Force Gauge
-  if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, machineProfile->configuration->forceGaugeScaleFactor, machineProfile->configuration->forceGaugeZeroFactor) != SUCCESS)
+  ForceGauge *forceGauge = force_gauge_create();
+  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, machineProfile.configuration.forceGaugeScaleFactor, machineProfile.configuration.forceGaugeZeroFactor) != SUCCESS)
   {
     loading_overlay_display(&display, "Force gauge failed", OVERLAY_TYPE_LOADING);
   }
@@ -357,8 +365,8 @@ void mad_begin()
     loading_overlay_display(&display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
   }
 
-  monitor_init(&monitor, dyn4, forceGauge, machineProfile, 1000);
-  if (monitor_begin(&monitor))
+  Monitor *monitor = monitor_create();
+  if (monitor_begin(monitor, dyn4, forceGauge, &machineProfile, 1000))
   {
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
   }
@@ -368,29 +376,31 @@ void mad_begin()
     return;
   }
 
-  control_init(control, machineProfile, machineState, dyn4, &(monitor->data));
-  if (control_begin(&control))
+  Control *control = control_create(&machineProfile, &machineState, dyn4, &(monitor->data));
+  if (control_begin(control))
   {
     loading_overlay_display(&display, "Control Started", OVERLAY_TYPE_LOADING);
-    control.motionProfile = static_test_profile(); // Set dummy test profile
+    static_test_profile(); // Create dummy test profile
   }
   else
   {
-    loading_overlay_display(display, "Control Failed, please reset", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(&display, "Control Failed, please reset", OVERLAY_TYPE_LOADING);
     return;
   }
+
   state_machine_set(&machineState, PARAM_SELF_CHARGE_PUMP, true);
 
-  status_page_init(&statusPage, display, machineState, &(monitor->data), images);
-  manual_page_init(&manualPage, display, machineState, images);
-  automatic_page_init(&automaticPage, display, images, machineState);
-  calibrate_force_page_init(&calibratePage, display, monitor, forceGauge, machineProfile, images);
-  settings_page_init(&settingsPage, display, machineProfile, images);
-  test_profile_page_init(&testProfilePage, display, images);
-  navigation_page_init(&navigationPage, display, images);
+  status_page_init(&statusPage, &display, &machineState, &(monitor->data), &images);
+  manual_page_init(&manualPage, &display, &machineState, &images);
+  automatic_page_init(&automaticPage, &display, &images, &machineState, control);
+  calibrate_force_page_init(&calibrateForcePage, &display, monitor, forceGauge, &machineProfile, &images);
+  settings_page_init(&settingsPage, &display, &machineProfile, &images);
+  test_profile_page_init(&testProfilePage, &display, &images);
+  navigation_page_init(&navigationPage, &display, &images);
 
+  printf("Machine propfile size:%d\n", sizeof(machineProfile));
   // Begin main loop
-  Page currentPage = PAGE_SETTINGS;
+  Page currentPage = PAGE_STATUS;
   while (1)
   {
     switch (currentPage)
@@ -423,8 +433,8 @@ void mad_begin()
       if (update)
       {
         write_machine_profile(&machineProfile);
-        forceGauge->interpolationSlope = machineProfile->configuration->forceGaugeScaleFactor;
-        forceGauge->interpolationZero = machineProfile->configuration->forceGaugeZeroFactor;
+        forceGauge->interpolationSlope = machineProfile.configuration.forceGaugeScaleFactor;
+        forceGauge->interpolationZero = machineProfile.configuration.forceGaugeZeroFactor;
       }
       printf("Leaving force calibration page\n");
       break;
@@ -434,6 +444,7 @@ void mad_begin()
       printf("Loading settings page...\n");
       while (settings_page_run(&settingsPage)) // Keep running settings page until navigation icon selected
       {
+        printf("Updating force calibration page:%s\n", machineProfile.name);
         write_machine_profile(&machineProfile);
       }
       printf("Leaving settings page\n");
@@ -441,7 +452,7 @@ void mad_begin()
     }
     case PAGE_TEST_PROFILE:
     {
-      test_profile_page_run(&page);
+      test_profile_page_run(&testProfilePage);
       break;
     }
     default:
@@ -449,6 +460,6 @@ void mad_begin()
     }
     printf("Selecting new page\n");
 
-    currentPage = navigation_page_run(navigationPage);
+    currentPage = navigation_page_run(&navigationPage);
   }
 }

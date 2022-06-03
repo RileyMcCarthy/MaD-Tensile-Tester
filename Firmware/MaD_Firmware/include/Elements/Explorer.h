@@ -29,7 +29,7 @@ typedef struct explorer_s
     bool complete;
 } Explorer;
 
-Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, char *path);
+Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path);
 char *explorer_run(Explorer *explorer);
 void explorer_destroy(Explorer *explorer);
 

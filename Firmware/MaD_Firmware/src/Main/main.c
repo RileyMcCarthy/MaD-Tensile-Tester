@@ -1,12 +1,12 @@
-#define P2_TARGET_MHZ 180
+#define P2_TARGET_MHZ 160
 #include <sys/p2es_clock.h>
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768 * 4
+    HEAPSIZE = 32768 * 5
 };
 
-double atof(char *str)
+double atof(const char *str)
 {
     int sign;
     double number = 0.0, power = 1.0;
@@ -47,8 +47,9 @@ double atof(char *str)
 
 int main()
 {
-    _waitms(200);
-    _clkset(_SETFREQ, _CLOCKFREQ);
+    //_clkset(_SETFREQ, _CLOCKFREQ);
+
+    mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
     mad_begin();
     while (1)
         ;

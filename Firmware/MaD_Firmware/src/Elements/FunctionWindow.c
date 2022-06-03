@@ -81,7 +81,6 @@ static void update_off(Display *display, Module *module, void *arg)
     int outlineColor = COLOR65K_BLACK;
     int innerColor = COLOR65K_BLACK;
     int textColor = COLOR65K_BLACK;
-    printf("%d\n", window->state->function);
     if (window->state->state == STATE_MOTION && window->state->motionParameters.status != STATUS_DISABLED)
     {
         if (window->state->function == FUNC_MANUAL_OFF)
