@@ -1,6 +1,6 @@
 #include "Control.h"
 #include "MotionPlanning.h"
-#define CONTROL_MEMORY_SIZE 4096 * 4
+#define CONTROL_MEMORY_SIZE 4096 * 1
 static long control_stack[CONTROL_MEMORY_SIZE];
 
 #define SERVO_CHECK_COUNT_MAX 3
@@ -208,8 +208,11 @@ static void control_cog(Control *control)
             // Update state machine
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_LOWER);
         }
-        else if (false) // Door
+        else if (mcp_get_pin(mcp, DOOR_SWITCH, DOOR_SWITCH_REGISTER) == 1) // Door
         {
+            // Error machine door open
+            // Update state machine
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_DOOR);
         }
         else if (!status.motorBusy) // STOPPED
         {
@@ -474,7 +477,7 @@ static void control_cog(Control *control)
                         startTime = _getus();
                         printf("start time: %d\n", startTime);
                         // json_print_motion_profile(&(control->motionProfile));
-                        //  monitorWriteData = true;
+                        monitorWriteData = true;
                     }
                     // Run the loaded test profile
 

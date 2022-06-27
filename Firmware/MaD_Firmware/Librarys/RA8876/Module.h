@@ -20,41 +20,66 @@ typedef enum ModuleType_e
     MODULE_WINDOW
 } ModuleType;
 
-typedef struct Module_s
-{
-    struct Module_s *parent;
-    struct Module_s **child;
-    ModuleType type;
-    void *data;
-    int numChildren;
-    int x, y, w, h, px, py;
-    int backgroundColor, foregroundColor;
-    bool visible;
-    int lastPressed;
-    int debouncems;
-    int touchId;
-    void (*onTouch)(int id, void *arg);
-    void (*onUpdate)(Display *display, struct Module_s *module, void *arg);
-    void (*draw)(Display *display, struct Module_s *module);
-} Module;
+#define MAX_GRAPH_MARKERS 10
+#define MAX_GRAPH_TITLE_LENGTH 20
+#define MAX_GRAPH_UNITS_LENGTH 10
 
 typedef enum ModuleTextAignType_e
 {
     MODULE_TEXT_ALIGN_NONE,
     MODULE_TEXT_ALIGN_INNER_LEFT,
     MODULE_TEXT_ALIGN_INNER_CENTER,
-    MODULE_TEXT_ALIGN_INNER_RIGHT
+    MODULE_TEXT_ALIGN_INNER_RIGHT,
+    MODULE_TEXT_ALIGN_VTOP,
+    MODULE_TEXT_ALIGN_VCENTER,
+    MODULE_TEXT_ALIGN_VBOTTOM,
 } ModuleTextAignType;
 
 typedef struct ModuleText_s
 {
-    char *text;
+    char *value;
     int font;
-    int maxChar;
-    ModuleTextAignType alignment;
+    bool underline;
+    ModuleTextAignType alignmentH;
+    ModuleTextAignType alignmentV;
 } ModuleText;
 
+#define MODULE_MAX_CHILDREN 50
+
+typedef union Data_u
+{
+    void *ptr;
+    ModuleText text;
+    Image *image;
+} Data;
+
+typedef struct Module_s
+{
+    struct Module_s *parent;
+    struct Module_s *child[MODULE_MAX_CHILDREN];
+    ModuleType type;
+    Data data;
+    int numChildren;
+    int x, y, w, h, px, py, mx, my, r;
+    int backgroundColor, foregroundColor, borderColor;
+    bool visible;
+    int lastPressed;
+    int debouncems;
+    int touchId;
+    int borderWidth;
+    void (*touchAnimate)(Display *display, struct Module_s *module);
+    void (*drawAnimate)(Display *display, struct Module_s *module);
+    void (*onTouch)(int id, void *arg);
+    void (*onUpdate)(Display *display, struct Module_s *module, void *arg);
+    void (*draw)(Display *display, struct Module_s *module);
+} Module;
+
+void module_animation_switch_page_right(Display *display, Module *module);
+void module_animation_switch_page_up(Display *display, Module *module);
+void module_animation_switch_page_down(Display *display, Module *module);
+
 Module *module_create(Module *parent);
+void module_init(Module *module, Module *parent); // Used for static module creation
 
 void module_update_callback(Module *module, void (*onUpdate)(Display *display, Module *module, void *arg));
 void module_update_check(Display *display, Module *module, void *arg);
@@ -67,29 +92,34 @@ void module_copy(Module *to, Module *from);
 
 void module_save(Module *module, Display *display);
 void module_paste(Module *module, Display *display);
-
-void module_set_graph(Module *window, const char *title, const char *units);
-void module_graph_add_marker(Module *module, float value);
-void module_graph_insert(Module *module, double value);
-void module_graph_set_range(Module *module, double maxY, double minY);
-int module_graph_get_max_data(Module *module);
+void module_animate_draw(Module *module, void (*drawAnimate)(Display *display, struct Module_s *module));
 
 void module_set_window(Module *module, void *window);
 void module_set_line(Module *module, int w);
 void module_set_line_one(Module *module, int x, int y);
 void module_set_rectangle(Module *module, int w, int h);
 void module_set_rectangle_circle(Module *module, int w, int h);
+void module_set_radius(Module *module, int r);
 void module_set_image(Module *module, Image *image);
-void module_add_underline(Module *module);
 
-const char *module_get_text(Module *module);
 void module_set_text(Module *module, char *text);
-void module_text_max_char(Module *module, int maxChar);
-void module_set_font(Module *module, int font);
+void module_set_text2(Module *module, char *text);
+void module_text_underline(Module *module);
+char *module_text_get(Module *module);
+void module_text_set(Module *module, char *text);
+void module_text_fit(Module *module);
 void module_text_align(Module *module, ModuleTextAignType alignment);
+void module_text_align_verticle(Module *module, ModuleTextAignType alignment);
+
+void module_text_font(Module *module, int font);
+int module_text_font_width(Module *module);
+int module_text_font_height(Module *module);
+void module_text_update(Module *module, char *text);
 
 void module_set_padding(Module *module, int px, int py);
+void module_set_margin(Module *module, int mx, int my);
 void module_set_color(Module *module, int foreground, int background);
+void module_add_border(Module *module, int color, int width);
 void module_set_position(Module *module, int x, int y);
 void module_set_size(Module *module, int w, int h);
 

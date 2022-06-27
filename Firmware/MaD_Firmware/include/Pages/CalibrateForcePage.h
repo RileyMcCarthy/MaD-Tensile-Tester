@@ -11,20 +11,20 @@
 #include "Monitor.h"
 #include "Button.h"
 
-typedef struct CalibrateForcePage_s
+typedef struct CalibratePage_s
 {
     bool complete;
     Display *display;
     Monitor *monitor;
-    ForceGauge *forceGauge;
     Button *buttons;
     MachineProfile *machineProfile;
     Images *images;
     int state;
-} CalibrateForcePage;
 
-void calibrate_force_page_init(CalibrateForcePage *page, Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images);
-void calibrate_force_page_destroy(CalibrateForcePage *page);
-bool calibrate_force_page_run(CalibrateForcePage *page);
+} CalibratePage;
+
+void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *monitor, MachineProfile *machineProfile, Images *images);
+void calibrate_force_page_destroy(CalibratePage *page);
+bool calibrate_force_page_run(CalibratePage *page);
 
 #endif

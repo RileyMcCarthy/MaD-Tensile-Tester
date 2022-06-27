@@ -25,11 +25,27 @@
  */
 typedef struct AutomaticPage_t
 {
-    bool complete;
     Display *display;
     Images *images;
-    MachineState *state;
+    MachineState *machineState;
     Control *control;
+    bool complete;
+
+    Module root;
+    Module background;
+    Module runProfile;
+    Module runTitle;
+    Module selectedProfileNameText;
+    Module selectedProfileNumberText;
+    Module selectedProfileNumberText;
+    Module openButton;
+    Module openText;
+    Module runButton;
+    Module runText;
+    Module navButton;
+
+    char profileNameBuffer[50];
+    char profileNumberBuffer[50];
 } AutomaticPage;
 
 void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, Control *control);

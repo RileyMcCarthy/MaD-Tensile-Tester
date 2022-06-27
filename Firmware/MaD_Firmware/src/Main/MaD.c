@@ -19,7 +19,7 @@ static Images images;
 static StatusPage statusPage;
 static ManualPage manualPage;
 static AutomaticPage automaticPage;
-static CalibrateForcePage calibrateForcePage;
+static CalibratePage calibrateForcePage;
 static SettingsPage settingsPage;
 static TestProfilePage testProfilePage;
 static NavigationPage navigationPage;
@@ -33,6 +33,8 @@ static void load_images()
   images.keyboardImage.x0 = 0;
   images.keyboardImage.y0 = SCREEN_HEIGHT - images.keyboardImage.height;
   images.keyboardImage.backgroundColor = NULL;
+  images.keyboardImage.colorToReplace = 0;
+  images.keyboardImage.replacementColor = 0;
   printf("Name:%s\n", (images.keyboardImage.name));
 
   strcpy(images.manualPageImage.name, "manual.bin");
@@ -42,6 +44,8 @@ static void load_images()
   images.manualPageImage.x0 = 0;
   images.manualPageImage.y0 = 0;
   images.manualPageImage.backgroundColor = 0xf800;
+  images.manualPageImage.colorToReplace = 0x0000;
+  images.manualPageImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.automaticPageImage.name, "auto.bin");
   images.automaticPageImage.page = 2;
@@ -50,6 +54,8 @@ static void load_images()
   images.automaticPageImage.x0 = 200;
   images.automaticPageImage.y0 = 0;
   images.automaticPageImage.backgroundColor = 0xf800;
+  images.automaticPageImage.colorToReplace = 0;
+  images.automaticPageImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.statusPageImage.name, "status.bin");
   images.statusPageImage.page = 2;
@@ -58,6 +64,8 @@ static void load_images()
   images.statusPageImage.x0 = 400;
   images.statusPageImage.y0 = 0;
   images.statusPageImage.backgroundColor = 0xf800;
+  images.statusPageImage.colorToReplace = 0;
+  images.statusPageImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.calibratePageImage.name, "calib.bin");
   images.calibratePageImage.page = 2;
@@ -66,6 +74,8 @@ static void load_images()
   images.calibratePageImage.x0 = 600;
   images.calibratePageImage.y0 = 0;
   images.calibratePageImage.backgroundColor = 0xf800;
+  images.calibratePageImage.colorToReplace = 0;
+  images.calibratePageImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.filesPageImage.name, "files.bin");
   images.filesPageImage.page = 2;
@@ -74,6 +84,8 @@ static void load_images()
   images.filesPageImage.x0 = 800;
   images.filesPageImage.y0 = 0;
   images.filesPageImage.backgroundColor = 0xf800;
+  images.filesPageImage.colorToReplace = 0;
+  images.filesPageImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.navigationImage.name, "nav.bin");
   images.navigationImage.page = 2;
@@ -82,6 +94,8 @@ static void load_images()
   images.navigationImage.x0 = 0;
   images.navigationImage.y0 = 200;
   images.navigationImage.backgroundColor = 0xf800;
+  images.navigationImage.colorToReplace = 0x0000;
+  images.navigationImage.replacementColor = SECONDARYCOLOR;
 
   strcpy(images.successImage.name, "check.bin");
   images.successImage.page = 2;
@@ -90,6 +104,8 @@ static void load_images()
   images.successImage.x0 = 100;
   images.successImage.y0 = 200;
   images.successImage.backgroundColor = 0xf800;
+  images.successImage.colorToReplace = 0;
+  images.successImage.replacementColor = 0;
 
   strcpy(images.failImage.name, "ex.bin");
   images.failImage.page = 2;
@@ -98,9 +114,13 @@ static void load_images()
   images.failImage.x0 = 100;
   images.failImage.y0 = 225;
   images.failImage.backgroundColor = 0x07e0;
+  images.failImage.colorToReplace = 0;
+  images.failImage.replacementColor = 0;
 
   loading_overlay_display(&display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
   display_load_image(&display, &(images.navigationImage));
+  // display_bte_mpu_write_color_expansion(&display, PAGE2_START_ADDR, SCREEN_WIDTH, images.navigationImage.x0, images.navigationImage.y0, images.navigationImage.width, images.navigationImage.height, 0xFFFF, COLOR65K_DARKRED);
+  //  display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->backgroundColor);
 
   loading_overlay_display(&display, "Loading Image: manual page", OVERLAY_TYPE_LOADING);
   display_load_image(&display, &(images.manualPageImage));
@@ -204,7 +224,7 @@ static MotionProfile *static_test_profile()
   strcpy(profile->sets[0].name, "/sd/profiles/Set_1.set");
 
   profile->sets[0].number = 1;
-  profile->sets[0].executions = 1;
+  profile->sets[0].executions = 2;
   profile->sets[0].quartetCount = 2;
 
   // Create first quartet
@@ -224,10 +244,10 @@ static MotionProfile *static_test_profile()
   profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
 
   profile->sets[0].quartets[1].parameters[0] = -10;   // Distance (m)
-  profile->sets[0].quartets[1].parameters[1] = 10;    // Strain rate (m/s)
+  profile->sets[0].quartets[1].parameters[1] = 2;     // Strain rate (m/s)
   profile->sets[0].quartets[1].parameters[2] = 0.001; // Error (m)
 
-  profile->sets[0].quartets[1].dwell = 500; // us
+  profile->sets[0].quartets[1].dwell = 200; // ms
 
   // Create second set
   strcpy(profile->sets[1].name, "/sd/profiles/Set_2.set");
@@ -242,7 +262,7 @@ static MotionProfile *static_test_profile()
   profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
 
   profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
-  profile->sets[1].quartets[0].parameters[1] = 30;    // Strain rate
+  profile->sets[1].quartets[0].parameters[1] = 40;    // Strain rate
   profile->sets[1].quartets[0].parameters[2] = 0.001; // Error
 
   profile->sets[1].quartets[0].dwell = 500; // 500ms
@@ -393,14 +413,14 @@ void mad_begin()
   status_page_init(&statusPage, &display, &machineState, &(monitor->data), &images);
   manual_page_init(&manualPage, &display, &machineState, &images);
   automatic_page_init(&automaticPage, &display, &images, &machineState, control);
-  calibrate_force_page_init(&calibrateForcePage, &display, monitor, forceGauge, &machineProfile, &images);
+  calibrate_force_page_init(&calibrateForcePage, &display, monitor, &machineProfile, &images);
   settings_page_init(&settingsPage, &display, &machineProfile, &images);
   test_profile_page_init(&testProfilePage, &display, &images);
   navigation_page_init(&navigationPage, &display, &images);
 
   printf("Machine propfile size:%d\n", sizeof(machineProfile));
   // Begin main loop
-  Page currentPage = PAGE_STATUS;
+  Page currentPage = PAGE_TEST_PROFILE;
   while (1)
   {
     switch (currentPage)

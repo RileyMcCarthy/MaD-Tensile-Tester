@@ -6,6 +6,30 @@
 #define BUTTON_CONDITION 1
 #define BUTTON_MODE 2
 
+static char disabledStr[] = "DISABLD";
+static char enabledStr[] = "ENABLED";
+static char smplimStr[] = "SMP LIM";
+static char mchlimStr[] = "MCH LIM";
+static char faultedStr[] = "FAULTED";
+
+static char lengthStr[] = "LENGTH";
+static char forceStr[] = "FORCE";
+static char tensionStr[] = "TENSION";
+static char compresStr[] = "COMPRES";
+static char upperStr[] = "UPPER";
+static char lowerStr[] = "LOWER";
+static char doorStr[] = "DOOR";
+static char stoppedStr[] = "STOPPED";
+static char movingStr[] = "MOVING";
+
+static char manualStr[] = "MANUAL";
+static char testStr[] = "TEST";
+static char runStr[] = "RUN";
+
+static char statusStr[] = "Status";
+static char conditionStr[] = "Condition";
+static char modeStr[] = "Mode";
+
 static void button_callback(int id, void *arg)
 {
     MotionStateWindow *window = (MotionStateWindow *)arg;
@@ -49,12 +73,12 @@ static void update_status(Display *display, Module *module, void *arg)
     int statusOutlineColor = COLOR65K_BLACK;
     int statusInnerColor = COLOR65K_BLACK;
     int statusTextColor = COLOR65K_BLACK;
-    char buf[50];
+    char *newString = NULL;
     switch (window->state->motionParameters.status)
     {
     case STATUS_DISABLED:
     {
-        strcpy(buf, "DISABLED");
+        newString = disabledStr;
         if (window->state->state == STATE_MOTION)
         {
             statusOutlineColor = COLOR65K_GREEN;
@@ -71,7 +95,7 @@ static void update_status(Display *display, Module *module, void *arg)
     }
     case STATUS_ENABLED:
     {
-        strcpy(buf, "ENABLED");
+        newString = enabledStr;
         statusOutlineColor = COLOR65K_GREEN;
         statusInnerColor = COLOR65K_WHITE;
         statusTextColor = COLOR65K_BLACK;
@@ -79,7 +103,8 @@ static void update_status(Display *display, Module *module, void *arg)
     }
     case STATUS_SAMPLE_LIMIT:
     {
-        strcpy(buf, "SMP LIM");
+
+        newString = smplimStr;
         statusOutlineColor = COLOR65K_BLUE;
         statusInnerColor = COLOR65K_YELLOW;
         statusTextColor = COLOR65K_BLACK;
@@ -87,7 +112,7 @@ static void update_status(Display *display, Module *module, void *arg)
     }
     case STATUS_MACHINE_LIMIT:
     {
-        strcpy(buf, "MCH LIM");
+        newString = mchlimStr;
         statusOutlineColor = COLOR65K_BLUE;
         statusInnerColor = COLOR65K_YELLOW;
         statusTextColor = COLOR65K_BLACK;
@@ -95,7 +120,7 @@ static void update_status(Display *display, Module *module, void *arg)
     }
     case STATUS_FAULTED:
     {
-        strcpy(buf, "FAULTED");
+        newString = faultedStr;
         statusOutlineColor = COLOR65K_BLUE;
         statusInnerColor = COLOR65K_RED;
         statusTextColor = COLOR65K_WHITE;
@@ -111,9 +136,11 @@ static void update_status(Display *display, Module *module, void *arg)
     {
         return;
     }
-    module_set_color(module, statusOutlineColor, statusOutlineColor);
+
+    module->borderColor = statusOutlineColor;
+    module_set_color(module, statusInnerColor, statusInnerColor);
     module_set_color(module->child[0], statusTextColor, statusInnerColor);
-    module_set_text(module->child[0], buf);
+    module_text_update(module->child[0], newString);
     module_draw(display, module);
 }
 
@@ -124,13 +151,13 @@ static void update_condition(Display *display, Module *module, void *arg)
     int conditionOutlineColor = COLOR65K_BLACK;
     int conditionInnerColor = COLOR65K_BLACK;
     int conditionTextColor = COLOR65K_BLACK;
-    char buf[50];
+    char *newString = NULL;
 
     switch (window->state->motionParameters.condition)
     {
     case MOTION_LENGTH:
     {
-        strcpy(buf, "LENGTH");
+        newString = lengthStr;
         conditionOutlineColor = COLOR65K_MAGENTA;
         conditionInnerColor = COLOR65K_MAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -138,7 +165,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_FORCE:
     {
-        strcpy(buf, "FORCE");
+        newString = forceStr;
         conditionOutlineColor = COLOR65K_MAGENTA;
         conditionInnerColor = COLOR65K_MAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -146,7 +173,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_TENSION:
     {
-        strcpy(buf, "TENSION");
+        newString = tensionStr;
         conditionOutlineColor = COLOR65K_YELLOW;
         conditionInnerColor = COLOR65K_YELLOW;
         conditionTextColor = COLOR65K_BLACK;
@@ -154,7 +181,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_COMPRESSION:
     {
-        strcpy(buf, "COMPRES");
+        newString = compresStr;
         conditionOutlineColor = COLOR65K_YELLOW;
         conditionInnerColor = COLOR65K_YELLOW;
         conditionTextColor = COLOR65K_BLACK;
@@ -162,7 +189,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_UPPER:
     {
-        strcpy(buf, "UPPER");
+        newString = upperStr;
         conditionOutlineColor = COLOR65K_YELLOW;
         conditionInnerColor = COLOR65K_YELLOW;
         conditionTextColor = COLOR65K_BLACK;
@@ -170,7 +197,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_LOWER:
     {
-        strcpy(buf, "LOWER");
+        newString = lowerStr;
         conditionOutlineColor = COLOR65K_YELLOW;
         conditionInnerColor = COLOR65K_YELLOW;
         conditionTextColor = COLOR65K_BLACK;
@@ -178,7 +205,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_DOOR:
     {
-        strcpy(buf, " DOOR");
+        newString = doorStr;
         conditionOutlineColor = COLOR65K_YELLOW;
         conditionInnerColor = COLOR65K_YELLOW;
         conditionTextColor = COLOR65K_BLACK;
@@ -186,7 +213,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_STOPPED:
     {
-        strcpy(buf, "STOPPED");
+        newString = stoppedStr;
         conditionOutlineColor = COLOR65K_RED;
         conditionInnerColor = COLOR65K_RED;
         conditionTextColor = COLOR65K_WHITE;
@@ -194,7 +221,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     case MOTION_MOVING:
     {
-        strcpy(buf, "MOVING");
+        newString = movingStr;
         conditionOutlineColor = COLOR65K_LIGHTMAGENTA;
         conditionInnerColor = COLOR65K_LIGHTMAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -211,7 +238,7 @@ static void update_condition(Display *display, Module *module, void *arg)
     }
     module_set_color(module, conditionOutlineColor, conditionOutlineColor);
     module_set_color(module->child[0], conditionTextColor, conditionInnerColor);
-    module_set_text(module->child[0], buf);
+    module_text_update(module->child[0], newString);
     module_draw(display, module);
 }
 
@@ -222,13 +249,13 @@ static void update_mode(Display *display, Module *module, void *arg)
     int conditionOutlineColor = COLOR65K_BLACK;
     int conditionInnerColor = COLOR65K_BLACK;
     int conditionTextColor = COLOR65K_BLACK;
-    char buf[50];
+    char *newString = NULL;
 
     switch (window->state->motionParameters.mode)
     {
     case MODE_MANUAL:
     {
-        strcpy(buf, "MANUAL");
+        newString = manualStr;
         conditionOutlineColor = COLOR65K_MAGENTA;
         conditionInnerColor = COLOR65K_MAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -236,7 +263,7 @@ static void update_mode(Display *display, Module *module, void *arg)
     }
     case MODE_TEST:
     {
-        strcpy(buf, "TEST");
+        newString = testStr;
         conditionOutlineColor = COLOR65K_MAGENTA;
         conditionInnerColor = COLOR65K_MAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -244,7 +271,7 @@ static void update_mode(Display *display, Module *module, void *arg)
     }
     case MODE_TEST_RUNNING:
     {
-        strcpy(buf, "RUN");
+        newString = runStr;
         conditionOutlineColor = COLOR65K_MAGENTA;
         conditionInnerColor = COLOR65K_MAGENTA;
         conditionTextColor = COLOR65K_BLACK;
@@ -256,13 +283,13 @@ static void update_mode(Display *display, Module *module, void *arg)
     if (module->foregroundColor == conditionOutlineColor &&
         module->child[0]->backgroundColor == conditionInnerColor &&
         module->child[0]->foregroundColor == conditionTextColor &&
-        strcmp(buf, module_get_text(module->child[0])) == 0)
+        strcmp(newString, module_text_get(module->child[0])) == 0)
     {
         return;
     }
     module_set_color(module, conditionOutlineColor, conditionOutlineColor);
     module_set_color(module->child[0], conditionTextColor, conditionInnerColor);
-    module_set_text(module->child[0], buf);
+    module_text_update(module->child[0], newString);
     module_draw(display, module);
 }
 
@@ -273,50 +300,55 @@ void motion_state_window_create(Module *container, MachineState *state)
 
     module_set_window(container, window);
 
-    int padding = 8;
+    int padding = 10;
 
     // Create edit window
     Module *motionStateWindow = module_create(container);
     module_set_rectangle_circle(motionStateWindow, 0, 0);
+    module_add_border(motionStateWindow, COLOR65K_WHITE, 1);
     module_fit_height(motionStateWindow);
     module_fit_width(motionStateWindow);
-    module_set_padding(motionStateWindow, 0, 0);
+    module_set_padding(motionStateWindow, 10, 10);
     module_set_color(motionStateWindow, MAINCOLOR, BACKCOLOR);
     module_align_inner_left(motionStateWindow);
     module_align_inner_top(motionStateWindow);
 
-    // Create Status Header
-    Module *statusHeader = module_create(motionStateWindow);
-    module_set_padding(statusHeader, padding, padding);
-    module_set_text(statusHeader, "Status");
-    module_set_font(statusHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(statusHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
-    module_align_space_even(statusHeader, 1, 3);
-    module_align_inner_top(statusHeader);
-
     // Create Condition Header
     Module *conditionHeader = module_create(motionStateWindow);
-    module_set_padding(conditionHeader, padding, padding);
-    module_set_text(conditionHeader, "Condition");
-    module_set_font(conditionHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(conditionHeader, COLOR65K_BLACK, conditionHeader->parent->foregroundColor);
-    module_align_space_even(conditionHeader, 2, 3);
+    module_set_margin(conditionHeader, padding, padding);
+    module_set_text(conditionHeader, conditionStr);
+    module_text_font(conditionHeader, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(conditionHeader);
+    module_set_color(conditionHeader, MAINTEXTCOLOR, conditionHeader->parent->foregroundColor);
+    module_align_center(conditionHeader);
     module_align_inner_top(conditionHeader);
+
+    // Create Status Header
+    Module *statusHeader = module_create(motionStateWindow);
+    module_set_margin(statusHeader, padding, padding);
+    module_set_text(statusHeader, statusStr);
+    module_text_font(statusHeader, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(statusHeader);
+    module_set_color(statusHeader, MAINTEXTCOLOR, statusHeader->parent->foregroundColor);
+    module_align_left(statusHeader, conditionHeader);
+    module_align_inner_top(statusHeader);
 
     // Create Mode Header
     Module *modeHeader = module_create(motionStateWindow);
-    module_set_padding(modeHeader, padding, padding);
-    module_set_text(modeHeader, "Mode");
-    module_set_font(modeHeader, RA8876_CHAR_HEIGHT_24);
-    module_set_color(modeHeader, COLOR65K_BLACK, statusHeader->parent->foregroundColor);
-    module_align_space_even(modeHeader, 3, 3);
+    module_set_margin(modeHeader, padding, padding);
+    module_set_text(modeHeader, modeStr);
+    module_text_font(modeHeader, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(modeHeader);
+    module_set_color(modeHeader, MAINTEXTCOLOR, statusHeader->parent->foregroundColor);
+    module_align_right(modeHeader, conditionHeader);
     module_align_inner_top(modeHeader);
 
     // Create status Button
     Module *statusButton = module_create(motionStateWindow);
     module_set_rectangle_circle(statusButton, 0, 0);
     module_set_color(statusButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(statusButton, padding, padding);
+    module_add_border(statusButton, COLOR65K_RED, 3);
+    module_set_margin(statusButton, padding, padding);
     module_fit_space_even(statusButton, 3);
     module_fit_below(statusButton, statusHeader);
     module_align_space_even(statusButton, 1, 3);
@@ -325,19 +357,21 @@ void motion_state_window_create(Module *container, MachineState *state)
 
     // Create status Button Text
     Module *statusButtonText = module_create(statusButton);
-    module_set_padding(statusButtonText, 0, 0);
-    module_set_text(statusButtonText, "");
-    module_text_max_char(statusButtonText, 8);
-    module_set_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(statusButtonText, COLOR65K_BLACK, statusButtonText->parent->foregroundColor);
+    module_set_text(statusButtonText, disabledStr);
+    module_text_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(statusButtonText);
+    module_fit_width(statusButtonText);
+    module_set_color(statusButtonText, MAINTEXTCOLOR, statusButtonText->parent->foregroundColor);
     module_text_align(statusButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
+    module_align_inner_left(statusButtonText);
     module_align_middle(statusButtonText);
 
     // Create Condition Button
     Module *conditionButton = module_create(motionStateWindow);
     module_set_rectangle_circle(conditionButton, 0, 0);
     module_set_color(conditionButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(conditionButton, padding, padding);
+    module_set_margin(conditionButton, padding, padding);
+    module_set_padding(conditionButton, 2, 2);
     module_fit_space_even(conditionButton, 3);
     module_fit_below(conditionButton, statusHeader);
     module_align_space_even(conditionButton, 2, 3);
@@ -345,19 +379,20 @@ void motion_state_window_create(Module *container, MachineState *state)
 
     // Create condition Button Text
     Module *conditionButtonText = module_create(conditionButton);
-    module_set_padding(conditionButtonText, 0, 0);
-    module_set_text(conditionButtonText, "");
-    module_text_max_char(conditionButtonText, 8);
-    module_set_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(conditionButtonText, COLOR65K_BLACK, conditionButtonText->parent->foregroundColor);
+    module_set_text(conditionButtonText, stoppedStr);
+    module_text_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(conditionButtonText);
+    module_fit_width(conditionButtonText);
+    module_set_color(conditionButtonText, MAINTEXTCOLOR, conditionButtonText->parent->foregroundColor);
     module_text_align(conditionButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
+    module_align_inner_left(conditionButtonText);
     module_align_middle(conditionButtonText);
 
     // Create Mode Button
     Module *modeButton = module_create(motionStateWindow);
     module_set_rectangle_circle(modeButton, 0, 0);
     module_set_color(modeButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(modeButton, padding, padding);
+    module_set_margin(modeButton, padding, padding);
     module_fit_space_even(modeButton, 3);
     module_fit_below(modeButton, statusHeader);
     module_align_space_even(modeButton, 3, 3);
@@ -366,217 +401,16 @@ void motion_state_window_create(Module *container, MachineState *state)
 
     // Create Mode Button Text
     Module *modeButtonText = module_create(modeButton);
-    module_set_padding(modeButtonText, 0, 0);
-    module_set_text(modeButtonText, "");
-    module_text_max_char(modeButtonText, 8);
-    module_set_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(modeButtonText, COLOR65K_BLACK, modeButtonText->parent->foregroundColor);
+    module_set_text(modeButtonText, manualStr);
+    module_text_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(modeButtonText);
+    module_fit_width(modeButtonText);
+    module_set_color(modeButtonText, MAINTEXTCOLOR, modeButtonText->parent->foregroundColor);
     module_text_align(modeButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
+    module_align_inner_left(modeButtonText);
     module_align_middle(modeButtonText);
 }
 void motion_state_window_destroy(MotionStateWindow *window)
 {
     free(window);
 }
-/*void motion_state_window_update(MotionStateWindow *window)
-{
-    check_buttons(window);
-
-    if (window->state->motionParameters.status == window->lastState.motionParameters.status &&
-        window->state->motionParameters.condition == window->lastState.motionParameters.condition &&
-        window->state->motionParameters.mode == window->lastState.motionParameters.mode &&
-        window->state->state == window->lastState.state)
-        return;
-    display_draw_circle_square_fill(window->display, window->x, window->y, window->x + 320, window->y + 90, 20, 20, MAINCOLOR);
-
-    display_set_text_parameter1(window->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_24, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(window->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
-
-    display_text_color(window->display, MAINTEXTCOLOR, MAINCOLOR);
-    display_draw_string(window->display, window->buttons[0].xmin + 20, window->y + 5, "Status");
-    display_draw_string(window->display, window->buttons[1].xmin, window->y + 5, "Condition");
-    display_draw_string(window->display, window->buttons[2].xmin + 30, window->y + 5, "Mode");
-char buf[50];
-int statusOutlineColor = COLOR65K_BLACK;
-int statusInnerColor = COLOR65K_BLACK;
-int statusTextColor = COLOR65K_BLACK;
-int conditionOutlineColor = COLOR65K_BLACK;
-int conditionInnerColor = COLOR65K_BLACK;
-int conditionTextColor = COLOR65K_BLACK;
-int modeOutlineColor = COLOR65K_BLACK;
-int modeInnerColor = COLOR65K_BLACK;
-int modeTextColor = COLOR65K_BLACK;
-switch (window->state->motionParameters.status)
-{
-case STATUS_DISABLED:
-{
-    strcpy(buf, "DISABLED");
-    if (window->state->state == STATE_MOTION)
-    {
-        statusOutlineColor = COLOR65K_GREEN;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_WHITE;
-    }
-    else
-    {
-        statusOutlineColor = COLOR65K_BROWN;
-        statusInnerColor = COLOR65K_BLACK;
-        statusTextColor = COLOR65K_YELLOW;
-    }
-    break;
-}
-case STATUS_ENABLED:
-{
-    strcpy(buf, "ENABLED");
-    statusOutlineColor = COLOR65K_GREEN;
-    statusInnerColor = COLOR65K_WHITE;
-    statusTextColor = COLOR65K_BLACK;
-    break;
-}
-case STATUS_SAMPLE_LIMIT:
-{
-    strcpy(buf, "SMP LIM");
-    statusOutlineColor = COLOR65K_BLUE;
-    statusInnerColor = COLOR65K_YELLOW;
-    statusTextColor = COLOR65K_BLACK;
-    break;
-}
-case STATUS_MACHINE_LIMIT:
-{
-    strcpy(buf, "MCH LIM");
-    statusOutlineColor = COLOR65K_BLUE;
-    statusInnerColor = COLOR65K_YELLOW;
-    statusTextColor = COLOR65K_BLACK;
-    break;
-}
-case STATUS_FAULTED:
-{
-    strcpy(buf, "FAULTED");
-    statusOutlineColor = COLOR65K_BLUE;
-    statusInnerColor = COLOR65K_RED;
-    statusTextColor = COLOR65K_WHITE;
-    break;
-}
-default:
-    break;
-}
-display_draw_circle_square_fill(window->display, window->buttons[0].xmin, window->buttons[0].ymin, window->buttons[0].xmax, window->buttons[0].ymax, 20, 20, statusOutlineColor);
-display_text_color(window->display, statusTextColor, statusInnerColor);
-display_draw_string(window->display, window->buttons[0].xmin + (window->buttons[0].xmax - window->buttons[0].xmin) / 2 - strlen(buf) * 6, window->buttons[0].ymin + (window->buttons[0].ymax - window->buttons[0].ymin) / 2 - 12, buf);
-
-switch (window->state->motionParameters.condition)
-{
-case MOTION_LENGTH:
-{
-    strcpy(buf, "LENGTH ");
-    conditionOutlineColor = COLOR65K_MAGENTA;
-    conditionInnerColor = COLOR65K_MAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_FORCE:
-{
-    strcpy(buf, " FORCE ");
-    conditionOutlineColor = COLOR65K_MAGENTA;
-    conditionInnerColor = COLOR65K_MAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_TENSION:
-{
-    strcpy(buf, "TENSION");
-    conditionOutlineColor = COLOR65K_YELLOW;
-    conditionInnerColor = COLOR65K_YELLOW;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_COMPRESSION:
-{
-    strcpy(buf, "COMPRES");
-    conditionOutlineColor = COLOR65K_YELLOW;
-    conditionInnerColor = COLOR65K_YELLOW;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_UPPER:
-{
-    strcpy(buf, " UPPER ");
-    conditionOutlineColor = COLOR65K_YELLOW;
-    conditionInnerColor = COLOR65K_YELLOW;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_LOWER:
-{
-    strcpy(buf, " LOWER ");
-    conditionOutlineColor = COLOR65K_YELLOW;
-    conditionInnerColor = COLOR65K_YELLOW;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_DOOR:
-{
-    strcpy(buf, " DOOR  ");
-    conditionOutlineColor = COLOR65K_YELLOW;
-    conditionInnerColor = COLOR65K_YELLOW;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MOTION_STOPPED:
-{
-    strcpy(buf, "STOPPED");
-    conditionOutlineColor = COLOR65K_RED;
-    conditionInnerColor = COLOR65K_RED;
-    conditionTextColor = COLOR65K_WHITE;
-    break;
-}
-case MOTION_MOVING:
-{
-    strcpy(buf, "MOVING ");
-    conditionOutlineColor = COLOR65K_LIGHTMAGENTA;
-    conditionInnerColor = COLOR65K_LIGHTMAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-default:
-    break;
-}
-display_draw_circle_square_fill(window->display, window->buttons[1].xmin, window->buttons[1].ymin, window->buttons[1].xmax, window->buttons[1].ymax, 20, 20, conditionOutlineColor);
-display_text_color(window->display, conditionTextColor, conditionInnerColor);
-display_draw_string(window->display, window->buttons[1].xmin + (window->buttons[1].xmax - window->buttons[1].xmin) / 2 - strlen(buf) * 6, window->buttons[1].ymin + (window->buttons[1].ymax - window->buttons[1].ymin) / 2 - 12, buf);
-
-switch (window->state->motionParameters.mode)
-{
-case MODE_MANUAL:
-{
-    strcpy(buf, "MANUAL");
-    conditionOutlineColor = COLOR65K_MAGENTA;
-    conditionInnerColor = COLOR65K_MAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MODE_TEST:
-{
-    strcpy(buf, " TEST ");
-    conditionOutlineColor = COLOR65K_MAGENTA;
-    conditionInnerColor = COLOR65K_MAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-case MODE_TEST_RUNNING:
-{
-    strcpy(buf, " RUN  ");
-    conditionOutlineColor = COLOR65K_MAGENTA;
-    conditionInnerColor = COLOR65K_MAGENTA;
-    conditionTextColor = COLOR65K_BLACK;
-    break;
-}
-default:
-    break;
-}
-display_draw_circle_square_fill(window->display, window->buttons[2].xmin, window->buttons[2].ymin, window->buttons[2].xmax, window->buttons[2].ymax, 20, 20, conditionOutlineColor);
-display_text_color(window->display, conditionTextColor, conditionInnerColor);
-display_draw_string(window->display, window->buttons[2].xmin + (window->buttons[2].xmax - window->buttons[2].xmin) / 2 - strlen(buf) * 6, window->buttons[2].ymin + (window->buttons[2].ymax - window->buttons[2].ymin) / 2 - 12, buf);
-window->lastState = *window->state;
-}
-* /

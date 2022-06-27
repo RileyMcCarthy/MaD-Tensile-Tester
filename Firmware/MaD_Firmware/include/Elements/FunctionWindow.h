@@ -9,6 +9,9 @@
 typedef struct FunctionWindow_t
 {
     MachineState *state;
+
+    char functionHeaderBuffer[30];
+
 } FunctionWindow;
 
 void function_window_create(Module *container, MachineState *state);

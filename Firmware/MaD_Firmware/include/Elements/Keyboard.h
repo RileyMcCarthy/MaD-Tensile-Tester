@@ -7,13 +7,24 @@
 #include "Button.h"
 #include "Module.h"
 
+#define BUTTONCOUNT 47
+
 typedef struct keyboard_s
 {
     Display *display;
     Images *images;
     Button *keys;
-    char *keyboard_buffer;
+    char keyboard_buffer[50];
+    char prompt[30];
     bool keyboard_complete;
+
+    Module root;
+    Module background;
+    Module topbar;
+    Module topbarPrompt;
+    Module topbarValue;
+    Module key[BUTTONCOUNT];
+    Module keyText[BUTTONCOUNT];
 } Keyboard;
 
 Keyboard *keyboard_create(Display *display, Images *images);

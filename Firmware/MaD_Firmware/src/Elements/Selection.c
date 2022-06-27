@@ -2,6 +2,8 @@
 
 #define SELECTION_WIDTH 400
 
+static char selectBuffer[] = "Select";
+
 typedef struct selection_s
 {
     Display *display;
@@ -32,12 +34,12 @@ int selection_run(Display *display, int x, int y, char **options, int amount)
     // Create Title
     Module *title = module_create(window);
     module_set_padding(title, padding, padding);
-    module_set_text(title, "Select");
-    module_set_font(title, RA8876_CHAR_HEIGHT_32);
+    module_set_text(title, selectBuffer);
+    module_text_font(title, RA8876_CHAR_HEIGHT_32);
     module_set_color(title, COLOR65K_WHITE, title->parent->foregroundColor);
     module_align_inner_top(title);
     module_align_center(title);
-    module_add_underline(title);
+    module_text_underline(title);
 
     Module **optionModule = (Module **)malloc(sizeof(Module *) * amount);
     Module *below = title;
@@ -54,7 +56,7 @@ int selection_run(Display *display, int x, int y, char **options, int amount)
 
         Module *text = module_create(optionModule[i]);
         module_set_text(text, options[i]);
-        module_set_font(text, RA8876_CHAR_HEIGHT_24);
+        module_text_font(text, RA8876_CHAR_HEIGHT_24);
         module_set_padding(text, padding, padding);
         module_set_color(text, COLOR65K_BLACK, text->parent->foregroundColor);
         module_align_center(text);

@@ -14,7 +14,7 @@ typedef struct ForceCalibration_s
     float slope;
 } ForceCalibration;
 
-static void check_buttons(CalibrateForcePage *page)
+static void check_buttons(CalibratePage *page)
 {
     button_update(page->display);
 
@@ -40,17 +40,16 @@ static void check_buttons(CalibrateForcePage *page)
     }
 }
 
-void calibrate_force_page_init(CalibrateForcePage *page, Display *display, Monitor *monitor, ForceGauge *forceGauge, MachineProfile *machineProfile, Images *images)
+void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *monitor, MachineProfile *machineProfile, Images *images)
 {
     page->display = display;
     page->monitor = monitor;
-    page->forceGauge = forceGauge;
     page->machineProfile = machineProfile;
     page->images = images;
 }
 
 // returns 1 if someting is updated
-bool calibrate_force_page_run(CalibrateForcePage *page)
+bool calibrate_force_page_run(CalibratePage *page)
 {
     bool infoUpdated = false;
     printf("Force Calibration page running\n");

@@ -27,9 +27,23 @@ typedef struct NavigationPage_s
 {
     bool complete;
     Display *display;
-    Button *buttons;
-    Page newPage;
     Images *images;
+    Page newPage;
+
+    Module root;
+    Module background;
+    Module statusPage;
+    Module statusText;
+    Module manualPage;
+    Module manualText;
+    Module testPage;
+    Module testText;
+    Module calibratePage;
+    Module calibrateText;
+    Module settingPage;
+    Module settingText;
+    Module tpPage;
+    Module tpText;
 } NavigationPage;
 
 void navigation_page_init(NavigationPage *page, Display *display, Images *images);

@@ -643,6 +643,7 @@ void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0)
 //**************************************************************//
 void display_canvas_image_start_address(Display *display, uint32_t addr)
 {
+  display->currentPage = addr;
   lcdRegDataWrite(display, RA8876_CVSSA0, addr);       // 50h
   lcdRegDataWrite(display, RA8876_CVSSA1, addr >> 8);  // 51h
   lcdRegDataWrite(display, RA8876_CVSSA2, addr >> 16); // 52h
@@ -1224,8 +1225,13 @@ void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint
 }
 //**************************************************************//
 //**************************************************************//
+//
 void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color)
 {
+  int maxxr = (x1 - x0 - 1) / 2;
+  int maxyr = (y1 - y0 - 1) / 2;
+  xr = (xr > maxxr) ? maxxr : xr;
+  yr = (yr > maxyr) ? maxyr : yr;
   display_fore_ground_color_16bpp(display, color);
   lcdRegDataWrite(display, RA8876_DLHSR0, x0);                           // 68h
   lcdRegDataWrite(display, RA8876_DLHSR1, x0 >> 8);                      // 69h
@@ -1501,12 +1507,8 @@ void display_load_image(Display *display, Image *image)
   mkdir("/sd/img", 0);
   chdir("/sd/img");
   printf("Loading image %s\n", image->name);
+
   FILE *fp = fopen(image->name, "r");
-  if (fp == NULL)
-  {
-    printf("Error opening file %s\n", image->name);
-    return;
-  }
   if (fp == NULL)
   {
     printf("Error opening file(%s): %d\n", image->name, _geterror());
@@ -1516,20 +1518,36 @@ void display_load_image(Display *display, Image *image)
     return;
   }
 
+  // display_write
+
   display_put_picture_16bpp(display, image->x0, image->y0, image->width, image->height);
-  int data;
-  int limit = image->width * image->height * 2 + 10;
+
+  uint16_t data;
+  int imageSize = image->width * image->height;
   int count = 0;
-  while ((data = fgetc(fp)) != EOF)
+  bool endOfFile = false;
+
+  for (int i = 0; i < imageSize; i++)
   {
-    lcdDataWrite(display, data);
-    if (count > limit)
-    {
-      printf("something went wrong...\n");
+    int temp = fgetc(fp);
+    if (temp == -1)
       break;
+    data = temp;
+
+    temp = fgetc(fp);
+    if (temp == -1)
+      break;
+    data |= temp << 8;
+
+    if (data == image->colorToReplace && image->colorToReplace != image->replacementColor)
+    {
+      // printf("replacing color(%s):%d with %d\n", image->name, image->colorToReplace, image->replacementColor);
+      data = image->replacementColor;
     }
-    count++;
+
+    lcdDataWrite16bbp(display, data);
   }
+
   fclose(fp);
   display_canvas_image_start_address(display, PAGE1_START_ADDR);
   display_active_window_xy(display, 0, 0);
@@ -1556,11 +1574,11 @@ void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int
   }
   if (image->backgroundColor != NULL)
   {
-    display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->backgroundColor);
+    display_bte_memory_copy_with_chroma_key(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, display->currentPage, SCREEN_WIDTH, xpos, ypos, image->width, image->height, image->backgroundColor);
   }
   else
   {
-    display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, PAGE1_START_ADDR, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
+    display_bte_memory_copy(display, pageAddr, SCREEN_WIDTH, image->x0, image->y0, display->currentPage, SCREEN_WIDTH, xpos, ypos, image->width, image->height);
   }
 }
 

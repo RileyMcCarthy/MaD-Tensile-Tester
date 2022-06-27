@@ -1,6 +1,6 @@
 #include "Monitor.h"
 #include "IOBoard.h"
-#define MONITOR_MEMORY_SIZE 4096 * 3
+#define MONITOR_MEMORY_SIZE 4096 * 2
 static long monitor_stack[MONITOR_MEMORY_SIZE];
 static bool monitorHasNewPosition = false;
 static int monitorNewPosition = 0;
@@ -20,7 +20,6 @@ monitor_cog(Monitor *monitor)
     FILE *file = NULL;
 
     int startTimems = 0;
-    // mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
     while (1)
     {
         /*Delay to run at sampleRate*/
@@ -51,39 +50,33 @@ monitor_cog(Monitor *monitor)
         {
             if (file == NULL)
             {
-                // _umount("/sd");                                    // Mount SD card using default pins
-                // mount("/host", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
                 startTimems = _getms();
-                file = fopen("/da/raw1.txt", "w");
+                file = fopen("/sd/raw1.txt", "w");
                 if (file == NULL)
                 {
-                    // printf("Failed to open file for writing\n");
+                    printf("Failed to open file for writing\n");
                 }
                 else
                 {
-                    //  printf("Opened file for writing\n");
-                    //  fprintf(file, "time (ms),forceRaw,force (mN),encoderRaw,position (um)\n");
+                    printf("Opened file for writing\n");
+                    fprintf(file, "time (ms),force (mN),position (mm),forceRaw,encoderRaw\n");
                 }
             }
             else
             {
-                // printf("%d,%d,%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.force, encoder.value(), monitor->data.positionum);
-                //  fprintf(file, "%d,%d,%d,%d,%d\n", monitor->data.timems - startTimems, monitor->data.forceRaw, monitor->data.force, monitor->data.encoderRaw, monitor->data.positionum);
+                fprintf(file, "%d,%d,%f,%d,%d\n", (monitor->data.timems - startTimems), monitor->data.force, monitor->data.positionum / 1000.0, monitor->data.forceRaw, monitor->data.encoderRaw);
+                _waitms(1);
             }
         }
         else
         {
             if (file != NULL)
             {
+                printf("Closing file\n");
                 fclose(file);
                 file = NULL;
             }
-            //_umount("/host");                 // Mount data card using default pins
-            // mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
         }
-
-        //  Update Buffer
-        //  circular buffer is faster implementation, this is simple for now
     }
 }
 

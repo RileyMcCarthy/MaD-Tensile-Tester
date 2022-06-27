@@ -1,115 +1,103 @@
 #include "Graph.h"
 #include "Module.h"
 
-void module_graph_draw(Display *display, Module *module)
+static void module_graph_draw(Display *display, Module *module)
 {
-    Graph *graph = (Graph *)module->data;
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
 
     double range = graph->maxY - graph->minY;
-    display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 4, graph->graphArea->y, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea->x + 2, graph->graphArea->y, graph->graphArea->w - 2, graph->graphArea->h);
-    display_draw_square_fill(display, graph->graphArea->x + graph->graphArea->w, graph->graphArea->y, graph->graphArea->x + graph->graphArea->w + 2, graph->graphArea->y + graph->graphArea->h, module->parent->foregroundColor);
-    int y = graph->graphArea->y + graph->graphArea->h / 2 - (int)(graph->data[0] * (double)((graph->graphArea->h / 2) / (range / 2)));
-    int lastY = graph->graphArea->y + graph->graphArea->h / 2 - (int)(graph->data[1] * (double)((graph->graphArea->h / 2) / (range / 2)));
-    display_draw_line(display, graph->graphArea->x + graph->graphArea->w, lastY, graph->graphArea->x + graph->graphArea->w + 2, y, COLOR65K_RED);
+    display_bte_memory_copy(display, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea.x + 4, graph->graphArea.y, PAGE1_START_ADDR, SCREEN_WIDTH, graph->graphArea.x + 2, graph->graphArea.y, graph->graphArea.w - 2, graph->graphArea.h);
+    display_draw_square_fill(display, graph->graphArea.x + graph->graphArea.w, graph->graphArea.y, graph->graphArea.x + graph->graphArea.w + 2, graph->graphArea.y + graph->graphArea.h, module->parent->foregroundColor);
+    int y = graph->graphArea.y + graph->graphArea.h / 2 - (int)(graph->data[0] * (double)((graph->graphArea.h / 2) / (range / 2)));
+    int lastY = graph->graphArea.y + graph->graphArea.h / 2 - (int)(graph->data[1] * (double)((graph->graphArea.h / 2) / (range / 2)));
+    display_draw_line(display, graph->graphArea.x + graph->graphArea.w, lastY, graph->graphArea.x + graph->graphArea.w + 2, y, COLOR65K_RED);
 }
 
-void module_set_graph(Module *window, const char *titleName, const char *units)
+void module_set_graph(Module *window, ModuleGraph *graph, const char *title, const char *units)
 {
     window->type = MODULE_GRAPH;
 
-    Graph *graph = (Graph *)malloc(sizeof(Graph));
     window->draw = module_graph_draw;
 
-    graph->title = malloc(strlen(titleName) + 1);
-    strcpy(graph->title, titleName);
+    window->data.ptr = graph;
+    graph->initialDraw = true;
+    strncpy(graph->title, title, MAX_GRAPH_TITLE_LENGTH);
 
-    graph->units = malloc(strlen(units) + 1);
-    strcpy(graph->units, units);
+    strncpy(graph->units, units, MAX_GRAPH_UNITS_LENGTH);
 
-    // Create Title
-    Module *title = module_create(window);
-    module_set_padding(title, 10, 10);
-    module_set_text(title, graph->title);
-    module_set_font(title, RA8876_CHAR_HEIGHT_32);
-    module_set_color(title, COLOR65K_BLACK, title->parent->foregroundColor);
-    module_align_inner_top(title);
-    module_align_center(title);
-    module_add_underline(title);
+    // Give parent reference to graph modules
+    // Initialize Title
+    module_init(&(graph->graphTitle), window);
+    module_set_margin(&(graph->graphTitle), 10, 10);
+    module_set_text(&(graph->graphTitle), graph->title);
+    module_text_font(&(graph->graphTitle), RA8876_CHAR_HEIGHT_32);
+    module_text_fit(&(graph->graphMinText));
+    module_set_color(&(graph->graphTitle), MAINTEXTCOLOR, graph->graphTitle.parent->foregroundColor);
+    module_align_inner_top(&(graph->graphTitle));
+    module_align_center(&(graph->graphTitle));
+    module_text_underline(&(graph->graphTitle));
 
-    // Create min
-    char buf[15];
-    Module *minText = module_create(window);
-    module_set_padding(minText, 3, 3);
-    module_set_text(minText, "00.00");
-    module_text_max_char(minText, 5);
-    module_set_font(minText, RA8876_CHAR_HEIGHT_16);
-    module_set_color(minText, COLOR65K_BLACK, minText->parent->foregroundColor);
-    module_align_inner_bottom(minText);
-    module_align_inner_left(minText);
-    module_text_align(minText, MODULE_TEXT_ALIGN_INNER_LEFT);
+    // Initialize min text
+    module_init(&(graph->graphMinText), window);
+    sprintf(graph->minyBuffer, "%.2f", graph->minY);
+    module_set_margin(&(graph->graphMinText), 3, 3);
+    module_set_text(&(graph->graphMinText), graph->minyBuffer);
+    module_text_font(&(graph->graphMinText), RA8876_CHAR_HEIGHT_16);
+    module_text_fit(&(graph->graphMinText));
+    module_set_color(&(graph->graphMinText), MAINTEXTCOLOR, graph->graphMinText.parent->foregroundColor);
+    module_align_inner_bottom(&(graph->graphMinText));
+    module_align_inner_left(&(graph->graphMinText));
+    module_text_align(&(graph->graphMinText), MODULE_TEXT_ALIGN_INNER_LEFT);
 
-    // Create max
-    Module *maxText = module_create(window);
-    module_set_padding(maxText, 3, 3);
-    module_set_text(maxText, "00.00");
-    module_text_max_char(maxText, 5);
-    module_set_font(maxText, RA8876_CHAR_HEIGHT_16);
-    module_align_inner_left(maxText);
-    module_text_align(maxText, MODULE_TEXT_ALIGN_INNER_LEFT);
-    module_set_color(maxText, COLOR65K_BLACK, maxText->parent->foregroundColor);
-    module_align_below(maxText, title);
+    // Initialize max text
+    sprintf(graph->maxyBuffer, "%.2f", graph->maxY);
+    module_init(&(graph->graphMaxText), window);
+    module_set_margin(&(graph->graphMaxText), 3, 3);
+    module_set_text(&(graph->graphMaxText), graph->maxyBuffer);
+    module_text_font(&(graph->graphMaxText), RA8876_CHAR_HEIGHT_16);
+    module_text_fit(&(graph->graphMaxText));
+    module_align_inner_left(&(graph->graphMaxText));
+    module_text_align(&(graph->graphMaxText), MODULE_TEXT_ALIGN_INNER_LEFT);
+    module_set_color(&(graph->graphMaxText), MAINTEXTCOLOR, graph->graphMaxText.parent->foregroundColor);
+    module_align_below(&(graph->graphMaxText), &(graph->graphTitle));
 
-    // Create Graph Area
-    Module *graphArea = module_create(window);
-    module_align_below(graphArea, title);
-    module_fit_below(graphArea, title);
-    module_fit_right(graphArea, minText);
-    module_align_right(graphArea, minText);
-    module_set_color(graphArea, graphArea->parent->foregroundColor, graphArea->parent->backgroundColor);
-    module_set_padding(graphArea, 0, 0);
+    // Initialize ModuleGraph Area
+    module_init(&(graph->graphArea), window);
+    module_align_below(&(graph->graphArea), &(graph->graphTitle));
+    module_fit_below(&(graph->graphArea), &(graph->graphTitle));
+    module_fit_right(&(graph->graphArea), &(graph->graphMinText));
+    module_align_right(&(graph->graphArea), &(graph->graphMinText));
+    module_set_color(&(graph->graphArea), graph->graphArea.parent->foregroundColor, graph->graphArea.parent->backgroundColor);
 
-    // Create Units
-    Module *units_module = module_create(window);
-    module_set_padding(units_module, 10, 10);
-    module_set_text(units_module, graph->units);
-    module_set_font(units_module, RA8876_CHAR_HEIGHT_32);
-    module_set_color(units_module, COLOR65K_BLACK, units_module->parent->foregroundColor);
-    module_align_above(units_module, graphArea);
-    module_align_inner_left(units_module);
+    // Initialize Units
+    module_init(&(graph->grapUnits), window);
+    module_set_margin(&(graph->grapUnits), 10, 10);
+    module_set_text(&(graph->grapUnits), graph->units);
+    module_text_font(&(graph->grapUnits), RA8876_CHAR_HEIGHT_32);
+    module_set_color(&(graph->grapUnits), MAINTEXTCOLOR, graph->grapUnits.parent->foregroundColor);
+    module_align_inner_top(&(graph->grapUnits));
+    module_align_inner_left(&(graph->grapUnits));
 
-    // Create zero
-    /*Module *zeroText = module_create(graphArea);
-    module_set_padding(zeroText, 3, 3);
-    module_set_text(zeroText, "0");
-    module_set_font(zeroText, RA8876_CHAR_HEIGHT_16);
-    module_set_color(zeroText, COLOR65K_BLACK, zeroText->parent->foregroundColor);
-    module_align_left(zeroText, graphArea);
-    module_align_middle(zeroText);*/
+    // Initialize ModuleGraph Horizontal Line
+    module_init(&(graph->graphCenterLine), &(graph->graphArea));
+    module_set_rectangle(&(graph->graphCenterLine), 0, 0);
+    module_fit_width(&(graph->graphCenterLine));
+    module_align_center(&(graph->graphCenterLine));
+    module_align_middle(&(graph->graphCenterLine));
+    module_set_color(&(graph->graphCenterLine), MAINTEXTCOLOR, MAINTEXTCOLOR);
 
-    // Create Graph Horizontal Line
-    Module *centerLine = module_create(graphArea);
-    module_set_rectangle(centerLine, 0, 0);
-    module_fit_width(centerLine);
-    module_align_center(centerLine);
-    module_align_middle(centerLine);
-    module_set_color(centerLine, COLOR65K_BLACK, COLOR65K_BLACK);
-
-    // Create Graph Vertical Line
-    Module *verticleLine = module_create(graphArea);
-    module_set_rectangle(verticleLine, 0, 0);
-    module_fit_height(verticleLine);
-    module_align_inner_left(verticleLine);
-    module_align_inner_top(verticleLine);
-    module_set_color(verticleLine, COLOR65K_BLACK, COLOR65K_BLACK);
-
-    graph->graphArea = graphArea;
-
-    window->data = graph;
+    // Initialize ModuleGraph Vertical Line
+    module_init(&(graph->graphVerticleLine), &(graph->graphArea));
+    module_set_rectangle(&(graph->graphVerticleLine), 0, 0);
+    module_fit_height(&(graph->graphVerticleLine));
+    module_align_inner_left(&(graph->graphVerticleLine));
+    module_align_inner_top(&(graph->graphVerticleLine));
+    module_set_color(&(graph->graphVerticleLine), MAINTEXTCOLOR, MAINTEXTCOLOR);
 }
 
 void module_graph_insert(Module *module, double value)
 {
-    Graph *graph = (Graph *)module->data;
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     if (value > graph->maxY || value < graph->minY)
     {
         return;
@@ -120,14 +108,14 @@ void module_graph_insert(Module *module, double value)
 
 void module_graph_set_range(Module *module, double maxY, double minY)
 {
-    Graph *graph = (Graph *)module->data;
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     graph->maxY = maxY;
     graph->minY = minY;
 }
 
 void module_graph_add_marker(Module *module, float value)
 {
-    Graph *graph = (Graph *)module->data;
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     if (graph->markerCount < MAX_GRAPH_MARKERS)
     {
         graph->markerY[graph->markerCount] = value;
@@ -137,6 +125,6 @@ void module_graph_add_marker(Module *module, float value)
 
 int module_graph_get_max_data(Module *module)
 {
-    Graph *graph = (Graph *)module->data;
-    return graph->graphArea->w / 2;
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
+    return graph->w / 2;
 }

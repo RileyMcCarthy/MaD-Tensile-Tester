@@ -8,24 +8,23 @@
 
 static bool complete = false;
 
+static char machineStateWindowTitleBuffer[] = "Machine State";
+static char chargePumpTextBuffer[] = "Charge Pump";
+static char switchedPowerTextBuffer[] = "Switched Power";
+static char estSwitchTextBuffer[] = "ESD Switch";
+static char esdUpperTextBuffer[] = "ESD Upper";
+static char estLowerTextBuffer[] = "ESD Lower";
+static char servoReadyTextBuffer[] = "Servo Ready";
+static char forceGaugeComTextBuffer[] = "Force Comm";
+static char servoComTextBuffer[] = "Servo Comm";
+static char machineInfoWindowTitleBuffer[] = "Machine Info";
+static char forceTextBuffer[] = "Force (N)";
+static char positionTextBuffer[] = "Position (mm)";
+
 static void button_navigation(int id, void *arg)
 {
     StatusPage *page = (StatusPage *)arg;
     complete = true;
-}
-
-static void drawSuccessIndicator(StatusPage *page, int x, int y)
-{
-    Image check = page->images->successImage;
-    display_draw_square_fill(page->display, x, y, x + check.width - 1, y + check.height - 1, MAINCOLOR);
-    display_bte_memory_copy_image(page->display, &check, x, y);
-}
-
-static void drawFailIndicator(StatusPage *page, int x, int y)
-{
-    Image ex = page->images->failImage;
-    display_draw_square_fill(page->display, x, y, x + ex.width - 1, y + ex.height - 1, MAINCOLOR);
-    display_bte_memory_copy_image(page->display, &ex, x, y);
 }
 
 void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images)
@@ -34,41 +33,44 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     page->stateMachine = machineState;
     page->data = data;
     page->images = images;
-}
-
-void status_page_run(StatusPage *page)
-{
-    complete = false;
-    printf("Status page running\n");
 
     int padding = 8;
     // Create Background
-    Module *root = module_create(NULL);
-    Module *background = module_create(root);
+    Module *root = &(page->root);
+    module_init(root, NULL);
+
+    Module *background = &(page->background);
+    module_init(background, root);
     module_set_rectangle_circle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
     module_set_position(background, 0, 0);
-    module_set_padding(background, padding, padding);
+    module_set_padding(background, 10, 10);
     module_set_color(background, BACKCOLOR, BACKCOLOR);
+    module_animate_draw(background, module_animation_switch_page_up);
 
     // Create navigation button
-    Module *navigationButton = module_create(background);
+    Module *navigationButton = &(page->navigationButton);
+    module_init(navigationButton, background);
     module_set_image(navigationButton, &(page->images->navigationImage));
     module_align_inner_top(navigationButton);
     module_align_inner_right(navigationButton);
     module_touch_callback(navigationButton, button_navigation, 0);
 
     // Create machine state window
-    Module *machineStateWindow = module_create(background);
+    Module *machineStateWindow = &(page->machineStateWindow);
+    module_init(machineStateWindow, background);
     module_set_padding(machineStateWindow, padding, padding);
+    module_add_border(machineStateWindow, MAINTEXTCOLOR, 1);
+    module_set_margin(machineStateWindow, 10, 10);
     module_set_rectangle_circle(machineStateWindow, 0, 0);
     module_fit_space_even(machineStateWindow, 3);
     module_fit_height(machineStateWindow);
     module_set_padding(machineStateWindow, padding, padding);
     module_set_color(machineStateWindow, MAINCOLOR, BACKCOLOR);
-    module_align_space_even(machineStateWindow, 1, 3);
+    module_align_inner_left(machineStateWindow);
     module_align_inner_top(machineStateWindow);
 
-    Module *machineStateImages = module_create(machineStateWindow);
+    Module *machineStateImages = &(page->machineStateImages);
+    module_init(machineStateImages, machineStateWindow);
     module_set_padding(machineStateImages, 0, 0);
     module_align_inner_left(machineStateImages);
     module_align_inner_top(machineStateImages);
@@ -76,186 +78,225 @@ void status_page_run(StatusPage *page)
     module_fit_height(machineStateImages);
 
     // Create machine state window title
-    Module *machineStateWindowTitle = module_create(machineStateWindow);
-    module_set_padding(machineStateWindowTitle, padding, padding);
-    module_set_text(machineStateWindowTitle, "Machine State");
-    module_set_font(machineStateWindowTitle, RA8876_CHAR_HEIGHT_32);
-    module_set_color(machineStateWindowTitle, COLOR65K_BLACK, MAINCOLOR);
+    Module *machineStateWindowTitle = &(page->machineStateWindowTitle);
+    module_init(machineStateWindowTitle, machineStateWindow);
+    module_set_text(machineStateWindowTitle, machineStateWindowTitleBuffer);
+    module_set_margin(machineStateWindowTitle, 8, 8);
+    module_text_font(machineStateWindowTitle, RA8876_CHAR_HEIGHT_32);
+    module_text_fit(machineStateWindowTitle);
+    module_set_color(machineStateWindowTitle, MAINTEXTCOLOR, MAINCOLOR);
     module_align_inner_top(machineStateWindowTitle);
     module_align_center(machineStateWindowTitle);
-    module_add_underline(machineStateWindowTitle);
+    module_text_underline(machineStateWindowTitle);
 
     // Charge Pump
-    Module *chargePumpText = module_create(machineStateWindow);
-    module_set_padding(chargePumpText, padding, padding);
-    module_set_text(chargePumpText, "Charge Pump");
-    module_set_font(chargePumpText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(chargePumpText, COLOR65K_BLACK, MAINCOLOR);
+    Module *chargePumpText = &(page->chargePumpText);
+    module_init(chargePumpText, machineStateWindow);
+    module_set_margin(chargePumpText, 8, 8);
+    module_set_text(chargePumpText, chargePumpTextBuffer);
+    module_text_font(chargePumpText, RA8876_CHAR_HEIGHT_24);
+    module_set_color(chargePumpText, MAINTEXTCOLOR, MAINCOLOR);
     module_align_below(chargePumpText, machineStateWindowTitle);
     module_align_inner_left(chargePumpText);
 
-    Module *chargePumpImage = module_create(machineStateImages);
+    Module *chargePumpImage = &(page->chargePumpImage);
+    module_init(chargePumpImage, machineStateImages);
     module_set_image(chargePumpImage, &(page->images->failImage));
     module_align_below(chargePumpImage, machineStateWindowTitle);
     module_align_inner_right(chargePumpImage);
 
     // Switched Power
-    Module *switchedPowerText = module_create(machineStateWindow);
+    Module *switchedPowerText = &(page->switchedPowerText);
+    module_init(switchedPowerText, machineStateWindow);
     module_copy(switchedPowerText, chargePumpText);
-    module_set_text(switchedPowerText, "Switched Power");
-    module_set_font(switchedPowerText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(switchedPowerText, switchedPowerTextBuffer);
+    module_text_font(switchedPowerText, RA8876_CHAR_HEIGHT_24);
     module_align_below(switchedPowerText, chargePumpText);
 
-    Module *switchedPowerImage = module_create(machineStateImages);
+    Module *switchedPowerImage = &(page->switchedPowerImage);
+    module_init(switchedPowerImage, machineStateImages);
     module_set_image(switchedPowerImage, &(page->images->failImage));
     module_align_below(switchedPowerImage, chargePumpText);
     module_align_inner_right(switchedPowerImage);
 
     // ESD Switch
-    Module *estSwitchText = module_create(machineStateWindow);
+    Module *estSwitchText = &(page->estSwitchText);
+    module_init(estSwitchText, machineStateWindow);
     module_copy(estSwitchText, chargePumpText);
-    module_set_text(estSwitchText, "ESD Switch");
-    module_set_font(estSwitchText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(estSwitchText, estSwitchTextBuffer);
+    module_text_font(estSwitchText, RA8876_CHAR_HEIGHT_24);
     module_align_below(estSwitchText, switchedPowerText);
 
-    Module *estSwitchImage = module_create(machineStateImages);
+    Module *estSwitchImage = &(page->estSwitchImage);
+    module_init(estSwitchImage, machineStateImages);
     module_set_image(estSwitchImage, &(page->images->failImage));
     module_align_below(estSwitchImage, switchedPowerText);
     module_align_inner_right(estSwitchImage);
 
     // ESD Upper
-    Module *esdUpperText = module_create(machineStateWindow);
+    Module *esdUpperText = &(page->esdUpperText);
+    module_init(esdUpperText, machineStateWindow);
     module_copy(esdUpperText, chargePumpText);
-    module_set_text(esdUpperText, "ESD Upper");
-    module_set_font(esdUpperText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(esdUpperText, esdUpperTextBuffer);
+    module_text_font(esdUpperText, RA8876_CHAR_HEIGHT_24);
     module_align_below(esdUpperText, estSwitchText);
 
-    Module *esdUpperImage = module_create(machineStateImages);
+    Module *esdUpperImage = &(page->esdUpperImage);
+    module_init(esdUpperImage, machineStateImages);
     module_set_image(esdUpperImage, &(page->images->failImage));
     module_align_below(esdUpperImage, estSwitchText);
     module_align_inner_right(esdUpperImage);
 
     // ESD Lower
-    Module *estLowerText = module_create(machineStateWindow);
+    Module *estLowerText = &(page->estLowerText);
+    module_init(estLowerText, machineStateWindow);
     module_copy(estLowerText, chargePumpText);
-    module_set_text(estLowerText, "ESD Lower");
-    module_set_font(estLowerText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(estLowerText, estLowerTextBuffer);
+    module_text_font(estLowerText, RA8876_CHAR_HEIGHT_24);
     module_align_below(estLowerText, esdUpperText);
 
-    Module *estLowerImage = module_create(machineStateImages);
+    Module *estLowerImage = &(page->estLowerImage);
+    module_init(estLowerImage, machineStateImages);
     module_set_image(estLowerImage, &(page->images->failImage));
     module_align_below(estLowerImage, esdUpperText);
     module_align_inner_right(estLowerImage);
 
     // Servo Ready
-    Module *servoReadyText = module_create(machineStateWindow);
+    Module *servoReadyText = &(page->servoReadyText);
+    module_init(servoReadyText, machineStateWindow);
     module_copy(servoReadyText, chargePumpText);
-    module_set_text(servoReadyText, "Servo Ready");
-    module_set_font(servoReadyText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(servoReadyText, servoReadyTextBuffer);
+    module_text_font(servoReadyText, RA8876_CHAR_HEIGHT_24);
     module_align_below(servoReadyText, estLowerText);
 
-    Module *servoReadyImage = module_create(machineStateImages);
+    Module *servoReadyImage = &(page->servoReadyImage);
+    module_init(servoReadyImage, machineStateImages);
     module_set_image(servoReadyImage, &(page->images->failImage));
     module_align_below(servoReadyImage, estLowerText);
     module_align_inner_right(servoReadyImage);
 
     // Force Gauge Comm
-    Module *forceGaugeComText = module_create(machineStateWindow);
+    Module *forceGaugeComText = &(page->forceGaugeComText);
+    module_init(forceGaugeComText, machineStateWindow);
     module_copy(forceGaugeComText, chargePumpText);
-    module_set_text(forceGaugeComText, "Force Comm");
-    module_set_font(forceGaugeComText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(forceGaugeComText, forceGaugeComTextBuffer);
+    module_text_font(forceGaugeComText, RA8876_CHAR_HEIGHT_24);
     module_align_below(forceGaugeComText, servoReadyText);
 
-    Module *forceGaugeComImage = module_create(machineStateImages);
+    Module *forceGaugeComImage = &(page->forceGaugeComImage);
+    module_init(forceGaugeComImage, machineStateImages);
     module_set_image(forceGaugeComImage, &(page->images->failImage));
     module_align_below(forceGaugeComImage, servoReadyText);
     module_align_inner_right(forceGaugeComImage);
 
     // Servo Comm
-    Module *servoComText = module_create(machineStateWindow);
+    Module *servoComText = &(page->servoComText);
+    module_init(servoComText, machineStateWindow);
     module_copy(servoComText, chargePumpText);
-    module_set_text(servoComText, "Servo Comm");
-    module_set_font(servoComText, RA8876_CHAR_HEIGHT_24);
+    module_set_text(servoComText, servoComTextBuffer);
+    module_text_font(servoComText, RA8876_CHAR_HEIGHT_24);
     module_align_below(servoComText, forceGaugeComText);
 
-    Module *servoComImage = module_create(machineStateImages);
+    Module *servoComImage = &(page->servoComImage);
+    module_init(servoComImage, machineStateImages);
     module_set_image(servoComImage, &(page->images->failImage));
     module_align_below(servoComImage, forceGaugeComText);
     module_align_inner_right(servoComImage);
 
     // Create machine info window
-    Module *machineInfoWindow = module_create(background);
+    Module *machineInfoWindow = &(page->machineInfoWindow);
+    module_init(machineInfoWindow, background);
     module_set_padding(machineInfoWindow, padding, padding);
+    module_add_border(machineInfoWindow, MAINTEXTCOLOR, 1);
+    module_set_margin(machineInfoWindow, 10, 10);
     module_set_rectangle_circle(machineInfoWindow, 0, 0);
     module_fit_space_even(machineInfoWindow, 3);
     module_set_padding(machineInfoWindow, padding, padding);
     module_fit_height(machineInfoWindow);
     module_set_color(machineInfoWindow, MAINCOLOR, BACKCOLOR);
-    module_align_space_even(machineInfoWindow, 2, 3);
+    module_align_right(machineInfoWindow, machineStateWindow);
     module_align_inner_top(machineInfoWindow);
 
     // Create machine info window title
-    Module *machineInfoWindowTitle = module_create(machineInfoWindow);
-    module_set_padding(machineInfoWindowTitle, padding, padding);
-    module_set_text(machineInfoWindowTitle, "Machine Info");
-    module_set_font(machineInfoWindowTitle, RA8876_CHAR_HEIGHT_32);
-    module_set_color(machineInfoWindowTitle, COLOR65K_BLACK, MAINCOLOR);
+    Module *machineInfoWindowTitle = &(page->machineInfoWindowTitle);
+    module_init(machineInfoWindowTitle, machineInfoWindow);
+    module_set_text(machineInfoWindowTitle, machineInfoWindowTitleBuffer);
+    module_set_margin(machineInfoWindowTitle, 8, 8);
+    module_text_font(machineInfoWindowTitle, RA8876_CHAR_HEIGHT_32);
+    module_text_fit(machineInfoWindowTitle);
+    module_set_color(machineInfoWindowTitle, MAINTEXTCOLOR, MAINCOLOR);
     module_align_inner_top(machineInfoWindowTitle);
     module_align_center(machineInfoWindowTitle);
-    module_add_underline(machineInfoWindowTitle);
+    module_text_underline(machineInfoWindowTitle);
 
-    Module *forceText = module_create(machineInfoWindow);
-    module_set_padding(forceText, padding, padding);
-    module_set_text(forceText, "Force (N)");
-    module_set_font(forceText, RA8876_CHAR_HEIGHT_24);
-    module_set_color(forceText, COLOR65K_BLACK, MAINCOLOR);
+    Module *forceText = &(page->forceText);
+    module_init(forceText, machineInfoWindow);
+    module_set_margin(forceText, padding, padding);
+    module_set_text(forceText, forceTextBuffer);
+    module_text_font(forceText, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(forceText);
+    module_set_color(forceText, MAINTEXTCOLOR, MAINCOLOR);
     module_align_below(forceText, machineInfoWindowTitle);
     module_align_inner_left(forceText);
 
-    Module *forceValue = module_create(machineInfoWindow);
+    Module *forceValue = &(page->forceValue);
+    module_init(forceValue, machineInfoWindow);
     module_copy(forceValue, forceText);
-    module_set_text(forceValue, "0.00");
-    module_text_max_char(forceValue, 10);
-    module_set_font(forceValue, RA8876_CHAR_HEIGHT_24);
+    module_set_text(forceValue, page->forceValueBuffer);
+    module_text_font(forceValue, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(forceValue);
+    module_fit_right(forceValue, forceText);
+    module_align_right(forceValue, forceText);
     module_text_align(forceValue, MODULE_TEXT_ALIGN_INNER_RIGHT);
 
-    Module *positionText = module_create(machineInfoWindow);
-    module_copy(positionText, forceText);
-    module_set_text(positionText, "Position (mm)");
-    module_set_font(positionText, RA8876_CHAR_HEIGHT_24);
+    Module *positionText = &(page->positionText);
+    module_init(positionText, machineInfoWindow);
+    module_set_margin(positionText, padding, padding);
+    module_set_text(positionText, positionTextBuffer);
+    module_text_font(positionText, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(positionText);
+    module_set_color(positionText, MAINTEXTCOLOR, MAINCOLOR);
     module_align_below(positionText, forceText);
+    module_align_inner_left(positionText);
 
-    Module *positionValue = module_create(machineInfoWindow);
+    Module *positionValue = &(page->positionValue);
+    module_init(positionValue, machineInfoWindow);
     module_copy(positionValue, positionText);
-    module_set_text(positionValue, "0.00");
-    module_text_max_char(positionValue, 10);
-    module_set_font(positionValue, RA8876_CHAR_HEIGHT_24);
+    module_set_text(positionValue, page->positionValueBuffer);
+    module_text_font(positionValue, RA8876_CHAR_HEIGHT_24);
+    module_text_fit(positionValue);
+    module_fit_right(positionValue, positionText);
+    module_align_right(positionValue, positionText);
     module_text_align(positionValue, MODULE_TEXT_ALIGN_INNER_RIGHT);
 
-    Module *positionGraph = module_create(machineInfoWindow);
-    module_set_padding(positionGraph, 0, 0);
-    module_set_size(positionGraph, 0, 200);
-    module_align_below(positionGraph, positionText);
-    module_align_inner_left(positionGraph);
-    module_set_color(positionGraph, positionGraph->parent->foregroundColor, positionGraph->parent->backgroundColor);
-    module_fit_width(positionGraph);
-    module_set_graph(positionGraph, "Position", "mm");
-    module_graph_set_range(positionGraph, 10.0, -10.0);
+    Module *positionGraphContainer = &(page->positionGraphContainer);
+    module_init(positionGraphContainer, machineInfoWindow);
+    module_set_margin(positionGraphContainer, 10, 10);
+    module_set_size(positionGraphContainer, 0, 200);
+    module_align_below(positionGraphContainer, positionText);
+    module_align_inner_left(positionGraphContainer);
+    module_set_color(positionGraphContainer, positionGraphContainer->parent->foregroundColor, positionGraphContainer->parent->backgroundColor);
+    module_fit_width(positionGraphContainer);
+    module_set_graph(positionGraphContainer, &(page->positionGraph), "Position", "mm");
+    module_graph_set_range(positionGraphContainer, 10.0, -10.0);
 
-    Module *forceGraph = module_create(machineInfoWindow);
-    module_set_padding(forceGraph, 0, 0);
-    module_set_size(forceGraph, 0, 200);
-    module_align_below(forceGraph, positionGraph);
-    forceGraph->y += 10;
-    module_align_inner_left(forceGraph);
-    module_set_color(forceGraph, forceGraph->parent->foregroundColor, forceGraph->parent->backgroundColor);
-    module_fit_width(forceGraph);
-    module_set_graph(forceGraph, "Force", "N");
-    module_graph_set_range(forceGraph, 5.0, -5.0);
+    Module *forceGraphContainer = &(page->forceGraphContainer);
+    module_init(forceGraphContainer, machineInfoWindow);
+    module_set_margin(forceGraphContainer, 10, 10);
+    module_set_size(forceGraphContainer, 0, 200);
+    module_align_below(forceGraphContainer, positionGraphContainer);
+    forceGraphContainer->y += 10;
+    module_align_inner_left(forceGraphContainer);
+    module_set_color(forceGraphContainer, forceGraphContainer->parent->foregroundColor, forceGraphContainer->parent->backgroundColor);
+    module_fit_width(forceGraphContainer);
+    module_set_graph(forceGraphContainer, &(page->forceGraph), "Force", "N");
+    module_graph_set_range(forceGraphContainer, 5.0, -5.0);
 
     // Create Function Window Container
-    Module *functionWindow = module_create(background);
+    Module *functionWindow = &(page->functionWindow);
+    module_init(functionWindow, background);
     module_set_padding(functionWindow, padding, padding);
+    module_set_margin(functionWindow, 10, 10);
     module_set_size(functionWindow, 0, 200);
     module_fit_space_even(functionWindow, 3);
     module_align_space_even(functionWindow, 3, 3);
@@ -264,16 +305,23 @@ void status_page_run(StatusPage *page)
     function_window_create(functionWindow, page->stateMachine);
 
     // Create Function Window Container
-    Module *motionStateWindow = module_create(background);
+    Module *motionStateWindow = &(page->motionStateWindow);
+    module_init(motionStateWindow, background);
     module_set_padding(motionStateWindow, padding, padding);
-    module_set_size(motionStateWindow, 0, 100);
+    module_set_margin(motionStateWindow, 10, 10);
+    module_set_size(motionStateWindow, 0, 110);
     module_fit_space_even(motionStateWindow, 3);
     module_align_space_even(motionStateWindow, 3, 3);
     module_align_above(motionStateWindow, functionWindow);
 
     motion_state_window_create(motionStateWindow, page->stateMachine);
+}
 
-    module_draw(page->display, root);
+void status_page_run(StatusPage *page)
+{
+    complete = false;
+
+    module_draw(page->display, &(page->root));
 
     MachineState previousState = *(page->stateMachine);
     bool initial = true;
@@ -284,7 +332,6 @@ void status_page_run(StatusPage *page)
     while (!complete)
     {
         MachineState currentState = *(page->stateMachine);
-
         /*Self Check State*/
         // charge pump
         if (currentState.selfCheckParameters.chargePump != previousState.selfCheckParameters.chargePump || initial)
@@ -292,11 +339,11 @@ void status_page_run(StatusPage *page)
             updateMachineState = true;
             if (currentState.selfCheckParameters.chargePump)
             {
-                module_set_image(chargePumpImage, &(page->images->successImage));
+                module_set_image(&(page->chargePumpImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(chargePumpImage, &(page->images->failImage));
+                module_set_image(&(page->chargePumpImage), &(page->images->failImage));
             }
         }
 
@@ -308,11 +355,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.switchedPower)
             {
-                module_set_image(switchedPowerImage, &(page->images->successImage));
+                module_set_image(&(page->switchedPowerImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(switchedPowerImage, &(page->images->failImage));
+                module_set_image(&(page->switchedPowerImage), &(page->images->failImage));
             }
         }
 
@@ -322,19 +369,19 @@ void status_page_run(StatusPage *page)
             updateMachineState = true;
             if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_OK)
             {
-                module_set_image(esdUpperImage, &(page->images->successImage));
-                module_set_image(estLowerImage, &(page->images->successImage));
+                module_set_image(&(page->esdUpperImage), &(page->images->successImage));
+                module_set_image(&(page->estLowerImage), &(page->images->successImage));
             }
             else if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_LOWER)
             {
 
-                module_set_image(esdUpperImage, &(page->images->successImage));
-                module_set_image(estLowerImage, &(page->images->failImage));
+                module_set_image(&(page->esdUpperImage), &(page->images->successImage));
+                module_set_image(&(page->estLowerImage), &(page->images->failImage));
             }
             else if (page->stateMachine->machineCheckParameters.esdTravelLimit == MOTION_LIMIT_UPPER)
             {
-                module_set_image(esdUpperImage, &(page->images->failImage));
-                module_set_image(estLowerImage, &(page->images->successImage));
+                module_set_image(&(page->esdUpperImage), &(page->images->failImage));
+                module_set_image(&(page->estLowerImage), &(page->images->successImage));
             }
         }
 
@@ -345,11 +392,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.esdSwitch)
             {
-                module_set_image(estSwitchImage, &(page->images->successImage));
+                module_set_image(&(page->estSwitchImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(estSwitchImage, &(page->images->failImage));
+                module_set_image(&(page->estSwitchImage), &(page->images->failImage));
             }
         }
 
@@ -360,11 +407,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.servoOK)
             {
-                module_set_image(servoReadyImage, &(page->images->successImage));
+                module_set_image(&(page->servoReadyImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(servoReadyImage, &(page->images->failImage));
+                module_set_image(&(page->servoReadyImage), &(page->images->failImage));
             }
         }
 
@@ -375,11 +422,11 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.forceGaugeCom)
             {
-                module_set_image(forceGaugeComImage, &(page->images->successImage));
+                module_set_image(&(page->forceGaugeComImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(forceGaugeComImage, &(page->images->failImage));
+                module_set_image(&(page->forceGaugeComImage), &(page->images->failImage));
             }
         }
 
@@ -390,49 +437,47 @@ void status_page_run(StatusPage *page)
 
             if (page->stateMachine->machineCheckParameters.servoCom)
             {
-                module_set_image(servoComImage, &(page->images->successImage));
+                module_set_image(&(page->servoComImage), &(page->images->successImage));
             }
             else
             {
-                module_set_image(servoComImage, &(page->images->failImage));
+                module_set_image(&(page->servoComImage), &(page->images->failImage));
             }
         }
 
-        module_touch_check(root, page->display, page); // Check for button presses
-        module_update_check(page->display, root, page);
+        module_touch_check(&(page->root), page->display, page); // Check for button presses
+        module_update_check(page->display, &(page->root), page);
 
-        // module_draw(page->display, positionGraph);
+        // module_draw(page->display, positionGraphContainer);
         // module_draw(page->display, machineStateImages);
 
         // module_draw(page->display, functionWindow);
         // module_draw(page->display, motionStateWindow);
         if (updateMachineState)
         {
-            module_draw(page->display, machineStateWindow);
+            module_draw(page->display, &(page->machineStateWindow));
             updateMachineState = false;
         }
         while (display_update_touch(page->display) == 0 && state_machine_equal(page->stateMachine, &currentState))
         {
-            if ((_getms() - lastDataUpdate) > 1000)
+            if ((_getms() - lastDataUpdate) > 100)
             {
                 lastDataUpdate = _getms();
-                char buf[10];
-                sprintf(buf, "%0.3fmm", page->data->positionum / 1000.0);
-                module_set_text(positionValue, buf);
-                sprintf(buf, "%0.3fN", page->data->force / 1000.0);
-                module_set_text(forceValue, buf);
-                module_draw(page->display, forceValue);
-                module_draw(page->display, positionValue);
+                sprintf(page->positionValueBuffer, "%0.3fmm", page->data->positionum / 1000.0);
+                // module_set_text(&(page->positionValue), page->positionValueBuffer);
+                sprintf(page->forceValueBuffer, "%0.3fN", page->data->force / 1000.0);
+                // module_set_text(&(page->forceValue), page->forceValueBuffer);
+                module_draw(page->display, &(page->forceValue));
+                module_draw(page->display, &(page->positionValue));
             }
-            module_graph_insert(positionGraph, page->data->positionum / 1000.0);
-            module_draw(page->display, positionGraph);
+            module_graph_insert(&(page->positionGraphContainer), page->data->positionum / 1000.0);
+            module_draw(page->display, &(page->positionGraphContainer));
 
-            module_graph_insert(forceGraph, page->data->force / 1000.0);
-            module_draw(page->display, forceGraph);
+            module_graph_insert(&(page->forceGraphContainer), page->data->force / 1000.0);
+            module_draw(page->display, &(page->forceGraphContainer));
         } // Update touch register
 
         previousState = currentState;
         initial = false;
     }
-    module_destroy(root);
 }

@@ -796,7 +796,9 @@ typedef struct Image_s
     int y0;
     int width;
     int height;
-    int backgroundColor;
+    uint16_t backgroundColor;
+    uint16_t colorToReplace;
+    uint16_t replacementColor;
 } Image;
 
 typedef struct RA8876_s
@@ -809,6 +811,7 @@ typedef struct RA8876_s
     TouchLocation lastLocation[1];
     int locationCount;
     I2CBus i2cBus;
+    int currentPage;
 } Display;
 
 Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);

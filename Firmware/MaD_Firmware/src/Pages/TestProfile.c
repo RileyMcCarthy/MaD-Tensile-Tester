@@ -1,6 +1,5 @@
 #include "TestProfile.h"
 #include "Explorer.h"
-#include "motionPlanning.h"
 
 #define BUTTONCOUNT 3
 #define BUTTON_NAVIGATION 0
@@ -14,14 +13,23 @@
 
 #define BUTTON_SET_COUNT 3
 #define BUTTON_SET_NAME 0
-#define BUTTON_SET_EXECUTIONS 1
-#define BUTTON_SET_QUARTETS 2
+#define BUTTON_SET_NUMBER 1
+#define BUTTON_SET_TYPE 2
+#define BUTTON_SET_EXECUTIONS 3
+#define BUTTON_SET_QUARTETS 4
 
 #define PROFILE_TYPES 4
 #define PROFILE_QUARTET 0
 #define PROFILE_SET 1
 #define PROFILE_MOTION 2
 #define PROFILE_TEST 3
+
+static const char openTextBuffer[] = "Open";
+static const char newTextBuffer[] = "New";
+static const char saveTextBuffer[] = "Save";
+
+static const char *optionNames[] = {"Quartet", "Set", "Motion", "Test"};
+static const char *extension[] = {".QRT", ".SET", ".MOT", ".TST"};
 
 static bool complete;
 
@@ -33,24 +41,17 @@ static void button_navigation(int id, void *arg)
 
 static void button_open(int id, void *arg)
 {
-    char *extension[] = {".QRT", ".SET", ".MOT", ".TST"};
     TestProfilePage *page = (TestProfilePage *)arg;
 
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_FILE, "/sd");
     char *filepath = explorer_run(explorer);
-    explorer_destroy(explorer);
-    if (filepath == NULL)
+    if (strcmp(filepath, "") == 0)
     {
         return;
     }
 
-    char *filename = strrchr(filepath, '/');
-    free(page->filename);
-    page->filename = (char *)malloc(strlen(filename) + 1);
+    char *filename = strrchr(filepath, '/') + 1;
     strcpy(page->filename, filename);
-
-    free(page->path);
-    page->path = malloc(strlen(filepath) - strlen(filename) + 1);
     strncpy(page->path, filepath, strlen(filepath) - strlen(filename));
 
     for (int i = 0; i < PROFILE_TYPES; i++)
@@ -66,99 +67,78 @@ static void button_open(int id, void *arg)
         }
     }
     printf("Mode:%d\n", page->mode);
-    free(filepath);
-    free(page->quartet);
-    free(page->set);
-    free(page->profile);
-    free(page->test);
 
     switch (page->mode)
     {
     case PROFILE_QUARTET:
     {
-        page->quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
         printf("Quartet from json\n");
-        json_to_motion_quartet(filepath, page->quartet);
+        json_to_motion_quartet(filepath, &(page->quartet));
         break;
     }
     case PROFILE_SET:
     {
-        page->set = (MotionSet *)malloc(sizeof(MotionSet));
-        json_to_motion_set(filepath, page->set);
+        json_to_motion_set(filepath, &(page->set));
         break;
     }
     case PROFILE_MOTION:
     {
-        page->profile = (MotionProfile *)malloc(sizeof(MotionProfile));
-        json_to_motion_profile(filepath, page->profile);
+        json_to_motion_profile(filepath, &(page->profile));
         break;
     }
     case PROFILE_TEST:
     {
-        page->test = (TestProfile *)malloc(sizeof(TestProfile));
-        json_to_test_profile(filepath, page->test);
+        json_to_test_profile(filepath, &(page->test));
         break;
     }
     }
-    free(filepath);
+    explorer_destroy(explorer);
 }
 
 static void button_new(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
 
-    char *optionNames[] = {"Quartet", "Set", "Motion", "Test"};
-    char *extension[] = {".QRT", ".SET", ".MOT", ".TST"};
     int newmode = selection_run(page->display, 100, 100, optionNames, PROFILE_TYPES);
 
     Keyboard *keyboard = keyboard_create(page->display, page->images);
     if (keyboard == NULL)
     {
         printf("TestProfile Button new Keyboard could not allocate memory\n");
+        return;
     }
     char *filename = keyboard_get_input(keyboard, "Enter file name: ");
-    keyboard_destroy(keyboard);
 
-    if (filename == NULL)
+    if (strcmp(filename, "") == 0)
     {
         return;
     }
 
-    page->filename = (char *)realloc(page->filename, strlen(filename) + strlen(extension[page->mode]) + 3);
-    if (page->filename == NULL)
-    {
-        printf("Testprofile.c page->filename could not allocate memory\n");
-    }
     strcpy(page->filename, filename);
-    strcat(page->filename, extension[newmode]);
-    free(filename);
+    keyboard_destroy(keyboard);
 
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_DIRECTORY, "/sd");
     if (explorer == NULL)
     {
         printf("Testprofile.c explorer could not allocate memory\n");
     }
-    free(page->path);
-    char *newpath = explorer_run(explorer);
-    explorer_destroy(explorer);
 
-    if (newpath == NULL)
+    char *newpath = explorer_run(explorer);
+
+    if (strcmp(newpath, "") == 0)
     {
         return;
     }
-    page->mode = newmode;
-    page->path = newpath;
 
-    free(page->quartet);
-    free(page->set);
-    free(page->profile);
-    free(page->test);
+    page->mode = newmode;
+    strcpy(page->path, newpath);
+    explorer_destroy(explorer);
 }
 
 static void button_save(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
-    char *filepath = (char *)malloc(strlen(page->path) + strlen(page->filename) + 2);
+    char *filepath = (char *)malloc(strlen(page->path) + strlen(page->filename) + strlen(extension[page->mode]) + 3);
     if (filepath == NULL)
     {
         printf("Testprofile.c filepath could not allocate memory\n");
@@ -166,11 +146,9 @@ static void button_save(int id, void *arg)
     strcpy(filepath, page->path);
     strcat(filepath, "/");
     strcat(filepath, page->filename);
-    motion_quartet_to_json(page->quartet, filepath);
-    if (page->quartet == NULL)
-    {
-        printf("Testprofile.c page->quartet could not allocate memory\n");
-    }
+    strcat(filepath, extension[page->mode]);
+    printf("Saving %s to %s: %s\n", page->filename, page->path, filepath);
+    motion_quartet_to_json(&(page->quartet), filepath);
     free(filepath);
 }
 
@@ -181,25 +159,26 @@ static void button_simulate(int id, void *arg)
     {
     case PROFILE_QUARTET:
     {
-        motion_quartet_simulate(page->quartet);
+        motion_quartet_simulate(&(page->quartet));
         break;
     }
     case PROFILE_SET:
     {
-        motion_set_simulate(page->set);
+        motion_set_simulate(&(page->set));
         break;
     }
     case PROFILE_MOTION:
     {
-        motion_profile_simulate(page->profile);
+        motion_profile_simulate(&(page->profile));
         break;
     }
     case PROFILE_TEST:
     {
-        test_profile_simulate(page->test);
+        test_profile_simulate(&(page->test));
         break;
     }
     }
+
     double max_velocity_rpm = 12.21 * 1 * (48 + 3)(48 + 3) / 16; //((float)value / 1000.0) * (60.0 / 80.0);              // um/s to rpm
     double max_acceleration_rpms = 30 * 635.78 * 1;
     double v_max = (0.08) * (max_velocity_rpm) / (60.0);
@@ -223,13 +202,12 @@ static void button_quartet(int id, void *arg)
     {
         Keyboard *keyboard = keyboard_create(page->display, page->images);
         char *filename = keyboard_get_input(keyboard, "Enter file name: ");
+
+        strcpy(page->quartet.name, filename);
+
+        strcpy(page->filename, filename);
+        strcat(page->filename, ".qrt");
         keyboard_destroy(keyboard);
-        free(page->quartet->name);
-        strcpy(page->quartet->name, page->path);
-        strcat(page->quartet->name, "/");
-        strcat(page->quartet->name, filename);
-        strcat(page->quartet->name, ".qrt");
-        free(filename);
         break;
     }
     case BUTTON_QUARTET_FUNC:
@@ -237,13 +215,12 @@ static void button_quartet(int id, void *arg)
         char *optionNames[FUNCTION_COUNT];
         for (int i = 0; i < FUNCTION_COUNT; i++)
         {
-            FunctionInfo info;
-            get_function_info(&info, i);
-            printf("function:%d,name:%s\n", i, info.name);
-            optionNames[i] = (char *)malloc(strlen(info.name) + 1);
-            strcpy(optionNames[i], info.name);
+            get_function_info(&(page->info), i);
+            printf("function:%d,name:%s\n", i, page->info.name);
+            optionNames[i] = (char *)malloc(strlen(page->info.name) + 1);
+            strncpy(optionNames[i], page->info.name, FUNCTION_MAX_NAME_LENGTH);
         }
-        page->quartet->function = selection_run(page->display, 300, 150, optionNames, FUNCTION_COUNT);
+        page->quartet.function = selection_run(page->display, 300, 150, optionNames, FUNCTION_COUNT);
         for (int i = 0; i < FUNCTION_COUNT; i++)
         {
             free(optionNames[i]);
@@ -254,9 +231,8 @@ static void button_quartet(int id, void *arg)
     {
         Keyboard *keyboard = keyboard_create(page->display, page->images);
         char *dwell = keyboard_get_input(keyboard, "Dwell: ");
+        page->quartet.dwell = atof(dwell);
         keyboard_destroy(keyboard);
-        page->quartet->dwell = atof(dwell);
-        free(dwell);
         break;
     }
     default:
@@ -267,22 +243,20 @@ static void button_quartet(int id, void *arg)
 static void button_quartet_parameters(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
-    FunctionInfo info;
-    get_function_info(&info, page->quartet->function);
+
+    get_function_info(&(page->info), page->quartet.function);
     Keyboard *keyboard = keyboard_create(page->display, page->images);
-    char *prompt = (char *)malloc(strlen(info.args[id]) + strlen(": ") + 1);
-    strcpy(prompt, info.args[id]);
+    char *prompt[30];
+    strcpy(prompt, page->info.args[id]);
     strcat(prompt, ": ");
     char *param = keyboard_get_input(keyboard, prompt);
-    free(prompt);
+    page->quartet.parameters[id] = atof(param);
     keyboard_destroy(keyboard);
-    page->quartet->parameters[id] = atof(param);
-    free(param);
 }
 
 static void button_set(int id, void *arg)
 {
-    TestProfilePage *page = (TestProfilePage *)arg;
+    /*TestProfilePage *page = (TestProfilePage *)arg;
     switch (id)
     {
     case BUTTON_SET_NAME:
@@ -362,7 +336,7 @@ static void button_set(int id, void *arg)
             printf("something is wrong:%d\n", newmode);
         }
     }
-    }
+    }*/
 }
 
 void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)
@@ -370,11 +344,152 @@ void test_profile_page_init(TestProfilePage *page, Display *display, Images *ima
     page->display = display;
     page->images = images;
     page->mode = -1;
-    page->quartet = NULL;
-    page->set = NULL;
-    page->profile = NULL;
-    page->test = NULL;
-    page->filename = NULL;
+    strcpy(page->path, "/sd");
+    strcpy(page->filename, "");
+    int padding = 10;
+
+    // Create Background
+    Module *root = &(page->root);
+    module_init(root, NULL);
+
+    Module *background = &(page->background);
+    module_init(background, root);
+    module_set_rectangle_circle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
+    module_set_position(background, 0, 0);
+    module_set_padding(background, padding, padding);
+    module_set_color(background, BACKCOLOR, BACKCOLOR);
+    module_animate_draw(background, module_animation_switch_page_up);
+
+    // Create edit window
+    Module *editWindow = &(page->editWindow);
+    module_init(editWindow, background);
+    module_set_rectangle_circle(editWindow, SCREEN_WIDTH / 3, 0);
+    module_fit_height(editWindow);
+    module_set_padding(editWindow, padding, padding);
+    module_set_color(editWindow, MAINCOLOR, BACKCOLOR);
+    module_add_border(editWindow, MAINTEXTCOLOR, 1);
+    module_align_inner_left(editWindow);
+    module_align_inner_top(editWindow);
+    module_set_margin(editWindow, 10, 10);
+
+    // Create Open Button
+    Module *openButton = &(page->openButton);
+    module_init(openButton, editWindow);
+    module_set_rectangle_circle(openButton, 100, 50);
+    module_set_color(openButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_set_padding(openButton, padding, padding);
+    module_align_space_even(openButton, 1, 2);
+    module_align_inner_top(openButton);
+    module_touch_callback(openButton, button_open, 0);
+
+    // Create Open Text
+    Module *openText = &(page->openText);
+    module_init(openText, openButton);
+    module_set_text(openText, openTextBuffer);
+    module_text_font(openText, -1);
+    module_text_fit(openText);
+    module_align_center(openText);
+    module_align_middle(openText);
+    module_set_color(openText, SECONDARYTEXTCOLOR, openText->parent->foregroundColor);
+
+    // Create New Button
+    Module *newButton = &(page->newButton);
+    module_init(newButton, editWindow);
+    module_copy(newButton, openButton);
+    module_align_space_even(newButton, 2, 2);
+    module_touch_callback(newButton, button_new, 0);
+
+    // Create New Text
+    Module *newText = &(page->newText);
+    module_init(newText, newButton);
+    module_copy(newText, openText);
+    module_set_text(newText, newTextBuffer);
+    module_text_font(newText, -1);
+    module_text_fit(newText);
+    module_align_center(newText);
+
+    // Create Save Button
+    Module *saveButton = &(page->saveButton);
+    module_init(saveButton, editWindow);
+    module_copy(saveButton, openButton);
+    module_align_center(saveButton);
+    module_align_inner_bottom(saveButton);
+    module_touch_callback(saveButton, button_save, 0);
+
+    // Create New Text
+    Module *saveText = &(page->saveText);
+    module_init(saveText, saveButton);
+    module_copy(saveText, openText);
+    module_set_text(saveText, saveTextBuffer);
+    module_text_font(saveText, -1);
+    module_text_fit(saveText);
+    module_align_center(saveText);
+    module_align_middle(saveText);
+
+    // Create navigation button
+    Module *navigationButton = &(page->navigationButton);
+    module_init(navigationButton, background);
+    module_set_image(navigationButton, &(page->images->navigationImage));
+    module_align_inner_top(navigationButton);
+    module_align_inner_right(navigationButton);
+    module_touch_callback(navigationButton, button_navigation, 0);
+
+    Module *graphPositionContainer = &(page->graphPositionContainer);
+    module_init(graphPositionContainer, background);
+    module_set_margin(graphPositionContainer, 10, 10);
+    module_set_size(graphPositionContainer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
+    module_align_right(graphPositionContainer, editWindow);
+    module_align_inner_top(graphPositionContainer);
+    module_set_color(graphPositionContainer, graphPositionContainer->parent->foregroundColor, graphPositionContainer->parent->backgroundColor);
+    module_set_graph(graphPositionContainer, &(page->graphPosition), "Position Vs. Time", "mm");
+    module_graph_set_range(graphPositionContainer, 5, -5);
+
+    Module *subroot = &(page->subroot);
+    module_init(subroot, editWindow);
+    module_align_below(subroot, newButton);
+    module_fit_below(subroot, newButton);
+    module_fit_width(subroot);
+    module_align_inner_left(subroot);
+    module_set_color(subroot, subroot->parent->foregroundColor, subroot->parent->backgroundColor);
+    module_set_padding(subroot, 0, 0);
+
+    // Create edit window title
+    Module *editWindowTitle = &(page->editWindowTitle);
+    module_init(editWindowTitle, subroot);
+    module_set_margin(editWindowTitle, 0, 10);
+    module_set_text(editWindowTitle, page->editWindowTitleBuffer);
+    module_text_font(editWindowTitle, RA8876_CHAR_HEIGHT_32);
+    module_text_fit(editWindowTitle);
+    module_fit_width(editWindowTitle);
+    module_text_align(editWindowTitle, MODULE_TEXT_ALIGN_INNER_LEFT);
+    module_set_color(editWindowTitle, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_inner_top(editWindowTitle);
+    module_align_center(editWindowTitle);
+    // module_text_underline(editWindowTitle);
+
+    Module *below = editWindowTitle;
+    for (int i = 0; i < 20; i++)
+    {
+        Module *param = &(page->profileParameters[i]);
+        module_init(param, subroot);
+        strcpy(page->profileParametersBuffer[i], "");
+        module_set_text(param, page->profileParametersBuffer[i]);
+        module_text_font(param, RA8876_CHAR_HEIGHT_24);
+        module_set_size(param, 0, 32);
+        module_fit_width(param);
+        module_set_radius(param, 5);
+        module_text_align(param, MODULE_TEXT_ALIGN_INNER_LEFT);
+        module_text_align_verticle(param, MODULE_TEXT_ALIGN_VCENTER);
+        module_align_below(param, below);
+        module_align_inner_left(param);
+        module_set_color(param, SECONDARYTEXTCOLOR, SECONDARYCOLOR);
+        module_touch_callback(param, button_quartet, BUTTON_QUARTET_NAME);
+        module_add_border(param, COLOR65K_BLACK, 2);
+        module_set_margin(param, 10, 10);
+        module_set_padding(param, 10, 0);
+        module_set_visable(param, false);
+        below = param;
+    }
 }
 
 void test_profile_page_destroy(TestProfilePage *page)
@@ -387,210 +502,57 @@ void test_profile_page_run(TestProfilePage *page)
     printf("Test profile page running\n");
     int padding = 20;
 
-    // Create Background
-    Module *root = module_create(NULL);
-    Module *background = module_create(root);
-    module_set_rectangle_circle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
-    module_set_position(background, 0, 0);
-    module_set_padding(background, padding, padding);
-    module_set_color(background, BACKCOLOR, BACKCOLOR);
-
-    // Create edit window
-    Module *editWindow = module_create(background);
-    module_set_rectangle_circle(editWindow, SCREEN_WIDTH / 3, 0);
-    module_fit_height(editWindow);
-    module_set_padding(editWindow, padding, padding);
-    module_set_color(editWindow, MAINCOLOR, BACKCOLOR);
-    module_align_inner_left(editWindow);
-    module_align_inner_top(editWindow);
-
-    // Create Open Button
-    Module *openButton = module_create(editWindow);
-    module_set_rectangle_circle(openButton, 100, 50);
-    module_set_color(openButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(openButton, padding, padding);
-    module_align_space_even(openButton, 1, 2);
-    module_align_inner_top(openButton);
-    module_touch_callback(openButton, button_open, 0);
-
-    // Create Open Text
-    Module *openText = module_create(openButton);
-    module_set_text(openText, "Open");
-    module_set_font(openText, -1);
-    module_align_center(openText);
-    module_align_middle(openText);
-    module_set_color(openText, SECONDARYTEXTCOLOR, openText->parent->foregroundColor);
-
-    // Create New Button
-    Module *newButton = module_create(editWindow);
-    module_copy(newButton, openButton);
-    module_align_space_even(newButton, 2, 2);
-    module_touch_callback(newButton, button_new, 0);
-
-    // Create New Text
-    Module *newText = module_create(newButton);
-    module_copy(newText, openText);
-    module_set_text(newText, "New");
-    module_set_font(newText, -1);
-    module_align_center(newText);
-
-    // Create Save Button
-    Module *saveButton = module_create(editWindow);
-    module_copy(saveButton, openButton);
-    module_align_center(saveButton);
-    module_align_inner_bottom(saveButton);
-    module_touch_callback(saveButton, button_save, 0);
-
-    // Create New Text
-    Module *saveText = module_create(saveButton);
-    module_copy(saveText, openText);
-    module_set_text(saveText, "Save");
-    module_set_font(saveText, -1);
-    module_align_center(saveText);
-    module_align_middle(saveText);
-
-    // Create navigation button
-    Module *navigationButton = module_create(background);
-    module_set_image(navigationButton, &(page->images->navigationImage));
-    module_align_inner_top(navigationButton);
-    module_align_inner_right(navigationButton);
-    module_touch_callback(navigationButton, button_navigation, 0);
-
-    // Create edit window title
-    Module *editWindowTitle = module_create(editWindow);
-    module_set_padding(editWindowTitle, padding, padding / 2);
-    module_set_text(editWindowTitle, "Edit");
-    module_set_font(editWindowTitle, RA8876_CHAR_HEIGHT_32);
-    module_set_color(editWindowTitle, SECONDARYTEXTCOLOR, MAINCOLOR);
-    module_align_below(editWindowTitle, newButton);
-    module_align_center(editWindowTitle);
-    module_add_underline(editWindowTitle);
-
-    Module *graph1 = module_create(background);
-    module_set_padding(graph1, 0, 0);
-    module_set_size(graph1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - padding * 3);
-    module_align_right(graph1, editWindow);
-    module_align_inner_top(graph1);
-    module_set_color(graph1, graph1->parent->foregroundColor, graph1->parent->backgroundColor);
-    module_set_graph(graph1, "Position Vs. Time", "mm");
-    module_graph_set_range(graph1, 5, -5);
-
-    module_draw(page->display, root);
+    module_draw(page->display, &(page->root));
     int lastMode = -1;
     while (!complete)
     {
-        printf("Test profile page running\n");
-        Module *subroot = module_create(editWindow);
-        module_align_below(subroot, editWindowTitle);
-        module_fit_below(subroot, editWindowTitle);
-        module_align_inner_left(subroot);
-        module_set_color(subroot, subroot->parent->foregroundColor, subroot->parent->backgroundColor);
-        module_set_padding(subroot, 0, 0);
         printf("Mode:%d\n", page->mode);
+        if (page->mode != lastMode)
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                module_set_visable(page->subroot.child[i], false);
+            }
+        }
         switch (page->mode)
         {
         case PROFILE_QUARTET:
         {
-            if (page->quartet == NULL)
+            if (lastMode != PROFILE_QUARTET)
             {
-                page->quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
-                strcpy(page->quartet->name, page->filename);
+                strcpy(page->quartet.name, page->filename);
+                printf("Quartet name:%s\n", page->quartet.name);
             }
 
-            char buf[50];
             printf("Quartet\n");
-            module_set_text(editWindowTitle, "Edit Quartet");
-            module_set_font(editWindowTitle, RA8876_CHAR_HEIGHT_32);
-            module_align_center(editWindowTitle);
-            module_add_underline(editWindowTitle);
+            strcpy(page->editWindowTitleBuffer, "Quartet");
 
-            Module *nameModule = module_create(subroot);
-            sprintf(buf, "Name: %s", page->quartet->name);
-            module_set_text(nameModule, buf);
-            module_set_font(nameModule, RA8876_CHAR_HEIGHT_24);
-            module_align_inner_left(nameModule);
-            module_align_inner_top(nameModule);
-            module_set_color(nameModule, SECONDARYTEXTCOLOR, nameModule->parent->foregroundColor);
+            Module *nameModule = &(page->profileParameters[0]);
+            sprintf(page->profileParametersBuffer[0], "Name: %s", page->quartet.name);
             module_touch_callback(nameModule, button_quartet, BUTTON_QUARTET_NAME);
+            module_set_visable(nameModule, true);
+            printf("Name:%s\n", page->profileParametersBuffer[0]);
 
-            Module *funcModule = module_create(subroot);
-            module_copy(funcModule, nameModule);
-
-            FunctionInfo info;
-            get_function_info(&info, page->quartet->function);
-            sprintf(buf, "Function: %s", info.name);
-            module_set_text(funcModule, buf);
-            module_set_font(funcModule, RA8876_CHAR_HEIGHT_24);
-            module_align_below(funcModule, nameModule);
+            Module *funcModule = &(page->profileParameters[1]);
+            get_function_info(&(page->info), page->quartet.function);
+            sprintf(page->profileParametersBuffer[1], "Function: %s", page->info.name);
             module_touch_callback(funcModule, button_quartet, BUTTON_QUARTET_FUNC);
+            module_set_visable(funcModule, true);
 
-            int params = info.args_count;
-            printf("info->args_count:%d\n", info.args_count);
-            Module *below = funcModule;
-            for (int i = 0; i < params; i++) //[distance, strain rate, error]
+            int paramIndex = 2;
+            for (int i = 0; i < page->info.args_count; i++) //[distance, strain rate, error]
             {
-                Module *paramModule = module_create(subroot);
-                module_copy(paramModule, nameModule);
-                sprintf(buf, "%s: %0.3f", info.args[i], page->quartet->parameters[i]);
-                module_set_text(paramModule, buf);
-                module_set_font(paramModule, RA8876_CHAR_HEIGHT_24);
-                module_align_below(paramModule, below);
+                Module *paramModule = &(page->profileParameters[paramIndex]);
+                sprintf(page->profileParametersBuffer[paramIndex], "    %s: %0.3f", page->info.args[i], page->quartet.parameters[i]);
                 module_touch_callback(paramModule, button_quartet_parameters, i);
-                below = paramModule;
+                module_set_visable(paramModule, true);
+                paramIndex++;
             }
 
-            printf("running quartet\n");
-            /*RunMotionProfile *run = get_run_motion_profile();
-
-            double t = 0;
-            // Find t_max
-            long startTime = _getms();
-            double d_max = 0;
-            double d_min = 0;
-            while (!run->quartetComplete)
-            {
-                double distance = position_quartet(t, run, page->quartet);
-                printf("distance:%f\n", distance);
-                t += 0.01;
-                if (distance > d_max)
-                {
-                    d_max = distance;
-                }
-                if (distance < d_min)
-                {
-                    d_min = distance;
-                }
-                if ((_getms() - startTime) > 1000) // timeout
-                {
-                    printf("Timeout\n");
-                    break;
-                }
-            }
-            destroy_run_motion_profile(run);
-
-            module_graph_set_range(graph1, 10, -10);
-            run = get_run_motion_profile();
-            printf("t_max:%f\n", t);
-            int dataPoints = module_graph_get_max_data(graph1);
-            printf("dataPoints:%d\n", dataPoints);
-            double dt = t * 1000 / (double)dataPoints; // Get interval for graph
-            for (int i = 0; i < dataPoints; i++)
-            {
-                double position = position_quartet(i * dt / 1000.0, run, page->quartet);
-                module_graph_insert(graph1, position);
-                module_draw(page->display, graph1);
-                // printf("graph1Data%f,%f\n", position, i * dt);
-            }
-            printf("total time:%f\n", t);
-            destroy_run_motion_profile(run);*/
-
-            Module *dwellModule = module_create(subroot);
-            module_copy(dwellModule, nameModule);
-            sprintf(buf, "Dwell (ms): %0.3f", page->quartet->dwell);
-            module_set_text(dwellModule, buf);
-            module_set_font(dwellModule, RA8876_CHAR_HEIGHT_24);
-            module_align_below(dwellModule, below);
+            Module *dwellModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Dwell (ms): %0.3f", page->quartet.dwell);
             module_touch_callback(dwellModule, button_quartet, BUTTON_QUARTET_DWELL);
+            module_set_visable(dwellModule, true);
             break;
         }
         case PROFILE_SET:
@@ -601,28 +563,44 @@ void test_profile_page_run(TestProfilePage *page)
     int executions;          // Number of times to execute the motion set
     int quartetCount;        // Number of motion quartets in the set
     MotionQuartet *quartets; // List of quartets to execute (max 10)*/
-            if (page->set == NULL)
+            if (lastMode != PROFILE_SET)
             {
-                page->set = (MotionSet *)malloc(sizeof(MotionSet));
-                strcpy(page->set->name, page->filename);
+                strcpy(page->set.name, page->filename);
             }
-            module_set_text(editWindowTitle, "Edit Set");
-            module_set_font(editWindowTitle, RA8876_CHAR_HEIGHT_32);
-            module_align_center(editWindowTitle);
-            module_add_underline(editWindowTitle);
+            module_set_text(&(page->editWindowTitle), "Edit Set");
+            module_text_font(&(page->editWindowTitle), RA8876_CHAR_HEIGHT_32);
+            module_align_center(&(page->editWindowTitle));
+            module_text_underline(&(page->editWindowTitle));
 
-            char buf[50];
-            Module *nameModule = module_create(subroot);
-            sprintf(buf, "Name: %s", page->set->name);
-            module_set_text(nameModule, buf);
-            module_set_font(nameModule, RA8876_CHAR_HEIGHT_24);
+            printf("Set\n");
+            strcpy(page->editWindowTitleBuffer, "Set");
+
+            Module *nameModule = &(page->profileParameters[0]);
+            sprintf(page->profileParametersBuffer[0], "Name: %s", page->set.name);
+            module_touch_callback(nameModule, button_set, BUTTON_SET_NAME);
+            module_set_visable(nameModule, true);
+
+            Module *numberModule = &(page->profileParameters[1]);
+            sprintf(page->profileParametersBuffer[1], "Number: %d", page->set.number);
+            module_touch_callback(nameModule, button_set, BUTTON_SET_NUMBER);
+            module_set_visable(nameModule, true);
+
+            Module *typeModule = &(page->profileParameters[2]);
+            sprintf(page->profileParametersBuffer[2], "Type: %d", page->set.type);
+            module_touch_callback(nameModule, button_set, BUTTON_SET_TYPE);
+            module_set_visable(nameModule, true);
+
+            /*Module *nameModule = module_create(subroot);
+            sprintf(page->nameBuffer, "Name: %s", page->set->name);
+            module_set_text(nameModule, page->nameBuffer);
+            module_text_font(nameModule, RA8876_CHAR_HEIGHT_24);
             module_align_inner_left(nameModule);
             module_align_inner_top(nameModule);
             module_set_color(nameModule, SECONDARYTEXTCOLOR, nameModule->parent->foregroundColor);
             module_touch_callback(nameModule, button_set, BUTTON_SET_NAME);
 
             Module *funcModule = module_create(subroot);
-            module_copy(funcModule, nameModule);
+            module_copy(funcModule, nameModule);*/
             break;
         }
         case PROFILE_MOTION:
@@ -636,14 +614,11 @@ void test_profile_page_run(TestProfilePage *page)
         default:
             break;
         }
-
-        module_draw(page->display, subroot);
+        lastMode = page->mode;
+        module_draw(page->display, &(page->subroot));
         do
         {
             display_update_touch(page->display);
-        } while (module_touch_check(root, page->display, page) == 0);
-        module_trim(subroot); // Remove subroot from tree
-        module_destroy(subroot);
+        } while (module_touch_check(&(page->root), page->display, page) == 0);
     }
-    module_destroy(root);
 }
