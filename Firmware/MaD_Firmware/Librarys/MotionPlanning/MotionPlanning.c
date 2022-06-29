@@ -2,6 +2,22 @@
 #include <JSON.h>
 // Needs to know current set, current quartet, quartet execution.
 
+void run_motion_profile_init(RunMotionProfile *run)
+{
+    run->currentSet = 0;
+    run->currentExecution = 0;
+    run->currentQuartet = 0;
+
+    run->profileComplete = false;
+    run->setComplete = false;
+    run->quartetComplete = false;
+    run->lastQuartetTime = 0;
+    run->lastQuartetDistance = 0;
+    run->dwellTime = 0;
+    run->lastExecutionDistance = 0;
+    run->lastSetDistance = 0;
+}
+
 RunMotionProfile *get_run_motion_profile()
 {
     RunMotionProfile *run = (RunMotionProfile *)malloc(sizeof(RunMotionProfile));
@@ -15,6 +31,10 @@ RunMotionProfile *get_run_motion_profile()
     run->quartetComplete = false;
     run->lastQuartetTime = 0;
     run->lastQuartetDistance = 0;
+    run->dwellTime = 0;
+    run->lastExecutionDistance = 0;
+    run->lastSetDistance = 0;
+
     return run;
 }
 void destroy_run_motion_profile(RunMotionProfile *run)

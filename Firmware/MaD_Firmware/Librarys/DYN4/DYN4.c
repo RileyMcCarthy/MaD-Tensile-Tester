@@ -11,7 +11,7 @@
 
 DYN4 *dyn4_create()
 {
-    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4) * 2);
+    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4));
     return dyn4;
 }
 

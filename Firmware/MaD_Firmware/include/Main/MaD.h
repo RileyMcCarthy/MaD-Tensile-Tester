@@ -30,6 +30,7 @@
 #include "SettingsPage.h"
 #include "Explorer.h"
 #include "TestProfile.h"
+#include "Encoder.h"
 
 #define DISPLAY_SCK 51     // SPI Clock Pin
 #define DISPLAY_MISO 53    // SPI Data Pin

@@ -68,6 +68,7 @@ typedef struct RunMotionProfile_s
 } RunMotionProfile;
 
 RunMotionProfile *get_run_motion_profile();
+void run_motion_profile_init(RunMotionProfile *profile);
 void destroy_run_motion_profile(RunMotionProfile *run);
 
 void get_function_info(FunctionInfo *info, QuartetFunctions id);

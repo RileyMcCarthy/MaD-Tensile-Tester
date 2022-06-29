@@ -5,7 +5,7 @@
 static void module_animation_touch(Display *display, Module *module)
 {
     int moveY = 5;
-    int speedms = 100; // animation time
+    int speedms = 50; // animation time
     int bufferPx = 2;
 
     int x = module->x - module->borderWidth - bufferPx;
@@ -622,7 +622,6 @@ void module_draw(Display *display, Module *module)
     {
         display_canvas_image_start_address(display, ANIMATION_PAGE);
     }
-
     switch (module->type)
     {
     case MODULE_TEXT:

@@ -13,7 +13,7 @@ static Display display;
 static MachineProfile machineProfile;
 static MachineState machineState;
 static DS3231 clock;
-static Images images;
+Images images; // Make images global
 
 // Pages
 static StatusPage statusPage;
@@ -117,6 +117,46 @@ static void load_images()
   images.failImage.colorToReplace = 0;
   images.failImage.replacementColor = 0;
 
+  strcpy(images.addImage.name, "add.bin");
+  images.addImage.page = 2;
+  images.addImage.width = 25;
+  images.addImage.height = 25;
+  images.addImage.x0 = 100;
+  images.addImage.y0 = 250;
+  images.addImage.backgroundColor = 0xFFFF;
+  images.addImage.colorToReplace = 0;
+  images.addImage.replacementColor = 0;
+
+  strcpy(images.garbageImage.name, "garbage.bin");
+  images.garbageImage.page = 2;
+  images.garbageImage.width = 25;
+  images.garbageImage.height = 25;
+  images.garbageImage.x0 = 100;
+  images.garbageImage.y0 = 275;
+  images.garbageImage.backgroundColor = 0xFFFF;
+  images.garbageImage.colorToReplace = 0;
+  images.garbageImage.replacementColor = 0;
+
+  strcpy(images.fileImage.name, "file.bin");
+  images.fileImage.page = 2;
+  images.fileImage.width = 87;
+  images.fileImage.height = 100;
+  images.fileImage.x0 = 150;
+  images.fileImage.y0 = 200;
+  images.fileImage.backgroundColor = 0xFFFF;
+  images.fileImage.colorToReplace = 0;
+  images.fileImage.replacementColor = 0;
+
+  strcpy(images.folderImage.name, "folder.bin");
+  images.folderImage.page = 2;
+  images.folderImage.width = 100;
+  images.folderImage.height = 80;
+  images.folderImage.x0 = 250;
+  images.folderImage.y0 = 200;
+  images.folderImage.backgroundColor = 0xFFFF;
+  images.folderImage.colorToReplace = 0;
+  images.folderImage.replacementColor = 0;
+
   loading_overlay_display(&display, "Loading Image: nav", OVERLAY_TYPE_LOADING);
   display_load_image(&display, &(images.navigationImage));
   // display_bte_mpu_write_color_expansion(&display, PAGE2_START_ADDR, SCREEN_WIDTH, images.navigationImage.x0, images.navigationImage.y0, images.navigationImage.width, images.navigationImage.height, 0xFFFF, COLOR65K_DARKRED);
@@ -142,6 +182,18 @@ static void load_images()
 
   loading_overlay_display(&display, "Loading Image: fail status", OVERLAY_TYPE_LOADING);
   display_load_image(&display, &(images.failImage));
+
+  loading_overlay_display(&display, "Loading Image: add status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.addImage));
+
+  loading_overlay_display(&display, "Loading Image: garbage status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.garbageImage));
+
+  loading_overlay_display(&display, "Loading Image: file status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.fileImage));
+
+  loading_overlay_display(&display, "Loading Image: folder status", OVERLAY_TYPE_LOADING);
+  display_load_image(&display, &(images.folderImage));
 }
 
 /**
@@ -385,10 +437,14 @@ void mad_begin()
     loading_overlay_display(&display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
   }
 
+  Encoder *encoder = (Encoder *)malloc(sizeof(Encoder)); // Spin objects need to be allocated on the heap (not sure why)
+  encoder->start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
+
   Monitor *monitor = monitor_create();
   if (monitor_begin(monitor, dyn4, forceGauge, &machineProfile, 1000))
   {
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
+    monitor->encoder = encoder;
   }
   else
   {
@@ -418,7 +474,7 @@ void mad_begin()
   test_profile_page_init(&testProfilePage, &display, &images);
   navigation_page_init(&navigationPage, &display, &images);
 
-  printf("Machine propfile size:%d\n", sizeof(machineProfile));
+  printf("Machine propfile size:%d\n", (int)sizeof(machineProfile));
   // Begin main loop
   Page currentPage = PAGE_TEST_PROFILE;
   while (1)

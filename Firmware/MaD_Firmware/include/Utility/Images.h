@@ -14,6 +14,10 @@ typedef struct images_s
     Image filesPageImage;
     Image successImage;
     Image failImage;
+    Image addImage;
+    Image garbageImage;
+    Image fileImage;
+    Image folderImage;
 } Images;
 
 #endif

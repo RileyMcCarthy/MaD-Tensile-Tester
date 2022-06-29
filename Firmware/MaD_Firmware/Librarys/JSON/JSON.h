@@ -137,12 +137,12 @@ typedef struct TestProfile_s
 
 // Helper Functions
 
-MachineProfile *get_machine_profile(); // U
-MotionProfile *get_motion_profile();   // U
-SampleProfile *get_sample_profile();   // U
-TestProfile *get_test_profile();       // U
-MotionSet *get_motion_set();           // U
-MotionQuartet *get_motion_quartet();   // U
+void machine_configuration_init(MachineConfiguration *configuration);
+void machine_performance_init(MachinePerformance *performance);
+void machine_profile_init(MachineProfile *profile);
+void motion_quartet_init(MotionQuartet *quartet);
+void motion_set_init(MotionSet *set);
+void motion_profile_init(MotionProfile *profile);
 
 Error machine_profile_to_json(MachineProfile *settings, const char *filename); // U
 Error sample_profile_to_json(SampleProfile *sample, const char *filename);     // U

@@ -1487,6 +1487,7 @@ int display_update_touch(Display *display)
 To load image with proper settings: use inkscape to export image with anialiasing turned off, then open in gimp where
 it is exported to jpg using max quality settings (100) and use preview to check for any back "smudging". Finally
 use the image took from RA8876 to convert that jpg to bin. 8 characters max with extension of three characters.
+*** Inkscape now has export tp jpg that seems to work without gimp
 */
 void display_load_image(Display *display, Image *image)
 {

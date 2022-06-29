@@ -126,5 +126,5 @@ void module_graph_add_marker(Module *module, float value)
 int module_graph_get_max_data(Module *module)
 {
     ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
-    return graph->w / 2;
+    return graph->graphArea.w / 2;
 }

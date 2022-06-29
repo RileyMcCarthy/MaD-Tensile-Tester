@@ -3,9 +3,6 @@
  
  CFLAGS=-2 -O1 -Wall -DDebug -g #-D __MEMORY_CHECK__ 
 
- CPPCHECK = cppcheck
- CHECKFLAGS = -q --error-exitcode=1
-
  TARGET = MAD.binary
  BIN = bin
  INCLUDE = include/Utility include/Elements include/Pages include/Main Librarys/json-maker Librarys/tiny-json Librarys/NavKey Librarys/RA8876 Librarys/IOBoard Librarys/MCP23017 Librarys/SPI Librarys/DS3231 Librarys/ForceGauge Librarys/DYN4 Librarys/I2C Librarys/Encoder Librarys/JSON Librarys/Serial Librarys/MotionPlanning Librarys/leak_detector_c Librarys/SimpleI2CSlow 
@@ -20,10 +17,8 @@
  $(info VAR="$(INC)")
  $(info VAR="$(SOURCE)")
 
- all: cppcheck.out.xml clean clear $(BIN)/$(TARGET) run
+ all: clean clear $(BIN)/$(TARGET) run
 
-cppcheck.out.xml: $(SOURCEDIR)
-    $(CPPCHECK) $(CHECKFLAGS) $^ -xml >$@
 
 $(BIN)/$(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $(INC) $(OBJECTS) -o $@

@@ -21,6 +21,8 @@ typedef struct control_t
     MonitorData *monitorData;
     MachineState *stateMachine;
     MotionProfile motionProfile;
+    MCP23017 *mcp;
+    NavKey *navkey;
     DYN4 *dyn4;
     int cogid;
     long setpointum;

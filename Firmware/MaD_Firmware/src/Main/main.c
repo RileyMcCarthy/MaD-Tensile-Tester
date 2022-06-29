@@ -3,7 +3,7 @@
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768 * 3
+    HEAPSIZE = 32768 * 2
 };
 
 double atof(const char *str)

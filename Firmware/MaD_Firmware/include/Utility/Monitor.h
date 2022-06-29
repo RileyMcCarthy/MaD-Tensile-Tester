@@ -4,6 +4,7 @@
 #include "ForceGauge.h"
 #include "StateMachine.h"
 #include "JSON.h"
+#include "Encoder.h"
 
 #define MONITOR_BUFFER_SIZE 10
 typedef struct monitor_data_t
@@ -20,12 +21,11 @@ typedef struct monitor_cog_t
     DYN4 *dyn4;
     ForceGauge *forceGauge;
     MachineProfile *profile;
+    Encoder *encoder;
     MonitorData data; // add list
     int sampleRate;   // sample rate in hz
     int cogid;
 } Monitor;
-
-typedef struct __using("jm_quadrature.spin2") Encoder;
 
 Monitor *monitor_create();
 void monitor_destroy(Monitor *monitor);

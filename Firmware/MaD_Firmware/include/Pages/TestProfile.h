@@ -43,9 +43,12 @@ typedef struct TestProfilePage_s
 
     Module profileParameters[20];
 
+    RunMotionProfile runProfile;
+
     char editWindowTitleBuffer[30];
     char profileParametersBuffer[20][30];
     FunctionInfo info;
+    Selection selection;
 } TestProfilePage;
 
 void test_profile_page_init(TestProfilePage *page, Display *display, Images *images);

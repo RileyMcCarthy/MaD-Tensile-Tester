@@ -20,6 +20,19 @@ static char doneBuffer[] = "Done";
 static char emptyBuffer[] = "";
 
 static Explorer staticExplorer;
+extern Images images;
+
+static bool isFile(char *name)
+{
+    for (int i = 0; i < strlen(name); i++)
+    {
+        if (name[i] == '.')
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 static void button_delete(int id, void *arg)
 {
@@ -161,7 +174,8 @@ char *explorer_run(Explorer *explorer)
     Module *deleteButton = &(explorer->deleteButton);
     module_init(deleteButton, window);
     module_set_margin(deleteButton, padding, padding);
-    module_set_rectangle(deleteButton, 25, 25);
+    module_set_image(deleteButton, &(images.garbageImage));
+    // module_set_rectangle(deleteButton, 25, 25);
     module_align_inner_top(deleteButton);
     module_align_inner_left(deleteButton);
     module_set_color(deleteButton, COLOR65K_RED, COLOR65K_RED);
@@ -316,16 +330,25 @@ char *explorer_run(Explorer *explorer)
             }
         }
 
-        struct dirent *dirent;
         for (int i = 0; i < MAX_FILES; i++)
         {
             Module *file = subroot->child[i];
+            struct dirent *dirent;
             if ((dirent = readdir(dir)) != NULL)
             {
                 strcpy(explorer->files[i], dirent->d_name);
 
                 printf("%s\n", explorer->files[i]);
                 // module_text_update(file->child[0], explorer->files[i]);
+                if (isFile(dirent->d_name))
+                {
+                    module_set_image(file, &(images.fileImage));
+                }
+                else
+                {
+                    module_set_image(file, &(images.folderImage));
+                }
+                module_set_size(file, 100, 100);
                 module_set_visable(file, true);
                 if (explorer->selection == i)
                 {

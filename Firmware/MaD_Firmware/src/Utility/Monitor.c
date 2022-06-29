@@ -1,6 +1,6 @@
 #include "Monitor.h"
 #include "IOBoard.h"
-#define MONITOR_MEMORY_SIZE 4096 * 2
+#define MONITOR_MEMORY_SIZE 4096 * 4
 static long monitor_stack[MONITOR_MEMORY_SIZE];
 static bool monitorHasNewPosition = false;
 static int monitorNewPosition = 0;
@@ -14,8 +14,6 @@ monitor_cog(Monitor *monitor)
     int lastus = 0;
     int delayus = 1000000 / monitor->sampleRate;
     int delay = 0;
-    Encoder encoder;
-    encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
     monitorWriteData = false;
     FILE *file = NULL;
 
@@ -36,22 +34,22 @@ monitor_cog(Monitor *monitor)
         else // Force gauge isnt responding attempt to reconnect
         {
             force_gauge_begin(monitor->forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, monitor->forceGauge->interpolationSlope, monitor->forceGauge->interpolationZero);
-            encoder.set(0);
+            monitor->encoder->set(0);
         }
 
         if (monitorHasNewPosition)
         {
-            encoder.set(monitorNewPosition);
+            monitor->encoder->set(monitorNewPosition);
             monitorHasNewPosition = false;
         }
-        monitor->data.positionum = (1000 * steps_to_mm(encoder.value(), &(monitor->profile->configuration))); // Get Position in um
+        monitor->data.positionum = (1000 * steps_to_mm(monitor->encoder->value(), &(monitor->profile->configuration))); // Get Position in um
         monitor->data.timems = _getms();
         if (monitorWriteData)
         {
             if (file == NULL)
             {
                 startTimems = _getms();
-                file = fopen("/sd/raw1.txt", "w");
+                file = fopen("/da/raw1.txt", "w");
                 if (file == NULL)
                 {
                     printf("Failed to open file for writing\n");

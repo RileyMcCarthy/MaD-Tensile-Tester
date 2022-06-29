@@ -78,40 +78,6 @@ static int json_property_to_string_array(char array[][], const json_t *json, con
     return index;
 }
 
-/**Structure Initialization Functions*/
-
-static MachineConfiguration *get_machine_configuration()
-{
-    MachineConfiguration *configuration = (MachineConfiguration *)malloc(sizeof(MachineConfiguration));
-    configuration->motorType = NULL;
-    configuration->maxMotorTorque = 0.0;
-    configuration->maxMotorRPM = 0.0;
-    configuration->gearDiameter = 0.0;
-    configuration->gearPitch = 0.0;
-    configuration->systemIntertia = 0.0;
-    configuration->staticTorque = 0.0;
-    configuration->load = 0.0;
-    configuration->positionEncoderType = NULL;
-    configuration->positionEncoderStepsPerRev = 0.0;
-    configuration->forceGauge = NULL;
-    configuration->forceGaugeScaleFactor = 0.0;
-    configuration->forceGaugeZeroFactor = 0;
-    return configuration;
-}
-
-static MachinePerformance *get_machine_performance()
-{
-    MachinePerformance *performance = (MachinePerformance *)malloc(sizeof(MachinePerformance));
-    performance->minPosition = 0.0;
-    performance->maxPosition = 0.0;
-    performance->maxVelocity = 0.0;
-    performance->maxAcceleration = 0.0;
-    performance->maxForceTensile = 0.0;
-    performance->maxForceCompression = 0.0;
-    performance->forceGaugeNeutralOffset = 0.0;
-    return performance;
-}
-
 /**Json to structure functions**/
 
 /**
@@ -230,6 +196,77 @@ static void machine_performance_to_json(FILE *file, MachinePerformance *performa
 
 /**Initialation Functions**/
 
+void machine_configuration_init(MachineConfiguration *configuration)
+{
+    strcpy(configuration->motorType, "");
+    configuration->maxMotorRPM = 0;
+    configuration->maxMotorTorque = 0;
+    configuration->gearDiameter = 0;
+    configuration->gearPitch = 0;
+    configuration->systemIntertia = 0;
+    configuration->staticTorque = 0;
+    configuration->load = 0;
+    strcpy(configuration->positionEncoderType, "");
+    configuration->positionEncoderStepsPerRev = 0;
+    strcpy(configuration->forceGauge, "");
+    configuration->forceGaugeScaleFactor = 0;
+    configuration->forceGaugeZeroFactor = 0;
+}
+
+void machine_performance_init(MachinePerformance *performance)
+{
+    performance->minPosition = 0;
+    performance->maxPosition = 0;
+    performance->maxVelocity = 0;
+    performance->maxAcceleration = 0;
+    performance->maxForceTensile = 0;
+    performance->maxForceCompression = 0;
+    performance->forceGaugeNeutralOffset = 0;
+}
+
+void machine_profile_init(MachineProfile *profile)
+{
+    strcpy(profile->name, "");
+    profile->number = 0;
+    machine_configuration_init(&(profile->configuration));
+    machine_performance_init(&(profile->performance));
+}
+
+void motion_quartet_init(MotionQuartet *quartet)
+{
+    strcpy(quartet->name, "");
+    quartet->function = 0;
+    for (int i = 0; i < MAX_MOTION_QUARTET_PARAMETERS; i++)
+    {
+        quartet->parameters[i] = 0;
+    }
+    quartet->dwell = 0;
+}
+
+void motion_set_init(MotionSet *set)
+{
+    strcpy(set->name, "");
+    set->number = 0;
+    strcpy(set->type, "");
+    set->executions = 0;
+    set->quartetCount = 0;
+    for (int i = 0; i < MAX_MOTION_QUARTETS; i++)
+    {
+        motion_quartet_init(&(set->quartets[i]));
+    }
+}
+
+void motion_profile_init(MotionProfile *profile)
+{
+    strcpy(profile->name, "");
+    profile->number = 0;
+    profile->setCount = 0;
+    for (int i = 0; i < MAX_MOTION_PROFILE_SETS; i++)
+    {
+        motion_set_init(&(profile->sets[i]));
+    }
+}
+
 // Need to be changed to initialize structures
 /*MachineProfile *get_machine_profile()
 {
@@ -331,7 +368,7 @@ Error motion_profile_to_json(MotionProfile *motion, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -363,7 +400,7 @@ Error sample_profile_to_json(SampleProfile *sample, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -405,7 +442,7 @@ Error motion_set_to_json(MotionSet *set, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -443,7 +480,7 @@ Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
     fprintf(file, "{");
@@ -476,7 +513,7 @@ Error test_profile_to_json(TestProfile *test, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        printf("Error opening file: %s\n", file);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
