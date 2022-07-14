@@ -6,39 +6,10 @@
 #define BUTTON_NAVIGATION 0
 #define BUTTON_FORCE_NAVIGATION 1
 
+static char forceCalibrateBuffer[] = "Force Calibrate";
+static char machineSettingsBuffer[] = "Machine Settings";
+
 static bool complete;
-
-typedef struct ForceCalibration_s
-{
-    int zero;
-    float slope;
-} ForceCalibration;
-
-static void check_buttons(CalibratePage *page)
-{
-    button_update(page->display);
-
-    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
-    {
-        for (int i = 0; i < BUTTONCOUNT; i++)
-        {
-            if (page->buttons[i].pressed)
-            {
-                switch (page->buttons[i].name)
-                {
-                case BUTTON_NAVIGATION:
-                    complete = true;
-                    break;
-                case BUTTON_FORCE_NAVIGATION:
-                    page->state++;
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
-}
 
 void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *monitor, MachineProfile *machineProfile, Images *images)
 {
@@ -46,83 +17,169 @@ void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *m
     page->monitor = monitor;
     page->machineProfile = machineProfile;
     page->images = images;
+
+    Module *root = &page->root;
+    module_init(root,NULL);
+
+    Module *background = &page->background;
+    module_init(background, root);
+    module_set_rectangle_circle(background, SCREEN_WIDTH, SCREEN_HEIGHT);
+    module_set_position(background, 0, 0);
+    module_set_padding(background, 10, 10);
+    module_set_color(background, BACKCOLOR, BACKCOLOR);
+    module_animate_draw(background, module_animation_switch_page_up);
+
+    // Create navigation button
+    Module *navigationButton = &(page->navigation);
+    module_init(navigationButton, background);
+    module_set_image(navigationButton, &(page->images->navigationImage));
+    module_align_inner_top(navigationButton);
+    module_align_inner_right(navigationButton);
+    module_touch_callback(navigationButton, button_navigation, 0);
+
+    // Create force calibrate window
+    Module *forceWindow = &(page->forceWindow);
+    module_init(forceWindow, background);
+    module_set_padding(forceWindow, 10, 10);
+    module_add_border(forceWindow, MAINTEXTCOLOR, 1);
+    module_set_margin(forceWindow, 10, 10);
+    module_set_rectangle_circle(forceWindow, 0, 0);
+    module_fit_space_even(forceWindow, 3);
+    module_fit_height(forceWindow);
+    module_set_color(forceWindow, MAINCOLOR, BACKCOLOR);
+    module_align_center(forceWindow);
+    module_align_inner_top(forceWindow);
+
+    // Create machine state window title
+    Module *forceTitle = &(page->forceHeader);
+    module_init(forceTitle, forceWindow);
+    module_set_text(forceTitle, forceCalibrateBuffer);
+    module_set_margin(forceTitle, 8, 8);
+    module_text_font(forceTitle, RA8876_CHAR_HEIGHT_32);
+    module_text_fit(forceTitle);
+    module_set_color(forceTitle, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_inner_top(forceTitle);
+    module_align_center(forceTitle);
+    module_text_underline(forceTitle);
+
+    // Force Status
+    Module *forceCalStatus = &(page->forceCalStatus);
+    module_init(forceCalStatus, forceWindow);
+    module_set_margin(forceCalStatus, 8, 8);
+    module_set_text(forceCalStatus, page->forceCalStatusBuffer);
+    module_text_font(forceCalStatus, RA8876_CHAR_HEIGHT_24);
+    module_set_color(forceCalStatus, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(forceCalStatus, forceTitle);
+    module_align_inner_left(forceCalStatus);
+
+    // ADC Value
+    Module *adcValue = &(page->adcValue);
+    module_init(adcValue, forceWindow);
+    module_set_margin(adcValue, 8, 8);
+    module_set_text(adcValue, page->adcValueBuffer);
+    module_text_font(adcValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(adcValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(adcValue, forceCalStatus);
+    module_align_inner_left(adcValue);
+
+    // Zero Value
+    Module *zeroValue = &(page->zeroValue);
+    module_init(zeroValue, forceWindow);
+    module_set_margin(zeroValue, 8, 8);
+    module_set_text(zeroValue, page->zeroValueBuffer);
+    module_text_font(zeroValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(zeroValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(zeroValue, adcValue);
+    module_align_inner_left(zeroValue);
+
+    // Slope Value
+    Module *slopeValue = &(page->slopeValue);
+    module_init(slopeValue, forceWindow);
+    module_set_margin(slopeValue, 8, 8);
+    module_set_text(slopeValue, page->slopeValueBuffer);
+    module_text_font(slopeValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(slopeValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(slopeValue, zeroValue);
+    module_align_inner_left(slopeValue);
+
+    // Slope Value
+    Module *slopeValue = &(page->slopeValue);
+    module_init(slopeValue, forceWindow);
+    module_set_margin(slopeValue, 8, 8);
+    module_set_text(slopeValue, page->slopeValueBuffer);
+    module_text_font(slopeValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(slopeValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(slopeValue, zeroValue);
+    module_align_inner_left(slopeValue);
+
+    // Create machine state window title
+    Module *machineSettingsHeader = &(page->machineSettingsHeader);
+    module_init(machineSettingsHeader, forceWindow);
+    module_set_text(machineSettingsHeader, machineSettingsBuffer);
+    module_set_margin(machineSettingsHeader, 8, 8);
+    module_text_font(machineSettingsHeader, RA8876_CHAR_HEIGHT_32);
+    module_text_fit(machineSettingsHeader);
+    module_set_color(machineSettingsHeader, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(machineSettingsHeader,slopeValue);
+    module_align_center(machineSettingsHeader);
+    module_text_underline(machineSettingsHeader);
+
+    // msZero Value
+    Module *msZeroValue = &(page->msZeroValue);
+    module_init(msZeroValue, forceWindow);
+    module_set_margin(msZeroValue, 8, 8);
+    module_set_text(msZeroValue, page->msZeroValueBuffer);
+    module_text_font(msZeroValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(msZeroValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(msZeroValue, machineSettingsHeader);
+    module_align_inner_left(msZeroValue);
+
+    // msSlope Value
+    Module *msSlopeValue = &(page->msSlopeValue);
+    module_init(msSlopeValue, forceWindow);
+    module_set_margin(msSlopeValue, 8, 8);
+    module_set_text(msSlopeValue, page->msZeroValueBuffer);
+    module_text_font(msSlopeValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(msSlopeValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(msSlopeValue, msZeroValue);
+    module_align_inner_left(msSlopeValue);
+
+    // Force Value
+    Module *forceValue = &(page->forceValue);
+    module_init(forceValue, forceWindow);
+    module_set_margin(forceValue, 8, 8);
+    module_set_text(forceValue, page->msSlopeValueBuffer);
+    module_text_font(forceValue, RA8876_CHAR_HEIGHT_24);
+    module_set_color(forceValue, MAINTEXTCOLOR, MAINCOLOR);
+    module_align_below(forceValue, msSlopeValue);
+    module_align_inner_left(forceValue);
+
+    // Action button
+    Module *actionButton = &(page->actionButton);
+    module_init(actionButton, forceWindow);
+    module_set_rectangle_circle(actionButton, 50, 100);
+    module_set_color(actionButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
+    module_add_border(actionButton, COLOR65K_RED, 3);
+    module_set_margin(actionButton, 10, 10);
+    module_fit_below(actionButton, forceValue);
+    module_align_center(actionButton);
+    module_touch_callback(actionButton, button_callback, BUTTON_STATUS);
+
 }
 
 // returns 1 if someting is updated
 bool calibrate_force_page_run(CalibratePage *page)
 {
     bool infoUpdated = false;
+    complete = false;
     printf("Force Calibration page running\n");
 
-    display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
-    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-    complete = false;
-
-    char buf[50];
-    strcpy(buf, "Calibrate");
-    int titlex = SCREEN_WIDTH / 2 - strlen(buf) * 16;
-    int titley = 10;
-    display_draw_string(page->display, titlex, titley, buf);
-
-    display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
-    display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
-    display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-
-    int calibrateX0 = 20;
-    int calibrateX1 = SCREEN_WIDTH / 3 - 10;
-    int calibrateY0 = 100;
-    int calibrateY1 = SCREEN_HEIGHT - 20;
-    int calibrateWidth = calibrateX1 - calibrateX0;
-
-    /*Section windows*/
-    // calibrate window
-    display_draw_circle_square_fill(page->display, calibrateX0, calibrateY0, calibrateX1, calibrateY1, 20, 20, MAINCOLOR);
-
-    /*Main headers*/
-    strcpy(buf, "Force");
-    int calibrateStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
-    int calibrateStartY = calibrateY0 + 20;
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    display_draw_string(page->display, calibrateStartX, calibrateStartY, buf);
-    display_draw_line(page->display, calibrateStartX, calibrateStartY + 30, calibrateStartX + strlen(buf) * 16, calibrateStartY + 30, MAINTEXTCOLOR);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-
-    strcpy(buf, "Machine Settings");
-    int machineStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
-    int machineStartY = calibrateY0 + 200;
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-    display_draw_string(page->display, machineStartX, machineStartY, buf);
-    display_draw_line(page->display, machineStartX, machineStartY + 30, machineStartX + strlen(buf) * 16, machineStartY + 30, MAINTEXTCOLOR);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
-
-    Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
-    page->buttons = buttons;
-
-    buttons[1].name = BUTTON_NAVIGATION;
-    buttons[1].xmin = SCREEN_WIDTH - 100;
-    buttons[1].xmax = buttons[1].xmin + 100;
-    buttons[1].ymin = 0;
-    buttons[1].ymax = buttons[1].ymin + 100;
-    buttons[1].pressed = false;
-    buttons[1].lastPress = 0;
-
-    buttons[0].name = BUTTON_FORCE_NAVIGATION;
-    buttons[0].xmin = calibrateX0 + calibrateWidth / 2 - 100;
-    buttons[0].xmax = buttons[0].xmin + 200;
-    buttons[0].ymin = calibrateY1 - 30 - 100;
-    buttons[0].ymax = buttons[0].ymin + 100;
-    buttons[0].pressed = false;
-    buttons[0].lastPress = 0;
-
-    Image navigationImg = page->images->navigationImage;
-    display_bte_memory_copy_image(page->display, &navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
-    display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
+    module_draw(page->display, &(page->root));
 
     page->state = 0;
     int lastState = -1;
-    ForceCalibration forceCalibration;
+    int slope;
+    int zero;
     int currentMills = 0;
     int lastMills = 0;
     int currentForce = 0;
@@ -147,8 +204,8 @@ bool calibrate_force_page_run(CalibratePage *page)
         {
             if (page->state != lastState)
             {
-                forceCalibration.slope = 0;
-                forceCalibration.zero = 0;
+                slope = 0;
+                zero = 0;
                 strcpy(buf, "  Press start...  ");
                 actionStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
                 actionStartY = calibrateStartY + 35;
@@ -181,7 +238,7 @@ bool calibrate_force_page_run(CalibratePage *page)
         {
             if (page->state != lastState)
             {
-                forceCalibration.zero = currentForce;
+                zero = currentForce;
                 strcpy(buf, "   Set new force  ");
                 actionStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
                 actionStartY = calibrateStartY + 35;
@@ -201,15 +258,15 @@ bool calibrate_force_page_run(CalibratePage *page)
                 int force = currentForce;
                 Keyboard *keyboard = keyboard_create(page->display, page->images);
                 char *forceValue = keyboard_get_input(keyboard, "Force:");
-                float forceFloat = atof(forceValue);
+                double forceReal = atof(forceValue);
                 printf("force value:%s\n", forceValue);
-                if (forceValue == NULL || forceFloat > 5 || forceFloat < -5)
+                if (forceValue == NULL || forceReal > 5 || forceReal < -5)
                 {
                     page->state--;
                 }
                 else
                 {
-                    forceCalibration.slope = (float)(force - forceCalibration.zero) / (1000 * forceFloat); // steps/mN
+                    slope = (double)(force - zero) / (1000 * forceReal); // steps/mN
                     strcpy(buf, "Update new values?");
                     actionStartX = calibrateX0 + calibrateWidth / 2 - strlen(buf) * 8;
                     actionStartY = calibrateStartY + 35;
@@ -226,8 +283,8 @@ bool calibrate_force_page_run(CalibratePage *page)
         }
         else if (page->state == 4)
         {
-            page->machineProfile->configuration.forceGaugeScaleFactor = forceCalibration.slope;
-            page->machineProfile->configuration.forceGaugeZeroFactor = forceCalibration.zero;
+            page->machineProfile->configuration.forceGaugeScaleFactor = slope;
+            page->machineProfile->configuration.forceGaugeZeroFactor = zero;
             page->state = 10;
             infoUpdated = true;
         }
@@ -238,13 +295,13 @@ bool calibrate_force_page_run(CalibratePage *page)
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, readingStartX, readingStartY, buf);
 
-        sprintf(buf, "Zero: %d", forceCalibration.zero);
+        sprintf(buf, "Zero: %d", zero);
         int zeroPointStartX = readingStartX;
         int zeroPointStartY = readingStartY + 30;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, zeroPointStartX, zeroPointStartY, buf);
 
-        sprintf(buf, "Slope: %0.3f", forceCalibration.slope);
+        sprintf(buf, "Slope: %0.3f", slope);
         int slopePointStartX = readingStartX;
         int slopePointStartY = zeroPointStartY + 30;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
@@ -262,7 +319,7 @@ bool calibrate_force_page_run(CalibratePage *page)
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);
         display_draw_string(page->display, forceSlopeStartX, forceSlopeStartY, buf);
 
-        sprintf(buf, "Force: %0.3fN", ((float)(force - page->machineProfile->configuration.forceGaugeZeroFactor) / (page->machineProfile->configuration.forceGaugeScaleFactor * (float)1000))); // need to add it machine configuration
+        sprintf(buf, "Force: %0.3fN", ((double)(force - page->machineProfile->configuration.forceGaugeZeroFactor) / (page->machineProfile->configuration.forceGaugeScaleFactor * (double)1000))); // need to add it machine configuration
         int forceRealStartX = calibrateX0 + 10;
         int forceRealStartY = forceSlopeStartY + 30;
         display_text_color(page->display, MAINTEXTCOLOR, MAINCOLOR);

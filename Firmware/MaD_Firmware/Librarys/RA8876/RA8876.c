@@ -48,6 +48,8 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
   display->spi_clk = spi_clk;
   display->spi_mosi = spi_mosi;
   display->spi_miso = spi_miso;
+  
+  display->spi.start(spi_miso,spi_mosi,spi_clk,10000);
 
   display->i2cBus.setup(i2c_clk, i2c_sda, 100, 1); // 1.5k pullup
 
@@ -157,8 +159,10 @@ void lcdRegWrite(Display *display, uint8_t reg)
   _pinl(display->xnscs); // xnscs low
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_CMDWRITE);@todo implement spi interface
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)reg);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_CMDWRITE);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)reg);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_CMDWRITE);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)reg);
+  display->spi.shiftout(1,RA8876_SPI_CMDWRITE, (uint32_t)8);
+  display->spi.shiftout(1,reg, (uint32_t)8);
   _pinh(display->xnscs); // xnscs high
 }
 //**************************************************************//
@@ -168,8 +172,10 @@ void lcdDataWrite(Display *display, uint8_t data)
   _pinl(display->xnscs); // xnscs low
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data); @todo implement spi interface
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)RA8876_SPI_DATAWRITE);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)data);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)RA8876_SPI_DATAWRITE);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, 8, (uint8_t)data);
+  display->spi.shiftout(1,RA8876_SPI_DATAWRITE, (uint32_t)8);
+  display->spi.shiftout(1,data, (uint32_t)8);
   _pinh(display->xnscs); // xnscs high
 }
 //**************************************************************//
@@ -178,10 +184,12 @@ uint8_t lcdDataRead(Display *display)
 {
   _pinl(display->xnscs); // xnscs low
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAREAD);@todo implement spi interface
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAREAD);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAREAD);
+  display->spi.shiftout(1,RA8876_SPI_DATAREAD, (uint32_t)8);
   _pinh(display->spi_mosi); // mosi high
   // uint8_t data = shift_in_fast(&spi_bus, 8);
-  uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
+  //uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
+  uint8_t data = display->spi.shiftin(1, (uint32_t)8);
   _pinh(display->xnscs); // xnscs high
   return data;
 }
@@ -191,10 +199,12 @@ uint8_t lcdStatusRead(Display *display)
 {
   _pinl(display->xnscs); // xnscs low
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_STATUSREAD);@todo implement spi interface
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_STATUSREAD);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_STATUSREAD);
+  display->spi.shiftout(1,RA8876_SPI_STATUSREAD, (uint32_t)8);
   _pinh(display->spi_mosi); // mosi high
   // uint8_t data = shift_in_fast(&spi_bus, 8);
-  uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
+  //uint8_t data = shift_in(display->spi_miso, display->spi_clk, LSBFIRST, (uint32_t)8);
+  uint8_t data = display->spi.shiftin(1, (uint32_t)8);
   _pinh(display->xnscs); // xnscs high
   return data;
 }
@@ -223,9 +233,12 @@ void lcdDataWrite16bbp(Display *display, uint16_t data)
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);@todo implement spi interface
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data);
   // shift_out_fast(&spi_bus, (uint32_t)8, (uint32_t)data >> 8);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data);
-  shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data >> 8);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)RA8876_SPI_DATAWRITE);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data);
+  //shift_out(display->spi_mosi, display->spi_clk, MSBFIRST, (uint32_t)8, (uint32_t)data >> 8);
+  display->spi.shiftout(1,RA8876_SPI_DATAWRITE, (uint32_t)8);
+  display->spi.shiftout(1,data, (uint32_t)8);
+  display->spi.shiftout(1,data >> 8, (uint32_t)8);
   _pinh(display->xnscs); // xnscs high
 }
 

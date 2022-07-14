@@ -43,30 +43,30 @@
 typedef struct MachineConfiguration_s
 {
     char motorType[MAX_CONFIGURATION_MOTOR_TYPE];             // Motor used for the machine (model)
-    float maxMotorTorque;                                     // Maximum torque of the motor (Nm)
-    float maxMotorRPM;                                        // Maximum RPM of the motor (RPM)
-    float gearDiameter;                                       // Diameter of the gear (mm)
-    float gearPitch;                                          // Pitch of the gear (mm)
-    float systemIntertia;                                     // Total inertia of the system (kgm2)
-    float staticTorque;                                       // Static torque of the motor (Nm)
-    float load;                                               // Estimated load of the system (N)
+    double maxMotorTorque;                                     // Maximum torque of the motor (Nm)
+    double maxMotorRPM;                                        // Maximum RPM of the motor (RPM)
+    double gearDiameter;                                       // Diameter of the gear (mm)
+    double gearPitch;                                          // Pitch of the gear (mm)
+    double systemIntertia;                                     // Total inertia of the system (kgm2)
+    double staticTorque;                                       // Static torque of the motor (Nm)
+    double load;                                               // Estimated load of the system (N)
     char positionEncoderType[MAX_CONFIGURATION_ENCODER_TYPE]; // Encoder used for the position measurement (encoder or distance scale)
-    float positionEncoderStepsPerRev;                         // steps per mm of position encoder (step/mm)
+    double positionEncoderStepsPerRev;                         // steps per mm of position encoder (step/mm)
     char forceGauge[MAX_CONFIGURATION_FORCE_GAUGE];           // Force gauge used (model)
-    float forceGaugeScaleFactor;                              // Force scale factor (mN/step)
+    double forceGaugeScaleFactor;                              // Force scale factor (mN/step)
     int forceGaugeZeroFactor;                                 // Force offset (steps)
 } MachineConfiguration;
 
 #define MACHINE_PERFORMANCE_FIELD_COUNT 7
 typedef struct MachinePerformance_s
 {
-    float minPosition;             // Minimum position of the motor (mm)
-    float maxPosition;             // Maximum position of the motor (mm)
-    float maxVelocity;             // Maximum velocity of the motor (mm/s)
-    float maxAcceleration;         // Maximum acceleration of the motor (mm/s2)
-    float maxForceTensile;         // Maximum force tensile of the motor (N)
-    float maxForceCompression;     // Maximum force compression of the motor (N)
-    float forceGaugeNeutralOffset; // Force gauge neutral offset (N)
+    double minPosition;             // Minimum position of the motor (mm)
+    double maxPosition;             // Maximum position of the motor (mm)
+    double maxVelocity;             // Maximum velocity of the motor (mm/s)
+    double maxAcceleration;         // Maximum acceleration of the motor (mm/s2)
+    double maxForceTensile;         // Maximum force tensile of the motor (N)
+    double maxForceCompression;     // Maximum force compression of the motor (N)
+    double forceGaugeNeutralOffset; // Force gauge neutral offset (N)
 } MachinePerformance;
 
 #define MACHINE_PROFILE_FIELD_COUNT MACHINE_PERFORMANCE_FIELD_COUNT + MACHINE_CONFIGURATION_FIELD_COUNT + 2
@@ -85,8 +85,8 @@ typedef struct MotionQuartet_s
 {
     char name[MAX_MOTION_QUARTET_NAME];              // Filename of the motion quartet
     int function;                                    // Motion function type
-    float parameters[MAX_MOTION_QUARTET_PARAMETERS]; // Parameters of the motion quartet (max 10)
-    float dwell;                                     // Dwell of the motion quartet (us)
+    double parameters[MAX_MOTION_QUARTET_PARAMETERS]; // Parameters of the motion quartet (max 10)
+    double dwell;                                     // Dwell of the motion quartet (us)
 } MotionQuartet;
 
 #define MOTION_SET_FIELD_COUNT 5 + 10
@@ -114,13 +114,13 @@ typedef struct SampleProfile_s
 {
     char *name;                // Name of the sample profile
     int number;                // Number of the sample profile
-    float length;              // Length of the sample profile (mm)
-    float stretchMax;          // Maximum stretch of the sample profile (% of length)
-    float maxVelocity;         // Maximum velocity of the sample profile (mm/s)
-    float maxAcceleration;     // Maximum acceleration of the sample profile (mm/s2)
-    float maxJerk;             // Maximum jerk of the sample profile (mm/s3)
-    float maxForceTensile;     // Maximum force tensile of the sample profile (N)
-    float maxForceCompression; // Maximum force compression of the sample profile (N)
+    double length;              // Length of the sample profile (mm)
+    double stretchMax;          // Maximum stretch of the sample profile (% of length)
+    double maxVelocity;         // Maximum velocity of the sample profile (mm/s)
+    double maxAcceleration;     // Maximum acceleration of the sample profile (mm/s2)
+    double maxJerk;             // Maximum jerk of the sample profile (mm/s3)
+    double maxForceTensile;     // Maximum force tensile of the sample profile (N)
+    double maxForceCompression; // Maximum force compression of the sample profile (N)
 
 } SampleProfile;
 

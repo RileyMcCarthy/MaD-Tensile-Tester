@@ -9,17 +9,6 @@
 #define READ_DRIVE_STATUS 0x09
 #define IS_STATUS 0x19
 
-DYN4 *dyn4_create()
-{
-    DYN4 *dyn4 = (DYN4 *)malloc(sizeof(DYN4));
-    return dyn4;
-}
-
-void dyn4_destroy(DYN4 *dyn4)
-{
-    free(dyn4);
-}
-
 /**
  * @brief Begin communication with the servo controller
  *
@@ -145,7 +134,7 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
         n = 1;
     }
     int package_size = 3 + n;
-    uint8_t *bytes = malloc(sizeof(uint8_t) * package_size);
+    uint8_t bytes[10];
     bytes[package_size - 1] = dyn4->device_id;
     bytes[package_size - 2] = 0x80 + ((n - 1) << 5) + command; // 0x80 is because the first bit is always 1
     // printf("starting commnad:bytes:%d,data%d\n", n, data);
@@ -163,5 +152,4 @@ void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
         dyn4->serial.tx(bytes[i]);
         //   printf("bytes[%d]=%d\n", i, bytes[i]);
     }
-    free(bytes);
 }

@@ -10,19 +10,14 @@
 typedef struct monitor_data_t
 {
     int forceRaw;   // Raw force value
-    int force;      // Force in milliNewtons
     int encoderRaw; // Raw encoder value
-    int positionum; // Position in um
-    int timems;     // time in us
+    int timems;     // time in ms
 } MonitorData;
 
 typedef struct monitor_cog_t
 {
-    DYN4 *dyn4;
-    ForceGauge *forceGauge;
-    MachineProfile *profile;
-    Encoder *encoder;
     MonitorData data; // add list
+    MachineState *machineState;
     int sampleRate;   // sample rate in hz
     int cogid;
 } Monitor;
@@ -30,6 +25,6 @@ typedef struct monitor_cog_t
 Monitor *monitor_create();
 void monitor_destroy(Monitor *monitor);
 
-bool monitor_begin(Monitor *monitor, DYN4 *dyn4, ForceGauge *forceGauge, MachineProfile *profile, int sampleRate);
+bool monitor_begin(Monitor *monitor, MachineState *machineState, int sampleRate);
 void monitor_set_position(int position);
 #endif

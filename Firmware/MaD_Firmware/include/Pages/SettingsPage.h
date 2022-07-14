@@ -9,14 +9,12 @@
 #include "JSON.h"
 #include "Keyboard.h"
 #include <stdbool.h>
-#include "Button.h"
 
 typedef struct SettingsPage_s
 {
     bool complete;
     MachineProfile *machineProfile;
     Display *display;
-    Button *buttons;
     Images *images;
 } SettingsPage;
 

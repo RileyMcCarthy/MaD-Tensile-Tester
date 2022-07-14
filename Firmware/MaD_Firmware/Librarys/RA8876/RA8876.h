@@ -18,6 +18,7 @@ Version   : v1.0
 #include <stdlib.h>
 
 typedef struct __using("jm_i2c.spin2") I2CBus;
+typedef struct __using("jm_spi.spin2") SPI;
 
 #define RA8876_SPI_CMDWRITE 0x00
 #define RA8876_SPI_DATAWRITE 0x80
@@ -811,6 +812,7 @@ typedef struct RA8876_s
     TouchLocation lastLocation[1];
     int locationCount;
     I2CBus i2cBus;
+    SPI spi;
     int currentPage;
 } Display;
 

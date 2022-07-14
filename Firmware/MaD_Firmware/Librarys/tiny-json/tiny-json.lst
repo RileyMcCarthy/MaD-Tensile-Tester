@@ -1,0 +1,796 @@
+00000                 | 
+00000                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00000                 | #line 30 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00000                 | #line 1 "C:/flexprop/include/string.h"
+00000                 | #line 4 "C:/flexprop/include/string.h"
+00000                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 |   typedef  unsigned long  size_t;
+00000                 | #line 5 "C:/flexprop/include/string.h"
+00000                 | #line 1 "C:/flexprop/include/sys/null.h"
+00000                 | #line 6 "C:/flexprop/include/string.h"
+00000                 | #line 1 "C:/flexprop/include/compiler.h"
+00000                 | #line 7 "C:/flexprop/include/string.h"
+00000                 | #line 12 "C:/flexprop/include/string.h"
+00000                 |     void * memcpy(void *dest, const void *src, size_t n)  __fromfile("libc/string/memcpy.c") ;
+00000                 |     void * memmove(void *dest, const void *src, size_t n)  __fromfile("libc/string/memmove.c") ;
+00000                 | 
+00000                 |     char * strcpy(char * __restrict dest, const char * __restrict src)  __fromfile("libc/string/strcpy.c") ;
+00000                 |     char * strncpy(char * __restrict dest, const char * __restrict src, size_t n)  __fromfile("libc/string/strncpy.c") ;
+00000                 |     char * strcat(char * __restrict dest, const char * __restrict src)  __fromfile("libc/string/strcat.c") ;
+00000                 |     char * strncat(char * __restrict dest, const char * __restrict src, size_t n)  __fromfile("libc/string/strncat.c") ;
+00000                 | 
+00000                 |     size_t strcspn(char *s, const char *accept)  __fromfile("libc/string/strcspn.c") ;
+00000                 |     size_t strspn(char *s, const char *reject)  __fromfile("libc/string/strspn.c") ;
+00000                 | 
+00000                 |     int memcmp(const void *s1, const void *s2, size_t n)  __fromfile("libc/string/memcmp.c") ;
+00000                 |     int strcmp(const char *s1, const char *s2)  __fromfile("libc/string/strcmp.c") ;
+00000                 |     int strcoll(const char *s1, const char *s2);
+00000                 |     int strncmp(const char *s1, const char *s2, size_t n)  __fromfile("libc/string/strncmp.c") ;
+00000                 |     size_t strxfrm(char *dest, const char *src, size_t n);
+00000                 | 
+00000                 |     char * strdup (const char *s1)  __fromfile("libc/string/strdup.c") ;
+00000                 | 
+00000                 |     void * memchr(const void *s, int c, size_t n)  __fromfile("libc/string/memchr.c") ;
+00000                 |     char * strchr(const char *, int)  __fromfile("libc/string/strchr.c") ;
+00000                 |     size_t strcspn(const char *s1, const char *s2);
+00000                 |     char * strpbrk(const char *str, const char *accept);
+00000                 |     char * strrchr(const char *, int)  __fromfile("libc/string/strrchr.c") ;
+00000                 |     size_t strspn(const char *, const char *);
+00000                 |     char * strstr(const char *src, const char *pattern)  __fromfile("libc/string/strstr.c") ;
+00000                 |     char * strtok(char * __restrict str, const char * __restrict delim);
+00000                 | 
+00000                 | 
+00000                 |     void * memset(void *dest, int c, size_t n)  __fromfile("libc/string/memset.c") ;
+00000                 |     char * strerror(int err)  __fromfile("libc/string/strerror.c") ;
+00000                 |     size_t strlen(const char *s)  __fromfile("libc/string/strlen.c") ;
+00000                 | 
+00000                 |     extern int _strcasecmp(const char *s1, const char *s2);
+00000                 |     extern int _strncasecmp(const char *s1, const char *s2, size_t n);
+00000                 | 
+00000                 |     char *_strrev(char *str);
+00000                 |     char *_strupr(char *str);
+00000                 | 
+00000                 | 
+00000                 |     int strcasecmp(const char *s1, const char *s2)  __fromfile("libc/string/strcasecmp.c") ;
+00000                 |     int strncasecmp(const char *s1, const char *s2, size_t n)  __fromfile("libc/string/strncasecmp.c") ;
+00000                 | #line 31 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00000                 | #line 1 "C:/flexprop/include/ctype.h"
+00000                 | #line 35 "C:/flexprop/include/ctype.h"
+00000                 | #line 1 "C:/flexprop/include/sys/ctype.h"
+00000                 | #line 14 "C:/flexprop/include/sys/ctype.h"
+00000                 | unsigned __ctype_get(unsigned c) __fromfile("libc/misc/ctype.c");
+00000                 | #line 36 "C:/flexprop/include/ctype.h"
+00000                 | 
+00000                 |     int isalnum(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isalpha(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isblank(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int iscntrl(int c)  __fromfile("libc/misc/iscntrl.c") ;
+00000                 |     int isdigit(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isgraph(int c)  __fromfile("libc/misc/isgraph.c") ;
+00000                 |     int islower(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isprint(int c)  __fromfile("libc/misc/isprint.c") ;
+00000                 |     int ispunct(int c)  __fromfile("libc/misc/ispunct.c") ;
+00000                 |     int isspace(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isupper(int c)  __fromfile("libc/misc/ctype.c") ;
+00000                 |     int isxdigit(int c)  __fromfile("libc/misc/isxdigit.c") ;
+00000                 | 
+00000                 |     int tolower(int c)  __fromfile("libc/misc/tolower.c") ;
+00000                 |     int toupper(int c)  __fromfile("libc/misc/toupper.c") ;
+00000                 | #line 155 "C:/flexprop/include/ctype.h"
+00000                 | int tolower(int c);
+00000                 | #line 169 "C:/flexprop/include/ctype.h"
+00000                 | int toupper(int c);
+00000                 | #line 32 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00000                 | #line 1 "tiny-json.h"
+00000                 | #line 33 "tiny-json.h"
+00000                 | #line 1 "C:/flexprop/include/stddef.h"
+00000                 | #line 4 "C:/flexprop/include/stddef.h"
+00000                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+00000                 | #line 5 "C:/flexprop/include/stddef.h"
+00000                 | #line 1 "C:/flexprop/include/sys/null.h"
+00000                 | #line 6 "C:/flexprop/include/stddef.h"
+00000                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+00000                 | #line 15 "C:/flexprop/include/sys/wchar_t.h"
+00000                 | typedef int wchar_t;
+00000                 | #line 24 "C:/flexprop/include/sys/wchar_t.h"
+00000                 | typedef struct _Mbstate {
+00000                 |   unsigned int total:5;
+00000                 |   unsigned int left:5;
+00000                 |   unsigned int partial:22;
+00000                 | } _Mbstate_t;
+00000                 | #line 7 "C:/flexprop/include/stddef.h"
+00000                 | 
+00000                 | typedef long ptrdiff_t;
+00000                 | #line 34 "tiny-json.h"
+00000                 | #line 1 "C:/flexprop/include/stdlib.h"
+00000                 | #line 5 "C:/flexprop/include/stdlib.h"
+00000                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+00000                 | #line 6 "C:/flexprop/include/stdlib.h"
+00000                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+00000                 | #line 7 "C:/flexprop/include/stdlib.h"
+00000                 | #line 1 "C:/flexprop/include/sys/null.h"
+00000                 | #line 8 "C:/flexprop/include/stdlib.h"
+00000                 | #line 22 "C:/flexprop/include/stdlib.h"
+00000                 |     double atof(const char *);
+00000                 |     int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+00000                 |     long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+00000                 |     long long atoll(const char *);
+00000                 | 
+00000                 |   long double strtold(const char *nptr, char **endptr);
+00000                 |   double strtod(const char *nptr, char **endptr);
+00000                 |   float strtof(const char *nptr, char **endptr);
+00000                 | 
+00000                 |     long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+00000                 |     unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+00000                 |   long long strtoll(const char *nptr, char **endptr, int base);
+00000                 |   unsigned long long strtoull(const char *nptr, char **endptr, int base);
+00000                 | 
+00000                 | 
+00000                 |     int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+00000                 |     void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+00000                 | 
+00000                 |     void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+00000                 |     void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+00000                 |     void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+00000                 |     void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+00000                 | 
+00000                 | 
+00000                 |     int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+00000                 |      void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+00000                 |      void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+00000                 |      void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+00000                 |    void _exit(int status);
+00000                 | #line 56 "C:/flexprop/include/stdlib.h"
+00000                 |    long labs(long l);
+00000                 | 
+00000                 | 
+00000                 |    long long llabs(long long ll);
+00000                 | 
+00000                 | 
+00000                 |   typedef struct {
+00000                 |     int quot, rem;
+00000                 |   } div_t;
+00000                 | 
+00000                 |   typedef struct {
+00000                 |     long int quot, rem;
+00000                 |   } ldiv_t;
+00000                 | 
+00000                 |   typedef struct {
+00000                 |     long long quot, rem;
+00000                 |   } lldiv_t;
+00000                 | 
+00000                 |   div_t div(int num, int denom);
+00000                 |   ldiv_t ldiv(long num, long denom);
+00000                 |   lldiv_t lldiv(long long num, long long denom);
+00000                 | 
+00000                 |     void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+00000                 |   void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+00000                 | 		int (*compare)(const void *, const void *));
+00000                 | 
+00000                 |     char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+00000                 |     int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+00000                 | 
+00000                 | 
+00000     00 00 00 00 |   extern int _mb_cur_max;
+00004                 | 
+00004                 | 
+00004                 | 
+00004                 |   int mblen(const char *s, size_t n);
+00004                 |   int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+00004                 |   size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+00004                 | 
+00004                 | 
+00004                 |   int system(const char *command);
+00004                 | #line 102 "C:/flexprop/include/stdlib.h"
+00004                 |     int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+00004                 |     int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+00004                 | #line 35 "tiny-json.h"
+00004                 | #line 1 "C:/flexprop/include/stdbool.h"
+00004                 | #line 36 "tiny-json.h"
+00004                 | #line 1 "C:/flexprop/include/stdint.h"
+00004                 | 
+00004                 | 
+00004                 | 
+00004                 | typedef signed char int8_t;
+00004                 | typedef unsigned char uint8_t;
+00004                 | 
+00004                 | typedef signed short int16_t;
+00004                 | typedef unsigned short uint16_t;
+00004                 | 
+00004                 | typedef signed long int32_t;
+00004                 | typedef unsigned long uint32_t;
+00004                 | 
+00004                 | typedef long long int64_t;
+00004                 | typedef unsigned long long uint64_t;
+00004                 | 
+00004                 | typedef unsigned long uintptr_t;
+00004                 | typedef long intptr_t;
+00004                 | 
+00004                 | typedef int64_t intmax_t;
+00004                 | typedef uint64_t uintmax_t;
+00004                 | 
+00004                 | typedef int8_t int_least8_t;
+00004                 | typedef int16_t int_least16_t;
+00004                 | typedef int32_t int_least32_t;
+00004                 | typedef int64_t int_least64_t;
+00004                 | 
+00004                 | typedef uint8_t uint_least8_t;
+00004                 | typedef uint16_t uint_least16_t;
+00004                 | typedef uint32_t uint_least32_t;
+00004                 | typedef uint64_t uint_least64_t;
+00004                 | 
+00004                 | typedef int32_t int_fast8_t;
+00004                 | typedef int32_t int_fast16_t;
+00004                 | typedef int32_t int_fast32_t;
+00004                 | typedef int64_t int_fast64_t;
+00004                 | 
+00004                 | typedef uint32_t uint_fast8_t;
+00004                 | typedef uint32_t uint_fast16_t;
+00004                 | typedef uint32_t uint_fast32_t;
+00004                 | typedef uint64_t uint_fast64_t;
+00004                 | #line 37 "tiny-json.h"
+00004                 | #line 45 "tiny-json.h"
+00004                 | typedef enum
+00004                 | {
+00004                 |     JSON_OBJ,
+00004                 |     JSON_ARRAY,
+00004                 |     JSON_TEXT,
+00004                 |     JSON_BOOLEAN,
+00004                 |     JSON_INTEGER,
+00004                 |     JSON_REAL,
+00004                 |     JSON_NULL
+00004                 | } jsonType_t;
+00004                 | 
+00004                 | 
+00004                 | typedef struct json_s
+00004                 | {
+00004                 |     struct json_s *sibling;
+00004                 |     char const *name;
+00004                 |     union
+00004                 |     {
+00004                 |         char const *value;
+00004                 |         struct
+00004                 |         {
+00004                 |             struct json_s *child;
+00004                 |             struct json_s *last_child;
+00004                 |         } c;
+00004                 |     } u;
+00004                 |     jsonType_t type;
+00004                 | } json_t;
+00004                 | #line 80 "tiny-json.h"
+00004                 | json_t const *json_create(char *str, json_t *mem, unsigned int qty);
+00004                 | #line 86 "tiny-json.h"
+00004                 | const char *json_getName(json_t const *json);
+00004                 | #line 92 "tiny-json.h"
+00004                 | const char *json_getValue(json_t const *property);
+00004                 | #line 97 "tiny-json.h"
+00004                 | jsonType_t json_getType(json_t const *json);
+00004                 | #line 103 "tiny-json.h"
+00004                 | json_t const *json_getSibling(json_t const *json);
+00004                 | #line 110 "tiny-json.h"
+00004                 | json_t const *json_getProperty(json_t const *obj, char const *property);
+00004                 | #line 117 "tiny-json.h"
+00004                 | char const *json_getPropertyValue(json_t const *obj, char const *property);
+00004                 | #line 124 "tiny-json.h"
+00004                 | json_t *json_getChild(json_t const *json);
+00004                 | #line 129 "tiny-json.h"
+00004                 | _Bool  json_getBoolean(json_t const *property);
+00004                 | #line 134 "tiny-json.h"
+00004                 | int json_getInteger(json_t const *property);
+00004                 | #line 138 "tiny-json.h"
+00004                 | double json_getReal(json_t const *property);
+00004                 | 
+00004                 | 
+00004                 | typedef struct jsonPool_s jsonPool_t;
+00004                 | struct jsonPool_s
+00004                 | {
+00004                 |     json_t *(*init)(jsonPool_t *pool);
+00004                 |     json_t *(*alloc)(jsonPool_t *pool);
+00004                 | };
+00004                 | #line 154 "tiny-json.h"
+00004                 | json_t const *json_createWithPool(char *str, jsonPool_t *pool);
+00004                 | #line 33 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | #line 38 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | _Bool  isOneOfThem(char ch, char const *set)
+00004                 | {
+00004                 |     while (*set != '\0')
+00004                 |     {
+00004                 |         if (ch == *set++)
+00004                 |             return  (1) ;
+00004                 |     }
+00004                 |     return  (0) ;
+00004                 | }
+00004                 | #line 52 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | char *goWhile(char *str, char const *set)
+00004                 | {
+00004                 |     for (; *str != '\0'; ++str)
+00004                 |     {
+00004                 |         if (!isOneOfThem(*str, set))
+00004                 |             return str;
+00004                 |     }
+00004                 |     return 0;
+00004                 | }
+00004                 | #line 65 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | char *goBlank(char *str)
+00004                 | {
+00004                 |     return goWhile(str, " \n\r\t\f");
+00004                 | }
+00004                 | #line 73 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | char *goNum(char *str)
+00004                 | {
+00004                 |     for (; *str != '\0'; ++str)
+00004                 |     {
+00004                 |         if (!isdigit((int)(*str)))
+00004                 |             return str;
+00004                 |     }
+00004                 |     return 0;
+00004                 | }
+00004                 | #line 88 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | char *setToNull(char *ch)
+00004                 | {
+00004                 |     if (!isOneOfThem(*ch, "}]"))
+00004                 |         *ch++ = '\0';
+00004                 |     return ch;
+00004                 | }
+00004                 | 
+00004                 | 
+00004                 | _Bool  isEndOfPrimitive(char ch)
+00004                 | {
+00004                 |     return ch == ',' || isOneOfThem(ch, " \n\r\t\f") || isOneOfThem(ch, "}]");
+00004                 | }
+00004                 | 
+00004                 | const char *json_getName(json_t const *json)
+00004                 | {
+00004                 |     return json->name;
+00004                 | }
+00004                 | 
+00004                 | const char *json_getValue(json_t const *property)
+00004                 | {
+00004                 |     return property->u.value;
+00004                 | }
+00004                 | 
+00004                 | jsonType_t json_getType(json_t const *json)
+00004                 | {
+00004                 |     return json->type;
+00004                 | }
+00004                 | 
+00004                 | json_t *json_getSibling(json_t const *json)
+00004                 | {
+00004                 |     return json->sibling;
+00004                 | }
+00004                 | 
+00004                 | json_t *json_getChild(json_t const *json)
+00004                 | {
+00004                 |     return json->u.c.child;
+00004                 | }
+00004                 | 
+00004                 | _Bool  json_getBoolean(json_t const *property)
+00004                 | {
+00004                 |     return *property->u.value == 't';
+00004                 | }
+00004                 | 
+00004                 | int json_getInteger(json_t const *property)
+00004                 | {
+00004                 |     return atoi(property->u.value);
+00004                 | }
+00004                 | 
+00004                 | double json_getReal(json_t const *property)
+00004                 | {
+00004                 |     return atof(property->u.value);
+00004                 | }
+00004                 | 
+00004                 | 
+00004                 | typedef struct jsonStaticPool_s
+00004                 | {
+00004                 |     json_t *mem;
+00004                 |     unsigned int qty;
+00004                 |     unsigned int nextFree;
+00004                 |     jsonPool_t pool;
+00004                 | } jsonStaticPool_t;
+00004                 | 
+00004                 | 
+00004                 | json_t const *json_getProperty(json_t const *obj, char const *property)
+00004                 | {
+00004                 |     json_t const *sibling;
+00004                 |     for (sibling = obj->u.c.child; sibling; sibling = sibling->sibling)
+00004                 |         if (sibling->name && !strcmp(sibling->name, property))
+00004                 |             return sibling;
+00004                 |     return 0;
+00004                 | }
+00004                 | 
+00004                 | 
+00004                 | char const *json_getPropertyValue(json_t const *obj, char const *property)
+00004                 | {
+00004                 |     json_t const *field = json_getProperty(obj, property);
+00004                 |     if (!field)
+00004                 |         return 0;
+00004                 |     jsonType_t type = json_getType(field);
+00004                 |     if (JSON_ARRAY >= type)
+00004                 |         return 0;
+00004                 |     return json_getValue(field);
+00004                 | }
+00004                 | 
+00004                 | 
+00004                 | json_t const *json_createWithPool(char *str, jsonPool_t *pool)
+00004                 | {
+00004                 |     char *ptr = goBlank(str);
+00004                 |     if (!ptr || (*ptr != '{' && *ptr != '['))
+00004                 |     {
+00004                 |         printf("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
+00004                 |         return 0;
+00004                 |     }
+00004                 |     json_t *obj = pool->init(pool);
+00004                 |     obj->name = 0;
+00004                 |     obj->sibling = 0;
+00004                 |     obj->u.c.child = 0;
+00004                 |     ptr = objValue(ptr, obj, pool);
+00004                 |     if (!ptr)
+00004                 |     {
+00004                 |         printf("Error: json_createWithPool: invalid json string.\n");
+00004                 |         return 0;
+00004                 |     }
+00004                 |     return obj;
+00004                 | }
+00004                 | 
+00004                 | 
+00004                 | json_t const *json_create(char *str, json_t *mem, unsigned int qty)
+00004                 | {
+00004                 |     jsonStaticPool_t spool;
+00004                 |     spool.mem = mem;
+00004                 |     spool.qty = qty;
+00004                 |     spool.pool.init = poolInit;
+00004                 |     spool.pool.alloc = poolAlloc;
+00004                 |     return json_createWithPool(str, &spool.pool);
+00004                 | }
+00004                 | #line 209 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00004                 | char getEscape(char ch)
+00004                 | {
+00004                 |     static struct
+00004                 |     {
+00004                 |         char ch;
+00004                 |         char code;
+00004                 |     } const pair[] = {
+00004                 |         {'\"', '\"'},
+00004                 |         {'\\', '\\'},
+00004                 |         {'/', '/'},
+00004                 |         {'b', '\b'},
+00004                 |         {'f', '\f'},
+00004                 |         {'n', '\n'},
+00004                 |         {'r', '\r'},
+00004                 |         {'t', '\t'},
+00004     22 22 00 00 
+00008     5C 5C 00 00 
+0000c     2F 2F 00 00 
+00010     62 08 00 00 
+00014     66 0C 00 00 
+00018     6E 0A 00 00 
+0001c     72 0D 00 00 
+00020     74 09 00 00 |     };
+00024                 |     unsigned int i;
+00024                 |     for (i = 0; i < sizeof pair / sizeof *pair; ++i)
+00024                 |         if (pair[i].ch == ch)
+00024                 |             return pair[i].code;
+00024                 |     return '\0';
+00024                 | }
+00024                 | #line 236 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | unsigned char getCharFromUnicode(unsigned char const *str)
+00024                 | {
+00024                 |     unsigned int i;
+00024                 |     for (i = 0; i < 4; ++i)
+00024                 |         if (!isxdigit(str[i]))
+00024                 |             return '\0';
+00024                 |     return '?';
+00024                 | }
+00024                 | #line 250 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *parseString(char *str)
+00024                 | {
+00024                 |     unsigned char *head = (unsigned char *)str;
+00024                 |     unsigned char *tail = (unsigned char *)str;
+00024                 |     for (; *head; ++head, ++tail)
+00024                 |     {
+00024                 |         if (*head == '\"')
+00024                 |         {
+00024                 |             *tail = '\0';
+00024                 |             return (char *)++head;
+00024                 |         }
+00024                 |         if (*head == '\\')
+00024                 |         {
+00024                 |             if (*++head == 'u')
+00024                 |             {
+00024                 |                 char const ch = getCharFromUnicode(++head);
+00024                 |                 if (ch == '\0')
+00024                 |                     return 0;
+00024                 |                 *tail = ch;
+00024                 |                 head += 3;
+00024                 |             }
+00024                 |             else
+00024                 |             {
+00024                 |                 char const esc = getEscape(*head);
+00024                 |                 if (esc == '\0')
+00024                 |                     return 0;
+00024                 |                 *tail = esc;
+00024                 |             }
+00024                 |         }
+00024                 |         else
+00024                 |             *tail = *head;
+00024                 |     }
+00024                 |     return 0;
+00024                 | }
+00024                 | #line 290 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *propertyName(char *ptr, json_t *property)
+00024                 | {
+00024                 |     property->name = ++ptr;
+00024                 |     ptr = parseString(ptr);
+00024                 |     if (!ptr)
+00024                 |         return 0;
+00024                 |     ptr = goBlank(ptr);
+00024                 |     if (!ptr)
+00024                 |         return 0;
+00024                 |     if (*ptr++ != ':')
+00024                 |         return 0;
+00024                 |     return goBlank(ptr);
+00024                 | }
+00024                 | #line 309 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *textValue(char *ptr, json_t *property)
+00024                 | {
+00024                 |     ++property->u.value;
+00024                 |     ptr = parseString(++ptr);
+00024                 |     if (!ptr)
+00024                 |         return 0;
+00024                 |     property->type = JSON_TEXT;
+00024                 |     return ptr;
+00024                 | }
+00024                 | #line 324 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *checkStr(char *ptr, char const *str)
+00024                 | {
+00024                 |     while (*str)
+00024                 |         if (*ptr++ != *str++)
+00024                 |             return 0;
+00024                 |     return ptr;
+00024                 | }
+00024                 | #line 340 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *primitiveValue(char *ptr, json_t *property, char const *value, jsonType_t type)
+00024                 | {
+00024                 |     ptr = checkStr(ptr, value);
+00024                 |     if (!ptr || !isEndOfPrimitive(*ptr))
+00024                 |         return 0;
+00024                 |     ptr = setToNull(ptr);
+00024                 |     property->type = type;
+00024                 |     return ptr;
+00024                 | }
+00024                 | #line 356 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *trueValue(char *ptr, json_t *property)
+00024                 | {
+00024                 |     return primitiveValue(ptr, property, "true", JSON_BOOLEAN);
+00024                 | }
+00024                 | #line 367 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *falseValue(char *ptr, json_t *property)
+00024                 | {
+00024                 |     return primitiveValue(ptr, property, "false", JSON_BOOLEAN);
+00024                 | }
+00024                 | #line 378 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *nullValue(char *ptr, json_t *property)
+00024                 | {
+00024                 |     return primitiveValue(ptr, property, "null", JSON_NULL);
+00024                 | }
+00024                 | #line 387 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *expValue(char *ptr)
+00024                 | {
+00024                 |     if (*ptr == '-' || *ptr == '+')
+00024                 |         ++ptr;
+00024                 |     if (!isdigit((int)(*ptr)))
+00024                 |         return 0;
+00024                 |     ptr = goNum(++ptr);
+00024                 |     return ptr;
+00024                 | }
+00024                 | #line 401 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *fraqValue(char *ptr)
+00024                 | {
+00024                 |     if (!isdigit((int)(*ptr)))
+00024                 |         return 0;
+00024                 |     ptr = goNum(++ptr);
+00024                 |     if (!ptr)
+00024                 |         return 0;
+00024                 |     return ptr;
+00024                 | }
+00024                 | #line 417 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+00024                 | char *numValue(char *ptr, json_t *property)
+00024                 | {
+00024                 |     if (*ptr == '-')
+00024                 |         ++ptr;
+00024                 |     if (!isdigit((int)(*ptr)))
+00024                 |         return 0;
+00024                 |     if (*ptr != '0')
+00024                 |     {
+00024                 |         ptr = goNum(ptr);
+00024                 |         if (!ptr)
+00024                 |             return 0;
+00024                 |     }
+00024                 |     else if (isdigit((int)(*++ptr)))
+00024                 |         return 0;
+00024                 |     property->type = JSON_INTEGER;
+00024                 |     if (*ptr == '.')
+00024                 |     {
+00024                 |         ptr = fraqValue(++ptr);
+00024                 |         if (!ptr)
+00024                 |             return 0;
+00024                 |         property->type = JSON_REAL;
+00024                 |     }
+00024                 |     if (*ptr == 'e' || *ptr == 'E')
+00024                 |     {
+00024                 |         ptr = expValue(++ptr);
+00024                 |         if (!ptr)
+00024                 |             return 0;
+00024                 |         property->type = JSON_REAL;
+00024                 |     }
+00024                 |     if (!isEndOfPrimitive(*ptr))
+00024                 |         return 0;
+00024                 |     if (JSON_INTEGER == property->type)
+00024                 |     {
+00024                 |         char const *value = property->u.value;
+00024                 |         _Bool  const negative = *value == '-';
+00024     2D 39 32 32 
+00028     33 33 37 32 
+0002c     30 33 36 38 
+00030     35 34 37 37 
+00034     35 38 30 38 
+00038     00          |         static char const min[] = "-9223372036854775808";
+00039     39 32 32 33 
+0003d     33 37 32 30 
+00041     33 36 38 35 
+00045     34 37 37 35 
+00049     38 30 37 00 |         static char const max[] = "9223372036854775807";
+0004d                 |         unsigned int const maxdigits = (negative ? sizeof min : sizeof max) - 1;
+0004d                 |         unsigned int const len = (unsigned int const)(ptr - value);
+0004d                 |         if (len > maxdigits)
+0004d                 |             return 0;
+0004d                 |         if (len == maxdigits)
+0004d                 |         {
+0004d                 |             char const tmp = *ptr;
+0004d                 |             *ptr = '\0';
+0004d                 |             char const *const threshold = negative ? min : max;
+0004d                 |             if (0 > strcmp(threshold, value))
+0004d                 |                 return 0;
+0004d                 |             *ptr = tmp;
+0004d                 |         }
+0004d                 |     }
+0004d                 |     ptr = setToNull(ptr);
+0004d                 |     return ptr;
+0004d                 | }
+0004d                 | #line 475 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+0004d                 | void add(json_t *obj, json_t *property)
+0004d                 | {
+0004d                 |     property->sibling = 0;
+0004d                 |     if (!obj->u.c.child)
+0004d                 |     {
+0004d                 |         obj->u.c.child = property;
+0004d                 |         obj->u.c.last_child = property;
+0004d                 |     }
+0004d                 |     else
+0004d                 |     {
+0004d                 |         obj->u.c.last_child->sibling = property;
+0004d                 |         obj->u.c.last_child = property;
+0004d                 |     }
+0004d                 | }
+0004d                 | #line 496 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+0004d                 | char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
+0004d                 | {
+0004d                 | 
+0004d                 | 
+0004d                 |     obj->type = *ptr == '{' ? JSON_OBJ : JSON_ARRAY;
+0004d                 |     obj->u.c.child = 0;
+0004d                 |     obj->sibling = 0;
+0004d                 |     ptr++;
+0004d                 |     for (;;)
+0004d                 |     {
+0004d                 |         ptr = goBlank(ptr);
+0004d                 | 
+0004d                 | 
+0004d                 |         if (!ptr)
+0004d                 |         {
+0004d                 |             printf("Error: Unexpected goblank error.\n");
+0004d                 |             return 0;
+0004d                 |         }
+0004d                 |         if (*ptr == ',')
+0004d                 |         {
+0004d                 |             ++ptr;
+0004d                 |             continue;
+0004d                 |         }
+0004d                 |         char endchar = (obj->type == JSON_OBJ) ? '}' : ']';
+0004d                 | 
+0004d                 |         if (*ptr == endchar)
+0004d                 |         {
+0004d                 |             *ptr = '\0';
+0004d                 |             json_t *parentObj = obj->sibling;
+0004d                 |             if (!parentObj)
+0004d                 |                 return ++ptr;
+0004d                 |             obj->sibling = 0;
+0004d                 |             obj = parentObj;
+0004d                 |             ++ptr;
+0004d                 |             continue;
+0004d                 |         }
+0004d                 |         json_t *property = pool->alloc(pool);
+0004d                 |         if (!property)
+0004d                 |         {
+0004d                 |             printf("Error: Unexpected allocation error.\n");
+0004d                 |             return 0;
+0004d                 |         }
+0004d                 |         if (obj->type != JSON_ARRAY)
+0004d                 |         {
+0004d                 | 
+0004d                 |             if (*ptr != '\"')
+0004d                 |             {
+0004d                 |                 printf("Error: Unexpected quote missing.\n");
+0004d                 |                 return 0;
+0004d                 |             }
+0004d                 |             ptr = propertyName(ptr, property);
+0004d                 |             if (!ptr)
+0004d                 |             {
+0004d                 |                 printf("Error: property name does not exist.\n");
+0004d                 |                 return 0;
+0004d                 |             }
+0004d                 |         }
+0004d                 |         else
+0004d                 |             property->name = 0;
+0004d                 |         add(obj, property);
+0004d                 |         property->u.value = ptr;
+0004d                 |         switch (*ptr)
+0004d                 |         {
+0004d                 |         case '{':
+0004d                 |             property->type = JSON_OBJ;
+0004d                 |             property->u.c.child = 0;
+0004d                 |             property->sibling = obj;
+0004d                 |             obj = property;
+0004d                 |             ++ptr;
+0004d                 |             break;
+0004d                 |         case '[':
+0004d                 |             property->type = JSON_ARRAY;
+0004d                 |             property->u.c.child = 0;
+0004d                 |             property->sibling = obj;
+0004d                 |             obj = property;
+0004d                 |             ++ptr;
+0004d                 |             break;
+0004d                 |         case '\"':
+0004d                 |             ptr = textValue(ptr, property);
+0004d                 |             break;
+0004d                 |         case 't':
+0004d                 |             ptr = trueValue(ptr, property);
+0004d                 |             break;
+0004d                 |         case 'f':
+0004d                 |             ptr = falseValue(ptr, property);
+0004d                 |             break;
+0004d                 |         case 'n':
+0004d                 |             ptr = nullValue(ptr, property);
+0004d                 |             break;
+0004d                 |         default:
+0004d                 |             ptr = numValue(ptr, property);
+0004d                 |             break;
+0004d                 |         }
+0004d                 |         if (!ptr)
+0004d                 |         {
+0004d                 |             printf("Error: unable to parse value.\n");
+0004d                 |             return 0;
+0004d                 |         }
+0004d                 |     }
+0004d                 | }
+0004d                 | #line 600 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+0004d                 | json_t *poolInit(jsonPool_t *pool)
+0004d                 | {
+0004d                 |     jsonStaticPool_t *spool =  ((jsonStaticPool_t *)((char *)pool - ( (size_t) & (((jsonStaticPool_t *)0)->pool) ) )) ;
+0004d                 |     spool->nextFree = 1;
+0004d                 |     return spool->mem;
+0004d                 | }
+0004d                 | #line 611 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.c"
+0004d                 | json_t *poolAlloc(jsonPool_t *pool)
+0004d                 | {
+0004d                 |     jsonStaticPool_t *spool =  ((jsonStaticPool_t *)((char *)pool - ( (size_t) & (((jsonStaticPool_t *)0)->pool) ) )) ;
+0004d                 |     if (spool->nextFree >= spool->qty)
+0004d                 |         return 0;
+0004d                 |     return spool->mem + spool->nextFree++;
+0004d                 | }
+0004d                 | 

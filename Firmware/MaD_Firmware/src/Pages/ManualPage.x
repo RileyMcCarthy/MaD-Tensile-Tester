@@ -83,7 +83,7 @@ void manual_page_run(ManualPage *page)
     display_draw_line(page->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
 
     display_text_color(page->display, MAINTEXTCOLOR, BACKCOLOR);
-    strcpy(buf, "Control");
+    strcpy(buf, "ControlSystem");
     titley = 300;
     titlex = SCREEN_WIDTH / 6 - strlen(buf) * 8;
     display_draw_string(page->display, titlex, titley, buf);

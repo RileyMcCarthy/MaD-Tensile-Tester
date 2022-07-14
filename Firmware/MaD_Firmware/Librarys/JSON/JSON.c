@@ -6,7 +6,7 @@ json_t mem[MAX_TOKENS];
 static bool bufferSem = false;
 
 // Private Function
-static void float_to_json(FILE *file, const char *name, float value)
+static void double_to_json(FILE *file, const char *name, double value)
 {
     fprintf(file, "\"%s\":%f", name, value);
 }
@@ -41,17 +41,17 @@ static int json_property_to_int(const json_t *parser, const char *name)
     return (int)json_getInteger(property);
 }
 
-static float json_property_to_float(const json_t *json, const char *name)
+static double json_property_to_double(const json_t *json, const char *name)
 {
     json_t const *property = json_getProperty(json, name);
     if (!property || JSON_REAL != json_getType(property))
     {
         printf("Error, the %s property is not found.", name);
     }
-    return (float)json_getReal(property);
+    return json_getReal(property);
 }
 
-static int json_property_to_float_array(float *array, const json_t *json, const char *name)
+static int json_property_to_double_array(double *array, const json_t *json, const char *name)
 {
     const json_t *properties = json_getProperty(json, name);
     int index = 0;
@@ -89,17 +89,17 @@ static int json_property_to_string_array(char array[][], const json_t *json, con
 static void json_to_machine_configuration(const json_t *json, MachineConfiguration *configuration)
 {
     strncpy(configuration->motorType, json_property_to_string(json, "Motor Type"), MAX_CONFIGURATION_MOTOR_TYPE);
-    configuration->maxMotorRPM = json_property_to_float(json, "Max Motor RPM");
-    configuration->maxMotorTorque = json_property_to_float(json, "Max Motor Torque");
-    configuration->gearDiameter = json_property_to_float(json, "Gear Diameter");
-    configuration->gearPitch = json_property_to_float(json, "Gear Pitch");
-    configuration->systemIntertia = json_property_to_float(json, "System Intertia");
-    configuration->staticTorque = json_property_to_float(json, "Static Torque");
-    configuration->load = json_property_to_float(json, "Load");
+    configuration->maxMotorRPM = json_property_to_double(json, "Max Motor RPM");
+    configuration->maxMotorTorque = json_property_to_double(json, "Max Motor Torque");
+    configuration->gearDiameter = json_property_to_double(json, "Gear Diameter");
+    configuration->gearPitch = json_property_to_double(json, "Gear Pitch");
+    configuration->systemIntertia = json_property_to_double(json, "System Intertia");
+    configuration->staticTorque = json_property_to_double(json, "Static Torque");
+    configuration->load = json_property_to_double(json, "Load");
     strncpy(configuration->positionEncoderType, json_property_to_string(json, "Position Encoder Type"), MAX_CONFIGURATION_ENCODER_TYPE);
-    configuration->positionEncoderStepsPerRev = json_property_to_float(json, "Position Encoder Scale Factor");
+    configuration->positionEncoderStepsPerRev = json_property_to_double(json, "Position Encoder Scale Factor");
     strncpy(configuration->forceGauge, json_property_to_string(json, "Force Gauge"), MAX_CONFIGURATION_FORCE_GAUGE);
-    configuration->forceGaugeScaleFactor = json_property_to_float(json, "Force Gauge Scale Factor");
+    configuration->forceGaugeScaleFactor = json_property_to_double(json, "Force Gauge Scale Factor");
     configuration->forceGaugeZeroFactor = json_property_to_int(json, "Force Gauge Zero Factor");
 }
 
@@ -111,13 +111,13 @@ static void json_to_machine_configuration(const json_t *json, MachineConfigurati
 
 static void json_to_machine_performance(const json_t *json, MachinePerformance *performance)
 {
-    performance->minPosition = json_property_to_float(json, "Position Minimum");
-    performance->maxPosition = json_property_to_float(json, "Position Maximum");
-    performance->maxVelocity = json_property_to_float(json, "Velocity Maximum");
-    performance->maxAcceleration = json_property_to_float(json, "Acceleration Maximum");
-    performance->maxForceTensile = json_property_to_float(json, "Force Tensile Maximum");
-    performance->maxForceCompression = json_property_to_float(json, "Force Compression Maximum");
-    performance->forceGaugeNeutralOffset = json_property_to_float(json, "Force gauge Neutral Offset");
+    performance->minPosition = json_property_to_double(json, "Position Minimum");
+    performance->maxPosition = json_property_to_double(json, "Position Maximum");
+    performance->maxVelocity = json_property_to_double(json, "Velocity Maximum");
+    performance->maxAcceleration = json_property_to_double(json, "Acceleration Maximum");
+    performance->maxForceTensile = json_property_to_double(json, "Force Tensile Maximum");
+    performance->maxForceCompression = json_property_to_double(json, "Force Compression Maximum");
+    performance->forceGaugeNeutralOffset = json_property_to_double(json, "Force gauge Neutral Offset");
 }
 
 /**Structure to JSON Functions**/
@@ -129,37 +129,37 @@ static void machine_configuration_to_json(FILE *file, MachineConfiguration *conf
     string_to_json(file, "Motor Type", configuration->motorType);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Motor RPM", configuration->maxMotorRPM);
+    double_to_json(file, "Max Motor RPM", configuration->maxMotorRPM);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Motor Torque", configuration->maxMotorTorque);
+    double_to_json(file, "Max Motor Torque", configuration->maxMotorTorque);
     fprintf(file, ",");
 
-    float_to_json(file, "Gear Diameter", configuration->gearDiameter);
+    double_to_json(file, "Gear Diameter", configuration->gearDiameter);
     fprintf(file, ",");
 
-    float_to_json(file, "Gear Pitch", configuration->gearPitch);
+    double_to_json(file, "Gear Pitch", configuration->gearPitch);
     fprintf(file, ",");
 
-    float_to_json(file, "System Intertia", configuration->systemIntertia);
+    double_to_json(file, "System Intertia", configuration->systemIntertia);
     fprintf(file, ",");
 
-    float_to_json(file, "Static Torque", configuration->staticTorque);
+    double_to_json(file, "Static Torque", configuration->staticTorque);
     fprintf(file, ",");
 
-    float_to_json(file, "Load", configuration->load);
+    double_to_json(file, "Load", configuration->load);
     fprintf(file, ",");
 
     string_to_json(file, "Position Encoder Type", configuration->positionEncoderType);
     fprintf(file, ",");
 
-    float_to_json(file, "Position Encoder Scale Factor", configuration->positionEncoderStepsPerRev);
+    double_to_json(file, "Position Encoder Scale Factor", configuration->positionEncoderStepsPerRev);
     fprintf(file, ",");
 
     string_to_json(file, "Force Gauge", configuration->forceGauge);
     fprintf(file, ",");
 
-    float_to_json(file, "Force Gauge Scale Factor", configuration->forceGaugeScaleFactor);
+    double_to_json(file, "Force Gauge Scale Factor", configuration->forceGaugeScaleFactor);
     fprintf(file, ",");
 
     int_to_json(file, "Force Gauge Zero Factor", configuration->forceGaugeZeroFactor);
@@ -170,25 +170,25 @@ static void machine_performance_to_json(FILE *file, MachinePerformance *performa
 {
     fprintf(file, "\"Performance\":{");
 
-    float_to_json(file, "Position Minimum", performance->minPosition);
+    double_to_json(file, "Position Minimum", performance->minPosition);
     fprintf(file, ",");
 
-    float_to_json(file, "Position Maximum", performance->maxPosition);
+    double_to_json(file, "Position Maximum", performance->maxPosition);
     fprintf(file, ",");
 
-    float_to_json(file, "Velocity Maximum", performance->maxVelocity);
+    double_to_json(file, "Velocity Maximum", performance->maxVelocity);
     fprintf(file, ",");
 
-    float_to_json(file, "Acceleration Maximum", performance->maxAcceleration);
+    double_to_json(file, "Acceleration Maximum", performance->maxAcceleration);
     fprintf(file, ",");
 
-    float_to_json(file, "Force Tensile Maximum", performance->maxForceTensile);
+    double_to_json(file, "Force Tensile Maximum", performance->maxForceTensile);
     fprintf(file, ",");
 
-    float_to_json(file, "Force Compression Maximum", performance->maxForceCompression);
+    double_to_json(file, "Force Compression Maximum", performance->maxForceCompression);
     fprintf(file, ",");
 
-    float_to_json(file, "Force gauge Neutral Offset", performance->forceGaugeNeutralOffset);
+    double_to_json(file, "Force gauge Neutral Offset", performance->forceGaugeNeutralOffset);
     fprintf(file, "}");
 }
 
@@ -267,77 +267,6 @@ void motion_profile_init(MotionProfile *profile)
     }
 }
 
-// Need to be changed to initialize structures
-/*MachineProfile *get_machine_profile()
-{
-    MachineProfile *settings = (MachineProfile *)malloc(sizeof(MachineProfile));
-    settings->name = NULL;
-    settings->number = 0;
-    settings->configuration = get_machine_configuration();
-    settings->performance = get_machine_performance();
-    return settings;
-}
-
-MotionProfile *get_motion_profile()
-{
-    MotionProfile *motion = (MotionProfile *)malloc(sizeof(MotionProfile));
-    motion->name = NULL;
-    motion->number = 0;
-    motion->setCount = 0;
-    motion->sets = NULL;
-    return motion;
-}
-
-SampleProfile *get_sample_profile()
-{
-    SampleProfile *sample = (SampleProfile *)malloc(sizeof(SampleProfile));
-    sample->name = NULL;
-    sample->number = 0;
-    sample->length = 0.0;
-    sample->stretchMax = 0.0;
-    sample->maxVelocity = 0.0;
-    sample->maxAcceleration = 0.0;
-    sample->maxJerk = 0.0;
-    sample->maxForceTensile = 0.0;
-    sample->maxForceCompression = 0.0;
-    return sample;
-}
-
-TestProfile *get_test_profile()
-{
-    TestProfile *test = (TestProfile *)malloc(sizeof(TestProfile));
-    test->name = NULL;
-    test->sampleSN = -1;
-    test->machineProfile = NULL;
-    test->sampleProfile = NULL;
-    test->motionProfile = 0;
-    test->comment = NULL;
-    return test;
-}
-
-MotionSet *get_motion_set()
-{
-    MotionSet *set = (MotionSet *)malloc(sizeof(MotionSet));
-    set->name = NULL;
-    set->number = 0;
-    set->type = NULL;
-    set->executions = 0;
-    set->quartetCount = 0;
-    set->quartets = NULL;
-    return set;
-}
-
-// First parameter must be final distance
-MotionQuartet *get_motion_quartet()
-{
-    MotionQuartet *quartet = (MotionQuartet *)malloc(sizeof(MotionQuartet));
-    quartet->name = NULL;
-    quartet->function = -1;
-    quartet->parameters = NULL; // Distance, ...
-    quartet->dwell = 0.0;
-    return quartet;
-}*/
-
 Error machine_profile_to_json(MachineProfile *settings, const char *filename)
 {
     FILE *file = fopen(filename, "w");
@@ -412,25 +341,25 @@ Error sample_profile_to_json(SampleProfile *sample, const char *filename)
     int_to_json(file, "Number", sample->number);
     fprintf(file, ",");
 
-    float_to_json(file, "Length", sample->length);
+    double_to_json(file, "Length", sample->length);
     fprintf(file, ",");
 
-    float_to_json(file, "Stretch Max", sample->stretchMax);
+    double_to_json(file, "Stretch Max", sample->stretchMax);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Velocity", sample->maxVelocity);
+    double_to_json(file, "Max Velocity", sample->maxVelocity);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Acceleration", sample->maxAcceleration);
+    double_to_json(file, "Max Acceleration", sample->maxAcceleration);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Jerk", sample->maxJerk);
+    double_to_json(file, "Max Jerk", sample->maxJerk);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Force Tensile", sample->maxForceTensile);
+    double_to_json(file, "Max Force Tensile", sample->maxForceTensile);
     fprintf(file, ",");
 
-    float_to_json(file, "Max Force Compression", sample->maxForceCompression);
+    double_to_json(file, "Max Force Compression", sample->maxForceCompression);
     fprintf(file, "}");
 
     fclose(file);
@@ -502,7 +431,7 @@ Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename)
         }
     }
     fprintf(file, "],");
-    float_to_json(file, "Dwell", quartet->dwell);
+    double_to_json(file, "Dwell", quartet->dwell);
     fprintf(file, "}");
     fclose(file);
     return SUCCESS;
@@ -642,6 +571,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
 
     fread(buffer, fileSize, 1, file);
     fclose(file);
+    
     buffer[fileSize] = '\0';
     printf("%s\n", buffer);
 
@@ -704,13 +634,13 @@ void json_to_sample_profile(SampleProfile *sample, const char *filename)
 
     strncpy(sample->name, json_property_to_string(parser, "Name"), MAX_SAMPLE_PROFILE_NAME);
     sample->number = json_property_to_int(parser, "Number");
-    sample->length = json_property_to_float(parser, "Length");
-    sample->stretchMax = json_property_to_float(parser, "Stretch Max");
-    sample->maxVelocity = json_property_to_float(parser, "Max Velocity");
-    sample->maxAcceleration = json_property_to_float(parser, "Max Acceleration");
-    sample->maxJerk = json_property_to_float(parser, "Max Jerk");
-    sample->maxForceTensile = json_property_to_float(parser, "Max Force Tensile");
-    sample->maxForceCompression = json_property_to_float(parser, "Max Force Compression");
+    sample->length = json_property_to_double(parser, "Length");
+    sample->stretchMax = json_property_to_double(parser, "Stretch Max");
+    sample->maxVelocity = json_property_to_double(parser, "Max Velocity");
+    sample->maxAcceleration = json_property_to_double(parser, "Max Acceleration");
+    sample->maxJerk = json_property_to_double(parser, "Max Jerk");
+    sample->maxForceTensile = json_property_to_double(parser, "Max Force Tensile");
+    sample->maxForceCompression = json_property_to_double(parser, "Max Force Compression");
 
     bufferSem = false; // Unlock buffer
 }
@@ -879,10 +809,10 @@ void json_to_motion_quartet(const char *filename, MotionQuartet *quartet)
     printf("parsing Function\n");
     quartet->function = json_property_to_int(parser, "Function");
     printf("parsing Parameters\n");
-    json_property_to_float_array(quartet->parameters, parser, "Parameters");
+    json_property_to_double_array(quartet->parameters, parser, "Parameters");
     printf("paramouter:%f \n", quartet->parameters[0]);
     printf("parsing Dwell\n");
-    quartet->dwell = json_property_to_float(parser, "Dwell");
+    quartet->dwell = json_property_to_double(parser, "Dwell");
     printf("done\n");
 
     bufferSem = false; // Unlock buffer

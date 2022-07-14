@@ -113,7 +113,7 @@ void module_graph_set_range(Module *module, double maxY, double minY)
     graph->minY = minY;
 }
 
-void module_graph_add_marker(Module *module, float value)
+void module_graph_add_marker(Module *module, double value)
 {
     ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     if (graph->markerCount < MAX_GRAPH_MARKERS)

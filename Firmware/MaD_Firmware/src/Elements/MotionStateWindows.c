@@ -293,9 +293,8 @@ static void update_mode(Display *display, Module *module, void *arg)
     module_draw(display, module);
 }
 
-void motion_state_window_create(Module *container, MachineState *state)
+void motion_state_window_init(MotionStateWindow *window, Module *container, MachineState *state)
 {
-    MotionStateWindow *window = (MotionStateWindow *)malloc(sizeof(MotionStateWindow));
     window->state = state;
 
     module_set_window(container, window);
@@ -303,7 +302,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     int padding = 10;
 
     // Create edit window
-    Module *motionStateWindow = module_create(container);
+    Module *motionStateWindow = &(window->motionStateWindow);
+    module_init(motionStateWindow, container);
     module_set_rectangle_circle(motionStateWindow, 0, 0);
     module_add_border(motionStateWindow, COLOR65K_WHITE, 1);
     module_fit_height(motionStateWindow);
@@ -314,7 +314,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_inner_top(motionStateWindow);
 
     // Create Condition Header
-    Module *conditionHeader = module_create(motionStateWindow);
+    Module *conditionHeader = &(window->conditionHeader);
+    module_init(conditionHeader, motionStateWindow);
     module_set_margin(conditionHeader, padding, padding);
     module_set_text(conditionHeader, conditionStr);
     module_text_font(conditionHeader, RA8876_CHAR_HEIGHT_24);
@@ -324,7 +325,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_inner_top(conditionHeader);
 
     // Create Status Header
-    Module *statusHeader = module_create(motionStateWindow);
+    Module *statusHeader = &(window->statusHeader);
+    module_init(statusHeader, motionStateWindow);
     module_set_margin(statusHeader, padding, padding);
     module_set_text(statusHeader, statusStr);
     module_text_font(statusHeader, RA8876_CHAR_HEIGHT_24);
@@ -334,7 +336,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_inner_top(statusHeader);
 
     // Create Mode Header
-    Module *modeHeader = module_create(motionStateWindow);
+    Module *modeHeader = &(window->modeHeader);
+    module_init(modeHeader, motionStateWindow);
     module_set_margin(modeHeader, padding, padding);
     module_set_text(modeHeader, modeStr);
     module_text_font(modeHeader, RA8876_CHAR_HEIGHT_24);
@@ -344,7 +347,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_inner_top(modeHeader);
 
     // Create status Button
-    Module *statusButton = module_create(motionStateWindow);
+    Module *statusButton = &(window->statusButton);
+    module_init(statusButton, motionStateWindow);
     module_set_rectangle_circle(statusButton, 0, 0);
     module_set_color(statusButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_add_border(statusButton, COLOR65K_RED, 3);
@@ -356,7 +360,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_update_callback(statusButton, update_status);
 
     // Create status Button Text
-    Module *statusButtonText = module_create(statusButton);
+    Module *statusButtonText = &(window->statusButtonText);
+    module_init(statusButtonText, statusButton);
     module_set_text(statusButtonText, disabledStr);
     module_text_font(statusButtonText, RA8876_CHAR_HEIGHT_24);
     module_text_fit(statusButtonText);
@@ -367,7 +372,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_middle(statusButtonText);
 
     // Create Condition Button
-    Module *conditionButton = module_create(motionStateWindow);
+    Module *conditionButton = &(window->conditionButton);
+    module_init(conditionButton, motionStateWindow);
     module_set_rectangle_circle(conditionButton, 0, 0);
     module_set_color(conditionButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_set_margin(conditionButton, padding, padding);
@@ -378,7 +384,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_update_callback(conditionButton, update_condition);
 
     // Create condition Button Text
-    Module *conditionButtonText = module_create(conditionButton);
+    Module *conditionButtonText = &(window->conditionButtonText);
+    module_init(conditionButtonText, conditionButton);
     module_set_text(conditionButtonText, stoppedStr);
     module_text_font(conditionButtonText, RA8876_CHAR_HEIGHT_24);
     module_text_fit(conditionButtonText);
@@ -389,7 +396,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_align_middle(conditionButtonText);
 
     // Create Mode Button
-    Module *modeButton = module_create(motionStateWindow);
+    Module *modeButton = &(window->modeButton);
+    module_init(modeButton, motionStateWindow);
     module_set_rectangle_circle(modeButton, 0, 0);
     module_set_color(modeButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_set_margin(modeButton, padding, padding);
@@ -400,7 +408,8 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_update_callback(modeButton, update_mode);
 
     // Create Mode Button Text
-    Module *modeButtonText = module_create(modeButton);
+    Module *modeButtonText = &(window->modeButtonText);
+    module_init(modeButtonText, modeButton);
     module_set_text(modeButtonText, manualStr);
     module_text_font(modeButtonText, RA8876_CHAR_HEIGHT_24);
     module_text_fit(modeButtonText);
@@ -409,8 +418,4 @@ void motion_state_window_create(Module *container, MachineState *state)
     module_text_align(modeButtonText, MODULE_TEXT_ALIGN_INNER_CENTER);
     module_align_inner_left(modeButtonText);
     module_align_middle(modeButtonText);
-}
-void motion_state_window_destroy(MotionStateWindow *window)
-{
-    free(window);
 }

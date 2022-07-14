@@ -331,20 +331,14 @@ static void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data)
 
 /*********************************** Public functions *************************************/
 
-NavKey *navkey_create(uint8_t addr)
-{
-  NavKey *navkey = malloc(sizeof(NavKey));
-  navkey->_add = addr;
-  return navkey;
-}
-
 void navkey_destroy(NavKey *navkey)
 {
   free(navkey);
 }
 /** Used for initialize the NavKey **/
-void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t conf)
+void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf)
 {
+  navkey->_add = addr;
   navkey->i2cBus.setup(scl, sda, 10, 1);
   // i2c_open(&(navkey->bus), scl, sda, 0);
   writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);

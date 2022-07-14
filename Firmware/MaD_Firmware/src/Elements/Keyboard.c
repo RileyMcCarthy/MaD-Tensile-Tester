@@ -160,7 +160,7 @@ static void key_pressed(int id, void *arg)
  * @image html https://cdn.shopify.com/s/files/1/0059/0630/1017/files/Keychron-C1-hot-swappable-wired-type-c-mechanical-keyboard-tenkeyless-layout-for-Mac-Windows-iOS-Keycap-Size_2048x2048.jpg?v=1608368111
  * @return Button struct
  */
-static Module *createKey(Keyboard *keyboard, int name, Module *left, Module *above, float keySize)
+static Module *createKey(Keyboard *keyboard, int name, Module *left, Module *above, double keySize)
 {
     Module *key = &(keyboard->key[name]);
     module_init(key, &(keyboard->background));

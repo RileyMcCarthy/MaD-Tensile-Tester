@@ -90,15 +90,10 @@ typedef struct DYN4_s
 
 typedef union Data_union
 {
-    float fval;
     uint16_t wval;
     int32_t val;
     uint8_t bval[4];
 } DataUnion;
-
-DYN4 *dyn4_create();
-
-void dyn4_destroy(DYN4 *dyn4);
 
 Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id);
 

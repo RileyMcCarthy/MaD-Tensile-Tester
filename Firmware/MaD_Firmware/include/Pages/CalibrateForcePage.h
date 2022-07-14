@@ -9,16 +9,41 @@
 #include "Keyboard.h"
 #include "JSON.h"
 #include "Monitor.h"
-#include "Button.h"
 
 typedef struct CalibratePage_s
 {
     bool complete;
     Display *display;
     Monitor *monitor;
-    Button *buttons;
     MachineProfile *machineProfile;
     Images *images;
+
+    Module root;
+    Module background;
+    Module navigation;
+    Module forceWindow;
+    Module forceHeader;
+    Module forceCalStatus;
+    Module adcValue;
+    Module zeroValue;
+    Module slopeValue;
+
+    Module machineSettingsHeader;
+    Module msZeroValue;
+    Module msSlopeValue;
+    Module forceValue;
+
+    Module actionButton;
+
+    char forceCalStatusBuffer[15];
+    char adcValueBuffer[15];
+    char zeroValueBuffer[15];
+    char slopeValueBuffer[15];
+    char msZeroValueBuffer[15];
+    char msSlopeValueBuffer[15];
+    char forceValueBuffer[15];
+    char actionButtonBuffer[15];
+
     int state;
 
 } CalibratePage;

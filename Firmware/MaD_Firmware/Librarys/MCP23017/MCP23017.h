@@ -3,6 +3,7 @@
 
 #include <simpletools.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define DIRA 0x00
 #define DIRB 0x01
@@ -24,9 +25,6 @@ typedef struct MCP23017_t
     uint8_t writeAddr, readAddr;
     uint8_t dira, dirb;
 } MCP23017;
-
-MCP23017 *mcp23017_create();
-void mcp32017_destroy();
 
 bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
 void mcp_update_register(MCP23017 *mcp23017);

@@ -1,5 +1,5 @@
 #include "FunctionWindow.h"
-#include "Control.h"
+#include "ControlSystem.h"
 #include "style.h"
 #define BUTTONCOUNT 7
 
@@ -29,7 +29,7 @@ static void update_header(Display *display, Module *module, void *arg)
         sprintf(window->functionHeaderBuffer, "OFF");
         break;
     case FUNC_MANUAL_INCREMENTAL_JOG:
-        sprintf(window->functionHeaderBuffer, "INCR JOG: %0.1fmm", (float)window->state->functionData / 1000.0);
+        sprintf(window->functionHeaderBuffer, "INCR JOG: %0.1fmm", (double)window->state->functionData / 1000.0);
         break;
     case FUNC_MANUAL_CONTINUOUS_JOG:
         sprintf(window->functionHeaderBuffer, "CONT JOG: %dmm", window->state->functionData / 1000);
@@ -351,9 +351,8 @@ static void update_force(Display *display, Module *module, void *arg)
     module_draw(display, module);
 }
 
-void function_window_create(Module *container, MachineState *state)
+void function_window_init(FunctionWindow *window, Module *container, MachineState *state)
 {
-    FunctionWindow *window = (FunctionWindow *)malloc(sizeof(FunctionWindow));
     window->state = state;
 
     int padding = 8;
@@ -361,7 +360,8 @@ void function_window_create(Module *container, MachineState *state)
     module_set_window(container, window);
 
     // Create edit window
-    Module *functionWindow = module_create(container);
+    Module *functionWindow = &(window->functionWindow);
+    module_init(functionWindow,container);
     module_set_rectangle_circle(functionWindow, 0, 0);
     module_add_border(functionWindow, COLOR65K_WHITE, 1);
     module_fit_height(functionWindow);
@@ -372,7 +372,8 @@ void function_window_create(Module *container, MachineState *state)
     module_align_inner_top(functionWindow);
 
     // Create Function Header
-    Module *functionHeader = module_create(functionWindow);
+    Module *functionHeader = &(window->functionHeader);
+    module_init(functionHeader, functionWindow);
     module_set_padding(functionHeader, padding, padding);
     module_set_margin(functionHeader, padding, padding);
     module_set_text(functionHeader, window->functionHeaderBuffer);
@@ -383,7 +384,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(functionHeader, update_header);
 
     // Create Button Area
-    Module *buttonArea = module_create(functionWindow);
+    Module *buttonArea = &(window->buttonArea);
+    module_init(buttonArea, functionWindow);
     module_set_padding(buttonArea, 0, 0);
     module_fit_width(buttonArea);
     module_fit_below(buttonArea, functionHeader);
@@ -391,7 +393,8 @@ void function_window_create(Module *container, MachineState *state)
     module_align_below(buttonArea, functionHeader);
 
     // Create Off Button
-    Module *offButton = module_create(buttonArea);
+    Module *offButton = &(window->offButton);
+    module_init(offButton, buttonArea);
     module_set_text(offButton, offBuffer);
     module_set_color(offButton, MAINTEXTCOLOR, COLOR65K_LIGHTGREEN);
     module_set_margin(offButton, padding, padding);
@@ -406,7 +409,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(offButton, update_off);
 
     // Create Incremental Jog Button
-    Module *incrementalButton = module_create(buttonArea);
+    Module *incrementalButton = &(window->incrementalButton);
+    module_init(incrementalButton, buttonArea);
     module_copy(incrementalButton, offButton);
     module_set_text(incrementalButton, incrementalBuffer);
     module_text_align(incrementalButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -419,7 +423,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(incrementalButton, update_incremental);
 
     // Create Continuous Jog Button
-    Module *continuousButton = module_create(buttonArea);
+    Module *continuousButton = &(window->continuousButton);
+    module_init(continuousButton, buttonArea);
     module_copy(continuousButton, offButton);
     module_set_text(continuousButton, contBuffer);
     module_text_align(continuousButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -432,7 +437,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(continuousButton, update_continuous);
 
     // Create Position Move Button
-    Module *positionalMoveButton = module_create(buttonArea);
+    Module *positionalMoveButton = &(window->positionalMoveButton);
+    module_init(positionalMoveButton, buttonArea);
     module_copy(positionalMoveButton, offButton);
     module_set_text(positionalMoveButton, posnBuffer);
     module_text_align(positionalMoveButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -446,7 +452,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(positionalMoveButton, update_positional);
 
     // Create Home Button
-    Module *homeButton = module_create(buttonArea);
+    Module *homeButton = &(window->homeButton);
+    module_init(homeButton, buttonArea);
     module_copy(homeButton, positionalMoveButton);
     module_set_text(homeButton, homeBuffer);
     module_text_align(homeButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -459,7 +466,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(homeButton, update_home);
 
     // Create Gauge Force Button
-    Module *gaugeForceButton = module_create(buttonArea);
+    Module *gaugeForceButton = &(window->gaugeForceButton);
+    module_init(gaugeForceButton, buttonArea);
     module_copy(gaugeForceButton, homeButton);
     module_set_text(gaugeForceButton, gaugeLengthBuffer);
     module_text_align(gaugeForceButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -472,7 +480,8 @@ void function_window_create(Module *container, MachineState *state)
     module_update_callback(gaugeForceButton, update_force);
 
     // Create Gauge Length Button
-    Module *gaugeLengthButton = module_create(buttonArea);
+    Module *gaugeLengthButton = &(window->gaugeLengthButton);
+    module_init(gaugeLengthButton, buttonArea);
     module_copy(gaugeLengthButton, offButton);
     module_set_text(gaugeLengthButton, gaugeForceBuffer);
     module_text_align(gaugeLengthButton, MODULE_TEXT_ALIGN_INNER_CENTER);
@@ -484,9 +493,4 @@ void function_window_create(Module *container, MachineState *state)
     module_align_below(gaugeLengthButton, positionalMoveButton);
     module_touch_callback(gaugeLengthButton, button_set_function, FUNC_MANUAL_MOVE_GAUGE_LENGTH);
     module_update_callback(gaugeLengthButton, update_length);
-}
-
-void function_window_destroy(FunctionWindow *window)
-{
-    free(window);
 }

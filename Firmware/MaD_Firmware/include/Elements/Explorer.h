@@ -6,7 +6,6 @@
 #include "Style.h"
 #include <dirent.h>
 #include "Module.h"
-#include "Button.h"
 
 #define EXPLORER_WIDTH 768
 #define EXPLORER_HEIGHT 400
@@ -24,7 +23,6 @@ typedef enum explorer_mode_e
 typedef struct explorer_s
 {
     Display *display;
-    Button *buttons;
     ExplorerMode mode;
     char files[MAX_FILES][20];
     int fileCount;

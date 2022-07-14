@@ -1,6 +1,5 @@
 #include "AutomaticPage.h"
 #include "Monitor.h"
-#include "Button.h"
 #include "Explorer.h"
 
 #define BUTTON_MOTION_MODE 0
@@ -70,7 +69,7 @@ static void update_profileNumber(Display *dis, Module *module, void *arg)
 }
 
 // Public Functions
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, Control *control)
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control)
 {
     page->display = display;
     page->images = images;

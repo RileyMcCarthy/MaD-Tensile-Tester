@@ -24,7 +24,7 @@ extern Images images;
 
 static bool isFile(char *name)
 {
-    for (int i = 0; i < strlen(name); i++)
+    for (int i = 0; i < (int)strlen(name); i++)
     {
         if (name[i] == '.')
         {
@@ -338,7 +338,7 @@ char *explorer_run(Explorer *explorer)
             {
                 strcpy(explorer->files[i], dirent->d_name);
 
-                printf("%s\n", explorer->files[i]);
+                printf("File: %s\n", explorer->files[i]);
                 // module_text_update(file->child[0], explorer->files[i]);
                 if (isFile(dirent->d_name))
                 {
@@ -367,7 +367,7 @@ char *explorer_run(Explorer *explorer)
                 module_touch_callback(file, NULL, 0);
             }
         }
-
+        closedir(dir);
         module_draw(explorer->display, root);
         printf("done drawing\n");
         do

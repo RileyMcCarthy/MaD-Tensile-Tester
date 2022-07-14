@@ -4,6 +4,7 @@
 #include <simpletools.h>
 #include <Error.h>
 #include <stdlib.h>
+#include "JSON.h"
 
 #define FORCE_GAUGE_RX 15
 #define FORCE_GAUGE_TX 16
@@ -15,18 +16,14 @@ typedef struct ForceGauge_s
     int counter;
     unsigned int force;
     uint8_t buffer[4];
-    int interpolationSlope;
-    int interpolationZero;
     FDS serial;
 
 } ForceGauge;
 
-ForceGauge *force_gauge_create();
-
-void force_gauge_destroy(ForceGauge *force_gauge);
-
 int force_gauge_raw_to_force(ForceGauge *forceGauge, int raw);
-int force_gauge_get_raw(ForceGauge *forceGauge);
+int raw_to_force(int raw, MachineConfiguration *configuration);
+int force_gauge_get_raw(ForceGauge *forceGauge, Error *err);
 
-Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx, int slope, int zero);
+Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx);
+void force_gauge_stop(ForceGauge *forceGauge);
 #endif

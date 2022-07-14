@@ -77,9 +77,8 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 double position_set(double t, RunMotionProfile *run, MotionSet *set);
 double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
 
-double sigmoid(float t, double *args);
-void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, float (*f)(float t, va_list args), ...);
-SetPoint *create_empty_setpoint();
+double sigmoid(double t, double *args);
+void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);
 
 double steps_to_mm(int steps, MachineConfiguration *config);
 int mm_to_steps(double mm, MachineConfiguration *config);

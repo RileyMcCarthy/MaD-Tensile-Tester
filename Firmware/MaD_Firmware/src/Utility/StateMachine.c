@@ -137,7 +137,9 @@ static State state_machine_motion(MachineState *machineState)
 
 static void state_machine_update(MachineState *machineState)
 {
+    while(!_locktry(machineState->lock)); // waits for lock to be available then claims it
     machineState->state = state_machine_motion(machineState);
+    _lockrel(machineState->lock);
 }
 
 bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2)
@@ -172,6 +174,8 @@ bool state_machine_equal(MachineState *machineState1, MachineState *machineState
            machineState1->function == machineState2->function &&
            machineState1->functionData == machineState2->functionData;
 }
+
+//@TODO use locks to prevent concurrent access to machineState (only require lock if upddating information)
 void state_machine_set(MachineState *machineState, Parameter param, int state)
 {
     switch (param)
@@ -280,10 +284,16 @@ void machine_state_init(MachineState *machineState)
     machineState->machineCheckParameters.servoOK = false;
     machineState->machineCheckParameters.forceGaugeCom = false;
     machineState->machineCheckParameters.servoCom = false;
-    machineState->machineCheckParameters.rtcCom = false;
+    machineState->machineCheckParameters.rtcCom = true;
 
     machineState->motionParameters.condition = MOTION_STOPPED;
     machineState->motionParameters.mode = MODE_MANUAL;
     machineState->motionParameters.status = STATUS_DISABLED;
     machineState->function = FUNC_MANUAL_OFF;
+
+    machineState->lock = _locknew();
+    if (machineState->lock==-1)
+    {
+        printf("Error allocating new lock\n");
+    }
 }

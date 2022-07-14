@@ -78,7 +78,6 @@ void module_animation_switch_page_right(Display *display, Module *module);
 void module_animation_switch_page_up(Display *display, Module *module);
 void module_animation_switch_page_down(Display *display, Module *module);
 
-Module *module_create(Module *parent);
 void module_init(Module *module, Module *parent); // Used for static module creation
 
 void module_update_callback(Module *module, void (*onUpdate)(Display *display, Module *module, void *arg));

@@ -1,8 +1,6 @@
 #ifndef AutomaticPage_H
 #define AutomaticPage_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+
 #include <simpletools.h>
 #include "RA8876.h"
 #include "Error.h"
@@ -15,9 +13,9 @@
 #include "string.h"
 #include "stdio.h"
 #include "Images.h"
-#include "Button.h"
-#include "Control.h"
+#include "ControlSystem.h"
 #include "StateMachine.h"
+#include "Module.h"
 
 /**
  * @brief Runs the UI for running tests
@@ -28,7 +26,7 @@ typedef struct AutomaticPage_t
     Display *display;
     Images *images;
     MachineState *machineState;
-    Control *control;
+    ControlSystem *control;
     bool complete;
 
     Module root;
@@ -48,7 +46,7 @@ typedef struct AutomaticPage_t
     char profileNumberBuffer[50];
 } AutomaticPage;
 
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, Control *control);
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control);
 void automatic_page_destroy(AutomaticPage *page);
 void automatic_page_run(AutomaticPage *page);
 

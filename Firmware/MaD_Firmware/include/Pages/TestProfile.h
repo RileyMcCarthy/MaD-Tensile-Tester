@@ -6,7 +6,6 @@
 #include "Style.h"
 #include "Module.h"
 #include "Images.h"
-#include "Button.h"
 #include "Keyboard.h"
 #include "Selection.h"
 #include "JSON.h"

@@ -74,32 +74,6 @@ void module_animation_switch_page_down(Display *display, Module *module)
     display_bte_memory_copy(display, ANIMATION_PAGE, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); // Copy new page in
 }
 
-Module *module_create(Module *parent)
-{
-    Module *module = (Module *)malloc(sizeof(Module));
-    module->parent = parent;
-    module->type = MODULE_ROOT;
-    module->numChildren = 0;
-    module->visible = true;
-
-    module->lastPressed = 0;
-    module->debouncems = 100;
-    module->onTouch = NULL;
-    module->onUpdate = NULL;
-    module->draw = NULL;
-    module->r = -1;
-    module->borderWidth = 0;
-    module->touchAnimate = module_animation_touch;
-    module->drawAnimate = NULL;
-
-    if (parent != NULL)
-    {
-        parent->numChildren++;
-        parent->child[parent->numChildren - 1] = module;
-    }
-    return module;
-}
-
 void module_init(Module *module, Module *parent)
 {
     module->parent = parent;

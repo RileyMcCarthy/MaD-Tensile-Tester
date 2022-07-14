@@ -27,10 +27,11 @@ static void button_navigation(int id, void *arg)
     complete = true;
 }
 
-void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images)
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images)
 {
     page->display = display;
     page->stateMachine = machineState;
+    page->machineProfile = machineProfile;
     page->data = data;
     page->images = images;
 
@@ -302,7 +303,7 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     module_align_space_even(functionWindow, 3, 3);
     module_align_inner_bottom(functionWindow);
 
-    function_window_create(functionWindow, page->stateMachine);
+    function_window_init(&(page->functionWindowData),functionWindow, page->stateMachine);
 
     // Create Function Window Container
     Module *motionStateWindow = &(page->motionStateWindow);
@@ -314,7 +315,7 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     module_align_space_even(motionStateWindow, 3, 3);
     module_align_above(motionStateWindow, functionWindow);
 
-    motion_state_window_create(motionStateWindow, page->stateMachine);
+    motion_state_window_init(&(page->motionStateWindowData), motionStateWindow, page->stateMachine);
 }
 
 void status_page_run(StatusPage *page)
@@ -463,17 +464,17 @@ void status_page_run(StatusPage *page)
             if ((_getms() - lastDataUpdate) > 100)
             {
                 lastDataUpdate = _getms();
-                sprintf(page->positionValueBuffer, "%0.3fmm", page->data->positionum / 1000.0);
+                sprintf(page->positionValueBuffer, "%0.3fmm", steps_to_mm(page->data->encoderRaw, &(page->machineProfile->configuration)));
                 // module_set_text(&(page->positionValue), page->positionValueBuffer);
-                sprintf(page->forceValueBuffer, "%0.3fN", page->data->force / 1000.0);
+                sprintf(page->forceValueBuffer, "%0.3fN", raw_to_force(page->data->forceRaw, &(page->machineProfile->configuration))/1000.0);
                 // module_set_text(&(page->forceValue), page->forceValueBuffer);
                 module_draw(page->display, &(page->forceValue));
                 module_draw(page->display, &(page->positionValue));
             }
-            module_graph_insert(&(page->positionGraphContainer), page->data->positionum / 1000.0);
+            module_graph_insert(&(page->positionGraphContainer), steps_to_mm(page->data->encoderRaw, &(page->machineProfile->configuration)));
             module_draw(page->display, &(page->positionGraphContainer));
 
-            module_graph_insert(&(page->forceGraphContainer), page->data->force / 1000.0);
+            module_graph_insert(&(page->forceGraphContainer), raw_to_force(page->data->forceRaw, &(page->machineProfile->configuration))/1000.0);
             module_draw(page->display, &(page->forceGraphContainer));
         } // Update touch register
 

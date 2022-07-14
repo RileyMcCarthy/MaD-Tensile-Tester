@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <dirent.h> 
 
 #include "IOBoard.h"
 #include "MCP23017.h"
-#include "DS3231.h"
 #include "StateMachine.h"
 #include "Style.h"
 #include "RA8876.h"
@@ -26,7 +26,7 @@
 #include "CalibrateForcePage.h"
 #include "JSON.h"
 #include "tiny-json.h"
-#include "Control.h"
+#include "ControlSystem.h"
 #include "SettingsPage.h"
 #include "Explorer.h"
 #include "TestProfile.h"

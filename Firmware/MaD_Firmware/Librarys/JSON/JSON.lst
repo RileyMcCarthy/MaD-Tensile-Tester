@@ -1,0 +1,1940 @@
+00000                 | 
+00000                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+00000                 | #line 1 "JSON.h"
+00000                 | #line 4 "JSON.h"
+00000                 | #line 1 "C:/flexprop/include/simpletools.h"
+00000                 | #line 9 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 4 "C:/flexprop/include/propeller2.h"
+00000                 | #line 1 "C:/flexprop/include/stdint.h"
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | typedef signed char int8_t;
+00000                 | typedef unsigned char uint8_t;
+00000                 | 
+00000                 | typedef signed short int16_t;
+00000                 | typedef unsigned short uint16_t;
+00000                 | 
+00000                 | typedef signed long int32_t;
+00000                 | typedef unsigned long uint32_t;
+00000                 | 
+00000                 | typedef long long int64_t;
+00000                 | typedef unsigned long long uint64_t;
+00000                 | 
+00000                 | typedef unsigned long uintptr_t;
+00000                 | typedef long intptr_t;
+00000                 | 
+00000                 | typedef int64_t intmax_t;
+00000                 | typedef uint64_t uintmax_t;
+00000                 | 
+00000                 | typedef int8_t int_least8_t;
+00000                 | typedef int16_t int_least16_t;
+00000                 | typedef int32_t int_least32_t;
+00000                 | typedef int64_t int_least64_t;
+00000                 | 
+00000                 | typedef uint8_t uint_least8_t;
+00000                 | typedef uint16_t uint_least16_t;
+00000                 | typedef uint32_t uint_least32_t;
+00000                 | typedef uint64_t uint_least64_t;
+00000                 | 
+00000                 | typedef int32_t int_fast8_t;
+00000                 | typedef int32_t int_fast16_t;
+00000                 | typedef int32_t int_fast32_t;
+00000                 | typedef int64_t int_fast64_t;
+00000                 | 
+00000                 | typedef uint32_t uint_fast8_t;
+00000                 | typedef uint32_t uint_fast16_t;
+00000                 | typedef uint32_t uint_fast32_t;
+00000                 | typedef uint64_t uint_fast64_t;
+00000                 | #line 5 "C:/flexprop/include/propeller2.h"
+00000                 | #line 56 "C:/flexprop/include/propeller2.h"
+00000                 | typedef struct _cartesian {
+00000                 |    int32_t x, y;
+00000                 | } cartesian_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _polar {
+00000                 |    uint32_t r, t;
+00000                 | } polar_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _counter64 {
+00000                 |     uint32_t low, high;
+00000                 | } counter64_t;
+00000                 | #line 96 "C:/flexprop/include/propeller2.h"
+00000                 | void _clkset(uint32_t clkmode, uint32_t clkfreq);
+00000                 | void _hubset(uint32_t val);
+00000                 | void _reboot(void);
+00000                 | 
+00000                 | 
+00000                 | int _coginit(int cog, void *pgm, void *ptr);
+00000                 | #line 116 "C:/flexprop/include/propeller2.h"
+00000                 | void _cogstop(int cog);
+00000                 | int _cogchk(int cog);
+00000                 | int _cogid(void);
+00000                 | 
+00000                 | int _locknew(void);
+00000                 | void _lockret(int lock);
+00000                 | 
+00000                 | int _locktry(int lock);
+00000                 | int _lockrel(int lock);
+00000                 | int _lockchk(int lock);
+00000                 | 
+00000                 | void _cogatn(uint32_t mask);
+00000                 | int _pollatn(void);
+00000                 | int _waitatn(void);
+00000                 | 
+00000                 | 
+00000                 | cartesian_t _rotxy(cartesian_t coord, uint32_t t);
+00000                 | cartesian_t _polxy(polar_t coord);
+00000                 | polar_t _xypol(cartesian_t coord);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _rnd(void);
+00000                 | 
+00000                 | 
+00000                 | int _clz(uint32_t val);
+00000                 | int _encod(uint32_t val);
+00000                 | uint32_t _isqrt(uint32_t val);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _cnt(void);
+00000                 | uint32_t _cnth(void);
+00000                 | counter64_t _cnthl();
+00000                 | uint32_t _getsec();
+00000                 | uint32_t _getms();
+00000                 | uint32_t _getus();
+00000                 | 
+00000                 | uint32_t _pollcnt(uint32_t tick);
+00000                 | void _waitcnt(uint32_t tick);
+00000                 | 
+00000                 | void _waitx(uint32_t cycles);
+00000                 | void _waitsec(uint32_t seconds);
+00000                 | void _waitms(uint32_t milliseconds);
+00000                 | void _waitus(uint32_t microseconds);
+00000                 | 
+00000                 | 
+00000                 | void _pinw(int pin, int val);
+00000                 | void _pinl(int pin);
+00000                 | void _pinh(int pin);
+00000                 | void _pinnot(int pin);
+00000                 | void _pinrnd(int pin);
+00000                 | void _pinf(int pin);
+00000                 | int _pinr(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _wrpin(int pin, uint32_t val);
+00000                 | void _wxpin(int pin, uint32_t val);
+00000                 | void _wypin(int pin, uint32_t val);
+00000                 | void _akpin(int pin);
+00000                 | uint32_t _rdpin(int pin);
+00000                 | uint32_t _rqpin(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _pinstart(int pin, uint32_t mode, uint32_t xval, uint32_t yval);
+00000                 | 
+00000                 | void _pinclear(int pin);
+00000                 | 
+00000                 | 
+00000                 | extern uint32_t _clockfreq(void);
+00000                 | extern uint32_t _clockmode(void);
+00000                 | #line 10 "C:/flexprop/include/simpletools.h"
+00000                 | #line 14 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/compiler.h"
+00000                 | #line 15 "C:/flexprop/include/simpletools.h"
+00000                 | #line 16 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 3 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 1 "C:/flexprop/include/stdarg.h"
+00000                 | #line 4 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 12 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | typedef struct text_struct
+00000                 | {
+00000                 | 
+00000                 |   int (*rxChar)(struct text_struct *p);
+00000                 | 
+00000                 |   int (*txChar)(struct text_struct *p, int ch);
+00000                 | 
+00000                 |   int cogid[ 7 ];
+00000                 | 
+00000                 |   volatile void *devst;
+00000                 | 
+00000                 |   volatile int terminalEcho;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 |   volatile char ecA;
+00000                 |   volatile char ecB;
+00000                 |   volatile char ecsA;
+00000                 |   volatile char ecsB;
+00000                 | } text_t;
+00000                 | 
+00000                 | char *_safe_gets(text_t *text, char *buf, int count)  __fromfile("libsimpletext/safe_gets.c") ;
+00000                 | char *getStr(char *buf, int max)  __fromfile("libsimpletext/getStr.c") ;
+00000                 | 
+00000                 | float string2float(char *s, char **end)  __fromfile("libsimpletext/stringToFloat.c") ;
+00000                 | int _doscanf(const char *str, const char *fmt,  unsigned long  args)  __fromfile("libsimpletext/doscanf.c") ;
+00000                 | 
+00000                 | const char* _scanf_getl(const char *str, int *dst, int base, unsigned width, int isSigned)  __fromfile("libsimpletext/scanf_getl.c") ;
+00000                 | const char* _scanf_getf(const char *str, float *dst)  __fromfile("libsimpletext/scanf_getf.c") ;
+00000                 | 
+00000                 | int scan(const char *fmt, ...)  __fromfile("libsimpletext/scan.c") ;
+00000                 | #line 17 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 21 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 22 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 26 "C:/flexprop/include/simplei2c.h"
+00000                 | typedef struct i2c_st
+00000                 | {
+00000                 |   int scl_pin;
+00000                 |   int sda_pin;
+00000                 |   int drivescl;
+00000                 | } i2c;
+00000                 | #line 46 "C:/flexprop/include/simplei2c.h"
+00000                 | i2c *i2c_open(i2c *bus, int sclPin, int sdaPin, int sclDrive) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 53 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_start(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 60 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_stop(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 72 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeByte(i2c *bus, int byte) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 83 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readByte(i2c *bus, int ackState) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 97 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeData(i2c *bus, const unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 112 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readData(i2c *bus, unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 123 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_poll(i2c *bus, int addr) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 18 "C:/flexprop/include/simpletools.h"
+00000                 | #line 30 "C:/flexprop/include/simpletools.h"
+00000                 | int input(int pin)  __fromfile("libsimpletools/input.c") ;
+00000                 | #line 45 "C:/flexprop/include/simpletools.h"
+00000                 | unsigned get_direction(int pin)  __fromfile("libsimpletools/getDirection.c") ;
+00000                 | unsigned get_directions(int startPin, int endPin)  __fromfile("libsimpletools/getDirections.c") ;
+00000                 | unsigned get_output(int pin)  __fromfile("libsimpletools/getOutput.c") ;
+00000                 | unsigned get_outputs(int startPin, int endPin)  __fromfile("libsimpletools/getOutputs.c") ;
+00000                 | unsigned get_states(int endPin, int startPin)  __fromfile("libsimpletools/getStates.c") ;
+00000                 | void set_directions(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setDirections.c") ;
+00000                 | void set_outputs(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setOutputs.c") ;
+00000                 | 
+00000                 | long count(int pin, long duration, int pinToCount = -1)  __fromfile("libsimpletools/count.c") ;
+00000                 | 
+00000                 | void dac_ctr(int pin, int channel, int dacVal)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_res(int bits)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_stop(void)  __fromfile("libsimpletools/dac.c") ;
+00000                 | 
+00000                 | void freqout(int pin, int msTime, int frequency)  __fromfile("libsimpletools/freqout.c") ;
+00000                 | 
+00000                 | int pwm_start(unsigned int cycleMicroseconds)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_set(int pin, int channel, int tHigh)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_stop(void)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | 
+00000                 | long pulse_in(int pin, int state)  __fromfile("libsimpletools/pulseIn.c") ;
+00000                 | void pulse_out(int pin, int time)  __fromfile("libsimpletools/pulseOut.c") ;
+00000                 | 
+00000                 | long rc_time(int pin, int state)  __fromfile("libsimpletools/rcTime.c") ;
+00000                 | 
+00000                 | void square_wave(int pin, int channel, int freq)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | void square_wave_stop(void)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | void square_wave_stop_pin(int pin)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | #line 79 "C:/flexprop/include/simpletools.h"
+00000                 | int int_fraction(int a, int b, int shift)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | int shift_in(int pinDat, int pinClk, int mode, int bits)  __fromfile("libsimpletools/shiftIn.c") ;
+00000                 | void shift_out(int pinDat, int pinClk, int mode, int bits, int value)  __fromfile("libsimpletools/shiftOut.c") ;
+00000                 | 
+00000                 | 
+00000     00 00 00 00 | extern unsigned int st_buscnt;
+00004                 | 
+00004                 | i2c *i2c_newbus(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/i2c_init.c") ;
+00004                 | int i2c_out(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, const unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_out.c") ;
+00004                 | int i2c_in(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_in.c") ;
+00004                 | int i2c_busy(i2c *busID, int i2cAddr)  __fromfile("libsimpletools/i2c_busy.c") ;
+00004                 | 
+00004                 | 
+00004     00 00 00 00 | extern i2c *st_eeprom;
+00008     00 00 00 00 | extern int st_eeInitFlag;
+0000c                 | #line 114 "C:/flexprop/include/simpletools.h"
+0000c                 | void ee_config(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/eeprom_initSclDrive.c") ;
+0000c                 | void ee_init()  __fromfile("libsimpletools/eeprom_init.c") ;
+0000c                 | void ee_putByte(unsigned char value, int addr)  __fromfile("libsimpletools/eeprom_putByte.c") ;
+0000c                 | char ee_getByte(int addr)  __fromfile("libsimpletools/eeprom_getByte.c") ;
+0000c                 | void ee_putInt(int value, int addr)  __fromfile("libsimpletools/eeprom_putInt.c") ;
+0000c                 | int ee_getInt(int addr)  __fromfile("libsimpletools/eeprom_getInt.c") ;
+0000c                 | void ee_putStr(unsigned char *s, int n, int addr)  __fromfile("libsimpletools/eeprom_putStr.c") ;
+0000c                 | unsigned char* ee_getStr(unsigned char* s, int n, int addr)  __fromfile("libsimpletools/eeprom_getStr.c") ;
+0000c                 | void ee_putFloat32(float value, int addr)  __fromfile("libsimpletools/eeprom_putFloat.c") ;
+0000c                 | float ee_getFloat32(int addr)  __fromfile("libsimpletools/eeprom_getFloat.c") ;
+0000c                 | 
+0000c                 | float constrainFloat(float value, float min, float max)  __fromfile("libsimpletools/constrainFloat.c") ;
+0000c                 | int constrainInt(int value, int min, int max)  __fromfile("libsimpletools/constrainInt.c") ;
+0000c                 | 
+0000c                 | void endianSwap(void *resultAddr, void *varAddr, int byteCount)  __fromfile("libsimpletools/endianSwap.c") ;
+0000c                 | 
+0000c                 | float mapFloat(float value, float fromMin, float fromMax, float toMin, float toMax)  __fromfile("libsimpletools/mapFloat.c") ;
+0000c                 | int mapInt(int value, int fromMin, int fromMax, int toMin, int toMax)  __fromfile("libsimpletools/mapInt.c") ;
+0000c                 | 
+0000c                 | int random(int limitLow, int limitHigh)  __fromfile("libsimpletools/random.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | void cog_end(int *coginfo)  __fromfile("libsimpletools/cogend.c") ;
+0000c                 | int cog_num(int *coginfo)  __fromfile("libsimpletools/cognum.c") ;
+0000c                 | int* cog_run(void (*function)(void *par), int stacksize)  __fromfile("libsimpletools/cogrun.c") ;
+0000c                 | #line 5 "JSON.h"
+0000c                 | #line 1 "C:/flexprop/include/stddef.h"
+0000c                 | #line 4 "C:/flexprop/include/stddef.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef  unsigned long  size_t;
+0000c                 | #line 5 "C:/flexprop/include/stddef.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/null.h"
+0000c                 | #line 6 "C:/flexprop/include/stddef.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 15 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef int wchar_t;
+0000c                 | #line 24 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef struct _Mbstate {
+0000c                 |   unsigned int total:5;
+0000c                 |   unsigned int left:5;
+0000c                 |   unsigned int partial:22;
+0000c                 | } _Mbstate_t;
+0000c                 | #line 7 "C:/flexprop/include/stddef.h"
+0000c                 | 
+0000c                 | typedef long ptrdiff_t;
+0000c                 | #line 6 "JSON.h"
+0000c                 | #line 1 "C:/flexprop/include/stdbool.h"
+0000c                 | #line 7 "JSON.h"
+0000c                 | #line 1 "C:/flexprop/include/string.h"
+0000c                 | #line 4 "C:/flexprop/include/string.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 5 "C:/flexprop/include/string.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/null.h"
+0000c                 | #line 6 "C:/flexprop/include/string.h"
+0000c                 | #line 12 "C:/flexprop/include/string.h"
+0000c                 |     void * memcpy(void *dest, const void *src, size_t n)  __fromfile("libc/string/memcpy.c") ;
+0000c                 |     void * memmove(void *dest, const void *src, size_t n)  __fromfile("libc/string/memmove.c") ;
+0000c                 | 
+0000c                 |     char * strcpy(char * __restrict dest, const char * __restrict src)  __fromfile("libc/string/strcpy.c") ;
+0000c                 |     char * strncpy(char * __restrict dest, const char * __restrict src, size_t n)  __fromfile("libc/string/strncpy.c") ;
+0000c                 |     char * strcat(char * __restrict dest, const char * __restrict src)  __fromfile("libc/string/strcat.c") ;
+0000c                 |     char * strncat(char * __restrict dest, const char * __restrict src, size_t n)  __fromfile("libc/string/strncat.c") ;
+0000c                 | 
+0000c                 |     size_t strcspn(char *s, const char *accept)  __fromfile("libc/string/strcspn.c") ;
+0000c                 |     size_t strspn(char *s, const char *reject)  __fromfile("libc/string/strspn.c") ;
+0000c                 | 
+0000c                 |     int memcmp(const void *s1, const void *s2, size_t n)  __fromfile("libc/string/memcmp.c") ;
+0000c                 |     int strcmp(const char *s1, const char *s2)  __fromfile("libc/string/strcmp.c") ;
+0000c                 |     int strcoll(const char *s1, const char *s2);
+0000c                 |     int strncmp(const char *s1, const char *s2, size_t n)  __fromfile("libc/string/strncmp.c") ;
+0000c                 |     size_t strxfrm(char *dest, const char *src, size_t n);
+0000c                 | 
+0000c                 |     char * strdup (const char *s1)  __fromfile("libc/string/strdup.c") ;
+0000c                 | 
+0000c                 |     void * memchr(const void *s, int c, size_t n)  __fromfile("libc/string/memchr.c") ;
+0000c                 |     char * strchr(const char *, int)  __fromfile("libc/string/strchr.c") ;
+0000c                 |     size_t strcspn(const char *s1, const char *s2);
+0000c                 |     char * strpbrk(const char *str, const char *accept);
+0000c                 |     char * strrchr(const char *, int)  __fromfile("libc/string/strrchr.c") ;
+0000c                 |     size_t strspn(const char *, const char *);
+0000c                 |     char * strstr(const char *src, const char *pattern)  __fromfile("libc/string/strstr.c") ;
+0000c                 |     char * strtok(char * __restrict str, const char * __restrict delim);
+0000c                 | 
+0000c                 | 
+0000c                 |     void * memset(void *dest, int c, size_t n)  __fromfile("libc/string/memset.c") ;
+0000c                 |     char * strerror(int err)  __fromfile("libc/string/strerror.c") ;
+0000c                 |     size_t strlen(const char *s)  __fromfile("libc/string/strlen.c") ;
+0000c                 | 
+0000c                 |     extern int _strcasecmp(const char *s1, const char *s2);
+0000c                 |     extern int _strncasecmp(const char *s1, const char *s2, size_t n);
+0000c                 | 
+0000c                 |     char *_strrev(char *str);
+0000c                 |     char *_strupr(char *str);
+0000c                 | 
+0000c                 | 
+0000c                 |     int strcasecmp(const char *s1, const char *s2)  __fromfile("libc/string/strcasecmp.c") ;
+0000c                 |     int strncasecmp(const char *s1, const char *s2, size_t n)  __fromfile("libc/string/strncasecmp.c") ;
+0000c                 | #line 8 "JSON.h"
+0000c                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+0000c                 | #line 14 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+0000c                 | typedef enum Error_e
+0000c                 | {
+0000c                 |     SUCCESS,
+0000c                 |     FAIL,
+0000c                 | 
+0000c                 |     DISPLAY_NOT_FOUND = 2,
+0000c                 |     DISPLAY_PLL_FAIL,
+0000c                 |     DISPLAY_SDRAM_FAIL,
+0000c                 | 
+0000c                 |     RTC_RESET = 51,
+0000c                 |     RTC_NOT_FOUND,
+0000c                 | 
+0000c                 |     DYN4_NOT_RESPONDING = 101,
+0000c                 |     DYN4_CONNECTION_LOST,
+0000c                 |     DYN4_COG_FAIL,
+0000c                 | 
+0000c                 |     FORCEGAUGE_NOT_RESPONDING = 151,
+0000c                 |     FORCEGAUGE_CONNECTION_LOST,
+0000c                 |     FORCEGAUGE_COG_FAIL,
+0000c                 | 
+0000c                 |     JSON_FILE_ERROR = 201,
+0000c                 |     JSON_FILE_NOT_FOUND,
+0000c                 |     JSON_FILE_READ_FAIL,
+0000c                 |     JSON_FILE_WRITE_FAIL,
+0000c                 |     JSON_FILE_INVALID,
+0000c                 |     JSON_FILE_EMPTY,
+0000c                 |     JSON_FILE_NOT_VALID,
+0000c                 | 
+0000c                 |     MCP23017_NOT_FOUND = 251,
+0000c                 | 
+0000c                 | } Error;
+0000c                 | 
+0000c                 | void print_error(Error value);
+0000c                 | inline void seterror(Error *err, Error value);
+0000c                 | #line 9 "JSON.h"
+0000c                 | #line 1 "C:/flexprop/include/stdio.h"
+0000c                 | #line 5 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 6 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 6 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 7 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 8 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/time.h"
+0000c                 | #line 7 "C:/flexprop/include/time.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 8 "C:/flexprop/include/time.h"
+0000c                 | #line 13 "C:/flexprop/include/time.h"
+0000c                 | typedef unsigned int clock_t;
+0000c                 | #line 29 "C:/flexprop/include/time.h"
+0000c                 | typedef unsigned long time_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | struct tm {
+0000c                 |   int tm_sec;
+0000c                 |   int tm_min;
+0000c                 |   int tm_hour;
+0000c                 |   int tm_mday;
+0000c                 |   int tm_mon;
+0000c                 |   int tm_year;
+0000c                 |   int tm_wday;
+0000c                 |   int tm_yday;
+0000c                 |   int tm_isdst;
+0000c                 | };
+0000c                 | 
+0000c                 | 
+0000c                 |     clock_t clock(void)  __fromfile("libc/sys/propeller/clock.c") ;
+0000c                 |     time_t time(time_t *)  __fromfile("libc/time/time.c") ;
+0000c                 |     double difftime(time_t time2, time_t time1)  __fromfile("libc/time/difftime.c") ;
+0000c                 | 
+0000c                 |     time_t mktime(struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+0000c                 | 
+0000c                 |     struct tm *_gmtime_r(const time_t *t, struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *gmtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *_localtime_r(const time_t *, struct tm *)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *localtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |     unsigned long  strftime(char *s,  unsigned long  max, const char *format, const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/strftime.c") ;
+0000c                 | 
+0000c                 |     char *asctime(const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *asctime_r(const struct tm *stm, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *ctime(const time_t *timep)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *ctime_r(const time_t *timep, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 | #line 74 "C:/flexprop/include/time.h"
+0000c                 |     void _tzset(void)  __fromfile("libc/time/localtim.c") ;
+0000c                 | #line 9 "C:/flexprop/include/sys/types.h"
+0000c                 | 
+0000c                 | 
+0000c                 | typedef long off_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef long ssize_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef int dev_t;
+0000c                 | typedef int ino_t;
+0000c                 | typedef unsigned int mode_t;
+0000c                 | 
+0000c                 | typedef unsigned short uid_t;
+0000c                 | typedef unsigned short gid_t;
+0000c                 | 
+0000c                 | typedef int pid_t;
+0000c                 | 
+0000c                 | struct stat {
+0000c                 |   int st_dev;
+0000c                 |   int st_ino;
+0000c                 |   unsigned int st_mode;
+0000c                 |   int st_nlink;
+0000c                 |   uid_t st_uid;
+0000c                 |   gid_t st_gid;
+0000c                 |   int st_rdev;
+0000c                 |   long st_size;
+0000c                 |   long st_blksize;
+0000c                 |   long st_blocks;
+0000c                 |   time_t st_atime;
+0000c                 |   time_t st_mtime;
+0000c                 |   time_t st_ctime;
+0000c                 | };
+0000c                 | 
+0000c                 | typedef struct s_vfs_file_t vfs_file_t;
+0000c                 | 
+0000c                 | struct s_vfs_file_t {
+0000c                 |     void *vfsdata;
+0000c                 |     unsigned flags;
+0000c                 |     unsigned state;
+0000c                 |     int lock;
+0000c                 |     ssize_t (*read)(vfs_file_t *fil, void *buf, size_t count);
+0000c                 |     ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t count);
+0000c                 |     int (*putcf)(int c, vfs_file_t *fil);
+0000c                 |     int (*getcf)(vfs_file_t *fil);
+0000c                 |     int (*close)(vfs_file_t *fil);
+0000c                 |     int (*ioctl)(vfs_file_t *fil, int arg, void *buf);
+0000c                 |     int (*flush)(vfs_file_t *fil);
+0000c                 |     off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+0000c                 | 
+0000c                 | 
+0000c                 |     int putchar(int c) {
+0000c                 |         int i;
+0000c                 |         if (!putcf) return 0;
+0000c                 |         i = putcf(c, __this); return (i < 0) ? 0 : 1;
+0000c                 |     }
+0000c                 |     int getchar(void) {
+0000c                 |         if (!getcf) return -1;
+0000c                 |         return getcf(__this);
+0000c                 |     }
+0000c                 | };
+0000c                 | 
+0000c                 | typedef int (*putcfunc_t)(int c, vfs_file_t *fil);
+0000c                 | typedef int (*getcfunc_t)(vfs_file_t *fil);
+0000c                 | #line 7 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/limits.h"
+0000c                 | #line 8 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 4 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 5 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 1 "C:/flexprop/include/dirent.h"
+0000c                 | #line 8 "C:/flexprop/include/dirent.h"
+0000c                 | struct dirent {
+0000c                 |     char d_name[ (64) ];
+0000c                 |     unsigned long d_off;
+0000c                 |     unsigned long d_ino;
+0000c                 |     unsigned long d_size;
+0000c                 |     unsigned long d_mtime;
+0000c                 |     unsigned char d_type;
+0000c                 | };
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef struct _dir {
+0000c                 |     void *vfs;
+0000c                 |     void *vfsdata;
+0000c                 |     struct dirent dirent;
+0000c                 | } DIR;
+0000c                 | 
+0000c                 | DIR *opendir(const char *name)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | int closedir(DIR *dir)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | struct dirent *readdir(DIR *dirp)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | #line 6 "C:/flexprop/include/sys/vfs.h"
+0000c                 | 
+0000c                 | typedef DIR vfs_dir_t;
+0000c                 | #line 11 "C:/flexprop/include/sys/vfs.h"
+0000c                 | struct vfs {
+0000c                 | 
+0000c                 |     int (*close)(vfs_file_t *fil);
+0000c                 |     ssize_t (*read)(vfs_file_t *fil, void *buf, size_t siz);
+0000c                 |     ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t siz);
+0000c                 |     off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+0000c                 |     int (*ioctl)(vfs_file_t *fil, unsigned long req, void *argp);
+0000c                 |     int (*flush)(vfs_file_t *fil);
+0000c                 |     void *vfs_data;
+0000c                 |     void *reserved;
+0000c                 | 
+0000c                 |     int (*open)(vfs_file_t *fil, const char *name, int flags);
+0000c                 |     int (*creat)(vfs_file_t *fil, const char *pathname, mode_t mode);
+0000c                 | 
+0000c                 |     int (*opendir)(vfs_dir_t *dir, const char *name);
+0000c                 |     int (*closedir)(vfs_dir_t *dir);
+0000c                 |     int (*readdir)(vfs_dir_t *dir, struct dirent *ent);
+0000c                 |     int (*stat)(const char *name, struct stat *buf);
+0000c                 | 
+0000c                 |     int (*mkdir)(const char *name, mode_t mode);
+0000c                 |     int (*rmdir)(const char *name);
+0000c                 | 
+0000c                 |     int (*remove)(const char *pathname);
+0000c                 |     int (*rename)(const char *oldname, const char *newname);
+0000c                 | 
+0000c                 |     int (*init)(const char *mountname);
+0000c                 |     int (*deinit)(const char *mountname);
+0000c                 | };
+0000c                 | 
+0000c                 | typedef struct vfs vfs_t;
+0000c                 | 
+0000c                 | int _openraw(void *f, const char *name, unsigned flags, unsigned perm)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | int _closeraw(void *f)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | struct vfs *_getrootvfs(void);
+0000c                 | void _setrootvfs(struct vfs *);
+0000c                 | 
+0000c                 | struct vfs *_vfs_open_host(void)  __fromfile("filesys/fs9p/fs9p_vfs.c") ;
+0000c                 | struct vfs *_vfs_open_sdcard(void)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+0000c                 | struct vfs *_vfs_open_sdcardx(int pclk = 61, int pss = 60, int pdi = 59, int pdo = 58)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+0000c                 | #line 64 "C:/flexprop/include/sys/vfs.h"
+0000c                 | struct _default_buffer {
+0000c                 |     int cnt;
+0000c                 |     unsigned char *ptr;
+0000c                 |     unsigned flags;
+0000c                 | 
+0000c                 | 
+0000c                 |     unsigned char buf[ 1024 ];
+0000c                 | };
+0000c                 | 
+0000c                 | int __default_getc(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_putc(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_putc_terminal(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_flush(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | char *__getfilebuffer();
+0000c                 | struct vfs *__getvfsforfile(char *fullname, const char *orig_name, char *full_path);
+0000c                 | #line 9 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/unistd.h"
+0000c                 | #line 2 "C:/flexprop/include/unistd.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 4 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 5 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 22 "C:/flexprop/include/sys/unistd.h"
+0000c                 |   typedef unsigned int useconds_t;
+0000c                 | 
+0000c                 |   int open(const char *name, int flags, mode_t mode)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int write(int fd, const void *buf, int count)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int read(int fd, void *buf, int count)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int close(int fd)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   off_t lseek(int fd, off_t offset, int whence)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int ioctl(int fd, unsigned long req, void *argp)  __fromfile("libc/unix/ioctl.c") ;
+0000c                 |   int access(const char *path, int mode)  __fromfile("libc/unix/access.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |   int isatty(int fd)  __fromfile("libc/unix/isatty.c") ;
+0000c                 | 
+0000c                 |   char *getcwd(char *buf, int size)  __attribute__((complexio))   __fromfile("libc/unix/_mount.c") ;
+0000c                 |   int chdir(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/_mount.c") ;
+0000c                 |   int rmdir(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int mkdir(const char *path, int mode)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 |   int unlink(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int chown(const char *pathname, uid_t owner, gid_t group)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int chmod(const char *pathname, mode_t mode)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 |   unsigned int sleep(unsigned int seconds)  __fromfile("libc/time/sleep.c") ;
+0000c                 |   int usleep(useconds_t usec)  __fromfile("libc/time/usleep.c") ;
+0000c                 | 
+0000c                 |   char *_mktemp(char *templ);
+0000c                 |   char *mktemp(char *);
+0000c                 | 
+0000c                 |   const char **_get_environ_ptr()  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 |   void _put_environ_ptr(const char **ptr)  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |     int _execve(const char *path, char **args, char **env)  __attribute__((complexio))   __fromfile("libc/unix/exec.c") ;
+0000c                 | #line 3 "C:/flexprop/include/unistd.h"
+0000c                 | #line 10 "C:/flexprop/include/stdio.h"
+0000c                 | #line 27 "C:/flexprop/include/stdio.h"
+0000c                 | typedef vfs_file_t FILE;
+0000c                 | typedef struct string_file_t {
+0000c                 |     FILE file;
+0000c                 |     const char *ptr;
+0000c                 |     size_t pos;
+0000c                 |     size_t len;
+0000c                 | } _STRING_FILE;
+0000c                 | 
+0000c                 | FILE *__getftab(int i)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int fputc(int c, FILE *f)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | int fgetc(FILE *f)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int sprintf(char *str, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int snprintf(char *str, size_t size, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int printf(const char *format, ...)  __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | int fprintf(FILE *f, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | 
+0000c                 | int vsprintf(char *str, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int vsnprintf(char *str, size_t size, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int vprintf(const char *format, unsigned long ap)  __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | int vfprintf(FILE *f, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | 
+0000c                 | int vscanf(const char *format, unsigned long ap)  __fromfile("libc/stdio/vscanf.c") ;
+0000c                 | int vsscanf(char *str, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sscanf.c") ;
+0000c                 | int vfscanf(FILE *f, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/vfscanf.c") ;
+0000c                 | 
+0000c                 | int scanf(const char *format, ...)  __fromfile("libc/stdio/scanf.c") ;
+0000c                 | int sscanf(char *str, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sscanf.c") ;
+0000c                 | int fscanf(FILE *f, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/fscanf.c") ;
+0000c                 | 
+0000c                 | int fputs(const char *s, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fputs.c") ;
+0000c                 | int puts(const char *s)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | 
+0000c                 | char *gets(char *data)  __fromfile("libc/stdio/gets.c") ;
+0000c                 | char *fgets(char *buf, int size, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fgets.c") ;
+0000c                 | 
+0000c                 | FILE *fopen(const char *name, const char *mode)  __attribute__((complexio))   __fromfile("libc/stdio/fopen.c") ;
+0000c                 | FILE *__string_file(_STRING_FILE *fp, const char *str, const char *mode, size_t len)  __attribute__((complexio))   __fromfile("libc/stdio/stringio.c") ;
+0000c                 | 
+0000c                 | int fclose(FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fopen.c") ;
+0000c                 | int fflush(FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fflush.c") ;
+0000c                 | size_t fwrite(const void *ptr, size_t size, size_t n, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fwrite.c") ;
+0000c                 | size_t fread(void *ptr, size_t size, size_t n, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fwrite.c") ;
+0000c                 | 
+0000c                 | void clearerr(FILE *f)  __fromfile("libc/stdio/clearerr.c") ;
+0000c                 | void perror(const char *s)  __fromfile("libc/stdio/perror.c") ;
+0000c                 | 
+0000c                 | int fileno(FILE *f)  __fromfile("libc/stdio/fileno.c") ;
+0000c                 | 
+0000c                 | int fseek(FILE *f, long offset, int whence)  __fromfile("libc/stdio/fseek.c") ;
+0000c                 | long ftell(FILE *f)  __fromfile("libc/stdio/fseek.c") ;
+0000c                 | 
+0000c                 | int remove(const char *pathname)  __fromfile("libsys/remove.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int rename(const char *oldpath, const char *newpath)  __fromfile("libc/unix/rename.c") ;
+0000c                 | #line 10 "JSON.h"
+0000c                 | #line 1 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 5 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 6 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 7 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/null.h"
+0000c                 | #line 8 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 22 "C:/flexprop/include/stdlib.h"
+0000c                 |     double atof(const char *);
+0000c                 |     int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long long atoll(const char *);
+0000c                 | 
+0000c                 |   long double strtold(const char *nptr, char **endptr);
+0000c                 |   double strtod(const char *nptr, char **endptr);
+0000c                 |   float strtof(const char *nptr, char **endptr);
+0000c                 | 
+0000c                 |     long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+0000c                 |     unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+0000c                 |   long long strtoll(const char *nptr, char **endptr, int base);
+0000c                 |   unsigned long long strtoull(const char *nptr, char **endptr, int base);
+0000c                 | 
+0000c                 | 
+0000c                 |     int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 |     void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 | 
+0000c                 |     void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 |     int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+0000c                 |      void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+0000c                 |    void _exit(int status);
+0000c                 | #line 56 "C:/flexprop/include/stdlib.h"
+0000c                 |    long labs(long l);
+0000c                 | 
+0000c                 | 
+0000c                 |    long long llabs(long long ll);
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     int quot, rem;
+0000c                 |   } div_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long int quot, rem;
+0000c                 |   } ldiv_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long long quot, rem;
+0000c                 |   } lldiv_t;
+0000c                 | 
+0000c                 |   div_t div(int num, int denom);
+0000c                 |   ldiv_t ldiv(long num, long denom);
+0000c                 |   lldiv_t lldiv(long long num, long long denom);
+0000c                 | 
+0000c                 |     void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+0000c                 |   void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+0000c                 | 		int (*compare)(const void *, const void *));
+0000c                 | 
+0000c                 |     char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 |     int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+0000c                 | 
+0000c                 | 
+0000c     00 00 00 00 |   extern int _mb_cur_max;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 |   int mblen(const char *s, size_t n);
+00010                 |   int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+00010                 |   size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+00010                 | 
+00010                 | 
+00010                 |   int system(const char *command);
+00010                 | #line 102 "C:/flexprop/include/stdlib.h"
+00010                 |     int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+00010                 |     int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+00010                 | #line 11 "JSON.h"
+00010                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 33 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 1 "C:/flexprop/include/stddef.h"
+00010                 | #line 34 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 1 "C:/flexprop/include/stdlib.h"
+00010                 | #line 35 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 1 "C:/flexprop/include/stdbool.h"
+00010                 | #line 36 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 1 "C:/flexprop/include/stdint.h"
+00010                 | #line 37 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | #line 45 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | typedef enum
+00010                 | {
+00010                 |     JSON_OBJ,
+00010                 |     JSON_ARRAY,
+00010                 |     JSON_TEXT,
+00010                 |     JSON_BOOLEAN,
+00010                 |     JSON_INTEGER,
+00010                 |     JSON_REAL,
+00010                 |     JSON_NULL
+00010                 | } jsonType_t;
+00010                 | 
+00010                 | 
+00010                 | typedef struct json_s
+00010                 | {
+00010                 |     struct json_s *sibling;
+00010                 |     char const *name;
+00010                 |     union
+00010                 |     {
+00010                 |         char const *value;
+00010                 |         struct
+00010                 |         {
+00010                 |             struct json_s *child;
+00010                 |             struct json_s *last_child;
+00010                 |         } c;
+00010                 |     } u;
+00010                 |     jsonType_t type;
+00010                 | } json_t;
+00010                 | #line 80 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | json_t const *json_create(char *str, json_t *mem, unsigned int qty);
+00010                 | #line 86 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | const char *json_getName(json_t const *json);
+00010                 | #line 92 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | const char *json_getValue(json_t const *property);
+00010                 | #line 97 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | jsonType_t json_getType(json_t const *json);
+00010                 | #line 103 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | json_t const *json_getSibling(json_t const *json);
+00010                 | #line 110 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | json_t const *json_getProperty(json_t const *obj, char const *property);
+00010                 | #line 117 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | char const *json_getPropertyValue(json_t const *obj, char const *property);
+00010                 | #line 124 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | json_t *json_getChild(json_t const *json);
+00010                 | #line 129 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | _Bool  json_getBoolean(json_t const *property);
+00010                 | #line 134 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | int json_getInteger(json_t const *property);
+00010                 | #line 138 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | double json_getReal(json_t const *property);
+00010                 | 
+00010                 | 
+00010                 | typedef struct jsonPool_s jsonPool_t;
+00010                 | struct jsonPool_s
+00010                 | {
+00010                 |     json_t *(*init)(jsonPool_t *pool);
+00010                 |     json_t *(*alloc)(jsonPool_t *pool);
+00010                 | };
+00010                 | #line 154 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json/tiny-json.h"
+00010                 | json_t const *json_createWithPool(char *str, jsonPool_t *pool);
+00010                 | #line 12 "JSON.h"
+00010                 | #line 1 "C:/flexprop/include/stdio.h"
+00010                 | #line 13 "JSON.h"
+00010                 | #line 1 "C:/flexprop/include/stdlib.h"
+00010                 | #line 14 "JSON.h"
+00010                 | #line 43 "JSON.h"
+00010                 | typedef struct MachineConfiguration_s
+00010                 | {
+00010                 |     char motorType[ 20 ];
+00010                 |     double maxMotorTorque;
+00010                 |     double maxMotorRPM;
+00010                 |     double gearDiameter;
+00010                 |     double gearPitch;
+00010                 |     double systemIntertia;
+00010                 |     double staticTorque;
+00010                 |     double load;
+00010                 |     char positionEncoderType[ 20 ];
+00010                 |     double positionEncoderStepsPerRev;
+00010                 |     char forceGauge[ 20 ];
+00010                 |     double forceGaugeScaleFactor;
+00010                 |     int forceGaugeZeroFactor;
+00010                 | } MachineConfiguration;
+00010                 | 
+00010                 | 
+00010                 | typedef struct MachinePerformance_s
+00010                 | {
+00010                 |     double minPosition;
+00010                 |     double maxPosition;
+00010                 |     double maxVelocity;
+00010                 |     double maxAcceleration;
+00010                 |     double maxForceTensile;
+00010                 |     double maxForceCompression;
+00010                 |     double forceGaugeNeutralOffset;
+00010                 | } MachinePerformance;
+00010                 | 
+00010                 | 
+00010                 | typedef struct MachineProfile_s
+00010                 | {
+00010                 |     char name[ 20 ];
+00010                 |     int number;
+00010                 |     MachineConfiguration configuration;
+00010                 |     MachinePerformance performance;
+00010                 | } MachineProfile;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | typedef struct MotionQuartet_s
+00010                 | {
+00010                 |     char name[ 50 ];
+00010                 |     int function;
+00010                 |     double parameters[ 10 ];
+00010                 |     double dwell;
+00010                 | } MotionQuartet;
+00010                 | 
+00010                 | 
+00010                 | typedef struct MotionSet_s
+00010                 | {
+00010                 |     char name[ 50 ];
+00010                 |     int number;
+00010                 |     char type[ 10 ];
+00010                 |     int executions;
+00010                 |     int quartetCount;
+00010                 |     MotionQuartet quartets[ 10 ];
+00010                 | } MotionSet;
+00010                 | 
+00010                 | 
+00010                 | typedef struct MotionProfile_s
+00010                 | {
+00010                 |     char name[ 50 ];
+00010                 |     int number;
+00010                 |     int setCount;
+00010                 |     MotionSet sets[ 15 ];
+00010                 | } MotionProfile;
+00010                 | 
+00010                 | 
+00010                 | typedef struct SampleProfile_s
+00010                 | {
+00010                 |     char *name;
+00010                 |     int number;
+00010                 |     double length;
+00010                 |     double stretchMax;
+00010                 |     double maxVelocity;
+00010                 |     double maxAcceleration;
+00010                 |     double maxJerk;
+00010                 |     double maxForceTensile;
+00010                 |     double maxForceCompression;
+00010                 | 
+00010                 | } SampleProfile;
+00010                 | 
+00010                 | 
+00010                 | typedef struct TestProfile_s
+00010                 | {
+00010                 |     char *name;
+00010                 |     int sampleSN;
+00010                 |     MachineProfile *machineProfile;
+00010                 |     SampleProfile *sampleProfile;
+00010                 |     MotionProfile *motionProfile;
+00010                 |     char *comment;
+00010                 | } TestProfile;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | void machine_configuration_init(MachineConfiguration *configuration);
+00010                 | void machine_performance_init(MachinePerformance *performance);
+00010                 | void machine_profile_init(MachineProfile *profile);
+00010                 | void motion_quartet_init(MotionQuartet *quartet);
+00010                 | void motion_set_init(MotionSet *set);
+00010                 | void motion_profile_init(MotionProfile *profile);
+00010                 | 
+00010                 | Error machine_profile_to_json(MachineProfile *settings, const char *filename);
+00010                 | Error sample_profile_to_json(SampleProfile *sample, const char *filename);
+00010                 | Error test_profile_to_json(TestProfile *test, const char *filename);
+00010                 | Error motion_profile_to_json(MotionProfile *motion, const char *filename);
+00010                 | Error motion_set_to_json(MotionSet *set, char *filename);
+00010                 | Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename);
+00010                 | 
+00010                 | void json_to_machine_profile(MachineProfile *profile, const char *filename);
+00010                 | void json_to_sample_profile(SampleProfile *sample, const char *filename);
+00010                 | void json_to_test_profile(const char *filename, TestProfile *test);
+00010                 | void json_to_motion_profile(const char *filename, MotionProfile *profile);
+00010                 | void json_to_motion_set(const char *filename, MotionSet *set);
+00010                 | void json_to_motion_quartet(const char *filename, MotionQuartet *quartet);
+00010                 | 
+00010                 | void json_print_machine_profile(MachineProfile *profile);
+00010                 | void json_print_motion_profile(MotionProfile *profile);
+00010                 | 
+00010                 | void free_machine_profile(MachineProfile *settings);
+00010                 | void free_machine_performance(MachinePerformance *performance);
+00010                 | void free_machine_configuration(MachineConfiguration *configuration);
+00010                 | void free_sample_profile(SampleProfile *sample);
+00010                 | void free_test_profile(TestProfile *test);
+00010                 | void free_motion_profile(MotionProfile *profile);
+00010                 | void free_motion_set(MotionSet *set);
+00010                 | void free_motion_quartet(MotionQuartet *quartet);
+00010                 | #line 2 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+00010                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | #line 3 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | #line 1 "C:/flexprop/include/simpletools.h"
+00010                 | #line 4 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | #line 1 "C:/flexprop/include/stddef.h"
+00010                 | #line 5 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h"
+00010                 | #line 6 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | #line 1 "C:/flexprop/include/math.h"
+00010                 | #line 77 "C:/flexprop/include/math.h"
+00010                 | typedef float float_t;
+00010                 | typedef double double_t;
+00010                 | #line 7 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanning.h"
+00010                 | 
+00010                 | typedef struct motionPeriods_s
+00010                 | {
+00010                 |     double x_goal;
+00010                 |     double x0;
+00010                 |     double v0;
+00010                 |     double v_max;
+00010                 |     double a_max;
+00010                 |     double T1;
+00010                 |     double T2;
+00010                 |     double T3;
+00010                 |     double a_acc;
+00010                 |     double a_dec;
+00010                 |     double v;
+00010                 | } MotionPeriod;
+00010                 | 
+00010                 | typedef struct setPoint_s
+00010                 | {
+00010                 |     double t;
+00010                 |     double x;
+00010                 |     double v;
+00010                 |     double a;
+00010                 | } SetPoint;
+00010                 | 
+00010                 | 
+00010                 | typedef enum quartetFunc_s
+00010                 | {
+00010                 |     QUARTET_FUNC_LINE,
+00010                 |     QUARTET_FUNC_SIGMOIDAL,
+00010                 | } QuartetFunctions;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | typedef struct functioninfo_s
+00010                 | {
+00010                 |     int id;
+00010                 |     char name[20];
+00010                 |     double (*func)(double, void *args);
+00010                 |     int args_count;
+00010                 |     char args[ 10  * 2][ 20 ];
+00010                 | } FunctionInfo;
+00010                 | 
+00010                 | typedef struct RunMotionProfile_s
+00010                 | {
+00010                 |     int currentSet;
+00010                 |     int currentExecution;
+00010                 |     int currentQuartet;
+00010                 | 
+00010                 |     _Bool  profileComplete;
+00010                 |     _Bool  setComplete;
+00010                 |     _Bool  quartetComplete;
+00010                 | 
+00010                 |     double lastQuartetTime;
+00010                 | 
+00010                 |     double lastSetDistance;
+00010                 |     double lastExecutionDistance;
+00010                 |     double lastQuartetDistance;
+00010                 | 
+00010                 |     double dwellTime;
+00010                 | } RunMotionProfile;
+00010                 | 
+00010                 | RunMotionProfile *get_run_motion_profile();
+00010                 | void run_motion_profile_init(RunMotionProfile *profile);
+00010                 | void destroy_run_motion_profile(RunMotionProfile *run);
+00010                 | 
+00010                 | void get_function_info(FunctionInfo *info, QuartetFunctions id);
+00010                 | 
+00010                 | double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
+00010                 | double position_set(double t, RunMotionProfile *run, MotionSet *set);
+00010                 | double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
+00010                 | 
+00010                 | double sigmoid(double t, double *args);
+00010                 | void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t,  unsigned long  args), ...);
+00010                 | 
+00010                 | double steps_to_mm(int steps, MachineConfiguration *config);
+00010                 | int mm_to_steps(double mm, MachineConfiguration *config);
+00010                 | #line 3 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+00010                 | 
+00010     00 00 00 00 
+      ...             
+007d8     00 00 00 00 
+007dc     00 00 00 00 | static char buffer[ 2000 ];
+007e0     00 00 00 00 
+      ...             
+01778     00 00 00 00 
+0177c     00 00 00 00 | json_t mem[ 200 ];
+01780     00          | static  _Bool  bufferSem =  (0) ;
+01781                 | 
+01781                 | 
+01781                 | static void double_to_json(FILE *file, const char *name, double value)
+01781                 | {
+01781                 |     fprintf(file, "\"%s\":%f", name, value);
+01781                 | }
+01781                 | 
+01781                 | static void int_to_json(FILE *file, const char *name, int value)
+01781                 | {
+01781                 |     fprintf(file, "\"%s\":%d", name, value);
+01781                 | }
+01781                 | 
+01781                 | static void string_to_json(FILE *file, const char *name, const char *value)
+01781                 | {
+01781                 |     fprintf(file, "\"%s\":\"%s\"", name, value);
+01781                 | }
+01781                 | 
+01781                 | static const char *json_property_to_string(const json_t *parser, const char *name)
+01781                 | {
+01781                 |     json_t const *property = json_getProperty(parser, name);
+01781                 |     if (property ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the %s property is not found.\n", name);
+01781                 |     }
+01781                 |     return json_getValue(property);
+01781                 | }
+01781                 | 
+01781                 | static int json_property_to_int(const json_t *parser, const char *name)
+01781                 | {
+01781                 |     json_t const *property = json_getProperty(parser, name);
+01781                 |     if (!property || JSON_INTEGER != json_getType(property))
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the %s property is not found.\n", name);
+01781                 |     }
+01781                 |     return (int)json_getInteger(property);
+01781                 | }
+01781                 | 
+01781                 | static double json_property_to_double(const json_t *json, const char *name)
+01781                 | {
+01781                 |     json_t const *property = json_getProperty(json, name);
+01781                 |     if (!property || JSON_REAL != json_getType(property))
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the %s property is not found.", name);
+01781                 |     }
+01781                 |     return json_getReal(property);
+01781                 | }
+01781                 | 
+01781                 | static int json_property_to_double_array(double *array, const json_t *json, const char *name)
+01781                 | {
+01781                 |     const json_t *properties = json_getProperty(json, name);
+01781                 |     int index = 0;
+01781                 |     for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
+01781                 |     {
+01781                 |         array[index] = json_getReal(property);
+01781                 |         __builtin_printf ("param:%f \n", array[index]);
+01781                 |         index++;
+01781                 |     }
+01781                 | 
+01781                 |     return index;
+01781                 | }
+01781                 | 
+01781                 | static int json_property_to_string_array(char array[][], const json_t *json, const char *name)
+01781                 | {
+01781                 |     const json_t *properties = json_getProperty(json, name);
+01781                 |     int index = 0;
+01781                 |     for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
+01781                 |     {
+01781                 |         const char *value = json_getValue(property);
+01781                 |         __builtin_strcpy(array[index], value) ;
+01781                 |         index++;
+01781                 |     }
+01781                 |     return index;
+01781                 | }
+01781                 | #line 89 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+01781                 | static void json_to_machine_configuration(const json_t *json, MachineConfiguration *configuration)
+01781                 | {
+01781                 |     strncpy(configuration->motorType, json_property_to_string(json, "Motor Type"),  20 );
+01781                 |     configuration->maxMotorRPM = json_property_to_double(json, "Max Motor RPM");
+01781                 |     configuration->maxMotorTorque = json_property_to_double(json, "Max Motor Torque");
+01781                 |     configuration->gearDiameter = json_property_to_double(json, "Gear Diameter");
+01781                 |     configuration->gearPitch = json_property_to_double(json, "Gear Pitch");
+01781                 |     configuration->systemIntertia = json_property_to_double(json, "System Intertia");
+01781                 |     configuration->staticTorque = json_property_to_double(json, "Static Torque");
+01781                 |     configuration->load = json_property_to_double(json, "Load");
+01781                 |     strncpy(configuration->positionEncoderType, json_property_to_string(json, "Position Encoder Type"),  20 );
+01781                 |     configuration->positionEncoderStepsPerRev = json_property_to_double(json, "Position Encoder Scale Factor");
+01781                 |     strncpy(configuration->forceGauge, json_property_to_string(json, "Force Gauge"),  20 );
+01781                 |     configuration->forceGaugeScaleFactor = json_property_to_double(json, "Force Gauge Scale Factor");
+01781                 |     configuration->forceGaugeZeroFactor = json_property_to_int(json, "Force Gauge Zero Factor");
+01781                 | }
+01781                 | #line 112 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+01781                 | static void json_to_machine_performance(const json_t *json, MachinePerformance *performance)
+01781                 | {
+01781                 |     performance->minPosition = json_property_to_double(json, "Position Minimum");
+01781                 |     performance->maxPosition = json_property_to_double(json, "Position Maximum");
+01781                 |     performance->maxVelocity = json_property_to_double(json, "Velocity Maximum");
+01781                 |     performance->maxAcceleration = json_property_to_double(json, "Acceleration Maximum");
+01781                 |     performance->maxForceTensile = json_property_to_double(json, "Force Tensile Maximum");
+01781                 |     performance->maxForceCompression = json_property_to_double(json, "Force Compression Maximum");
+01781                 |     performance->forceGaugeNeutralOffset = json_property_to_double(json, "Force gauge Neutral Offset");
+01781                 | }
+01781                 | 
+01781                 | 
+01781                 | 
+01781                 | static void machine_configuration_to_json(FILE *file, MachineConfiguration *configuration)
+01781                 | {
+01781                 |     fprintf(file, "\"Configuration\":{");
+01781                 | 
+01781                 |     string_to_json(file, "Motor Type", configuration->motorType);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Motor RPM", configuration->maxMotorRPM);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Motor Torque", configuration->maxMotorTorque);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Gear Diameter", configuration->gearDiameter);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Gear Pitch", configuration->gearPitch);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "System Intertia", configuration->systemIntertia);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Static Torque", configuration->staticTorque);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Load", configuration->load);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Position Encoder Type", configuration->positionEncoderType);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Position Encoder Scale Factor", configuration->positionEncoderStepsPerRev);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Force Gauge", configuration->forceGauge);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Force Gauge Scale Factor", configuration->forceGaugeScaleFactor);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Force Gauge Zero Factor", configuration->forceGaugeZeroFactor);
+01781                 |     fprintf(file, "}");
+01781                 | }
+01781                 | 
+01781                 | static void machine_performance_to_json(FILE *file, MachinePerformance *performance)
+01781                 | {
+01781                 |     fprintf(file, "\"Performance\":{");
+01781                 | 
+01781                 |     double_to_json(file, "Position Minimum", performance->minPosition);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Position Maximum", performance->maxPosition);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Velocity Maximum", performance->maxVelocity);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Acceleration Maximum", performance->maxAcceleration);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Force Tensile Maximum", performance->maxForceTensile);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Force Compression Maximum", performance->maxForceCompression);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Force gauge Neutral Offset", performance->forceGaugeNeutralOffset);
+01781                 |     fprintf(file, "}");
+01781                 | }
+01781                 | 
+01781                 | 
+01781                 | 
+01781                 | 
+01781                 | 
+01781                 | void machine_configuration_init(MachineConfiguration *configuration)
+01781                 | {
+01781                 |     __builtin_strcpy(configuration->motorType, "") ;
+01781                 |     configuration->maxMotorRPM = 0;
+01781                 |     configuration->maxMotorTorque = 0;
+01781                 |     configuration->gearDiameter = 0;
+01781                 |     configuration->gearPitch = 0;
+01781                 |     configuration->systemIntertia = 0;
+01781                 |     configuration->staticTorque = 0;
+01781                 |     configuration->load = 0;
+01781                 |     __builtin_strcpy(configuration->positionEncoderType, "") ;
+01781                 |     configuration->positionEncoderStepsPerRev = 0;
+01781                 |     __builtin_strcpy(configuration->forceGauge, "") ;
+01781                 |     configuration->forceGaugeScaleFactor = 0;
+01781                 |     configuration->forceGaugeZeroFactor = 0;
+01781                 | }
+01781                 | 
+01781                 | void machine_performance_init(MachinePerformance *performance)
+01781                 | {
+01781                 |     performance->minPosition = 0;
+01781                 |     performance->maxPosition = 0;
+01781                 |     performance->maxVelocity = 0;
+01781                 |     performance->maxAcceleration = 0;
+01781                 |     performance->maxForceTensile = 0;
+01781                 |     performance->maxForceCompression = 0;
+01781                 |     performance->forceGaugeNeutralOffset = 0;
+01781                 | }
+01781                 | 
+01781                 | void machine_profile_init(MachineProfile *profile)
+01781                 | {
+01781                 |     __builtin_strcpy(profile->name, "") ;
+01781                 |     profile->number = 0;
+01781                 |     machine_configuration_init(&(profile->configuration));
+01781                 |     machine_performance_init(&(profile->performance));
+01781                 | }
+01781                 | 
+01781                 | void motion_quartet_init(MotionQuartet *quartet)
+01781                 | {
+01781                 |     __builtin_strcpy(quartet->name, "") ;
+01781                 |     quartet->function = 0;
+01781                 |     for (int i = 0; i <  10 ; i++)
+01781                 |     {
+01781                 |         quartet->parameters[i] = 0;
+01781                 |     }
+01781                 |     quartet->dwell = 0;
+01781                 | }
+01781                 | 
+01781                 | void motion_set_init(MotionSet *set)
+01781                 | {
+01781                 |     __builtin_strcpy(set->name, "") ;
+01781                 |     set->number = 0;
+01781                 |     __builtin_strcpy(set->type, "") ;
+01781                 |     set->executions = 0;
+01781                 |     set->quartetCount = 0;
+01781                 |     for (int i = 0; i <  10 ; i++)
+01781                 |     {
+01781                 |         motion_quartet_init(&(set->quartets[i]));
+01781                 |     }
+01781                 | }
+01781                 | 
+01781                 | void motion_profile_init(MotionProfile *profile)
+01781                 | {
+01781                 |     __builtin_strcpy(profile->name, "") ;
+01781                 |     profile->number = 0;
+01781                 |     profile->setCount = 0;
+01781                 |     for (int i = 0; i <  15 ; i++)
+01781                 |     {
+01781                 |         motion_set_init(&(profile->sets[i]));
+01781                 |     }
+01781                 | }
+01781                 | 
+01781                 | Error machine_profile_to_json(MachineProfile *settings, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 |     fprintf(file, "{");
+01781                 |     string_to_json(file, "Name", settings->name);
+01781                 |     __builtin_printf ("writing name: %s\n", settings->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Number", settings->number);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     machine_configuration_to_json(file, &(settings->configuration));
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     machine_performance_to_json(file, &(settings->performance));
+01781                 |     fprintf(file, "}");
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | Error motion_profile_to_json(MotionProfile *motion, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file: %s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 | 
+01781                 |     fprintf(file, "{");
+01781                 | 
+01781                 |     string_to_json(file, "Name", motion->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Number", motion->number);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     fprintf(file, "\"Motion Sets\":[");
+01781                 |     for (int i = 0; i < motion->setCount; i++)
+01781                 |     {
+01781                 |         __builtin_printf ("writing motion set: %s\n", motion->sets[i].name);
+01781                 |         fprintf(file, "\"%s\"", motion->sets[i].name);
+01781                 |         if (i < motion->setCount - 1)
+01781                 |         {
+01781                 |             fprintf(file, ",");
+01781                 |         }
+01781                 |     }
+01781                 |     fprintf(file, "]}");
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | Error sample_profile_to_json(SampleProfile *sample, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file: %s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 | 
+01781                 |     fprintf(file, "{");
+01781                 | 
+01781                 |     string_to_json(file, "Name", sample->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Number", sample->number);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Length", sample->length);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Stretch Max", sample->stretchMax);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Velocity", sample->maxVelocity);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Acceleration", sample->maxAcceleration);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Jerk", sample->maxJerk);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Force Tensile", sample->maxForceTensile);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     double_to_json(file, "Max Force Compression", sample->maxForceCompression);
+01781                 |     fprintf(file, "}");
+01781                 | 
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | Error motion_set_to_json(MotionSet *set, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file: %s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 | 
+01781                 |     fprintf(file, "{");
+01781                 | 
+01781                 |     string_to_json(file, "Name", set->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Number", set->number);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Type", set->type);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Executions", set->executions);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 | 
+01781                 |     fprintf(file, "\"Quartets\":[");
+01781                 |     for (int i = 0; i < set->quartetCount; i++)
+01781                 |     {
+01781                 |         fprintf(file, "\"%s\"", set->quartets[i].name);
+01781                 |         if (i < set->quartetCount - 1)
+01781                 |         {
+01781                 |             fprintf(file, ",");
+01781                 |         }
+01781                 |     }
+01781                 |     fprintf(file, "]}");
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file: %s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 |     fprintf(file, "{");
+01781                 |     string_to_json(file, "Name", quartet->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     int_to_json(file, "Function", quartet->function);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     FunctionInfo info;
+01781                 |     get_function_info(&info, quartet->function);
+01781                 |     fprintf(file, "\"Parameters\":[");
+01781                 |     for (int i = 0; i < info.args_count; i++)
+01781                 |     {
+01781                 |         fprintf(file, "%f", (quartet->parameters)[i]);
+01781                 |         if (i < info.args_count - 1)
+01781                 |         {
+01781                 |             fprintf(file, ",");
+01781                 |         }
+01781                 |     }
+01781                 |     fprintf(file, "],");
+01781                 |     double_to_json(file, "Dwell", quartet->dwell);
+01781                 |     fprintf(file, "}");
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | Error test_profile_to_json(TestProfile *test, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "w");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file: %s\n", filename);
+01781                 |         return JSON_FILE_ERROR;
+01781                 |     }
+01781                 | 
+01781                 |     fprintf(file, "{");
+01781                 |     string_to_json(file, "Name", test->name);
+01781                 | 
+01781                 |     int_to_json(file, "Sample Serial Number", test->sampleSN);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Machine Profile Name", test->machineProfile->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Sample Profile Name", test->sampleProfile->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Motion Profile Name", test->sampleProfile->name);
+01781                 |     fprintf(file, ",");
+01781                 | 
+01781                 |     string_to_json(file, "Comment", test->comment);
+01781                 |     fprintf(file, "}");
+01781                 |     fclose(file);
+01781                 |     return SUCCESS;
+01781                 | }
+01781                 | 
+01781                 | static void json_print_machine_configuration(MachineConfiguration *configuration)
+01781                 | {
+01781                 |     __builtin_printf ("Machine Configuration:\n");
+01781                 |     __builtin_printf ("    Motor Type: %s\n", configuration->motorType);
+01781                 |     __builtin_printf ("    maxMotorTorque: %f\n", configuration->maxMotorTorque);
+01781                 |     __builtin_printf ("    maxMotorRPM: %f\n", configuration->maxMotorRPM);
+01781                 |     __builtin_printf ("    gearPitch: %f\n", configuration->gearPitch);
+01781                 |     __builtin_printf ("    systemIntertia: %f\n", configuration->systemIntertia);
+01781                 |     __builtin_printf ("    staticTorque: %f\n", configuration->staticTorque);
+01781                 |     __builtin_printf ("    load: %f\n", configuration->load);
+01781                 |     __builtin_printf ("    positionEncoderType: %s\n", configuration->positionEncoderType);
+01781                 |     __builtin_printf ("    positionEncoderScaleFactor: %f\n", configuration->positionEncoderStepsPerRev);
+01781                 |     __builtin_printf ("    forceGauge: %s\n", configuration->forceGauge);
+01781                 |     __builtin_printf ("    forceGaugeScaleFactor: %f\n", configuration->forceGaugeScaleFactor);
+01781                 |     __builtin_printf ("    forceGaugeZeroFactor: %d\n", configuration->forceGaugeZeroFactor);
+01781                 | }
+01781                 | 
+01781                 | static void json_print_machine_performance(MachinePerformance *performance)
+01781                 | {
+01781                 |     __builtin_printf ("Machine performance:\n");
+01781                 |     __builtin_printf ("    minPosition: %f\n", performance->minPosition);
+01781                 |     __builtin_printf ("    maxPosition: %f\n", performance->maxPosition);
+01781                 |     __builtin_printf ("    maxVelocity: %f\n", performance->maxVelocity);
+01781                 |     __builtin_printf ("    maxAcceleration: %f\n", performance->maxAcceleration);
+01781                 |     __builtin_printf ("    maxForceTensile: %f\n", performance->maxForceTensile);
+01781                 |     __builtin_printf ("    maxForceCompression: %f\n", performance->maxForceCompression);
+01781                 |     __builtin_printf ("    forceGaugeNeutralOffset: %f\n", performance->forceGaugeNeutralOffset);
+01781                 | }
+01781                 | 
+01781                 | void json_print_machine_profile(MachineProfile *profile)
+01781                 | {
+01781                 |     __builtin_printf ("Name:%s\n", profile->name);
+01781                 |     __builtin_printf ("Number:%d\n", profile->number);
+01781                 |     json_print_machine_configuration(&(profile->configuration));
+01781                 |     json_print_machine_performance(&(profile->performance));
+01781                 | }
+01781                 | 
+01781                 | void json_print_quartet(MotionQuartet *quartet)
+01781                 | {
+01781                 |     __builtin_printf ("        Name:%s\n", quartet->name);
+01781                 |     __builtin_printf ("        Function:%d\n", quartet->function);
+01781                 |     __builtin_printf ("        Dwell:%f\n", quartet->dwell);
+01781                 |     FunctionInfo info;
+01781                 |     get_function_info(&info, quartet->function);
+01781                 |     __builtin_printf ("        Parameters:[");
+01781                 |     for (int i = 0; i < info.args_count; i++)
+01781                 |     {
+01781                 |         __builtin_printf ("%f", quartet->parameters[i]);
+01781                 |         if (i < info.args_count - 1)
+01781                 |         {
+01781                 |             __builtin_printf (",");
+01781                 |         }
+01781                 |     }
+01781                 |     __builtin_printf ("\n");
+01781                 | }
+01781                 | 
+01781                 | void json_print_motion_set(MotionSet *set)
+01781                 | {
+01781                 |     __builtin_printf ("    Name:%s\n", set->name);
+01781                 |     __builtin_printf ("    Number:%d\n", set->number);
+01781                 |     __builtin_printf ("    Type:%s\n", set->type);
+01781                 |     __builtin_printf ("    Executions:%d\n", set->executions);
+01781                 |     __builtin_printf ("    Quartest:\n");
+01781                 |     for (int i = 0; i < set->quartetCount; i++)
+01781                 |     {
+01781                 |         json_print_quartet(&(set->quartets[i]));
+01781                 |     }
+01781                 | }
+01781                 | 
+01781                 | void json_print_motion_profile(MotionProfile *profile)
+01781                 | {
+01781                 |     __builtin_printf ("Name:%s\n", profile->name);
+01781                 |     __builtin_printf ("Number:%d\n", profile->number);
+01781                 |     __builtin_printf ("Sets:\n");
+01781                 |     for (int i = 0; i < profile->setCount; i++)
+01781                 |     {
+01781                 |         json_print_motion_set(&(profile->sets[i]));
+01781                 |     }
+01781                 | }
+01781                 | #line 556 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.c"
+01781                 | void json_to_machine_profile(MachineProfile *profile, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 | 
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 | 
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 | 
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     if (mem ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error allocating memory\n");
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 | 
+01781                 |     if (!parser || JSON_OBJ != json_getType(parser))
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the  JSON cannot be parsed.\n");
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 |     strncpy(profile->name, json_property_to_string(parser, "Name"),  20 );
+01781                 |     profile->number = json_property_to_int(parser, "Number");
+01781                 | 
+01781                 |     const json_t *mcParser = json_getProperty(parser, "Configuration");
+01781                 |     if (!mcParser || JSON_OBJ != json_getType(mcParser))
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the  Machine Configuration  property is not found.\n");
+01781                 |     }
+01781                 |     json_to_machine_configuration(mcParser, &(profile->configuration));
+01781                 | 
+01781                 |     const json_t *mpParser = json_getProperty(parser, "Performance");
+01781                 |     if (!mpParser || JSON_OBJ != json_getType(mpParser))
+01781                 |     {
+01781                 |         __builtin_printf ("Error, the  Machine Profile  property is not found.\n");
+01781                 |     }
+01781                 |     json_to_machine_performance(mpParser, &(profile->performance));
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 
+01781                 | void json_to_sample_profile(SampleProfile *sample, const char *filename)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 | 
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 | 
+01781                 |     strncpy(sample->name, json_property_to_string(parser, "Name"),  50 );
+01781                 |     sample->number = json_property_to_int(parser, "Number");
+01781                 |     sample->length = json_property_to_double(parser, "Length");
+01781                 |     sample->stretchMax = json_property_to_double(parser, "Stretch Max");
+01781                 |     sample->maxVelocity = json_property_to_double(parser, "Max Velocity");
+01781                 |     sample->maxAcceleration = json_property_to_double(parser, "Max Acceleration");
+01781                 |     sample->maxJerk = json_property_to_double(parser, "Max Jerk");
+01781                 |     sample->maxForceTensile = json_property_to_double(parser, "Max Force Tensile");
+01781                 |     sample->maxForceCompression = json_property_to_double(parser, "Max Force Compression");
+01781                 | 
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 
+01781                 | void json_to_test_profile(const char *filename, TestProfile *test)
+01781                 | {
+01781                 |     __builtin_printf ("before open\n");
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 |     __builtin_printf ("after open\n");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 |     __builtin_printf ("before read\n");
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 | 
+01781                 |     strncpy(test->name, json_property_to_string(parser, "Name"),  50 );
+01781                 |     test->sampleSN = json_property_to_int(parser, "Sample Serial Number");
+01781                 | 
+01781                 |     const char *machineProfileFilename = json_property_to_string(parser, "Machine Profile Name");
+01781                 |     json_to_machine_profile(test->machineProfile, machineProfileFilename);
+01781                 | 
+01781                 |     const char *sampleProfileFileName = json_property_to_string(parser, "Sample Profile Name");
+01781                 |     json_to_sample_profile(test->sampleProfile, sampleProfileFileName);
+01781                 | 
+01781                 |     const char *motionProfileFileName = json_property_to_string(parser, "Motion Profile Name");
+01781                 |     json_to_motion_profile(motionProfileFileName, test->motionProfile);
+01781                 | 
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 
+01781                 | void json_to_motion_profile(const char *filename, MotionProfile *profile)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 |     __builtin_printf ("before read\n");
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 | 
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 | 
+01781                 |     strncpy(profile->name, json_property_to_string(parser, "Name"),  50 );
+01781                 |     profile->number = json_property_to_int(parser, "Number");
+01781                 | 
+01781                 |     const json_t *properties = json_getProperty(parser, "Motion Sets");
+01781                 | 
+01781                 |     int index = 0;
+01781                 |     char filenames[ 15 ][ 50 ];
+01781                 |     for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
+01781                 |     {
+01781                 |         strncpy(filenames[index], json_getValue(property),  50 );
+01781                 |         index++;
+01781                 |     }
+01781                 |     profile->setCount = index;
+01781                 | 
+01781                 |     for (int i = 0; i < profile->setCount; i++)
+01781                 |     {
+01781                 |         __builtin_printf ("reading motion profile: %s\n", filenames[i]);
+01781                 |         json_to_motion_set(filenames[i], &(profile->sets[i]));
+01781                 |     }
+01781                 | 
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 
+01781                 | void json_to_motion_set(const char *filename, MotionSet *set)
+01781                 | {
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 | 
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 | 
+01781                 |     strncpy(set->name, json_property_to_string(parser, "Name"),  50 );
+01781                 |     set->number = json_property_to_int(parser, "Number");
+01781                 |     strncpy(set->type, json_property_to_string(parser, "Type"),  10 );
+01781                 |     set->executions = json_property_to_int(parser, "Executions");
+01781                 | 
+01781                 |     char filenames[ 10 ][ 50 ];
+01781                 |     const json_t *properties = json_getProperty(parser, "Quartets");
+01781                 | 
+01781                 |     int index = 0;
+01781                 |     for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
+01781                 |     {
+01781                 |         strncpy(filenames[index], json_getValue(property),  50 );
+01781                 |         index++;
+01781                 |     }
+01781                 |     set->quartetCount = index;
+01781                 | 
+01781                 |     for (int i = 0; i < set->quartetCount; i++)
+01781                 |     {
+01781                 |         __builtin_printf ("reading motion set: %s\n", filenames[i]);
+01781                 |         json_to_motion_quartet(filenames[i], &(set->quartets[i]));
+01781                 |     }
+01781                 | 
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 
+01781                 | void json_to_motion_quartet(const char *filename, MotionQuartet *quartet)
+01781                 | {
+01781                 |     __builtin_printf ("Opening file\n");
+01781                 |     FILE *file = fopen(filename, "r");
+01781                 |     if (file ==  (0) )
+01781                 |     {
+01781                 |         __builtin_printf ("Error opening file:%s\n", filename);
+01781                 |         return  (0) ;
+01781                 |     }
+01781                 |     __builtin_printf ("file opened\n");
+01781                 | 
+01781                 | 
+01781                 |     bufferSem =  (1) ;
+01781                 |     fseek(file, 0,  2 );
+01781                 |     long fileSize = ftell(file);
+01781                 |     fseek(file, 0,  0 );
+01781                 | 
+01781                 |     fread(buffer, fileSize, 1, file);
+01781                 |     fclose(file);
+01781                 |     buffer[fileSize] = '\0';
+01781                 |     __builtin_printf ("%s\n", buffer);
+01781                 | 
+01781                 | 
+01781                 |     const json_t *parser = json_create(buffer, mem,  200 );
+01781                 |     __builtin_printf ("parsing name\n");
+01781                 |     strncpy(quartet->name, json_property_to_string(parser, "Name"),  50 );
+01781                 |     __builtin_printf ("parsing Function\n");
+01781                 |     quartet->function = json_property_to_int(parser, "Function");
+01781                 |     __builtin_printf ("parsing Parameters\n");
+01781                 |     json_property_to_double_array(quartet->parameters, parser, "Parameters");
+01781                 |     __builtin_printf ("paramouter:%f \n", quartet->parameters[0]);
+01781                 |     __builtin_printf ("parsing Dwell\n");
+01781                 |     quartet->dwell = json_property_to_double(parser, "Dwell");
+01781                 |     __builtin_printf ("done\n");
+01781                 | 
+01781                 |     bufferSem =  (0) ;
+01781                 | }
+01781                 | 

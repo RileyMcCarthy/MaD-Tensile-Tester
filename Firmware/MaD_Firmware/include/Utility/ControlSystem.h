@@ -1,5 +1,5 @@
-#ifndef Control_H
-#define Control_H
+#ifndef ControlSystem_H
+#define ControlSystem_H
 #include "JSON.h"
 #include "Monitor.h"
 #include "i2cNavKey.h"
@@ -21,15 +21,10 @@ typedef struct control_t
     MonitorData *monitorData;
     MachineState *stateMachine;
     MotionProfile motionProfile;
-    MCP23017 *mcp;
-    NavKey *navkey;
-    DYN4 *dyn4;
     int cogid;
-    long setpointum;
-} Control;
+} ControlSystem;
 
-Control *control_create(MachineProfile *machineProfile, MachineState *stateMachine, DYN4 *dyn4, MonitorData *monitorData);
-void control_destry(Control *control);
-bool control_begin(Control *control);
+void control_destry(ControlSystem *control);
+bool control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine,  MonitorData *monitorData);
 
 #endif

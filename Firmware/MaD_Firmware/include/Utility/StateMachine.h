@@ -78,7 +78,7 @@ typedef struct MachineCheck_t
     MotionOverTravel esdTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
     bool esdSwitch;                  // User ESD switch is activated ( GPI_4 ). Control.c. implemented (big red button)
     bool servoOK;                    // Servo ready signal recieved ( GPI_11 ). Control.c, implemented
-    bool forceGaugeCom;              // Force gauge communicating. Control.c, implemented
+    bool forceGaugeCom;              // Force gauge communicating. ControlSystem.c, implemented
     bool servoCom;                   // DYN4 is communicating. Control.c
     bool rtcCom;                     // RTC is communicating. Control.c , not implmeented
 
@@ -91,6 +91,7 @@ typedef struct Motion_t
     MotionMode mode;           // internal and external
 } MotionParameters;
 
+//@TODO use lock for this struct (built into flexprop)
 typedef struct MachineState_t
 {
     State state;
@@ -98,8 +99,9 @@ typedef struct MachineState_t
     MachineCheckParameters machineCheckParameters;
     MotionParameters motionParameters;
     ModeFunctions function;
-    int functionData;
-    int cogid;
+    int functionData; //@TODO use union for function data
+
+    int lock;
 } MachineState;
 
 typedef enum parameters_e
@@ -121,6 +123,7 @@ typedef enum parameters_e
 MachineState *machine_state_create();
 
 // External State Setters
+void machine_state_init(MachineState *machineState);
 void state_machine_set(MachineState *machineState, Parameter param, int state);
 bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2);
 bool state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2);

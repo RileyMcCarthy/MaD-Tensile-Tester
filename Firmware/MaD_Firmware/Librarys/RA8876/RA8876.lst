@@ -1,0 +1,2511 @@
+00000                 | 
+00000                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+00000                 | #line 11 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+00000                 | #line 1 "RA8876.h"
+00000                 | #line 13 "RA8876.h"
+00000                 | #line 1 "C:/flexprop/include/simpletools.h"
+00000                 | #line 9 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 4 "C:/flexprop/include/propeller2.h"
+00000                 | #line 1 "C:/flexprop/include/stdint.h"
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | typedef signed char int8_t;
+00000                 | typedef unsigned char uint8_t;
+00000                 | 
+00000                 | typedef signed short int16_t;
+00000                 | typedef unsigned short uint16_t;
+00000                 | 
+00000                 | typedef signed long int32_t;
+00000                 | typedef unsigned long uint32_t;
+00000                 | 
+00000                 | typedef long long int64_t;
+00000                 | typedef unsigned long long uint64_t;
+00000                 | 
+00000                 | typedef unsigned long uintptr_t;
+00000                 | typedef long intptr_t;
+00000                 | 
+00000                 | typedef int64_t intmax_t;
+00000                 | typedef uint64_t uintmax_t;
+00000                 | 
+00000                 | typedef int8_t int_least8_t;
+00000                 | typedef int16_t int_least16_t;
+00000                 | typedef int32_t int_least32_t;
+00000                 | typedef int64_t int_least64_t;
+00000                 | 
+00000                 | typedef uint8_t uint_least8_t;
+00000                 | typedef uint16_t uint_least16_t;
+00000                 | typedef uint32_t uint_least32_t;
+00000                 | typedef uint64_t uint_least64_t;
+00000                 | 
+00000                 | typedef int32_t int_fast8_t;
+00000                 | typedef int32_t int_fast16_t;
+00000                 | typedef int32_t int_fast32_t;
+00000                 | typedef int64_t int_fast64_t;
+00000                 | 
+00000                 | typedef uint32_t uint_fast8_t;
+00000                 | typedef uint32_t uint_fast16_t;
+00000                 | typedef uint32_t uint_fast32_t;
+00000                 | typedef uint64_t uint_fast64_t;
+00000                 | #line 5 "C:/flexprop/include/propeller2.h"
+00000                 | #line 56 "C:/flexprop/include/propeller2.h"
+00000                 | typedef struct _cartesian {
+00000                 |    int32_t x, y;
+00000                 | } cartesian_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _polar {
+00000                 |    uint32_t r, t;
+00000                 | } polar_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _counter64 {
+00000                 |     uint32_t low, high;
+00000                 | } counter64_t;
+00000                 | #line 96 "C:/flexprop/include/propeller2.h"
+00000                 | void _clkset(uint32_t clkmode, uint32_t clkfreq);
+00000                 | void _hubset(uint32_t val);
+00000                 | void _reboot(void);
+00000                 | 
+00000                 | 
+00000                 | int _coginit(int cog, void *pgm, void *ptr);
+00000                 | #line 116 "C:/flexprop/include/propeller2.h"
+00000                 | void _cogstop(int cog);
+00000                 | int _cogchk(int cog);
+00000                 | int _cogid(void);
+00000                 | 
+00000                 | int _locknew(void);
+00000                 | void _lockret(int lock);
+00000                 | 
+00000                 | int _locktry(int lock);
+00000                 | int _lockrel(int lock);
+00000                 | int _lockchk(int lock);
+00000                 | 
+00000                 | void _cogatn(uint32_t mask);
+00000                 | int _pollatn(void);
+00000                 | int _waitatn(void);
+00000                 | 
+00000                 | 
+00000                 | cartesian_t _rotxy(cartesian_t coord, uint32_t t);
+00000                 | cartesian_t _polxy(polar_t coord);
+00000                 | polar_t _xypol(cartesian_t coord);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _rnd(void);
+00000                 | 
+00000                 | 
+00000                 | int _clz(uint32_t val);
+00000                 | int _encod(uint32_t val);
+00000                 | uint32_t _isqrt(uint32_t val);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _cnt(void);
+00000                 | uint32_t _cnth(void);
+00000                 | counter64_t _cnthl();
+00000                 | uint32_t _getsec();
+00000                 | uint32_t _getms();
+00000                 | uint32_t _getus();
+00000                 | 
+00000                 | uint32_t _pollcnt(uint32_t tick);
+00000                 | void _waitcnt(uint32_t tick);
+00000                 | 
+00000                 | void _waitx(uint32_t cycles);
+00000                 | void _waitsec(uint32_t seconds);
+00000                 | void _waitms(uint32_t milliseconds);
+00000                 | void _waitus(uint32_t microseconds);
+00000                 | 
+00000                 | 
+00000                 | void _pinw(int pin, int val);
+00000                 | void _pinl(int pin);
+00000                 | void _pinh(int pin);
+00000                 | void _pinnot(int pin);
+00000                 | void _pinrnd(int pin);
+00000                 | void _pinf(int pin);
+00000                 | int _pinr(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _wrpin(int pin, uint32_t val);
+00000                 | void _wxpin(int pin, uint32_t val);
+00000                 | void _wypin(int pin, uint32_t val);
+00000                 | void _akpin(int pin);
+00000                 | uint32_t _rdpin(int pin);
+00000                 | uint32_t _rqpin(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _pinstart(int pin, uint32_t mode, uint32_t xval, uint32_t yval);
+00000                 | 
+00000                 | void _pinclear(int pin);
+00000                 | 
+00000                 | 
+00000                 | extern uint32_t _clockfreq(void);
+00000                 | extern uint32_t _clockmode(void);
+00000                 | #line 10 "C:/flexprop/include/simpletools.h"
+00000                 | #line 14 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/compiler.h"
+00000                 | #line 15 "C:/flexprop/include/simpletools.h"
+00000                 | #line 16 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 3 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 1 "C:/flexprop/include/stdarg.h"
+00000                 | #line 4 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 12 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | typedef struct text_struct
+00000                 | {
+00000                 | 
+00000                 |   int (*rxChar)(struct text_struct *p);
+00000                 | 
+00000                 |   int (*txChar)(struct text_struct *p, int ch);
+00000                 | 
+00000                 |   int cogid[ 7 ];
+00000                 | 
+00000                 |   volatile void *devst;
+00000                 | 
+00000                 |   volatile int terminalEcho;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 |   volatile char ecA;
+00000                 |   volatile char ecB;
+00000                 |   volatile char ecsA;
+00000                 |   volatile char ecsB;
+00000                 | } text_t;
+00000                 | 
+00000                 | char *_safe_gets(text_t *text, char *buf, int count)  __fromfile("libsimpletext/safe_gets.c") ;
+00000                 | char *getStr(char *buf, int max)  __fromfile("libsimpletext/getStr.c") ;
+00000                 | 
+00000                 | float string2float(char *s, char **end)  __fromfile("libsimpletext/stringToFloat.c") ;
+00000                 | int _doscanf(const char *str, const char *fmt,  unsigned long  args)  __fromfile("libsimpletext/doscanf.c") ;
+00000                 | 
+00000                 | const char* _scanf_getl(const char *str, int *dst, int base, unsigned width, int isSigned)  __fromfile("libsimpletext/scanf_getl.c") ;
+00000                 | const char* _scanf_getf(const char *str, float *dst)  __fromfile("libsimpletext/scanf_getf.c") ;
+00000                 | 
+00000                 | int scan(const char *fmt, ...)  __fromfile("libsimpletext/scan.c") ;
+00000                 | #line 17 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 21 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 22 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 26 "C:/flexprop/include/simplei2c.h"
+00000                 | typedef struct i2c_st
+00000                 | {
+00000                 |   int scl_pin;
+00000                 |   int sda_pin;
+00000                 |   int drivescl;
+00000                 | } i2c;
+00000                 | #line 46 "C:/flexprop/include/simplei2c.h"
+00000                 | i2c *i2c_open(i2c *bus, int sclPin, int sdaPin, int sclDrive) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 53 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_start(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 60 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_stop(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 72 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeByte(i2c *bus, int byte) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 83 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readByte(i2c *bus, int ackState) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 97 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeData(i2c *bus, const unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 112 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readData(i2c *bus, unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 123 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_poll(i2c *bus, int addr) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 18 "C:/flexprop/include/simpletools.h"
+00000                 | #line 30 "C:/flexprop/include/simpletools.h"
+00000                 | int input(int pin)  __fromfile("libsimpletools/input.c") ;
+00000                 | #line 45 "C:/flexprop/include/simpletools.h"
+00000                 | unsigned get_direction(int pin)  __fromfile("libsimpletools/getDirection.c") ;
+00000                 | unsigned get_directions(int startPin, int endPin)  __fromfile("libsimpletools/getDirections.c") ;
+00000                 | unsigned get_output(int pin)  __fromfile("libsimpletools/getOutput.c") ;
+00000                 | unsigned get_outputs(int startPin, int endPin)  __fromfile("libsimpletools/getOutputs.c") ;
+00000                 | unsigned get_states(int endPin, int startPin)  __fromfile("libsimpletools/getStates.c") ;
+00000                 | void set_directions(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setDirections.c") ;
+00000                 | void set_outputs(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setOutputs.c") ;
+00000                 | 
+00000                 | long count(int pin, long duration, int pinToCount = -1)  __fromfile("libsimpletools/count.c") ;
+00000                 | 
+00000                 | void dac_ctr(int pin, int channel, int dacVal)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_res(int bits)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_stop(void)  __fromfile("libsimpletools/dac.c") ;
+00000                 | 
+00000                 | void freqout(int pin, int msTime, int frequency)  __fromfile("libsimpletools/freqout.c") ;
+00000                 | 
+00000                 | int pwm_start(unsigned int cycleMicroseconds)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_set(int pin, int channel, int tHigh)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_stop(void)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | 
+00000                 | long pulse_in(int pin, int state)  __fromfile("libsimpletools/pulseIn.c") ;
+00000                 | void pulse_out(int pin, int time)  __fromfile("libsimpletools/pulseOut.c") ;
+00000                 | 
+00000                 | long rc_time(int pin, int state)  __fromfile("libsimpletools/rcTime.c") ;
+00000                 | 
+00000                 | void square_wave(int pin, int channel, int freq)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | void square_wave_stop(void)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | void square_wave_stop_pin(int pin)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | #line 79 "C:/flexprop/include/simpletools.h"
+00000                 | int int_fraction(int a, int b, int shift)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | int shift_in(int pinDat, int pinClk, int mode, int bits)  __fromfile("libsimpletools/shiftIn.c") ;
+00000                 | void shift_out(int pinDat, int pinClk, int mode, int bits, int value)  __fromfile("libsimpletools/shiftOut.c") ;
+00000                 | 
+00000                 | 
+00000     00 00 00 00 | extern unsigned int st_buscnt;
+00004                 | 
+00004                 | i2c *i2c_newbus(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/i2c_init.c") ;
+00004                 | int i2c_out(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, const unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_out.c") ;
+00004                 | int i2c_in(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_in.c") ;
+00004                 | int i2c_busy(i2c *busID, int i2cAddr)  __fromfile("libsimpletools/i2c_busy.c") ;
+00004                 | 
+00004                 | 
+00004     00 00 00 00 | extern i2c *st_eeprom;
+00008     00 00 00 00 | extern int st_eeInitFlag;
+0000c                 | #line 114 "C:/flexprop/include/simpletools.h"
+0000c                 | void ee_config(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/eeprom_initSclDrive.c") ;
+0000c                 | void ee_init()  __fromfile("libsimpletools/eeprom_init.c") ;
+0000c                 | void ee_putByte(unsigned char value, int addr)  __fromfile("libsimpletools/eeprom_putByte.c") ;
+0000c                 | char ee_getByte(int addr)  __fromfile("libsimpletools/eeprom_getByte.c") ;
+0000c                 | void ee_putInt(int value, int addr)  __fromfile("libsimpletools/eeprom_putInt.c") ;
+0000c                 | int ee_getInt(int addr)  __fromfile("libsimpletools/eeprom_getInt.c") ;
+0000c                 | void ee_putStr(unsigned char *s, int n, int addr)  __fromfile("libsimpletools/eeprom_putStr.c") ;
+0000c                 | unsigned char* ee_getStr(unsigned char* s, int n, int addr)  __fromfile("libsimpletools/eeprom_getStr.c") ;
+0000c                 | void ee_putFloat32(float value, int addr)  __fromfile("libsimpletools/eeprom_putFloat.c") ;
+0000c                 | float ee_getFloat32(int addr)  __fromfile("libsimpletools/eeprom_getFloat.c") ;
+0000c                 | 
+0000c                 | float constrainFloat(float value, float min, float max)  __fromfile("libsimpletools/constrainFloat.c") ;
+0000c                 | int constrainInt(int value, int min, int max)  __fromfile("libsimpletools/constrainInt.c") ;
+0000c                 | 
+0000c                 | void endianSwap(void *resultAddr, void *varAddr, int byteCount)  __fromfile("libsimpletools/endianSwap.c") ;
+0000c                 | 
+0000c                 | float mapFloat(float value, float fromMin, float fromMax, float toMin, float toMax)  __fromfile("libsimpletools/mapFloat.c") ;
+0000c                 | int mapInt(int value, int fromMin, int fromMax, int toMin, int toMax)  __fromfile("libsimpletools/mapInt.c") ;
+0000c                 | 
+0000c                 | int random(int limitLow, int limitHigh)  __fromfile("libsimpletools/random.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | void cog_end(int *coginfo)  __fromfile("libsimpletools/cogend.c") ;
+0000c                 | int cog_num(int *coginfo)  __fromfile("libsimpletools/cognum.c") ;
+0000c                 | int* cog_run(void (*function)(void *par), int stacksize)  __fromfile("libsimpletools/cogrun.c") ;
+0000c                 | #line 14 "RA8876.h"
+0000c                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+0000c                 | #line 14 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+0000c                 | typedef enum Error_e
+0000c                 | {
+0000c                 |     SUCCESS,
+0000c                 |     FAIL,
+0000c                 | 
+0000c                 |     DISPLAY_NOT_FOUND = 2,
+0000c                 |     DISPLAY_PLL_FAIL,
+0000c                 |     DISPLAY_SDRAM_FAIL,
+0000c                 | 
+0000c                 |     RTC_RESET = 51,
+0000c                 |     RTC_NOT_FOUND,
+0000c                 | 
+0000c                 |     DYN4_NOT_RESPONDING = 101,
+0000c                 |     DYN4_CONNECTION_LOST,
+0000c                 |     DYN4_COG_FAIL,
+0000c                 | 
+0000c                 |     FORCEGAUGE_NOT_RESPONDING = 151,
+0000c                 |     FORCEGAUGE_CONNECTION_LOST,
+0000c                 |     FORCEGAUGE_COG_FAIL,
+0000c                 | 
+0000c                 |     JSON_FILE_ERROR = 201,
+0000c                 |     JSON_FILE_NOT_FOUND,
+0000c                 |     JSON_FILE_READ_FAIL,
+0000c                 |     JSON_FILE_WRITE_FAIL,
+0000c                 |     JSON_FILE_INVALID,
+0000c                 |     JSON_FILE_EMPTY,
+0000c                 |     JSON_FILE_NOT_VALID,
+0000c                 | 
+0000c                 |     MCP23017_NOT_FOUND = 251,
+0000c                 | 
+0000c                 | } Error;
+0000c                 | 
+0000c                 | void print_error(Error value);
+0000c                 | inline void seterror(Error *err, Error value);
+0000c                 | #line 15 "RA8876.h"
+0000c                 | #line 1 "C:/flexprop/include/stdbool.h"
+0000c                 | #line 16 "RA8876.h"
+0000c                 | #line 1 "C:/flexprop/include/stdint.h"
+0000c                 | #line 17 "RA8876.h"
+0000c                 | #line 1 "C:/flexprop/include/stdio.h"
+0000c                 | #line 5 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef  unsigned long  size_t;
+0000c                 | #line 6 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 6 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 7 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 15 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef int wchar_t;
+0000c                 | #line 24 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef struct _Mbstate {
+0000c                 |   unsigned int total:5;
+0000c                 |   unsigned int left:5;
+0000c                 |   unsigned int partial:22;
+0000c                 | } _Mbstate_t;
+0000c                 | #line 8 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 1 "C:/flexprop/include/time.h"
+0000c                 | #line 7 "C:/flexprop/include/time.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 8 "C:/flexprop/include/time.h"
+0000c                 | #line 13 "C:/flexprop/include/time.h"
+0000c                 | typedef unsigned int clock_t;
+0000c                 | #line 29 "C:/flexprop/include/time.h"
+0000c                 | typedef unsigned long time_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | struct tm {
+0000c                 |   int tm_sec;
+0000c                 |   int tm_min;
+0000c                 |   int tm_hour;
+0000c                 |   int tm_mday;
+0000c                 |   int tm_mon;
+0000c                 |   int tm_year;
+0000c                 |   int tm_wday;
+0000c                 |   int tm_yday;
+0000c                 |   int tm_isdst;
+0000c                 | };
+0000c                 | 
+0000c                 | 
+0000c                 |     clock_t clock(void)  __fromfile("libc/sys/propeller/clock.c") ;
+0000c                 |     time_t time(time_t *)  __fromfile("libc/time/time.c") ;
+0000c                 |     double difftime(time_t time2, time_t time1)  __fromfile("libc/time/difftime.c") ;
+0000c                 | 
+0000c                 |     time_t mktime(struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+0000c                 | 
+0000c                 |     struct tm *_gmtime_r(const time_t *t, struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *gmtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *_localtime_r(const time_t *, struct tm *)  __fromfile("libc/time/localtim.c") ;
+0000c                 |     struct tm *localtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |     unsigned long  strftime(char *s,  unsigned long  max, const char *format, const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/strftime.c") ;
+0000c                 | 
+0000c                 |     char *asctime(const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *asctime_r(const struct tm *stm, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *ctime(const time_t *timep)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 |     char *ctime_r(const time_t *timep, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+0000c                 | #line 74 "C:/flexprop/include/time.h"
+0000c                 |     void _tzset(void)  __fromfile("libc/time/localtim.c") ;
+0000c                 | #line 9 "C:/flexprop/include/sys/types.h"
+0000c                 | 
+0000c                 | 
+0000c                 | typedef long off_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef long ssize_t;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef int dev_t;
+0000c                 | typedef int ino_t;
+0000c                 | typedef unsigned int mode_t;
+0000c                 | 
+0000c                 | typedef unsigned short uid_t;
+0000c                 | typedef unsigned short gid_t;
+0000c                 | 
+0000c                 | typedef int pid_t;
+0000c                 | 
+0000c                 | struct stat {
+0000c                 |   int st_dev;
+0000c                 |   int st_ino;
+0000c                 |   unsigned int st_mode;
+0000c                 |   int st_nlink;
+0000c                 |   uid_t st_uid;
+0000c                 |   gid_t st_gid;
+0000c                 |   int st_rdev;
+0000c                 |   long st_size;
+0000c                 |   long st_blksize;
+0000c                 |   long st_blocks;
+0000c                 |   time_t st_atime;
+0000c                 |   time_t st_mtime;
+0000c                 |   time_t st_ctime;
+0000c                 | };
+0000c                 | 
+0000c                 | typedef struct s_vfs_file_t vfs_file_t;
+0000c                 | 
+0000c                 | struct s_vfs_file_t {
+0000c                 |     void *vfsdata;
+0000c                 |     unsigned flags;
+0000c                 |     unsigned state;
+0000c                 |     int lock;
+0000c                 |     ssize_t (*read)(vfs_file_t *fil, void *buf, size_t count);
+0000c                 |     ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t count);
+0000c                 |     int (*putcf)(int c, vfs_file_t *fil);
+0000c                 |     int (*getcf)(vfs_file_t *fil);
+0000c                 |     int (*close)(vfs_file_t *fil);
+0000c                 |     int (*ioctl)(vfs_file_t *fil, int arg, void *buf);
+0000c                 |     int (*flush)(vfs_file_t *fil);
+0000c                 |     off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+0000c                 | 
+0000c                 | 
+0000c                 |     int putchar(int c) {
+0000c                 |         int i;
+0000c                 |         if (!putcf) return 0;
+0000c                 |         i = putcf(c, __this); return (i < 0) ? 0 : 1;
+0000c                 |     }
+0000c                 |     int getchar(void) {
+0000c                 |         if (!getcf) return -1;
+0000c                 |         return getcf(__this);
+0000c                 |     }
+0000c                 | };
+0000c                 | 
+0000c                 | typedef int (*putcfunc_t)(int c, vfs_file_t *fil);
+0000c                 | typedef int (*getcfunc_t)(vfs_file_t *fil);
+0000c                 | #line 7 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/limits.h"
+0000c                 | #line 8 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 4 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 5 "C:/flexprop/include/sys/vfs.h"
+0000c                 | #line 1 "C:/flexprop/include/dirent.h"
+0000c                 | #line 8 "C:/flexprop/include/dirent.h"
+0000c                 | struct dirent {
+0000c                 |     char d_name[ (64) ];
+0000c                 |     unsigned long d_off;
+0000c                 |     unsigned long d_ino;
+0000c                 |     unsigned long d_size;
+0000c                 |     unsigned long d_mtime;
+0000c                 |     unsigned char d_type;
+0000c                 | };
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | typedef struct _dir {
+0000c                 |     void *vfs;
+0000c                 |     void *vfsdata;
+0000c                 |     struct dirent dirent;
+0000c                 | } DIR;
+0000c                 | 
+0000c                 | DIR *opendir(const char *name)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | int closedir(DIR *dir)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | struct dirent *readdir(DIR *dirp)  __fromfile("libc/unix/opendir.c") ;
+0000c                 | #line 6 "C:/flexprop/include/sys/vfs.h"
+0000c                 | 
+0000c                 | typedef DIR vfs_dir_t;
+0000c                 | #line 11 "C:/flexprop/include/sys/vfs.h"
+0000c                 | struct vfs {
+0000c                 | 
+0000c                 |     int (*close)(vfs_file_t *fil);
+0000c                 |     ssize_t (*read)(vfs_file_t *fil, void *buf, size_t siz);
+0000c                 |     ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t siz);
+0000c                 |     off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+0000c                 |     int (*ioctl)(vfs_file_t *fil, unsigned long req, void *argp);
+0000c                 |     int (*flush)(vfs_file_t *fil);
+0000c                 |     void *vfs_data;
+0000c                 |     void *reserved;
+0000c                 | 
+0000c                 |     int (*open)(vfs_file_t *fil, const char *name, int flags);
+0000c                 |     int (*creat)(vfs_file_t *fil, const char *pathname, mode_t mode);
+0000c                 | 
+0000c                 |     int (*opendir)(vfs_dir_t *dir, const char *name);
+0000c                 |     int (*closedir)(vfs_dir_t *dir);
+0000c                 |     int (*readdir)(vfs_dir_t *dir, struct dirent *ent);
+0000c                 |     int (*stat)(const char *name, struct stat *buf);
+0000c                 | 
+0000c                 |     int (*mkdir)(const char *name, mode_t mode);
+0000c                 |     int (*rmdir)(const char *name);
+0000c                 | 
+0000c                 |     int (*remove)(const char *pathname);
+0000c                 |     int (*rename)(const char *oldname, const char *newname);
+0000c                 | 
+0000c                 |     int (*init)(const char *mountname);
+0000c                 |     int (*deinit)(const char *mountname);
+0000c                 | };
+0000c                 | 
+0000c                 | typedef struct vfs vfs_t;
+0000c                 | 
+0000c                 | int _openraw(void *f, const char *name, unsigned flags, unsigned perm)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | int _closeraw(void *f)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | struct vfs *_getrootvfs(void);
+0000c                 | void _setrootvfs(struct vfs *);
+0000c                 | 
+0000c                 | struct vfs *_vfs_open_host(void)  __fromfile("filesys/fs9p/fs9p_vfs.c") ;
+0000c                 | struct vfs *_vfs_open_sdcard(void)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+0000c                 | struct vfs *_vfs_open_sdcardx(int pclk = 61, int pss = 60, int pdi = 59, int pdo = 58)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+0000c                 | #line 64 "C:/flexprop/include/sys/vfs.h"
+0000c                 | struct _default_buffer {
+0000c                 |     int cnt;
+0000c                 |     unsigned char *ptr;
+0000c                 |     unsigned flags;
+0000c                 | 
+0000c                 | 
+0000c                 |     unsigned char buf[ 1024 ];
+0000c                 | };
+0000c                 | 
+0000c                 | int __default_getc(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_putc(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_putc_terminal(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | int __default_flush(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | char *__getfilebuffer();
+0000c                 | struct vfs *__getvfsforfile(char *fullname, const char *orig_name, char *full_path);
+0000c                 | #line 9 "C:/flexprop/include/stdio.h"
+0000c                 | #line 1 "C:/flexprop/include/unistd.h"
+0000c                 | #line 2 "C:/flexprop/include/unistd.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 4 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/types.h"
+0000c                 | #line 5 "C:/flexprop/include/sys/unistd.h"
+0000c                 | #line 22 "C:/flexprop/include/sys/unistd.h"
+0000c                 |   typedef unsigned int useconds_t;
+0000c                 | 
+0000c                 |   int open(const char *name, int flags, mode_t mode)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int write(int fd, const void *buf, int count)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int read(int fd, void *buf, int count)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int close(int fd)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   off_t lseek(int fd, off_t offset, int whence)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int ioctl(int fd, unsigned long req, void *argp)  __fromfile("libc/unix/ioctl.c") ;
+0000c                 |   int access(const char *path, int mode)  __fromfile("libc/unix/access.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |   int isatty(int fd)  __fromfile("libc/unix/isatty.c") ;
+0000c                 | 
+0000c                 |   char *getcwd(char *buf, int size)  __attribute__((complexio))   __fromfile("libc/unix/_mount.c") ;
+0000c                 |   int chdir(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/_mount.c") ;
+0000c                 |   int rmdir(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int mkdir(const char *path, int mode)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 |   int unlink(const char *path)  __attribute__((complexio))   __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int chown(const char *pathname, uid_t owner, gid_t group)  __fromfile("libc/unix/posixio.c") ;
+0000c                 |   int chmod(const char *pathname, mode_t mode)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 |   unsigned int sleep(unsigned int seconds)  __fromfile("libc/time/sleep.c") ;
+0000c                 |   int usleep(useconds_t usec)  __fromfile("libc/time/usleep.c") ;
+0000c                 | 
+0000c                 |   char *_mktemp(char *templ);
+0000c                 |   char *mktemp(char *);
+0000c                 | 
+0000c                 |   const char **_get_environ_ptr()  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 |   void _put_environ_ptr(const char **ptr)  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |     int _execve(const char *path, char **args, char **env)  __attribute__((complexio))   __fromfile("libc/unix/exec.c") ;
+0000c                 | #line 3 "C:/flexprop/include/unistd.h"
+0000c                 | #line 10 "C:/flexprop/include/stdio.h"
+0000c                 | #line 27 "C:/flexprop/include/stdio.h"
+0000c                 | typedef vfs_file_t FILE;
+0000c                 | typedef struct string_file_t {
+0000c                 |     FILE file;
+0000c                 |     const char *ptr;
+0000c                 |     size_t pos;
+0000c                 |     size_t len;
+0000c                 | } _STRING_FILE;
+0000c                 | 
+0000c                 | FILE *__getftab(int i)  __fromfile("libc/unix/posixio.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int fputc(int c, FILE *f)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | int fgetc(FILE *f)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int sprintf(char *str, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int snprintf(char *str, size_t size, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int printf(const char *format, ...)  __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | int fprintf(FILE *f, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | 
+0000c                 | int vsprintf(char *str, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int vsnprintf(char *str, size_t size, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sprintf.c") ;
+0000c                 | int vprintf(const char *format, unsigned long ap)  __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | int vfprintf(FILE *f, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/fprintf.c") ;
+0000c                 | 
+0000c                 | int vscanf(const char *format, unsigned long ap)  __fromfile("libc/stdio/vscanf.c") ;
+0000c                 | int vsscanf(char *str, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/sscanf.c") ;
+0000c                 | int vfscanf(FILE *f, const char *format, unsigned long ap)  __attribute__((complexio))   __fromfile("libc/stdio/vfscanf.c") ;
+0000c                 | 
+0000c                 | int scanf(const char *format, ...)  __fromfile("libc/stdio/scanf.c") ;
+0000c                 | int sscanf(char *str, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/sscanf.c") ;
+0000c                 | int fscanf(FILE *f, const char *format, ...)  __attribute__((complexio))   __fromfile("libc/stdio/fscanf.c") ;
+0000c                 | 
+0000c                 | int fputs(const char *s, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fputs.c") ;
+0000c                 | int puts(const char *s)  __fromfile("libc/stdio/fputs.c") ;
+0000c                 | 
+0000c                 | char *gets(char *data)  __fromfile("libc/stdio/gets.c") ;
+0000c                 | char *fgets(char *buf, int size, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fgets.c") ;
+0000c                 | 
+0000c                 | FILE *fopen(const char *name, const char *mode)  __attribute__((complexio))   __fromfile("libc/stdio/fopen.c") ;
+0000c                 | FILE *__string_file(_STRING_FILE *fp, const char *str, const char *mode, size_t len)  __attribute__((complexio))   __fromfile("libc/stdio/stringio.c") ;
+0000c                 | 
+0000c                 | int fclose(FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fopen.c") ;
+0000c                 | int fflush(FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fflush.c") ;
+0000c                 | size_t fwrite(const void *ptr, size_t size, size_t n, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fwrite.c") ;
+0000c                 | size_t fread(void *ptr, size_t size, size_t n, FILE *f)  __attribute__((complexio))   __fromfile("libc/stdio/fwrite.c") ;
+0000c                 | 
+0000c                 | void clearerr(FILE *f)  __fromfile("libc/stdio/clearerr.c") ;
+0000c                 | void perror(const char *s)  __fromfile("libc/stdio/perror.c") ;
+0000c                 | 
+0000c                 | int fileno(FILE *f)  __fromfile("libc/stdio/fileno.c") ;
+0000c                 | 
+0000c                 | int fseek(FILE *f, long offset, int whence)  __fromfile("libc/stdio/fseek.c") ;
+0000c                 | long ftell(FILE *f)  __fromfile("libc/stdio/fseek.c") ;
+0000c                 | 
+0000c                 | int remove(const char *pathname)  __fromfile("libsys/remove.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | int rename(const char *oldpath, const char *newpath)  __fromfile("libc/unix/rename.c") ;
+0000c                 | #line 18 "RA8876.h"
+0000c                 | #line 1 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 5 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | #line 6 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 7 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/null.h"
+0000c                 | #line 8 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 22 "C:/flexprop/include/stdlib.h"
+0000c                 |     double atof(const char *);
+0000c                 |     int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long long atoll(const char *);
+0000c                 | 
+0000c                 |   long double strtold(const char *nptr, char **endptr);
+0000c                 |   double strtod(const char *nptr, char **endptr);
+0000c                 |   float strtof(const char *nptr, char **endptr);
+0000c                 | 
+0000c                 |     long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+0000c                 |     unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+0000c                 |   long long strtoll(const char *nptr, char **endptr, int base);
+0000c                 |   unsigned long long strtoull(const char *nptr, char **endptr, int base);
+0000c                 | 
+0000c                 | 
+0000c                 |     int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 |     void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 | 
+0000c                 |     void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 |     int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+0000c                 |      void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+0000c                 |    void _exit(int status);
+0000c                 | #line 56 "C:/flexprop/include/stdlib.h"
+0000c                 |    long labs(long l);
+0000c                 | 
+0000c                 | 
+0000c                 |    long long llabs(long long ll);
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     int quot, rem;
+0000c                 |   } div_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long int quot, rem;
+0000c                 |   } ldiv_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long long quot, rem;
+0000c                 |   } lldiv_t;
+0000c                 | 
+0000c                 |   div_t div(int num, int denom);
+0000c                 |   ldiv_t ldiv(long num, long denom);
+0000c                 |   lldiv_t lldiv(long long num, long long denom);
+0000c                 | 
+0000c                 |     void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+0000c                 |   void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+0000c                 | 		int (*compare)(const void *, const void *));
+0000c                 | 
+0000c                 |     char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 |     int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+0000c                 | 
+0000c                 | 
+0000c     00 00 00 00 |   extern int _mb_cur_max;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 |   int mblen(const char *s, size_t n);
+00010                 |   int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+00010                 |   size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+00010                 | 
+00010                 | 
+00010                 |   int system(const char *command);
+00010                 | #line 102 "C:/flexprop/include/stdlib.h"
+00010                 |     int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+00010                 |     int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+00010                 | #line 19 "RA8876.h"
+00010                 | 
+00010                 | typedef struct __using("jm_i2c.spin2") I2CBus;
+00010                 | typedef struct __using("jm_spi.spin2") SPI;
+00010                 | #line 786 "RA8876.h"
+00010                 | typedef struct TouchLocation_s
+00010                 | {
+00010                 |     uint16_t x;
+00010                 |     uint16_t y;
+00010                 | } TouchLocation;
+00010                 | 
+00010                 | typedef struct Image_s
+00010                 | {
+00010                 |     char name[20];
+00010                 |     int page;
+00010                 |     int x0;
+00010                 |     int y0;
+00010                 |     int width;
+00010                 |     int height;
+00010                 |     uint16_t backgroundColor;
+00010                 |     uint16_t colorToReplace;
+00010                 |     uint16_t replacementColor;
+00010                 | } Image;
+00010                 | 
+00010                 | typedef struct RA8876_s
+00010                 | {
+00010                 |     int xnscs, reset;
+00010                 |     int spi_mosi, spi_miso, spi_clk;
+00010                 |     int i2c_addr_write, i2c_addr_read;
+00010                 |     int reset_mask;
+00010                 |     TouchLocation location[1];
+00010                 |     TouchLocation lastLocation[1];
+00010                 |     int locationCount;
+00010                 |     I2CBus i2cBus;
+00010                 |     SPI spi;
+00010                 |     int currentPage;
+00010                 | } Display;
+00010                 | 
+00010                 | Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);
+00010                 | 
+00010                 | 
+00010                 | void display_load_image(Display *display, Image *image);
+00010                 | void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos);
+00010                 | 
+00010                 | void display_on(Display *display,  _Bool  on);
+00010                 | void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height);
+00010                 | void display_lcd_horizontal_non_display(Display *display, uint16_t numbers);
+00010                 | void display_lcd_hsync_start_position(Display *display, uint16_t numbers);
+00010                 | void display_lcd_hsync_pulse_width(Display *display, uint16_t numbers);
+00010                 | void display_lcd_vertical_non_display(Display *display, uint16_t numbers);
+00010                 | void display_lcd_vsync_start_position(Display *display, uint16_t numbers);
+00010                 | void display_lcd_vsync_pulse_width(Display *display, uint16_t numbers);
+00010                 | void display_image_start_address(Display *display, uint32_t addr);
+00010                 | void display_image_width(Display *display, uint16_t width);
+00010                 | void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0);
+00010                 | void display_canvas_image_start_address(Display *display, uint32_t addr);
+00010                 | void display_canvas_image_width(Display *display, uint16_t width);
+00010                 | void display_active_window_xy(Display *display, uint16_t x0, uint16_t y0);
+00010                 | void display_active_window_wh(Display *display, uint16_t width, uint16_t height);
+00010                 | 
+00010                 | void display_ram_access_prepare(Display *display, Display *display);
+00010                 | void display_fore_ground_color_16bpp(Display *display, uint16_t color);
+00010                 | void display_back_ground_color_16bpp(Display *display, uint16_t color);
+00010                 | 
+00010                 | 
+00010                 | void display_graphic_mode(Display *display,  _Bool  on);
+00010                 | void display_set_pixel_cursor(Display *display, uint16_t x, uint16_t y);
+00010                 | void display_put_pixel_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t color);
+00010                 | void display_put_picture_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+00010                 | void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char *data);
+00010                 | 
+00010                 | 
+00010                 | void display_text_mode(Display *display,  _Bool  on);
+00010                 | void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color);
+00010                 | void display_set_text_cursor(Display *display, uint16_t x, uint16_t y);
+00010                 | void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select);
+00010                 | void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge);
+00010                 | 
+00010                 | void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width);
+00010                 | 
+00010                 | void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str);
+00010                 | 
+00010                 | 
+00010                 | void display_draw_line(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+00010                 | void display_draw_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+00010                 | void display_draw_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+00010                 | void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+00010                 | void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+00010                 | void display_draw_triangle(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+00010                 | void display_draw_triangle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+00010                 | void display_draw_circle(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+00010                 | void display_draw_circle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+00010                 | void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
+00010                 | void display_draw_ellipse_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
+00010                 | 
+00010                 | 
+00010                 | void display_bte_memory_copy(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t des_addr, uint16_t des_image_width,
+00010                 |                              uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height);
+00010                 | void display_bte_memory_copy_with_rop(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y,
+00010                 |                                       uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint8_t rop_code);
+00010                 | void display_bte_memory_copy_with_chroma_key(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+00010                 |                                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint16_t chromakey_color);
+00010                 | void display_bte_mpu_write_with_rop(Display *display, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y, uint32_t des_addr, uint16_t des_image_width,
+00010                 |                                     uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint8_t rop_code);
+00010                 | void display_bte_mpu_write_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
+00010                 | void display_bte_mpu_write_color_expansion(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
+00010                 | void display_bte_mpu_write_color_expansion_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y,
+00010                 |                                                            uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
+00010                 | 
+00010                 | void display_bte_pattern_fill(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+00010                 |                               uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height);
+00010                 | void display_bte_pattern_fill_with_chroma_key(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+00010                 |                                               uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
+00010                 | 
+00010                 | Error display_initialize(Display *display);
+00010                 | _Bool  display_pll_initial(Display *display);
+00010                 | _Bool  display_sdram_initial(Display *display);
+00010                 | 
+00010                 | 
+00010                 | uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len);
+00010                 | void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt);
+00010                 | uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
+00010                 | uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
+00010                 | void button_update(Display *display);
+00010                 | int display_update_touch(Display *display);
+00010                 | 
+00010                 | void lcdRegWrite(Display *display, uint8_t reg);
+00010                 | void lcdDataWrite(Display *display, uint8_t data);
+00010                 | uint8_t lcdDataRead(Display *display);
+00010                 | uint8_t lcdStatusRead(Display *display);
+00010                 | void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data);
+00010                 | uint8_t lcdRegDataRead(Display *display, uint8_t reg);
+00010                 | void lcdDataWrite16bbp(Display *display, uint16_t data);
+00010                 | 
+00010                 | 
+00010                 | void checkWriteFifoNotFull(Display *display);
+00010                 | void checkWriteFifoEmpty(Display *display);
+00010                 | void checkReadFifoNotFull(Display *display);
+00010                 | void checkReadFifoFull(Display *display);
+00010                 | void checkReadFifoNotEmpty(Display *display);
+00010                 | void check2dBusy(Display *display);
+00010                 | _Bool  checkSdramReady(Display *display);
+00010                 | uint8_t powerSavingStatus(Display *display);
+00010                 | _Bool  checkIcReady(Display *display);
+00010                 | 
+00010                 | void bte_Source0_MemoryStartAddr(Display *display, uint32_t addr);
+00010                 | void bte_Source0_ImageWidth(Display *display, uint16_t width);
+00010                 | void bte_Source0_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+00010                 | void bte_Source1_MemoryStartAddr(Display *display, uint32_t addr);
+00010                 | void bte_Source1_ImageWidth(Display *display, uint16_t width);
+00010                 | void bte_Source1_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+00010                 | void bte_DestinationMemoryStartAddr(Display *display, uint32_t addr);
+00010                 | void bte_DestinationImageWidth(Display *display, uint16_t width);
+00010                 | void bte_DestinationWindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+00010                 | void bte_WindowSize(Display *display, uint16_t width, uint16_t height);
+00010                 | 
+00010                 | 
+00010                 | void pwm_Prescaler(Display *display, uint8_t prescaler);
+00010                 | void pwm_ClockMuxReg(Display *display, uint8_t pwm1_clk_div, uint8_t pwm0_clk_div, uint8_t xpwm1_ctrl, uint8_t xpwm0_ctrl);
+00010                 | void pwm_Configuration(Display *display, uint8_t pwm1_inverter, uint8_t pwm1_auto_reload, uint8_t pwm1_start, uint8_t pwm0_dead_zone, uint8_t pwm0_inverter, uint8_t pwm0_auto_reload, uint8_t pwm0_start);
+00010                 | 
+00010                 | void pwm0_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+00010                 | void pwm0_Duty(Display *display, uint16_t duty);
+00010                 | void pwm1_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+00010                 | void pwm1_Duty(Display *display, uint16_t duty);
+00010                 | #line 12 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+00010                 | 
+00010                 | static unsigned char GTP_CFG_DATA[] =
+00010                 |     {
+00010                 | 
+00010                 |         0x63, 0x00, 0x04, 0x58, 0x02, 0x0A, 0x3D, 0x00,
+00010                 |         0x01, 0x08, 0x28, 0x0F, 0x50, 0x32, 0x03, 0x05,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17,
+00010                 |         0x19, 0x1D, 0x14, 0x90, 0x2F, 0x89, 0x23, 0x25,
+00010                 |         0xD3, 0x07, 0x00, 0x00, 0x00, 0x02, 0x03, 0x1D,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x19, 0x32, 0x94, 0xD5, 0x02,
+00010                 |         0x07, 0x00, 0x00, 0x04, 0xA2, 0x1A, 0x00, 0x90,
+00010                 |         0x1E, 0x00, 0x80, 0x23, 0x00, 0x73, 0x28, 0x00,
+00010                 |         0x68, 0x2E, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x16, 0x15, 0x14, 0x11, 0x10, 0x0F, 0x0E, 0x0D,
+00010                 |         0x0C, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x01,
+00010                 |         0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x29, 0x28,
+00010                 |         0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20,
+00010                 |         0x1F, 0x1E, 0x1C, 0x1B, 0x19, 0x14, 0x13, 0x12,
+00010                 |         0x11, 0x10, 0x0F, 0x0E, 0x0D, 0x0C, 0x0A, 0x08,
+00010                 |         0x07, 0x06, 0x04, 0x02, 0x00, 0xFF, 0x00, 0x00,
+00010                 |         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+00010                 |         0x71, 0x01
+00010                 | 
+00010     63 00 04 58 
+00014     02 0A 3D 00 
+00018     01 08 28 0F 
+0001c     50 32 03 05 
+00020     00 00 00 00 
+00024     00 00 00 17 
+00028     19 1D 14 90 
+0002c     2F 89 23 25 
+00030     D3 07 00 00 
+00034     00 02 03 1D 
+00038     00 00 00 00 
+0003c     00 00 00 00 
+00040     00 00 00 19 
+00044     32 94 D5 02 
+00048     07 00 00 04 
+0004c     A2 1A 00 90 
+00050     1E 00 80 23 
+00054     00 73 28 00 
+00058     68 2E 00 68 
+0005c     00 00 00 00 
+      ...             
+0007c     00 00 00 00 
+00080     16 15 14 11 
+00084     10 0F 0E 0D 
+00088     0C 09 08 07 
+0008c     06 05 04 01 
+00090     00 FF FF FF 
+00094     00 00 00 00 
+00098     00 00 00 00 
+0009c     00 00 29 28 
+000a0     27 26 25 24 
+000a4     23 22 21 20 
+000a8     1F 1E 1C 1B 
+000ac     19 14 13 12 
+000b0     11 10 0F 0E 
+000b4     0D 0C 0A 08 
+000b8     07 06 04 02 
+000bc     00 FF 00 00 
+000c0     00 00 00 00 
+000c4     00 00 00 00 
+000c8     71 01       | };
+000ca                 | 
+000ca                 | Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda)
+000ca                 | {
+000ca                 |   display->reset = reset;
+000ca                 |   display->xnscs = xnscs;
+000ca                 | 
+000ca                 |   display->spi_clk = spi_clk;
+000ca                 |   display->spi_mosi = spi_mosi;
+000ca                 |   display->spi_miso = spi_miso;
+000ca                 | 
+000ca                 |   display->spi.start(spi_miso,spi_mosi,spi_clk,10000);
+000ca                 | 
+000ca                 |   display->i2cBus.setup(i2c_clk, i2c_sda, 100, 1);
+000ca                 | 
+000ca                 |   int i2c_addr = 0x5d;
+000ca                 |   display->i2c_addr_write = (i2c_addr << 1) & 0b11111110;
+000ca                 |   display->i2c_addr_read = (i2c_addr << 1) | 0b00000001;
+000ca                 | 
+000ca                 |   _pinl(display->reset);
+000ca                 |   _waitms(2);
+000ca                 |   _pinh(display->reset);
+000ca                 |   _waitms(2);
+000ca                 | 
+000ca                 |   _waitms(1000);
+000ca                 | 
+000ca                 |   display_gt9271_send_cfg(display, (uint8_t *)GTP_CFG_DATA, sizeof(GTP_CFG_DATA));
+000ca                 | 
+000ca                 |   _pinh(display->xnscs);
+000ca                 |   _pinl(spi_clk);
+000ca                 | 
+000ca                 |   _pinh(reset);
+000ca                 |   _waitms(1);
+000ca                 |   _pinl(display->reset);
+000ca                 |   _waitms(1);
+000ca                 |   _pinh(reset);
+000ca                 |   _waitms(10);
+000ca                 | 
+000ca                 | 
+000ca                 |   lcdRegDataWrite(display, 0x01, 0x08);
+000ca                 |   _waitms(100);
+000ca                 | 
+000ca                 |   if ((lcdRegDataRead(display, 0xff) != 0x76) && (lcdRegDataRead(display, 0xff) != 0x77))
+000ca                 |   {
+000ca                 |     __builtin_printf ("Display not found\n");
+000ca                 |     return DISPLAY_NOT_FOUND;
+000ca                 |   }
+000ca                 |   Error err;
+000ca                 |   if ((err = display_initialize(display)) != SUCCESS)
+000ca                 |   {
+000ca                 |     __builtin_printf ("Error:%d\n", err);
+000ca                 |     return err;
+000ca                 |   }
+000ca                 |   return SUCCESS;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | Error display_initialize(Display *display)
+000ca                 | {
+000ca                 |   if (!display_pll_initial(display))
+000ca                 |   {
+000ca                 |     __builtin_printf ("PLL initial fail!");
+000ca                 |     return DISPLAY_PLL_FAIL;
+000ca                 |   }
+000ca                 |   if (!display_sdram_initial(display))
+000ca                 |   {
+000ca                 |     __builtin_printf ("SDRAM initial fail!");
+000ca                 |     return DISPLAY_SDRAM_FAIL;
+000ca                 |   }
+000ca                 |   lcdRegWrite(display,  0x01 );
+000ca                 |   lcdDataWrite(display,  1  << 7 |  0  << 6 |  0  << 5 |  0  << 3 |  0  << 2 |  1  << 1 |  0 );
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x02 );
+000ca                 |   lcdDataWrite(display,  0  << 6 |  0  << 4 |  0  << 1);
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x03 );
+000ca                 |   lcdDataWrite(display,  0  << 3 |  0  << 2 |  0 );
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x10 );
+000ca                 |   lcdDataWrite(display,  0  << 7 |  0  << 6 |  0  << 4 |  1  << 2 |  0 );
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x11 );
+000ca                 |   lcdDataWrite(display,  1  << 2 |  1 );
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x5E );
+000ca                 |   lcdDataWrite(display,  0  << 2 |  1 );
+000ca                 | 
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 | 
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x12 );
+000ca                 |   lcdDataWrite(display,  1  << 7 |  0  << 6 |  0 );
+000ca                 | 
+000ca                 |   lcdRegWrite(display,  0x13 );
+000ca                 |   lcdDataWrite(display,  1  << 7 |  1  << 6 |  0  << 5);
+000ca                 | 
+000ca                 |   display_lcd_horizontal_width_vertical_height(display,  1024 ,  600 );
+000ca                 |   display_lcd_horizontal_non_display(display,  160 );
+000ca                 |   display_lcd_hsync_start_position(display,  160 );
+000ca                 |   display_lcd_hsync_pulse_width(display,  70 );
+000ca                 |   display_lcd_vertical_non_display(display,  23 );
+000ca                 |   display_lcd_vsync_start_position(display,  12 );
+000ca                 |   display_lcd_vsync_pulse_width(display,  10 );
+000ca                 | 
+000ca                 | 
+000ca                 |   display_image_start_address(display,  0 );
+000ca                 |   display_image_width(display,  1024 );
+000ca                 |   display_window_start_xy(display, 0, 0);
+000ca                 |   display_canvas_image_start_address(display,  0 );
+000ca                 |   display_canvas_image_width(display,  1024 );
+000ca                 |   display_active_window_xy(display, 0, 0);
+000ca                 |   display_active_window_wh(display,  1024 ,  600 );
+000ca                 |   return SUCCESS;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void lcdRegWrite(Display *display, uint8_t reg)
+000ca                 | {
+000ca                 |   _pinl(display->xnscs);
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 |   display->spi.shiftout(1, 0x00 , (uint32_t)8);
+000ca                 |   display->spi.shiftout(1,reg, (uint32_t)8);
+000ca                 |   _pinh(display->xnscs);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void lcdDataWrite(Display *display, uint8_t data)
+000ca                 | {
+000ca                 |   _pinl(display->xnscs);
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 |   display->spi.shiftout(1, 0x80 , (uint32_t)8);
+000ca                 |   display->spi.shiftout(1,data, (uint32_t)8);
+000ca                 |   _pinh(display->xnscs);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | uint8_t lcdDataRead(Display *display)
+000ca                 | {
+000ca                 |   _pinl(display->xnscs);
+000ca                 | 
+000ca                 | 
+000ca                 |   display->spi.shiftout(1, 0xc0 , (uint32_t)8);
+000ca                 |   _pinh(display->spi_mosi);
+000ca                 | 
+000ca                 | 
+000ca                 |   uint8_t data = display->spi.shiftin(1, (uint32_t)8);
+000ca                 |   _pinh(display->xnscs);
+000ca                 |   return data;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | uint8_t lcdStatusRead(Display *display)
+000ca                 | {
+000ca                 |   _pinl(display->xnscs);
+000ca                 | 
+000ca                 | 
+000ca                 |   display->spi.shiftout(1, 0x40 , (uint32_t)8);
+000ca                 |   _pinh(display->spi_mosi);
+000ca                 | 
+000ca                 | 
+000ca                 |   uint8_t data = display->spi.shiftin(1, (uint32_t)8);
+000ca                 |   _pinh(display->xnscs);
+000ca                 |   return data;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data)
+000ca                 | {
+000ca                 |   lcdRegWrite(display, reg);
+000ca                 |   lcdDataWrite(display, data);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | uint8_t lcdRegDataRead(Display *display, uint8_t reg)
+000ca                 | {
+000ca                 |   lcdRegWrite(display, reg);
+000ca                 |   uint8_t data = lcdDataRead(display);
+000ca                 |   return data;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void lcdDataWrite16bbp(Display *display, uint16_t data)
+000ca                 | {
+000ca                 |   _pinl(display->xnscs);
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 |   display->spi.shiftout(1, 0x80 , (uint32_t)8);
+000ca                 |   display->spi.shiftout(1,data, (uint32_t)8);
+000ca                 |   display->spi.shiftout(1,data >> 8, (uint32_t)8);
+000ca                 |   _pinh(display->xnscs);
+000ca                 | }
+000ca                 | #line 253 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void checkWriteFifoNotFull(Display *display)
+000ca                 | {
+000ca                 |   uint16_t i;
+000ca                 |   for (i = 0; i < 10000; i++)
+000ca                 |   {
+000ca                 |     if ((lcdStatusRead(display) & 0x80) == 0)
+000ca                 |     {
+000ca                 |       break;
+000ca                 |     }
+000ca                 |   }
+000ca                 | }
+000ca                 | #line 272 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void checkWriteFifoEmpty(Display *display)
+000ca                 | {
+000ca                 |   uint16_t i;
+000ca                 |   for (i = 0; i < 10000; i++)
+000ca                 |   {
+000ca                 |     if ((lcdStatusRead(display) & 0x40) == 0x40)
+000ca                 |     {
+000ca                 |       break;
+000ca                 |     }
+000ca                 |   }
+000ca                 | }
+000ca                 | #line 291 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void checkReadFifoNotFull(Display *display)
+000ca                 | {
+000ca                 |   uint16_t i;
+000ca                 |   for (i = 0; i < 10000; i++)
+000ca                 |   {
+000ca                 |     if ((lcdStatusRead(display) & 0x20) == 0x00)
+000ca                 |     {
+000ca                 |       break;
+000ca                 |     }
+000ca                 |   }
+000ca                 | }
+000ca                 | #line 308 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void checkReadFifoNotEmpty(Display *display)
+000ca                 | {
+000ca                 |   uint16_t i;
+000ca                 |   for (i = 0; i < 10000; i++)
+000ca                 |   {
+000ca                 |     if ((lcdStatusRead(display) & 0x10) == 0x00)
+000ca                 |     {
+000ca                 |       break;
+000ca                 |     }
+000ca                 |   }
+000ca                 | }
+000ca                 | #line 326 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void check2dBusy(Display *display)
+000ca                 | {
+000ca                 |   uint32_t i;
+000ca                 |   for (i = 0; i < 1000000; i++)
+000ca                 |   {
+000ca                 |     _waitus(1);
+000ca                 |     if ((lcdStatusRead(display) & 0x08) == 0x00)
+000ca                 |     {
+000ca                 |       break;
+000ca                 |     }
+000ca                 |   }
+000ca                 | }
+000ca                 | #line 343 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | _Bool  checkSdramReady(Display *display)
+000ca                 | {
+000ca                 |   uint32_t i;
+000ca                 |   for (i = 0; i < 1000000; i++)
+000ca                 |   {
+000ca                 |     _waitms(1);
+000ca                 |     if ((lcdStatusRead(display) & 0x04) == 0x04)
+000ca                 |     {
+000ca                 |       return  (1) ;
+000ca                 |     }
+000ca                 |   }
+000ca                 |   return  (0) ;
+000ca                 | }
+000ca                 | #line 363 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | _Bool  checkIcReady(Display *display)
+000ca                 | {
+000ca                 |   uint32_t i;
+000ca                 |   for (i = 0; i < 1000000; i++)
+000ca                 |   {
+000ca                 |     _waitus(1);
+000ca                 |     if ((lcdStatusRead(display) & 0x02) == 0x00)
+000ca                 |     {
+000ca                 |       return  (1) ;
+000ca                 |     }
+000ca                 |   }
+000ca                 |   return  (0) ;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | _Bool  display_pll_initial(Display *display)
+000ca                 | {
+000ca                 | #line 395 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 |   if ( 50  >= 79)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x04);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 4 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  >= 63) && ( 50  <= 78))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x05);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  >= 40) && ( 50  <= 62))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  >= 32) && ( 50  <= 39))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x07);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 16 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  >= 16) && ( 50  <= 31))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x16);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 16 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  >= 8) && ( 50  <= 15))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x26);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 32 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 50  > 0) && ( 50  <= 7))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x05, 0x36);
+000ca                 |     lcdRegDataWrite(display, 0x06, ( 50  * 64 /  10 ) - 1);
+000ca                 |   }
+000ca                 | 
+000ca                 | 
+000ca                 |   if ( 120  >= 158)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x02);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 2 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 125) && ( 120  <= 157))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x03);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 4 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 79) && ( 120  <= 124))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x04);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 4 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 63) && ( 120  <= 78))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x05);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 40) && ( 120  <= 62))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 32) && ( 120  <= 39))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x07);
+000ca                 |     lcdRegDataWrite(display, 0x08, ( 120  * 16 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if ( 120  <= 31)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x07, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x08, (30 * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 | 
+000ca                 | 
+000ca                 |   if ( 120  >= 158)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x02);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 2 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 125) && ( 120  <= 157))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x03);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 4 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 79) && ( 120  <= 124))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x04);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 4 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 63) && ( 120  <= 78))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x05);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 40) && ( 120  <= 62))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if (( 120  >= 32) && ( 120  <= 39))
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x0A, ( 120  * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 |   else if ( 120  <= 31)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display, 0x09, 0x06);
+000ca                 |     lcdRegDataWrite(display, 0x0A, (30 * 8 /  10 ) - 1);
+000ca                 |   }
+000ca                 | 
+000ca                 |   _waitms(1);
+000ca                 |   lcdRegWrite(display, 0x01);
+000ca                 |   lcdDataWrite(display, 0x80);
+000ca                 |   _waitms(2);
+000ca                 |   if ((lcdDataRead(display) & 0x80) == 0x80)
+000ca                 |     return  (1) ;
+000ca                 |   else
+000ca                 |     return  (0) ;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | _Bool  display_sdram_initial(Display *display)
+000ca                 | {
+000ca                 |   uint8_t CAS_Latency;
+000ca                 |   uint16_t Auto_Refresh;
+000ca                 | 
+000ca                 |   CAS_Latency = 3;
+000ca                 |   Auto_Refresh = (64 *  120  * 1000) / (4096);
+000ca                 |   Auto_Refresh = Auto_Refresh - 2;
+000ca                 |   lcdRegDataWrite(display, 0xe0, 0x29);
+000ca                 |   lcdRegDataWrite(display, 0xe1, CAS_Latency);
+000ca                 |   lcdRegDataWrite(display, 0xe2, Auto_Refresh);
+000ca                 |   lcdRegDataWrite(display, 0xe3, Auto_Refresh >> 8);
+000ca                 |   lcdRegDataWrite(display, 0xe4, 0x01);
+000ca                 | 
+000ca                 |   checkSdramReady(display);
+000ca                 |   return  (1) ;
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_on(Display *display,  _Bool  on)
+000ca                 | {
+000ca                 |   if (on)
+000ca                 |     lcdRegDataWrite(display,  0x12 ,  1  << 7 |  1  << 6 |  0 );
+000ca                 |   else
+000ca                 |     lcdRegDataWrite(display,  0x12 ,  1  << 7 |  0  << 6 |  0 );
+000ca                 |   _waitms(20);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height)
+000ca                 | {
+000ca                 |   unsigned char temp;
+000ca                 |   temp = (width / 8) - 1;
+000ca                 |   lcdRegDataWrite(display,  0x14 , temp);
+000ca                 |   temp = width % 8;
+000ca                 |   lcdRegDataWrite(display,  0x15 , temp);
+000ca                 |   temp = height - 1;
+000ca                 |   lcdRegDataWrite(display,  0x1A , temp);
+000ca                 |   temp = (height - 1) >> 8;
+000ca                 |   lcdRegDataWrite(display,  0x1B , temp);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_horizontal_non_display(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   if (numbers < 8)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display,  0x16 , 0x00);
+000ca                 |     lcdRegDataWrite(display,  0x17 , numbers);
+000ca                 |   }
+000ca                 |   else
+000ca                 |   {
+000ca                 |     temp = (numbers / 8) - 1;
+000ca                 |     lcdRegDataWrite(display,  0x16 , temp);
+000ca                 |     temp = numbers % 8;
+000ca                 |     lcdRegDataWrite(display,  0x17 , temp);
+000ca                 |   }
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_hsync_start_position(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   if (numbers < 8)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display,  0x18 , 0x00);
+000ca                 |   }
+000ca                 |   else
+000ca                 |   {
+000ca                 |     temp = (numbers / 8) - 1;
+000ca                 |     lcdRegDataWrite(display,  0x18 , temp);
+000ca                 |   }
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_hsync_pulse_width(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   if (numbers < 8)
+000ca                 |   {
+000ca                 |     lcdRegDataWrite(display,  0x19 , 0x00);
+000ca                 |   }
+000ca                 |   else
+000ca                 |   {
+000ca                 |     temp = (numbers / 8) - 1;
+000ca                 |     lcdRegDataWrite(display,  0x19 , temp);
+000ca                 |   }
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_vertical_non_display(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   temp = numbers - 1;
+000ca                 |   lcdRegDataWrite(display,  0x1C , temp);
+000ca                 |   lcdRegDataWrite(display,  0x1D , temp >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_vsync_start_position(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   temp = numbers - 1;
+000ca                 |   lcdRegDataWrite(display,  0x1E , temp);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_lcd_vsync_pulse_width(Display *display, uint16_t numbers)
+000ca                 | {
+000ca                 |   uint8_t temp;
+000ca                 |   temp = numbers - 1;
+000ca                 |   lcdRegDataWrite(display,  0x1F , temp);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_image_start_address(Display *display, uint32_t addr)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x20 , addr);
+000ca                 |   lcdRegDataWrite(display,  0x21 , addr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x22 , addr >> 16);
+000ca                 |   lcdRegDataWrite(display,  0x23 , addr >> 24);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_image_width(Display *display, uint16_t width)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x24 , width);
+000ca                 |   lcdRegDataWrite(display,  0x25 , width >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x26 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x27 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x28 , y0);
+000ca                 |   lcdRegDataWrite(display,  0x29 , y0 >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_canvas_image_start_address(Display *display, uint32_t addr)
+000ca                 | {
+000ca                 |   display->currentPage = addr;
+000ca                 |   lcdRegDataWrite(display,  0x50 , addr);
+000ca                 |   lcdRegDataWrite(display,  0x51 , addr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x52 , addr >> 16);
+000ca                 |   lcdRegDataWrite(display,  0x53 , addr >> 24);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_canvas_image_width(Display *display, uint16_t width)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x54 , width);
+000ca                 |   lcdRegDataWrite(display,  0x55 , width >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_active_window_xy(Display *display, uint16_t x0, uint16_t y0)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x56 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x57 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x58 , y0);
+000ca                 |   lcdRegDataWrite(display,  0x59 , y0 >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_active_window_wh(Display *display, uint16_t width, uint16_t height)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x5A , width);
+000ca                 |   lcdRegDataWrite(display,  0x5B , width >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x5C , height);
+000ca                 |   lcdRegDataWrite(display,  0x5D , height >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_set_pixel_cursor(Display *display, uint16_t x, uint16_t y)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x5F , x);
+000ca                 |   lcdRegDataWrite(display,  0x60 , x >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x61 , y);
+000ca                 |   lcdRegDataWrite(display,  0x62 , y >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source0_MemoryStartAddr(Display *display, uint32_t addr)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x93 , addr);
+000ca                 |   lcdRegDataWrite(display,  0x94 , addr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x95 , addr >> 16);
+000ca                 |   lcdRegDataWrite(display,  0x96 , addr >> 24);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source0_ImageWidth(Display *display, uint16_t width)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x97 , width);
+000ca                 |   lcdRegDataWrite(display,  0x98 , width >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source0_WindowStartXY(Display *display, uint16_t x0, uint16_t y0)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x99 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x9A , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x9B , y0);
+000ca                 |   lcdRegDataWrite(display,  0x9C , y0 >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source1_MemoryStartAddr(Display *display, uint32_t addr)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x9D , addr);
+000ca                 |   lcdRegDataWrite(display,  0x9E , addr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x9F , addr >> 16);
+000ca                 |   lcdRegDataWrite(display,  0xA0 , addr >> 24);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source1_ImageWidth(Display *display, uint16_t width)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xA1 , width);
+000ca                 |   lcdRegDataWrite(display,  0xA2 , width >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_Source1_WindowStartXY(Display *display, uint16_t x0, uint16_t y0)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xA3 , x0);
+000ca                 |   lcdRegDataWrite(display,  0xA4 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xA5 , y0);
+000ca                 |   lcdRegDataWrite(display,  0xA6 , y0 >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_DestinationMemoryStartAddr(Display *display, uint32_t addr)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xA7 , addr);
+000ca                 |   lcdRegDataWrite(display,  0xA8 , addr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xA9 , addr >> 16);
+000ca                 |   lcdRegDataWrite(display,  0xAA , addr >> 24);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_DestinationImageWidth(Display *display, uint16_t width)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xAB , width);
+000ca                 |   lcdRegDataWrite(display,  0xAC , width >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_DestinationWindowStartXY(Display *display, uint16_t x0, uint16_t y0)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xAD , x0);
+000ca                 |   lcdRegDataWrite(display,  0xAE , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xAF , y0);
+000ca                 |   lcdRegDataWrite(display,  0xB0 , y0 >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void bte_WindowSize(Display *display, uint16_t width, uint16_t height)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xB1 , width);
+000ca                 |   lcdRegDataWrite(display,  0xB2 , width >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xB3 , height);
+000ca                 |   lcdRegDataWrite(display,  0xB4 , height >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_memory_copy(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t des_addr, uint16_t des_image_width,
+000ca                 |                              uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height)
+000ca                 | {
+000ca                 |   bte_Source0_MemoryStartAddr(display, s0_addr);
+000ca                 |   bte_Source0_ImageWidth(display, s0_image_width);
+000ca                 |   bte_Source0_WindowStartXY(display, s0_x, s0_y);
+000ca                 | 
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 | 
+000ca                 |   bte_WindowSize(display, copy_width, copy_height);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  12  << 4 |  2 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_memory_copy_with_rop(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y,
+000ca                 |                                       uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint8_t rop_code)
+000ca                 | {
+000ca                 |   bte_Source0_MemoryStartAddr(display, s0_addr);
+000ca                 |   bte_Source0_ImageWidth(display, s0_image_width);
+000ca                 |   bte_Source0_WindowStartXY(display, s0_x, s0_y);
+000ca                 |   bte_Source1_MemoryStartAddr(display, s1_addr);
+000ca                 |   bte_Source1_ImageWidth(display, s1_image_width);
+000ca                 |   bte_Source1_WindowStartXY(display, s1_x, s1_y);
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, copy_width, copy_height);
+000ca                 |   lcdRegDataWrite(display,  0x91 , rop_code << 4 |  2 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_memory_copy_with_chroma_key(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+000ca                 |                                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint16_t chromakey_color)
+000ca                 | {
+000ca                 |   bte_Source0_MemoryStartAddr(display, s0_addr);
+000ca                 |   bte_Source0_ImageWidth(display, s0_image_width);
+000ca                 |   bte_Source0_WindowStartXY(display, s0_x, s0_y);
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, copy_width, copy_height);
+000ca                 |   display_back_ground_color_16bpp(display, chromakey_color);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  5 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_mpu_write_with_rop(Display *display, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y, uint32_t des_addr, uint16_t des_image_width,
+000ca                 |                                     uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint8_t rop_code)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 |   bte_Source1_MemoryStartAddr(display, s1_addr);
+000ca                 |   bte_Source1_ImageWidth(display, s1_image_width);
+000ca                 |   bte_Source1_WindowStartXY(display, s1_x, s1_y);
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   lcdRegDataWrite(display,  0x91 , rop_code << 4 |  0 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_mpu_write_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   display_back_ground_color_16bpp(display, chromakey_color);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  4 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_mpu_write_color_expansion(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   display_fore_ground_color_16bpp(display, foreground_color);
+000ca                 |   display_back_ground_color_16bpp(display, background_color);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  7  << 4 |  8 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_mpu_write_color_expansion_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   display_fore_ground_color_16bpp(display, foreground_color);
+000ca                 |   display_back_ground_color_16bpp(display, background_color);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  7  << 4 |  9 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   lcdRegDataWrite(display,  0x90 ,  1  << 4);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_pattern_fill(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+000ca                 |                               uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height)
+000ca                 | {
+000ca                 |   bte_Source0_MemoryStartAddr(display, s0_addr);
+000ca                 |   bte_Source0_ImageWidth(display, s0_image_width);
+000ca                 |   bte_Source0_WindowStartXY(display, s0_x, s0_y);
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  12  << 4 |  6 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 | 
+000ca                 |   if (p8x8or16x16 == 0)
+000ca                 |     lcdRegDataWrite(display,  0x90 ,  1  << 4 |  0 );
+000ca                 |   else
+000ca                 |     lcdRegDataWrite(display,  0x90 ,  1  << 4 |  1 );
+000ca                 | 
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_bte_pattern_fill_with_chroma_key(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
+000ca                 |                                               uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color)
+000ca                 | {
+000ca                 |   bte_Source0_MemoryStartAddr(display, s0_addr);
+000ca                 |   bte_Source0_ImageWidth(display, s0_image_width);
+000ca                 |   bte_Source0_WindowStartXY(display, s0_x, s0_y);
+000ca                 |   bte_DestinationMemoryStartAddr(display, des_addr);
+000ca                 |   bte_DestinationImageWidth(display, des_image_width);
+000ca                 |   bte_DestinationWindowStartXY(display, des_x, des_y);
+000ca                 |   bte_WindowSize(display, width, height);
+000ca                 |   display_back_ground_color_16bpp(display, chromakey_color);
+000ca                 |   lcdRegDataWrite(display,  0x91 ,  12  << 4 |  7 );
+000ca                 |   lcdRegDataWrite(display,  0x92 ,  1  << 5 |  1  << 2 |  1 );
+000ca                 |   if (p8x8or16x16 == 0)
+000ca                 |     lcdRegDataWrite(display,  0x90 ,  1  << 4 |  0 );
+000ca                 |   else
+000ca                 |     lcdRegDataWrite(display,  0x90 ,  1  << 4 |  1 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm_Prescaler(Display *display, uint8_t prescaler)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x84 , prescaler);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm_ClockMuxReg(Display *display, uint8_t pwm1_clk_div, uint8_t pwm0_clk_div, uint8_t xpwm1_ctrl, uint8_t xpwm0_ctrl)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x85 , pwm1_clk_div << 6 | pwm0_clk_div << 4 | xpwm1_ctrl << 2 | xpwm0_ctrl);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm_Configuration(Display *display, uint8_t pwm1_inverter, uint8_t pwm1_auto_reload, uint8_t pwm1_start, uint8_t pwm0_dead_zone, uint8_t pwm0_inverter, uint8_t pwm0_auto_reload, uint8_t pwm0_start)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x86 , pwm1_inverter << 6 | pwm1_auto_reload << 5 | pwm1_start << 4 | pwm0_dead_zone << 3 | pwm0_inverter << 2 | pwm0_auto_reload << 1 | pwm0_start);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm0_Duty(Display *display, uint16_t duty)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x88 , duty);
+000ca                 |   lcdRegDataWrite(display,  0x89 , duty >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm0_ClocksPerPeriod(Display *display, uint16_t clocks_per_period)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x8A , clocks_per_period);
+000ca                 |   lcdRegDataWrite(display,  0x8B , clocks_per_period >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm1_Duty(Display *display, uint16_t duty)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x8C , duty);
+000ca                 |   lcdRegDataWrite(display,  0x8D , duty >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void pwm1_ClocksPerPeriod(Display *display, uint16_t clocks_per_period)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x8E , clocks_per_period);
+000ca                 |   lcdRegDataWrite(display,  0x8F , clocks_per_period >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_ram_access_prepare(Display *display)
+000ca                 | {
+000ca                 |   lcdRegWrite(display,  0x04 );
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_fore_ground_color_16bpp(Display *display, uint16_t color)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xD2 , color >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xD3 , color >> 3);
+000ca                 |   lcdRegDataWrite(display,  0xD4 , color << 3);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_back_ground_color_16bpp(Display *display, uint16_t color)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xD5 , color >> 8);
+000ca                 |   lcdRegDataWrite(display,  0xD6 , color >> 3);
+000ca                 |   lcdRegDataWrite(display,  0xD7 , color << 3);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_graphic_mode(Display *display,  _Bool  on)
+000ca                 | {
+000ca                 |   if (on)
+000ca                 |     lcdRegDataWrite(display,  0x03 ,  0  << 3 |  0  << 2 |  0 );
+000ca                 |   else
+000ca                 |     lcdRegDataWrite(display,  0x03 ,  0  << 3 |  1  << 2 |  0 );
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_put_pixel_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t color)
+000ca                 | {
+000ca                 |   display_set_pixel_cursor(display, x, y);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 |   lcdDataWrite16bbp(display, color);
+000ca                 | 
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_put_picture_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 |   display_active_window_xy(display, x, y);
+000ca                 |   display_active_window_wh(display, width, height);
+000ca                 |   display_set_pixel_cursor(display, x, y);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char *data)
+000ca                 | {
+000ca                 |   uint16_t i, j;
+000ca                 | 
+000ca                 |   display_active_window_xy(display, x, y);
+000ca                 |   display_active_window_wh(display, width, height);
+000ca                 |   display_set_pixel_cursor(display, x, y);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 |   for (j = 0; j < height; j++)
+000ca                 |   {
+000ca                 |     for (i = 0; i < width; i++)
+000ca                 |     {
+000ca                 | 
+000ca                 |       lcdDataWrite(display, *data);
+000ca                 |       data++;
+000ca                 | 
+000ca                 |       lcdDataWrite(display, *data);
+000ca                 |       data++;
+000ca                 |     }
+000ca                 |   }
+000ca                 |   checkWriteFifoEmpty(display);
+000ca                 |   display_active_window_xy(display, 0, 0);
+000ca                 |   display_active_window_wh(display,  1024 ,  600 );
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_text_mode(Display *display,  _Bool  on)
+000ca                 | {
+000ca                 |   if (on)
+000ca                 |     lcdRegDataWrite(display,  0x03 ,  0  << 3 |  1  << 2 |  0 );
+000ca                 |   else
+000ca                 |     lcdRegDataWrite(display,  0x03 ,  0  << 3 |  0  << 2 |  0 );
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, foreground_color);
+000ca                 |   display_back_ground_color_16bpp(display, background_color);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_set_text_cursor(Display *display, uint16_t x, uint16_t y)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0x63 , x);
+000ca                 |   lcdRegDataWrite(display,  0x64 , x >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x65 , y);
+000ca                 |   lcdRegDataWrite(display,  0x66 , y >> 8);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xCC , source_select << 6 | size_select << 4 | iso_select);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge)
+000ca                 | {
+000ca                 |   lcdRegDataWrite(display,  0xCD , align << 7 | chroma_key << 6 | width_enlarge << 2 | height_enlarge);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width)
+000ca                 | {
+000ca                 |   if (scs_select == 0)
+000ca                 |     lcdRegDataWrite(display,  0xB7 ,  0  << 7 |  0  << 6 |  0  << 5 |  1  << 4 |  4 );
+000ca                 |   if (scs_select == 1)
+000ca                 |     lcdRegDataWrite(display,  0xB7 ,  1  << 7 |  0  << 6 |  0  << 5 |  1  << 4 |  4 );
+000ca                 | 
+000ca                 |   lcdRegDataWrite(display,  0xBB , clk_div);
+000ca                 | 
+000ca                 |   lcdRegDataWrite(display,  0xCE , rom_select << 5);
+000ca                 |   lcdRegDataWrite(display,  0xCF , character_select << 3 | gt_width);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str)
+000ca                 | {
+000ca                 |   display_text_mode(display,  (1) );
+000ca                 |   display_set_text_cursor(display, x0, y0);
+000ca                 |   display_ram_access_prepare(display);
+000ca                 |   while (*str != '\0')
+000ca                 |   {
+000ca                 |     checkWriteFifoNotFull(display);
+000ca                 |     lcdDataWrite(display, *str);
+000ca                 |     ++str;
+000ca                 |   }
+000ca                 |   check2dBusy(display);
+000ca                 |   display_text_mode(display,  (0) );
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_line(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x67 ,  0x80 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0xA0 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0xE0 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x77 , xr);
+000ca                 |   lcdRegDataWrite(display,  0x78 , xr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x79 , yr);
+000ca                 |   lcdRegDataWrite(display,  0x7A , yr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0xB0 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color)
+000ca                 | {
+000ca                 |   int maxxr = (x1 - x0 - 1) / 2;
+000ca                 |   int maxyr = (y1 - y0 - 1) / 2;
+000ca                 |   xr = (xr > maxxr) ? maxxr : xr;
+000ca                 |   yr = (yr > maxyr) ? maxyr : yr;
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x77 , xr);
+000ca                 |   lcdRegDataWrite(display,  0x78 , xr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x79 , yr);
+000ca                 |   lcdRegDataWrite(display,  0x7A , yr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0xF0 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_triangle(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x70 , x2);
+000ca                 |   lcdRegDataWrite(display,  0x71 , x2 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x72 , y2);
+000ca                 |   lcdRegDataWrite(display,  0x73 , y2 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x67 ,  0x82 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_triangle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x68 , x0);
+000ca                 |   lcdRegDataWrite(display,  0x69 , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6A , y0);
+000ca                 |   lcdRegDataWrite(display,  0x6B , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6C , x1);
+000ca                 |   lcdRegDataWrite(display,  0x6D , x1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x6E , y1);
+000ca                 |   lcdRegDataWrite(display,  0x6F , y1 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x70 , x2);
+000ca                 |   lcdRegDataWrite(display,  0x71 , x2 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x72 , y2);
+000ca                 |   lcdRegDataWrite(display,  0x73 , y2 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x67 ,  0xA2 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_circle(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x7B , x0);
+000ca                 |   lcdRegDataWrite(display,  0x7C , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x7D , y0);
+000ca                 |   lcdRegDataWrite(display,  0x7E , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x77 , r);
+000ca                 |   lcdRegDataWrite(display,  0x78 , r >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x79 , r);
+000ca                 |   lcdRegDataWrite(display,  0x7A , r >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0x80 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_circle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x7B , x0);
+000ca                 |   lcdRegDataWrite(display,  0x7C , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x7D , y0);
+000ca                 |   lcdRegDataWrite(display,  0x7E , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x77 , r);
+000ca                 |   lcdRegDataWrite(display,  0x78 , r >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x79 , r);
+000ca                 |   lcdRegDataWrite(display,  0x7A , r >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0xC0 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | 
+000ca                 | void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color)
+000ca                 | {
+000ca                 |   display_fore_ground_color_16bpp(display, color);
+000ca                 |   lcdRegDataWrite(display,  0x7B , x0);
+000ca                 |   lcdRegDataWrite(display,  0x7C , x0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x7D , y0);
+000ca                 |   lcdRegDataWrite(display,  0x7E , y0 >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x77 , xr);
+000ca                 |   lcdRegDataWrite(display,  0x78 , xr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x79 , yr);
+000ca                 |   lcdRegDataWrite(display,  0x7A , yr >> 8);
+000ca                 |   lcdRegDataWrite(display,  0x76 ,  0x80 );
+000ca                 |   check2dBusy(display);
+000ca                 | }
+000ca                 | 
+000ca                 | void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt)
+000ca                 | {
+000ca                 |   uint16_t i = 0;
+000ca                 |   display->i2cBus.start();
+000ca                 |   display->i2cBus.write(display->i2c_addr_write);
+000ca                 |   display->i2cBus.write(regAddr >> 8);
+000ca                 |   display->i2cBus.write(regAddr);
+000ca                 |   for (i = 0; i < cnt; i++, val++)
+000ca                 |   {
+000ca                 |     display->i2cBus.write(*val);
+000ca                 |   }
+000ca                 | 
+000ca                 |   display->i2cBus.stop();
+000ca                 | }
+000ca                 | 
+000ca                 | uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len)
+000ca                 | {
+000ca                 |   display_write_gt9271_touch_register(display, 0x8047, buf, cfg_len);
+000ca                 |   _waitms(10);
+000ca                 | }
+000ca                 | 
+000ca                 | uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len)
+000ca                 | {
+000ca                 |   uint8_t i;
+000ca                 |   display->i2cBus.start();
+000ca                 | 
+000ca                 |   display->i2cBus.write(display->i2c_addr_write);
+000ca                 |   display->i2cBus.write(regAddr >> 8);
+000ca                 |   display->i2cBus.write(regAddr);
+000ca                 |   display->i2cBus.start();
+000ca                 |   display->i2cBus.write(display->i2c_addr_read);
+000ca                 |   for (i = 0; i < len; i++)
+000ca                 |   {
+000ca                 |     if (i == (len - 1))
+000ca                 |     {
+000ca                 |       pBuf[i] = display->i2cBus.read(1);
+000ca                 |       break;
+000ca                 |     }
+000ca                 |     pBuf[i] = display->i2cBus.read(0);
+000ca                 |   }
+000ca                 |   display->i2cBus.stop();
+000ca                 |   return i;
+000ca                 | }
+000ca                 | 
+000ca                 | uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num)
+000ca                 | {
+000ca                 |   uint8_t retVal = 0;
+000ca                 |   uint8_t i = 0;
+000ca                 |   uint8_t k = 0;
+000ca                 |   uint8_t ss[1];
+000ca                 |   do
+000ca                 |   {
+000ca                 | 
+000ca                 |     if (!pLoc)
+000ca                 |       break;
+000ca                 |     if (!num)
+000ca                 |       break;
+000ca                 |     ss[0] = 0;
+000ca                 |     display_read_gt9271_touch_addr(display, 0x814e, ss, 1);
+000ca                 |     uint8_t status = ss[0];
+000ca                 |     if ((status & 0x0f) == 0)
+000ca                 |       break;
+000ca                 |     uint8_t hitPoints = status & 0x0f;
+000ca                 | 
+000ca                 |     uint8_t tbuf[32];
+000ca                 |     uint8_t tbuf1[32];
+000ca                 |     uint8_t tbuf2[16];
+000ca                 |     display_read_gt9271_touch_addr(display, 0x8150, tbuf, 32);
+000ca                 |     display_read_gt9271_touch_addr(display, 0x8150 + 32, tbuf1, 32);
+000ca                 |     display_read_gt9271_touch_addr(display, 0x8150 + 64, tbuf2, 16);
+000ca                 | 
+000ca                 |     if (hitPoints <= 4)
+000ca                 |     {
+000ca                 |       for (k = 0, i = 0;
+000ca                 |            (i < 4 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf[i + 1] << 8 | tbuf[i + 0];
+000ca                 |         pLoc[k].y = tbuf[i + 3] << 8 | tbuf[i + 2];
+000ca                 |       }
+000ca                 |     }
+000ca                 |     if (hitPoints > 4)
+000ca                 |     {
+000ca                 |       for (k = 0, i = 0;
+000ca                 |            (i < 4 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf[i + 1] << 8 | tbuf[i + 0];
+000ca                 |         pLoc[k].y = tbuf[i + 3] << 8 | tbuf[i + 2];
+000ca                 |       }
+000ca                 | 
+000ca                 |       for (k = 4, i = 0;
+000ca                 |            (i < 4 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf1[i + 1] << 8 | tbuf1[i + 0];
+000ca                 |         pLoc[k].y = tbuf1[i + 3] << 8 | tbuf1[i + 2];
+000ca                 |       }
+000ca                 |     }
+000ca                 | 
+000ca                 |     if (hitPoints > 8)
+000ca                 |     {
+000ca                 |       for (k = 0, i = 0;
+000ca                 |            (i < 4 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf[i + 1] << 8 | tbuf[i + 0];
+000ca                 |         pLoc[k].y = tbuf[i + 3] << 8 | tbuf[i + 2];
+000ca                 |       }
+000ca                 | 
+000ca                 |       for (k = 4, i = 0;
+000ca                 |            (i < 4 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf1[i + 1] << 8 | tbuf1[i + 0];
+000ca                 |         pLoc[k].y = tbuf1[i + 3] << 8 | tbuf1[i + 2];
+000ca                 |       }
+000ca                 | 
+000ca                 |       for (k = 8, i = 0;
+000ca                 |            (i < 2 * 8) && (k < num); k++, i += 8)
+000ca                 |       {
+000ca                 |         pLoc[k].x = tbuf2[i + 1] << 8 | tbuf2[i + 0];
+000ca                 |         pLoc[k].y = tbuf2[i + 3] << 8 | tbuf2[i + 2];
+000ca                 |       }
+000ca                 |     }
+000ca                 | 
+000ca                 |     retVal = hitPoints;
+000ca                 | 
+000ca                 |   } while (0);
+000ca                 | 
+000ca                 |   ss[0] = 0;
+000ca                 |   display_write_gt9271_touch_register(display, 0x814e, ss, 1);
+000ca                 | 
+000ca                 |   return retVal;
+000ca                 | }
+000ca                 | 
+000ca                 | int display_update_touch(Display *display)
+000ca                 | {
+000ca                 |   int touchCount = readGT9271TouchLocation(display, display->location, 1);
+000ca                 |   if (display->lastLocation[0].x != display->location[0].x || display->lastLocation[0].y != display->location[0].y)
+000ca                 |   {
+000ca                 |     display->locationCount = touchCount;
+000ca                 |   }
+000ca                 |   else
+000ca                 |   {
+000ca                 |     display->locationCount = 0;
+000ca                 |   }
+000ca                 |   display->lastLocation[0] = display->location[0];
+000ca                 |   return touchCount;
+000ca                 | }
+000ca                 | #line 1505 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876/RA8876.c"
+000ca                 | void display_load_image(Display *display, Image *image)
+000ca                 | {
+000ca                 |   __builtin_printf ("Loading image %s\n", image->name);
+000ca                 |   if (image->page == 1)
+000ca                 |   {
+000ca                 |     display_canvas_image_start_address(display,  0 );
+000ca                 |   }
+000ca                 |   else if (image->page == 2)
+000ca                 |   {
+000ca                 |     display_canvas_image_start_address(display,  1024 * 600 * 2 );
+000ca                 |   }
+000ca                 |   else if (image->page == 3)
+000ca                 |   {
+000ca                 |     display_canvas_image_start_address(display,  1024 * 600 * 2 * 2 );
+000ca                 |   }
+000ca                 | 
+000ca                 |   mkdir("/sd/img", 0);
+000ca                 |   chdir("/sd/img");
+000ca                 |   __builtin_printf ("Loading image %s\n", image->name);
+000ca                 | 
+000ca                 |   FILE *fp = fopen(image->name, "r");
+000ca                 |   if (fp ==  (0) )
+000ca                 |   {
+000ca                 |     __builtin_printf ("Error opening file(%s): %d\n", image->name, _geterror());
+000ca                 |     display_canvas_image_start_address(display,  0 );
+000ca                 |     display_active_window_xy(display, 0, 0);
+000ca                 |     display_active_window_wh(display,  1024 ,  600 );
+000ca                 |     return;
+000ca                 |   }
+000ca                 | 
+000ca                 | 
+000ca                 | 
+000ca                 |   display_put_picture_16bpp(display, image->x0, image->y0, image->width, image->height);
+000ca                 | 
+000ca                 |   uint16_t data;
+000ca                 |   int imageSize = image->width * image->height;
+000ca                 |   int count = 0;
+000ca                 |   _Bool  endOfFile =  (0) ;
+000ca                 | 
+000ca                 |   for (int i = 0; i < imageSize; i++)
+000ca                 |   {
+000ca                 |     int temp = fgetc(fp);
+000ca                 |     if (temp == -1)
+000ca                 |       break;
+000ca                 |     data = temp;
+000ca                 | 
+000ca                 |     temp = fgetc(fp);
+000ca                 |     if (temp == -1)
+000ca                 |       break;
+000ca                 |     data |= temp << 8;
+000ca                 | 
+000ca                 |     if (data == image->colorToReplace && image->colorToReplace != image->replacementColor)
+000ca                 |     {
+000ca                 | 
+000ca                 |       data = image->replacementColor;
+000ca                 |     }
+000ca                 | 
+000ca                 |     lcdDataWrite16bbp(display, data);
+000ca                 |   }
+000ca                 | 
+000ca                 |   fclose(fp);
+000ca                 |   display_canvas_image_start_address(display,  0 );
+000ca                 |   display_active_window_xy(display, 0, 0);
+000ca                 |   display_active_window_wh(display,  1024 ,  600 );
+000ca                 | }
+000ca                 | 
+000ca                 | void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos)
+000ca                 | {
+000ca                 | 
+000ca                 |   int pageAddr = 0;
+000ca                 |   switch (image->page)
+000ca                 |   {
+000ca                 |   case 1:
+000ca                 |     pageAddr =  0 ;
+000ca                 |     break;
+000ca                 |   case 2:
+000ca                 |     pageAddr =  1024 * 600 * 2 ;
+000ca                 |     break;
+000ca                 |   case 3:
+000ca                 |     pageAddr =  1024 * 600 * 2 * 2 ;
+000ca                 |     break;
+000ca                 |   default:
+000ca                 |     break;
+000ca                 |   }
+000ca                 |   if (image->backgroundColor !=  (0) )
+000ca                 |   {
+000ca                 |     display_bte_memory_copy_with_chroma_key(display, pageAddr,  1024 , image->x0, image->y0, display->currentPage,  1024 , xpos, ypos, image->width, image->height, image->backgroundColor);
+000ca                 |   }
+000ca                 |   else
+000ca                 |   {
+000ca                 |     display_bte_memory_copy(display, pageAddr,  1024 , image->x0, image->y0, display->currentPage,  1024 , xpos, ypos, image->width, image->height);
+000ca                 |   }
+000ca                 | }
+000ca                 | 

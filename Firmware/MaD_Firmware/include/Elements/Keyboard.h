@@ -4,16 +4,14 @@
 #include "simpletools.h"
 #include "RA8876.h"
 #include "Images.h"
-#include "Button.h"
 #include "Module.h"
 
-#define BUTTONCOUNT 47
+#define KEYBOARDBUTTONCOUNT 47
 
 typedef struct keyboard_s
 {
     Display *display;
     Images *images;
-    Button *keys;
     char keyboard_buffer[50];
     char prompt[30];
     bool keyboard_complete;
@@ -23,8 +21,8 @@ typedef struct keyboard_s
     Module topbar;
     Module topbarPrompt;
     Module topbarValue;
-    Module key[BUTTONCOUNT];
-    Module keyText[BUTTONCOUNT];
+    Module key[KEYBOARDBUTTONCOUNT];
+    Module keyText[KEYBOARDBUTTONCOUNT];
 } Keyboard;
 
 Keyboard *keyboard_create(Display *display, Images *images);

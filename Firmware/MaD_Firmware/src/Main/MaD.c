@@ -8,11 +8,14 @@
 #include "DYN4.h"
 #include <stdint.h>
 #include "MotionPlanning.h"
+#include "ControlSystem.h"
+
+static Monitor monitor;
+static ControlSystem control;
 
 static Display display;
 static MachineProfile machineProfile;
 static MachineState machineState;
-static DS3231 clock;
 Images images; // Make images global
 
 // Pages
@@ -286,7 +289,7 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[0].parameters[0] = 10;    // Distance
   profile->sets[0].quartets[0].parameters[1] = 20;    // Strain rate
-  profile->sets[0].quartets[0].parameters[2] = 0.001; // Error
+  profile->sets[0].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[0].quartets[0].dwell = 500; // 500ms
 
@@ -297,7 +300,7 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[1].parameters[0] = -10;   // Distance (m)
   profile->sets[0].quartets[1].parameters[1] = 2;     // Strain rate (m/s)
-  profile->sets[0].quartets[1].parameters[2] = 0.001; // Error (m)
+  profile->sets[0].quartets[1].parameters[2] = 0.01; // Error (m)
 
   profile->sets[0].quartets[1].dwell = 200; // ms
 
@@ -315,7 +318,7 @@ static MotionProfile *static_test_profile()
 
   profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
   profile->sets[1].quartets[0].parameters[1] = 40;    // Strain rate
-  profile->sets[1].quartets[0].parameters[2] = 0.001; // Error
+  profile->sets[1].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[0].dwell = 500; // 500ms
 
@@ -326,7 +329,7 @@ static MotionProfile *static_test_profile()
 
   profile->sets[1].quartets[1].parameters[0] = -10;   // Distance
   profile->sets[1].quartets[1].parameters[1] = 10;    // Strain rate
-  profile->sets[1].quartets[1].parameters[2] = 0.001; // Error
+  profile->sets[1].quartets[1].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[1].dwell = 500; // 500ms
 
@@ -377,10 +380,22 @@ static bool start_display()
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
  */
+MCP23017 mcp;
 void mad_begin()
 {
-  printf("Starting...\n");
-  //   Begin the display
+  printf("Starting MAD P2\n");
+
+  if (monitor_begin(&monitor, &machineState, 10))
+  {
+    return;
+    loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
+  }
+  else
+  {
+    loading_overlay_display(&display, "Monitor Failed, please reset", OVERLAY_TYPE_LOADING);
+    return;
+  }
+
   if (!start_display())
   {
     printf("Error starting display\n");
@@ -400,51 +415,11 @@ void mad_begin()
   loading_overlay_display(&display, "All Images Loaded", OVERLAY_TYPE_LOADING);
 
   machine_state_init(&machineState);
-  // Create DYN4 object and check for communication
-  DYN4 *dyn4 = dyn4_create();
-  if (dyn4_begin(dyn4, DYN4_RX, DYN4_TX, 0) != SUCCESS)
-  {
-    loading_overlay_display(&display, "DYN4 Comm Error", OVERLAY_TYPE_LOADING);
-    _waitms(500);
-  }
-  else
-  {
-    loading_overlay_display(&display, "DYN4 Connected", OVERLAY_TYPE_LOADING);
-  }
 
-  // Connect to RTC
-  Error status = ds3231_begin(&clock, MAD_DS3231_SCL, MAD_DS3231_SDA);
-
-  if (status != SUCCESS)
+  if (monitor_begin(&monitor, &machineState, 10))
   {
-    loading_overlay_display(&display, "Error connecting to RTC", OVERLAY_TYPE_LOADING);
-    state_machine_set(&machineState, PARAM_MACHINE_RTC_COM, true);
-  }
-  else
-  {
-    state_machine_set(&machineState, PARAM_MACHINE_RTC_COM, true);
-    loading_overlay_display(&display, "RTC Connected", OVERLAY_TYPE_LOADING);
-  }
-
-  // Connect Force Gauge
-  ForceGauge *forceGauge = force_gauge_create();
-  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX, machineProfile.configuration.forceGaugeScaleFactor, machineProfile.configuration.forceGaugeZeroFactor) != SUCCESS)
-  {
-    loading_overlay_display(&display, "Force gauge failed", OVERLAY_TYPE_LOADING);
-  }
-  else
-  {
-    loading_overlay_display(&display, "Force Gauge Connected", OVERLAY_TYPE_LOADING);
-  }
-
-  Encoder *encoder = (Encoder *)malloc(sizeof(Encoder)); // Spin objects need to be allocated on the heap (not sure why)
-  encoder->start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
-
-  Monitor *monitor = monitor_create();
-  if (monitor_begin(monitor, dyn4, forceGauge, &machineProfile, 1000))
-  {
+    return;
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
-    monitor->encoder = encoder;
   }
   else
   {
@@ -452,25 +427,24 @@ void mad_begin()
     return;
   }
 
-  Control *control = control_create(&machineProfile, &machineState, dyn4, &(monitor->data));
-  if (control_begin(control))
+  if (control_begin(&control, &machineProfile, &machineState, &(monitor.data)))
   {
-    loading_overlay_display(&display, "Control Started", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(&display, "ControlSystem Started", OVERLAY_TYPE_LOADING);
     static_test_profile(); // Create dummy test profile
   }
   else
   {
-    loading_overlay_display(&display, "Control Failed, please reset", OVERLAY_TYPE_LOADING);
+    loading_overlay_display(&display, "ControlSystem Failed, please reset", OVERLAY_TYPE_LOADING);
     return;
   }
 
   state_machine_set(&machineState, PARAM_SELF_CHARGE_PUMP, true);
 
-  status_page_init(&statusPage, &display, &machineState, &(monitor->data), &images);
-  manual_page_init(&manualPage, &display, &machineState, &images);
-  automatic_page_init(&automaticPage, &display, &images, &machineState, control);
-  calibrate_force_page_init(&calibrateForcePage, &display, monitor, &machineProfile, &images);
-  settings_page_init(&settingsPage, &display, &machineProfile, &images);
+  status_page_init(&statusPage, &display, &machineState, &machineProfile, &(monitor.data), &images);
+  //manual_page_init(&manualPage, &display, &machineState, &images);
+  automatic_page_init(&automaticPage, &display, &images, &machineState, &control); //@TODO: remove structure pointer and pass data only
+  //calibrate_force_page_init(&calibrateForcePage, &display, &monitor, &machineProfile, &images); //@TODO: remove structure pointer and pass data only
+  //settings_page_init(&settingsPage, &display, &machineProfile, &images);
   test_profile_page_init(&testProfilePage, &display, &images);
   navigation_page_init(&navigationPage, &display, &images);
 
@@ -491,7 +465,7 @@ void mad_begin()
     case PAGE_MANUAL:
     {
       printf("Loading manual page\n");
-      manual_page_run(&manualPage);
+//      manual_page_run(&manualPage);
       printf("Leaving manual page\n");
       break;
     }
@@ -505,12 +479,10 @@ void mad_begin()
     case PAGE_CALIBRATION:
     {
       printf("Loading force calibration page...\n");
-      bool update = calibrate_force_page_run(&calibrateForcePage);
+      bool update = 0;//calibrate_force_page_run(&calibrateForcePage);
       if (update)
       {
         write_machine_profile(&machineProfile);
-        forceGauge->interpolationSlope = machineProfile.configuration.forceGaugeScaleFactor;
-        forceGauge->interpolationZero = machineProfile.configuration.forceGaugeZeroFactor;
       }
       printf("Leaving force calibration page\n");
       break;
@@ -518,11 +490,11 @@ void mad_begin()
     case PAGE_SETTINGS:
     {
       printf("Loading settings page...\n");
-      while (settings_page_run(&settingsPage)) // Keep running settings page until navigation icon selected
+      /*while (settings_page_run(&settingsPage)) // Keep running settings page until navigation icon selected
       {
         printf("Updating force calibration page:%s\n", machineProfile.name);
         write_machine_profile(&machineProfile);
-      }
+      }*/
       printf("Leaving settings page\n");
       break;
     }

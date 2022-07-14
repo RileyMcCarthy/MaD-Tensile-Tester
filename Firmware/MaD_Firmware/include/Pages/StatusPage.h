@@ -10,12 +10,14 @@
 #include "MotionStateWindow.h"
 #include "FunctionWindow.h"
 #include "Graph.h"
+#include "JSON.h"
 
 typedef struct StatusPage_s
 {
     bool complete;
     Display *display;
     MachineState *stateMachine;
+    MachineProfile *machineProfile;
     MonitorData *data;
     Images *images;
 
@@ -52,13 +54,15 @@ typedef struct StatusPage_s
     Module forceGraphContainer;
     ModuleGraph forceGraph;
     Module functionWindow;
+    FunctionWindow functionWindowData;
     Module motionStateWindow;
+    MotionStateWindow motionStateWindowData;
 
     char forceValueBuffer[20];
     char positionValueBuffer[20];
 } StatusPage;
 
-void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MonitorData *data, Images *images);
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images);
 
 void status_page_destroy(StatusPage *statusPage);
 

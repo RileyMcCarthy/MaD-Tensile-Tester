@@ -42,4 +42,8 @@ typedef enum Error_e
     MCP23017_NOT_FOUND = 251,
 
 } Error;
+
+void print_error(Error value);
+inline void seterror(Error *err, Error value);
+
 #endif

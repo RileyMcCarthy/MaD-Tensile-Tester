@@ -42,7 +42,7 @@ static bool isNumber(char *string)
     return true;
 }
 
-static bool isFloat(char *string)
+static bool isDouble(char *string)
 {
     int i = 0;
     while (string[i] != '\0')
@@ -108,7 +108,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *torque = keyboard_get_input(keyboard, "Max Torque: ");
-                    if (torque != NULL && isFloat(torque))
+                    if (torque != NULL && isDouble(torque))
                     {
                         page->machineProfile->configuration.maxMotorTorque = atof(torque);
                     }
@@ -119,7 +119,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *rpm = keyboard_get_input(keyboard, "Max RPM: ");
-                    if (rpm != NULL && isFloat(rpm))
+                    if (rpm != NULL && isDouble(rpm))
                     {
                         page->machineProfile->configuration.maxMotorRPM = atof(rpm);
                     }
@@ -130,7 +130,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *diameter = keyboard_get_input(keyboard, "Gear Diameter: ");
-                    if (diameter != NULL && isFloat(diameter))
+                    if (diameter != NULL && isDouble(diameter))
                     {
                         page->machineProfile->configuration.gearDiameter = atof(diameter);
                     }
@@ -141,7 +141,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *pitch = keyboard_get_input(keyboard, "Gear Pitch: ");
-                    if (pitch != NULL && isFloat(pitch))
+                    if (pitch != NULL && isDouble(pitch))
                     {
                         page->machineProfile->configuration.gearPitch = atof(pitch);
                     }
@@ -152,7 +152,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *inertia = keyboard_get_input(keyboard, "Inertia: ");
-                    if (inertia != NULL && isFloat(inertia))
+                    if (inertia != NULL && isDouble(inertia))
                     {
                         page->machineProfile->configuration.systemIntertia = atof(inertia);
                     }
@@ -163,7 +163,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *torque = keyboard_get_input(keyboard, "Static Torque: ");
-                    if (torque != NULL && isFloat(torque))
+                    if (torque != NULL && isDouble(torque))
                     {
                         page->machineProfile->configuration.staticTorque = atof(torque);
                     }
@@ -174,7 +174,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *load = keyboard_get_input(keyboard, "Load: ");
-                    if (load != NULL && isFloat(load))
+                    if (load != NULL && isDouble(load))
                     {
                         page->machineProfile->configuration.load = atof(load);
                     }
@@ -196,7 +196,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
-                    if (scale != NULL && isFloat(scale))
+                    if (scale != NULL && isDouble(scale))
                     {
                         page->machineProfile->configuration.positionEncoderStepsPerRev = atof(scale);
                     }
@@ -218,7 +218,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *scale = keyboard_get_input(keyboard, "Scale: ");
-                    if (scale != NULL && isFloat(scale))
+                    if (scale != NULL && isDouble(scale))
                     {
                         page->machineProfile->configuration.forceGaugeScaleFactor = atof(scale);
                     }
@@ -240,7 +240,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *minpos = keyboard_get_input(keyboard, "Minimum Position: ");
-                    if (minpos != NULL && isFloat(minpos))
+                    if (minpos != NULL && isDouble(minpos))
                     {
                         page->machineProfile->performance.minPosition = atof(minpos);
                     }
@@ -251,7 +251,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *maxpos = keyboard_get_input(keyboard, "Maximum Position: ");
-                    if (maxpos != NULL && isFloat(maxpos))
+                    if (maxpos != NULL && isDouble(maxpos))
                     {
                         page->machineProfile->performance.maxPosition = atof(maxpos);
                     }
@@ -262,7 +262,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *maxvel = keyboard_get_input(keyboard, "Maximum Velocity: ");
-                    if (maxvel != NULL && isFloat(maxvel))
+                    if (maxvel != NULL && isDouble(maxvel))
                     {
                         page->machineProfile->performance.maxVelocity = atof(maxvel);
                     }
@@ -273,7 +273,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *maxaccel = keyboard_get_input(keyboard, "Maximum Acceleration: ");
-                    if (maxaccel != NULL && isFloat(maxaccel))
+                    if (maxaccel != NULL && isDouble(maxaccel))
                     {
                         page->machineProfile->performance.maxAcceleration = atof(maxaccel);
                     }
@@ -284,7 +284,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *maxtensile = keyboard_get_input(keyboard, "Maximum Tensile: ");
-                    if (maxtensile != NULL && isFloat(maxtensile))
+                    if (maxtensile != NULL && isDouble(maxtensile))
                     {
                         page->machineProfile->performance.maxForceTensile = atof(maxtensile);
                     }
@@ -295,7 +295,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *maxcompression = keyboard_get_input(keyboard, "Maximum Compression: ");
-                    if (maxcompression != NULL && isFloat(maxcompression))
+                    if (maxcompression != NULL && isDouble(maxcompression))
                     {
                         page->machineProfile->performance.maxForceCompression = atof(maxcompression);
                     }
@@ -306,7 +306,7 @@ static bool check_buttons(SettingsPage *page)
                 {
                     Keyboard *keyboard = keyboard_create(page->display, page->images);
                     char *neutral = keyboard_get_input(keyboard, "Force Offset: ");
-                    if (neutral != NULL && isFloat(neutral))
+                    if (neutral != NULL && isDouble(neutral))
                     {
                         page->machineProfile->performance.forceGaugeNeutralOffset = atof(neutral);
                     }

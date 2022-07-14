@@ -18,30 +18,6 @@ void run_motion_profile_init(RunMotionProfile *run)
     run->lastSetDistance = 0;
 }
 
-RunMotionProfile *get_run_motion_profile()
-{
-    RunMotionProfile *run = (RunMotionProfile *)malloc(sizeof(RunMotionProfile));
-
-    run->currentSet = 0;
-    run->currentExecution = 0;
-    run->currentQuartet = 0;
-
-    run->profileComplete = false;
-    run->setComplete = false;
-    run->quartetComplete = false;
-    run->lastQuartetTime = 0;
-    run->lastQuartetDistance = 0;
-    run->dwellTime = 0;
-    run->lastExecutionDistance = 0;
-    run->lastSetDistance = 0;
-
-    return run;
-}
-void destroy_run_motion_profile(RunMotionProfile *run)
-{
-    free(run);
-}
-
 double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 {
     double position = position_set(t, run, &(profile->sets[run->currentSet]));
@@ -192,7 +168,7 @@ static double velocity(double t, double vi, double a)
 }
 
 // computes the position of the setpoint at time t
-static MotionPeriod *compute_period(double x_goal, double x0, double v0, double v_max, double a_max)
+static void compute_period(MotionPeriod *periods, double x_goal, double x0, double v0, double v_max, double a_max)
 {
     double x_stop = abs((-1 * v0 + sqrt(powf(v0, 2) - 4 * (-0.5 * a_max) * x0)) / (2 * (-0.5 * a_max)));
     int d = (x_goal > x_stop) ? 1 : -1;
@@ -214,7 +190,6 @@ static MotionPeriod *compute_period(double x_goal, double x0, double v0, double 
         T1 = abs((v - v0) / a_acc);
         T3 = abs(v / a_dec);
     }
-    MotionPeriod *periods = malloc(sizeof(MotionPeriod));
     periods->x_goal = x_goal;
     periods->x0 = x0;
     periods->v0 = v0;
@@ -226,7 +201,6 @@ static MotionPeriod *compute_period(double x_goal, double x0, double v0, double 
     periods->a_acc = a_acc;
     periods->a_dec = a_dec;
     periods->v = v;
-    return periods;
 }
 
 static void compute_setpoint(SetPoint *setpoint, double t, MotionPeriod *periods)
@@ -266,23 +240,14 @@ static void compute_setpoint(SetPoint *setpoint, double t, MotionPeriod *periods
     }
 }
 
-void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, float (*f)(float t, va_list args), void *args)
+void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), void *args)
 {
 
     // Computesetpoint
-    MotionPeriod *motionPeriods = compute_period(sigmoid(t, args), setpoint->x, setpoint->v, v_max, a_max);
-    compute_setpoint(setpoint, t - setpoint->t, motionPeriods);
+    MotionPeriod motionPeriod;
+    compute_period(&motionPeriod, sigmoid(t, args), setpoint->x, setpoint->v, v_max, a_max);
+    compute_setpoint(setpoint, t - setpoint->t, &motionPeriod);
     setpoint->t = t;
-}
-
-SetPoint *create_empty_setpoint()
-{
-    SetPoint *setpoint = malloc(sizeof(SetPoint));
-    setpoint->t = 0;
-    setpoint->x = 0;
-    setpoint->v = 0;
-    setpoint->a = 0;
-    return setpoint;
 }
 
 double steps_to_mm(int steps, MachineConfiguration *config)
@@ -292,5 +257,5 @@ double steps_to_mm(int steps, MachineConfiguration *config)
 
 int mm_to_steps(double mm, MachineConfiguration *config)
 {
-    return (int)round(mm * config->positionEncoderStepsPerRev / (config->gearDiameter * 3.14159));
+    return (int)round(mm * (double)config->positionEncoderStepsPerRev / (double)(config->gearDiameter * 3.14159));
 }

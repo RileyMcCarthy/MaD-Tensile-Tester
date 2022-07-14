@@ -1,7 +1,6 @@
 #include "TestProfile.h"
 #include "Explorer.h"
 
-#define BUTTONCOUNT 3
 #define BUTTON_NAVIGATION 0
 #define BUTTON_NEW 1
 #define BUTTON_OPEN 2
@@ -39,7 +38,7 @@ static void button_navigation(int id, void *arg)
     complete = true;
 }
 
-static void create_filepath(char *dest, char *path, char *filename, char *extension)
+static void create_filepath(char *dest, const char *path, const char *filename, const char *extension)
 {
     strcpy(dest, path);
     strcat(dest, "/");
@@ -247,19 +246,6 @@ static void button_simulate(int id, void *arg)
         module_draw(page->display, &(page->graphPositionContainer));
         t += dt;
     }
-
-    /* double max_velocity_rpm = 12.21 * 1 * (48 + 3)(48 + 3) / 16; //((float)value / 1000.0) * (60.0 / 80.0);              // um/s to rpm
-     double max_acceleration_rpms = 30 * 635.78 * 1;
-     double v_max = (0.08) * (max_velocity_rpm) / (60.0);
-     double a_max = (0.08) * (max_acceleration_rpms) / (60.0);
-     SetPoint *setpoint = create_empty_setpoint();
-     double t = 0;
-     while (abs(d_max - setpoint->x) > error)
-     {
-         // simulate_profile(setpoint, t, d_max, v_max, a_max, sigmoid, d_max, sr, error);
-         printf("%f,%f,%f,%f\n", t + 0.0386, setpoint->x, setpoint->v, setpoint->a);
-         t += error * 4;
-     }*/
 }
 
 static void button_save(int id, void *arg)
@@ -294,7 +280,7 @@ static void button_save(int id, void *arg)
     }
     // button_simulate(id, arg);
 }
-static void update_filename(char *filepath, char *newName, char *extension)
+static void update_filename(char *filepath, const char *newName, const char *extension)
 {
     char *name = strrchr(filepath, '/') + 1;
     strcpy(name, newName);
@@ -402,61 +388,6 @@ static void button_set(int id, void *arg)
         page->set.executions = atoi(executions);
         break;
     }
-        /*case BUTTON_SET_QUARTETS:
-        {
-            char *optionNames[] = {"Add", "Remove"};
-            int newmode = selection_run(page->display, 100, 100, optionNames, 2);
-            if (newmode == 0) // Add
-            {
-                Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_FILE, "/sd");
-                if (explorer == NULL)
-                {
-                    printf("Testprofile.c explorer could not allocate memory\n");
-                }
-
-                char *newfile = explorer_run(explorer);
-                explorer_destroy(explorer);
-
-                if (newfile != NULL)
-                {
-                    page->set->quartetCount++;
-                    json_to_motion_quartet(newfile, &(page->set->quartets[page->set->quartetCount - 1]));
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else if (newmode == 1) // Remove
-            {
-                char **optionNames = (char **)malloc(sizeof(char *) * page->set->quartetCount);
-                for (int i = 0; i < page->set->quartetCount; i++)
-                {
-                    optionNames[i] = (char *)malloc(strlen(page->set->quartets[i].name) + 1);
-                    strcpy(optionNames[i], page->set->quartets[i]);
-                }
-                int index = selection_run(page->display, 100, 100, optionNames, 2);
-
-                // Free option names
-                for (int i = 0; i < page->set->quartetCount; i++)
-                {
-                    free(optionNames[i]);
-                }
-                free(optionNames);
-
-                // Remove index for quartets
-                free(&(page->set->quartets[index]));
-                for (int i = index; i < page->set->quartetCount - 1; i++)
-                {
-                    page->set->quartets[i] = page->set->quartets[i + 1];
-                }
-                page->set->quartetCount--;
-            }
-            else
-            {
-                printf("something is wrong:%d\n", newmode);
-            }
-        }*/
     }
 }
 

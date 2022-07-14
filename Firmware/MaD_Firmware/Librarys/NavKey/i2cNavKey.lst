@@ -1,0 +1,1107 @@
+00000                 | 
+00000                 | #line 1 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00000                 | #line 15 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00000                 | #line 1 "i2cNavKey.h"
+00000                 | #line 19 "i2cNavKey.h"
+00000                 | #line 1 "C:/flexprop/include/simpletools.h"
+00000                 | #line 9 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 4 "C:/flexprop/include/propeller2.h"
+00000                 | #line 1 "C:/flexprop/include/stdint.h"
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | typedef signed char int8_t;
+00000                 | typedef unsigned char uint8_t;
+00000                 | 
+00000                 | typedef signed short int16_t;
+00000                 | typedef unsigned short uint16_t;
+00000                 | 
+00000                 | typedef signed long int32_t;
+00000                 | typedef unsigned long uint32_t;
+00000                 | 
+00000                 | typedef long long int64_t;
+00000                 | typedef unsigned long long uint64_t;
+00000                 | 
+00000                 | typedef unsigned long uintptr_t;
+00000                 | typedef long intptr_t;
+00000                 | 
+00000                 | typedef int64_t intmax_t;
+00000                 | typedef uint64_t uintmax_t;
+00000                 | 
+00000                 | typedef int8_t int_least8_t;
+00000                 | typedef int16_t int_least16_t;
+00000                 | typedef int32_t int_least32_t;
+00000                 | typedef int64_t int_least64_t;
+00000                 | 
+00000                 | typedef uint8_t uint_least8_t;
+00000                 | typedef uint16_t uint_least16_t;
+00000                 | typedef uint32_t uint_least32_t;
+00000                 | typedef uint64_t uint_least64_t;
+00000                 | 
+00000                 | typedef int32_t int_fast8_t;
+00000                 | typedef int32_t int_fast16_t;
+00000                 | typedef int32_t int_fast32_t;
+00000                 | typedef int64_t int_fast64_t;
+00000                 | 
+00000                 | typedef uint32_t uint_fast8_t;
+00000                 | typedef uint32_t uint_fast16_t;
+00000                 | typedef uint32_t uint_fast32_t;
+00000                 | typedef uint64_t uint_fast64_t;
+00000                 | #line 5 "C:/flexprop/include/propeller2.h"
+00000                 | #line 56 "C:/flexprop/include/propeller2.h"
+00000                 | typedef struct _cartesian {
+00000                 |    int32_t x, y;
+00000                 | } cartesian_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _polar {
+00000                 |    uint32_t r, t;
+00000                 | } polar_t;
+00000                 | 
+00000                 | 
+00000                 | typedef struct _counter64 {
+00000                 |     uint32_t low, high;
+00000                 | } counter64_t;
+00000                 | #line 96 "C:/flexprop/include/propeller2.h"
+00000                 | void _clkset(uint32_t clkmode, uint32_t clkfreq);
+00000                 | void _hubset(uint32_t val);
+00000                 | void _reboot(void);
+00000                 | 
+00000                 | 
+00000                 | int _coginit(int cog, void *pgm, void *ptr);
+00000                 | #line 116 "C:/flexprop/include/propeller2.h"
+00000                 | void _cogstop(int cog);
+00000                 | int _cogchk(int cog);
+00000                 | int _cogid(void);
+00000                 | 
+00000                 | int _locknew(void);
+00000                 | void _lockret(int lock);
+00000                 | 
+00000                 | int _locktry(int lock);
+00000                 | int _lockrel(int lock);
+00000                 | int _lockchk(int lock);
+00000                 | 
+00000                 | void _cogatn(uint32_t mask);
+00000                 | int _pollatn(void);
+00000                 | int _waitatn(void);
+00000                 | 
+00000                 | 
+00000                 | cartesian_t _rotxy(cartesian_t coord, uint32_t t);
+00000                 | cartesian_t _polxy(polar_t coord);
+00000                 | polar_t _xypol(cartesian_t coord);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _rnd(void);
+00000                 | 
+00000                 | 
+00000                 | int _clz(uint32_t val);
+00000                 | int _encod(uint32_t val);
+00000                 | uint32_t _isqrt(uint32_t val);
+00000                 | 
+00000                 | 
+00000                 | uint32_t _cnt(void);
+00000                 | uint32_t _cnth(void);
+00000                 | counter64_t _cnthl();
+00000                 | uint32_t _getsec();
+00000                 | uint32_t _getms();
+00000                 | uint32_t _getus();
+00000                 | 
+00000                 | uint32_t _pollcnt(uint32_t tick);
+00000                 | void _waitcnt(uint32_t tick);
+00000                 | 
+00000                 | void _waitx(uint32_t cycles);
+00000                 | void _waitsec(uint32_t seconds);
+00000                 | void _waitms(uint32_t milliseconds);
+00000                 | void _waitus(uint32_t microseconds);
+00000                 | 
+00000                 | 
+00000                 | void _pinw(int pin, int val);
+00000                 | void _pinl(int pin);
+00000                 | void _pinh(int pin);
+00000                 | void _pinnot(int pin);
+00000                 | void _pinrnd(int pin);
+00000                 | void _pinf(int pin);
+00000                 | int _pinr(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _wrpin(int pin, uint32_t val);
+00000                 | void _wxpin(int pin, uint32_t val);
+00000                 | void _wypin(int pin, uint32_t val);
+00000                 | void _akpin(int pin);
+00000                 | uint32_t _rdpin(int pin);
+00000                 | uint32_t _rqpin(int pin);
+00000                 | 
+00000                 | 
+00000                 | void _pinstart(int pin, uint32_t mode, uint32_t xval, uint32_t yval);
+00000                 | 
+00000                 | void _pinclear(int pin);
+00000                 | 
+00000                 | 
+00000                 | extern uint32_t _clockfreq(void);
+00000                 | extern uint32_t _clockmode(void);
+00000                 | #line 10 "C:/flexprop/include/simpletools.h"
+00000                 | #line 14 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/compiler.h"
+00000                 | #line 15 "C:/flexprop/include/simpletools.h"
+00000                 | #line 16 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 3 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 1 "C:/flexprop/include/stdarg.h"
+00000                 | #line 4 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | #line 12 "C:/flexprop/include/libsimpletext/simpletext.h"
+00000                 | typedef struct text_struct
+00000                 | {
+00000                 | 
+00000                 |   int (*rxChar)(struct text_struct *p);
+00000                 | 
+00000                 |   int (*txChar)(struct text_struct *p, int ch);
+00000                 | 
+00000                 |   int cogid[ 7 ];
+00000                 | 
+00000                 |   volatile void *devst;
+00000                 | 
+00000                 |   volatile int terminalEcho;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 |   volatile char ecA;
+00000                 |   volatile char ecB;
+00000                 |   volatile char ecsA;
+00000                 |   volatile char ecsB;
+00000                 | } text_t;
+00000                 | 
+00000                 | char *_safe_gets(text_t *text, char *buf, int count)  __fromfile("libsimpletext/safe_gets.c") ;
+00000                 | char *getStr(char *buf, int max)  __fromfile("libsimpletext/getStr.c") ;
+00000                 | 
+00000                 | float string2float(char *s, char **end)  __fromfile("libsimpletext/stringToFloat.c") ;
+00000                 | int _doscanf(const char *str, const char *fmt,  unsigned long  args)  __fromfile("libsimpletext/doscanf.c") ;
+00000                 | 
+00000                 | const char* _scanf_getl(const char *str, int *dst, int base, unsigned width, int isSigned)  __fromfile("libsimpletext/scanf_getl.c") ;
+00000                 | const char* _scanf_getf(const char *str, float *dst)  __fromfile("libsimpletext/scanf_getf.c") ;
+00000                 | 
+00000                 | int scan(const char *fmt, ...)  __fromfile("libsimpletext/scan.c") ;
+00000                 | #line 17 "C:/flexprop/include/simpletools.h"
+00000                 | #line 1 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 21 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 1 "C:/flexprop/include/propeller2.h"
+00000                 | #line 22 "C:/flexprop/include/simplei2c.h"
+00000                 | #line 26 "C:/flexprop/include/simplei2c.h"
+00000                 | typedef struct i2c_st
+00000                 | {
+00000                 |   int scl_pin;
+00000                 |   int sda_pin;
+00000                 |   int drivescl;
+00000                 | } i2c;
+00000                 | #line 46 "C:/flexprop/include/simplei2c.h"
+00000                 | i2c *i2c_open(i2c *bus, int sclPin, int sdaPin, int sclDrive) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 53 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_start(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 60 "C:/flexprop/include/simplei2c.h"
+00000                 | void i2c_stop(i2c *bus) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 72 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeByte(i2c *bus, int byte) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 83 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readByte(i2c *bus, int ackState) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 97 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_writeData(i2c *bus, const unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 112 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_readData(i2c *bus, unsigned char *data, int count) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 123 "C:/flexprop/include/simplei2c.h"
+00000                 | int i2c_poll(i2c *bus, int addr) __fromfile("libsimplei2c/simplei2c.c");
+00000                 | #line 18 "C:/flexprop/include/simpletools.h"
+00000                 | #line 30 "C:/flexprop/include/simpletools.h"
+00000                 | int input(int pin)  __fromfile("libsimpletools/input.c") ;
+00000                 | #line 45 "C:/flexprop/include/simpletools.h"
+00000                 | unsigned get_direction(int pin)  __fromfile("libsimpletools/getDirection.c") ;
+00000                 | unsigned get_directions(int startPin, int endPin)  __fromfile("libsimpletools/getDirections.c") ;
+00000                 | unsigned get_output(int pin)  __fromfile("libsimpletools/getOutput.c") ;
+00000                 | unsigned get_outputs(int startPin, int endPin)  __fromfile("libsimpletools/getOutputs.c") ;
+00000                 | unsigned get_states(int endPin, int startPin)  __fromfile("libsimpletools/getStates.c") ;
+00000                 | void set_directions(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setDirections.c") ;
+00000                 | void set_outputs(int endPin, int startPin, unsigned int pattern)  __fromfile("libsimpletools/setOutputs.c") ;
+00000                 | 
+00000                 | long count(int pin, long duration, int pinToCount = -1)  __fromfile("libsimpletools/count.c") ;
+00000                 | 
+00000                 | void dac_ctr(int pin, int channel, int dacVal)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_res(int bits)  __fromfile("libsimpletools/dac.c") ;
+00000                 | void dac_ctr_stop(void)  __fromfile("libsimpletools/dac.c") ;
+00000                 | 
+00000                 | void freqout(int pin, int msTime, int frequency)  __fromfile("libsimpletools/freqout.c") ;
+00000                 | 
+00000                 | int pwm_start(unsigned int cycleMicroseconds)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_set(int pin, int channel, int tHigh)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | void pwm_stop(void)  __fromfile("libsimpletools/pwm.c") ;
+00000                 | 
+00000                 | long pulse_in(int pin, int state)  __fromfile("libsimpletools/pulseIn.c") ;
+00000                 | void pulse_out(int pin, int time)  __fromfile("libsimpletools/pulseOut.c") ;
+00000                 | 
+00000                 | long rc_time(int pin, int state)  __fromfile("libsimpletools/rcTime.c") ;
+00000                 | 
+00000                 | void square_wave(int pin, int channel, int freq)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | void square_wave_stop(void)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | void square_wave_stop_pin(int pin)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | #line 79 "C:/flexprop/include/simpletools.h"
+00000                 | int int_fraction(int a, int b, int shift)  __fromfile("libsimpletools/squareWave.c") ;
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | 
+00000                 | int shift_in(int pinDat, int pinClk, int mode, int bits)  __fromfile("libsimpletools/shiftIn.c") ;
+00000                 | void shift_out(int pinDat, int pinClk, int mode, int bits, int value)  __fromfile("libsimpletools/shiftOut.c") ;
+00000                 | 
+00000                 | 
+00000     00 00 00 00 | extern unsigned int st_buscnt;
+00004                 | 
+00004                 | i2c *i2c_newbus(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/i2c_init.c") ;
+00004                 | int i2c_out(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, const unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_out.c") ;
+00004                 | int i2c_in(i2c *busID, int i2cAddr, int memAddr, int memAddrCount, unsigned char *data, int dataCount)  __fromfile("libsimpletools/i2c_in.c") ;
+00004                 | int i2c_busy(i2c *busID, int i2cAddr)  __fromfile("libsimpletools/i2c_busy.c") ;
+00004                 | 
+00004                 | 
+00004     00 00 00 00 | extern i2c *st_eeprom;
+00008     00 00 00 00 | extern int st_eeInitFlag;
+0000c                 | #line 114 "C:/flexprop/include/simpletools.h"
+0000c                 | void ee_config(int sclPin, int sdaPin, int sclDrive)  __fromfile("libsimpletools/eeprom_initSclDrive.c") ;
+0000c                 | void ee_init()  __fromfile("libsimpletools/eeprom_init.c") ;
+0000c                 | void ee_putByte(unsigned char value, int addr)  __fromfile("libsimpletools/eeprom_putByte.c") ;
+0000c                 | char ee_getByte(int addr)  __fromfile("libsimpletools/eeprom_getByte.c") ;
+0000c                 | void ee_putInt(int value, int addr)  __fromfile("libsimpletools/eeprom_putInt.c") ;
+0000c                 | int ee_getInt(int addr)  __fromfile("libsimpletools/eeprom_getInt.c") ;
+0000c                 | void ee_putStr(unsigned char *s, int n, int addr)  __fromfile("libsimpletools/eeprom_putStr.c") ;
+0000c                 | unsigned char* ee_getStr(unsigned char* s, int n, int addr)  __fromfile("libsimpletools/eeprom_getStr.c") ;
+0000c                 | void ee_putFloat32(float value, int addr)  __fromfile("libsimpletools/eeprom_putFloat.c") ;
+0000c                 | float ee_getFloat32(int addr)  __fromfile("libsimpletools/eeprom_getFloat.c") ;
+0000c                 | 
+0000c                 | float constrainFloat(float value, float min, float max)  __fromfile("libsimpletools/constrainFloat.c") ;
+0000c                 | int constrainInt(int value, int min, int max)  __fromfile("libsimpletools/constrainInt.c") ;
+0000c                 | 
+0000c                 | void endianSwap(void *resultAddr, void *varAddr, int byteCount)  __fromfile("libsimpletools/endianSwap.c") ;
+0000c                 | 
+0000c                 | float mapFloat(float value, float fromMin, float fromMax, float toMin, float toMax)  __fromfile("libsimpletools/mapFloat.c") ;
+0000c                 | int mapInt(int value, int fromMin, int fromMax, int toMin, int toMax)  __fromfile("libsimpletools/mapInt.c") ;
+0000c                 | 
+0000c                 | int random(int limitLow, int limitHigh)  __fromfile("libsimpletools/random.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 | void cog_end(int *coginfo)  __fromfile("libsimpletools/cogend.c") ;
+0000c                 | int cog_num(int *coginfo)  __fromfile("libsimpletools/cognum.c") ;
+0000c                 | int* cog_run(void (*function)(void *par), int stacksize)  __fromfile("libsimpletools/cogrun.c") ;
+0000c                 | #line 20 "i2cNavKey.h"
+0000c                 | #line 1 "C:/flexprop/include/stdbool.h"
+0000c                 | #line 21 "i2cNavKey.h"
+0000c                 | #line 1 "C:/flexprop/include/stdint.h"
+0000c                 | #line 22 "i2cNavKey.h"
+0000c                 | #line 1 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 5 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/size_t.h"
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef  unsigned long  size_t;
+0000c                 | #line 6 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | #line 15 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef int wchar_t;
+0000c                 | #line 24 "C:/flexprop/include/sys/wchar_t.h"
+0000c                 | typedef struct _Mbstate {
+0000c                 |   unsigned int total:5;
+0000c                 |   unsigned int left:5;
+0000c                 |   unsigned int partial:22;
+0000c                 | } _Mbstate_t;
+0000c                 | #line 7 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 1 "C:/flexprop/include/sys/null.h"
+0000c                 | #line 8 "C:/flexprop/include/stdlib.h"
+0000c                 | #line 22 "C:/flexprop/include/stdlib.h"
+0000c                 |     double atof(const char *);
+0000c                 |     int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+0000c                 |     long long atoll(const char *);
+0000c                 | 
+0000c                 |   long double strtold(const char *nptr, char **endptr);
+0000c                 |   double strtod(const char *nptr, char **endptr);
+0000c                 |   float strtof(const char *nptr, char **endptr);
+0000c                 | 
+0000c                 |     long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+0000c                 |     unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+0000c                 |   long long strtoll(const char *nptr, char **endptr, int base);
+0000c                 |   unsigned long long strtoull(const char *nptr, char **endptr, int base);
+0000c                 | 
+0000c                 | 
+0000c                 |     int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 |     void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+0000c                 | 
+0000c                 |     void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 |     void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+0000c                 | 
+0000c                 | 
+0000c                 |     int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+0000c                 |      void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+0000c                 |      void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+0000c                 |    void _exit(int status);
+0000c                 | #line 56 "C:/flexprop/include/stdlib.h"
+0000c                 |    long labs(long l);
+0000c                 | 
+0000c                 | 
+0000c                 |    long long llabs(long long ll);
+0000c                 | 
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     int quot, rem;
+0000c                 |   } div_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long int quot, rem;
+0000c                 |   } ldiv_t;
+0000c                 | 
+0000c                 |   typedef struct {
+0000c                 |     long long quot, rem;
+0000c                 |   } lldiv_t;
+0000c                 | 
+0000c                 |   div_t div(int num, int denom);
+0000c                 |   ldiv_t ldiv(long num, long denom);
+0000c                 |   lldiv_t lldiv(long long num, long long denom);
+0000c                 | 
+0000c                 |     void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+0000c                 |   void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+0000c                 | 		int (*compare)(const void *, const void *));
+0000c                 | 
+0000c                 |     char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+0000c                 |     int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+0000c                 | 
+0000c                 | 
+0000c     00 00 00 00 |   extern int _mb_cur_max;
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 |   int mblen(const char *s, size_t n);
+00010                 |   int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+00010                 |   size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+00010                 | 
+00010                 | 
+00010                 |   int system(const char *command);
+00010                 | #line 102 "C:/flexprop/include/stdlib.h"
+00010                 |     int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+00010                 |     int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+00010                 | #line 23 "i2cNavKey.h"
+00010                 | 
+00010                 | typedef struct __using("jm_i2c.spin2") Bus;
+00010                 | 
+00010                 | 
+00010                 | enum GCONF_PARAMETER
+00010                 | {
+00010                 | 	FLOAT_DATA = 0x01,
+00010                 | 	INT_DATA = 0x00,
+00010                 | 	WRAP_ENABLE = 0x02,
+00010                 | 	WRAP_DISABLE = 0x00,
+00010                 | 	DIRE_LEFT = 0x04,
+00010                 | 	DIRE_RIGHT = 0x00,
+00010                 | 	IPUP_DISABLE = 0x08,
+00010                 | 	IPUP_ENABLE = 0x00,
+00010                 | 	CLK_STRECH_ENABLE = 0x10,
+00010                 | 	CLK_STRECH_DISABLE = 0x00,
+00010                 | 	EEPROM_BANK1 = 0x20,
+00010                 | 	EEPROM_BANK2 = 0x00,
+00010                 | 	RESET = 0x80,
+00010                 | };
+00010                 | 
+00010                 | union Data_v
+00010                 | {
+00010                 | 	float fval;
+00010                 | 	uint16_t wval;
+00010                 | 	int32_t val;
+00010                 | 	uint8_t bval[4];
+00010                 | };
+00010                 | typedef struct navkeystatus_t
+00010                 | {
+00010                 | 	int UPR, UPP, DNR, DNP, RTR, RTP, LTR, LTP;
+00010                 | 	int CTRR, CTRP, CTRDP;
+00010                 | 	int RINC, RDEC, RMAX, RMIN;
+00010                 | 	int GP1POS, GP1NEG, GP2POS, GP2NEG, GP3POS, GP3NEG;
+00010                 | 	int FADEINT;
+00010                 | } NavKeyStatus;
+00010                 | 
+00010                 | typedef struct navkey_t
+00010                 | {
+00010                 | 	Bus i2cBus;
+00010                 | 	int scl;
+00010                 | 	int sda;
+00010                 | 	NavKeyStatus status;
+00010                 | 	uint8_t _add;
+00010                 | 	uint16_t _stat;
+00010                 | 	uint8_t _stat2;
+00010                 | 	uint8_t _statfade;
+00010                 | 	uint8_t _gconf;
+00010                 | 	union Data_v _tem_data;
+00010                 | } NavKey;
+00010                 | 
+00010                 | void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf);
+00010                 | void navkey_reset(NavKey *navkey);
+00010                 | void navkey_auto_config_interrupt(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | void navkey_update_status(NavKey *navkey);
+00010                 | 
+00010                 | uint8_t navkey_read_gp1_conf(NavKey *navkey);
+00010                 | uint8_t navkey_read_gp2_conf(NavKey *navkey);
+00010                 | uint8_t navkey_read_gp3_conf(NavKey *navkey);
+00010                 | uint16_t navkey_read_interrupt_config(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | uint16_t navkey_read_status(NavKey *navkey);
+00010                 | 
+00010                 | uint8_t navkey_read_int2(NavKey *navkey);
+00010                 | 
+00010                 | uint8_t navkey_read_fade_status(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | float navkey_read_counter_float(NavKey *navkey);
+00010                 | int32_t navkey_read_counter_long(NavKey *navkey);
+00010                 | int16_t navkey_read_counter_int(NavKey *navkey);
+00010                 | int8_t navkey_read_counter_byte(NavKey *navkey);
+00010                 | 
+00010                 | int32_t navkey_read_max(NavKey *navkey);
+00010                 | float navkey_read_max_float(NavKey *navkey);
+00010                 | 
+00010                 | int32_t navkey_read_min(NavKey *navkey);
+00010                 | float navkey_read_min_float(NavKey *navkey);
+00010                 | 
+00010                 | int32_t navkey_readStep(NavKey *navkey);
+00010                 | float navkey_read_step_float(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp1(NavKey *navkey);
+00010                 | uint8_t navkey_read_gp2(NavKey *navkey);
+00010                 | uint8_t navkey_read_gp3(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_double_push_period(NavKey *navkey);
+00010                 | uint8_t navkey_read_fade_gp(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add);
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_id_code(NavKey *navkey);
+00010                 | uint8_t navkey_read_version(NavKey *navkey);
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1);
+00010                 | void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2);
+00010                 | void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3);
+00010                 | void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_counter(NavKey *navkey, int counter);
+00010                 | 
+00010                 | void navkey_write_max(NavKey *navkey, int max);
+00010                 | 
+00010                 | void navkey_write_min(NavKey *navkey, int min);
+00010                 | 
+00010                 | void navkey_write_step(NavKey *navkey, int step);
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp1(NavKey *navkey, uint8_t gp1);
+00010                 | void navkey_write_gp2(NavKey *navkey, uint8_t gp2);
+00010                 | void navkey_write_gp3(NavKey *navkey, uint8_t gp3);
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod);
+00010                 | void navkey_write_fade_gp(NavKey *navkey, uint8_t fade);
+00010                 | 
+00010                 | void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma);
+00010                 | void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma);
+00010                 | void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma);
+00010                 | 
+00010                 | 
+00010                 | void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data);
+00010                 | 
+00010                 | void navkey_write8(NavKey *navkey, uint8_t reg, uint8_t data);
+00010                 | void navkey_write16(NavKey *navkey, uint8_t reg, uint16_t data);
+00010                 | void navkey_write32(NavKey *navkey, uint8_t reg, int32_t data);
+00010                 | void navkey_write_float(NavKey *navkey, uint8_t reg, float data);
+00010                 | void navkey_write24(NavKey *navkey, uint8_t reg, uint32_t data);
+00010                 | #line 16 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 | 
+00010                 | static enum I2C_Register {
+00010                 |   REG_GCONF = 0x00,
+00010                 |   REG_GP1CONF = 0x01,
+00010                 |   REG_GP2CONF = 0x02,
+00010                 |   REG_GP3CONF = 0x03,
+00010                 |   REG_INTCONFB2 = 0x04,
+00010                 |   REG_INTCONFB1 = 0x05,
+00010                 |   REG_STATUSB2 = 0x06,
+00010                 |   REG_STATUSB1 = 0x07,
+00010                 |   REG_SSTATUS = 0x08,
+00010                 |   REG_FSTATUS = 0x09,
+00010                 |   REG_CVALB4 = 0x0A,
+00010                 |   REG_CVALB3 = 0x0B,
+00010                 |   REG_CVALB2 = 0x0C,
+00010                 |   REG_CVALB1 = 0x0D,
+00010                 |   REG_CMAXB4 = 0x0E,
+00010                 |   REG_CMAXB3 = 0x0F,
+00010                 |   REG_CMAXB2 = 0x10,
+00010                 |   REG_CMAXB1 = 0x11,
+00010                 |   REG_CMINB4 = 0x12,
+00010                 |   REG_CMINB3 = 0x13,
+00010                 |   REG_CMINB2 = 0x14,
+00010                 |   REG_CMINB1 = 0x15,
+00010                 |   REG_ISTEPB4 = 0x16,
+00010                 |   REG_ISTEPB3 = 0x17,
+00010                 |   REG_ISTEPB2 = 0x18,
+00010                 |   REG_ISTEPB1 = 0x19,
+00010                 |   REG_GP1REG = 0x1A,
+00010                 |   REG_GP2REG = 0x1B,
+00010                 |   REG_GP3REG = 0x1C,
+00010                 |   REG_DPPERIOD = 0x1D,
+00010                 |   REG_FADEGP = 0x1E,
+00010                 |   REG_GAMMAGP1 = 0x1F,
+00010                 |   REG_GAMMAGP2 = 0x20,
+00010                 |   REG_GAMMAGP3 = 0x21,
+00010                 |   REG_IDCODE = 0x70,
+00010                 |   REG_VERSION = 0x71,
+00010                 |   REG_EEPROMS = 0x80,
+00010                 | };
+00010                 | 
+00010                 | 
+00010                 | static enum Int_Status {
+00010                 |   UPR = 0x0001,
+00010                 |   UPP = 0x0002,
+00010                 |   DNR = 0x0004,
+00010                 |   DNP = 0x0008,
+00010                 |   RTR = 0x0010,
+00010                 |   RTP = 0x0020,
+00010                 |   LTR = 0x0040,
+00010                 |   LTP = 0x0080,
+00010                 |   CTRR = 0x0100,
+00010                 |   CTRP = 0x0200,
+00010                 |   CTRDP = 0x0400,
+00010                 |   RINC = 0x0800,
+00010                 |   RDEC = 0x1000,
+00010                 |   RMAX = 0x2000,
+00010                 |   RMIN = 0x4000,
+00010                 |   INT_2 = 0x8000,
+00010                 | };
+00010                 | 
+00010                 | 
+00010                 | static enum Int2_Status {
+00010                 |   GP1_POS = 0x01,
+00010                 |   GP1_NEG = 0x02,
+00010                 |   GP2_POS = 0x04,
+00010                 |   GP2_NEG = 0x08,
+00010                 |   GP3_POS = 0x10,
+00010                 |   GP3_NEG = 0x20,
+00010                 |   FADE_INT = 0x40,
+00010                 | };
+00010                 | 
+00010                 | 
+00010                 | static enum Fade_Status {
+00010                 |   FADES_GP1 = 0x01,
+00010                 |   FADES_GP2 = 0x02,
+00010                 |   FADES_GP3 = 0x04,
+00010                 | };
+00010                 | 
+00010                 | 
+00010                 | static enum GP_PARAMETER {
+00010                 |   GP_PWM = 0x00,
+00010                 |   GP_OUT = 0x01,
+00010                 |   GP_AN = 0x02,
+00010                 |   GP_IN = 0x03,
+00010                 |   GP_PULL_EN = 0x04,
+00010                 |   GP_PULL_DI = 0x00,
+00010                 |   GP_INT_DI = 0x00,
+00010                 |   GP_INT_PE = 0x08,
+00010                 |   GP_INT_NE = 0x10,
+00010                 |   GP_INT_BE = 0x18,
+00010                 | };
+00010                 | 
+00010                 | static enum GAMMA_PARAMETER {
+00010                 |   GAMMA_1 = 0,
+00010                 |   GAMMA_1_8 = 1,
+00010                 |   GAMMA_2 = 2,
+00010                 |   GAMMA_2_2 = 3,
+00010                 |   GAMMA_2_4 = 4,
+00010                 |   GAMMA_2_6 = 5,
+00010                 |   GAMMA_2_8 = 6,
+00010                 | 
+00010                 | };
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | static uint8_t readNavKeyByte(NavKey *navkey, uint8_t reg)
+00010                 | {
+00010                 |   uint8_t rdata = 0xFF;
+00010                 | #line 133 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->_tem_data.val = 0;
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add | 0b00000001);
+00010                 |   rdata = navkey->i2cBus.read(1);
+00010                 |   navkey->i2cBus.stop();
+00010                 | 
+00010                 |   return rdata;
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static int16_t readNavKeyInt(NavKey *navkey, uint8_t reg)
+00010                 | {
+00010                 | #line 156 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->_tem_data.val = 0;
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add | 0b00000001);
+00010                 |   navkey->_tem_data.bval[1] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[0] = navkey->i2cBus.read(1);
+00010                 |   navkey->i2cBus.stop();
+00010                 | 
+00010                 |   return ((int16_t)(navkey->_tem_data.val));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static int32_t readNavKeyLong(NavKey *navkey, uint8_t reg)
+00010                 | {
+00010                 | #line 182 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->_tem_data.val = 0;
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add | 0b00000001);
+00010                 |   navkey->_tem_data.bval[3] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[2] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[1] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[0] = navkey->i2cBus.read(1);
+00010                 |   printf("read bval4: %d\n", navkey->_tem_data.bval[3]);
+00010                 |   printf("read bval4: %d\n", navkey->_tem_data.bval[2]);
+00010                 |   printf("read bval4: %d\n", navkey->_tem_data.bval[1]);
+00010                 |   printf("read bval4: %d\n", navkey->_tem_data.bval[0]);
+00010                 |   navkey->i2cBus.stop();
+00010                 | 
+00010                 |   return ((int32_t)(navkey->_tem_data.val));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static float readNavKeyFloat(NavKey *navkey, uint8_t reg)
+00010                 | {
+00010                 | #line 214 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->_tem_data.val = 0;
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add | 0b00000001);
+00010                 |   navkey->_tem_data.bval[3] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[2] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[1] = navkey->i2cBus.read(0);
+00010                 |   navkey->_tem_data.bval[0] = navkey->i2cBus.read(1);
+00010                 |   navkey->i2cBus.stop();
+00010                 | 
+00010                 |   return ((float)navkey->_tem_data.fval);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static void writeNavKey8(NavKey *navkey, uint8_t reg, uint8_t data)
+00010                 | {
+00010                 | #line 238 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.write(data);
+00010                 |   navkey->i2cBus.stop();
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static void writeNavKey32(NavKey *navkey, uint8_t reg, int32_t data)
+00010                 | {
+00010                 |   navkey->_tem_data.val = data;
+00010                 | #line 258 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[3]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[2]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[1]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[0]);
+00010                 |   navkey->i2cBus.stop();
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static void writeNavKey16(NavKey *navkey, uint8_t reg, uint16_t data)
+00010                 | {
+00010                 |   navkey->_tem_data.val = data;
+00010                 | #line 279 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[1]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[0]);
+00010                 |   navkey->i2cBus.stop();
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static void writeNavKeyFloat(NavKey *navkey, uint8_t reg, float data)
+00010                 | {
+00010                 |   navkey->_tem_data.fval = data;
+00010                 | #line 301 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[3]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[2]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[1]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[0]);
+00010                 |   navkey->i2cBus.stop();
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | static void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data)
+00010                 | {
+00010                 |   navkey->_tem_data.val = data;
+00010                 | #line 323 "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey/i2cNavKey.c"
+00010                 |   navkey->i2cBus.start();
+00010                 |   navkey->i2cBus.write(navkey->_add & 0b11111110);
+00010                 |   navkey->i2cBus.write(reg);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[2]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[1]);
+00010                 |   navkey->i2cBus.write(navkey->_tem_data.bval[0]);
+00010                 |   navkey->i2cBus.stop();
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | void navkey_destroy(NavKey *navkey)
+00010                 | {
+00010                 |   free(navkey);
+00010                 | }
+00010                 | 
+00010                 | void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf)
+00010                 | {
+00010                 |   navkey->_add = addr;
+00010                 |   navkey->i2cBus.setup(scl, sda, 10, 1);
+00010                 | 
+00010                 |   writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);
+00010                 |   _waitms(100);
+00010                 |   writeNavKey8(navkey, REG_GCONF, conf);
+00010                 |   navkey->_gconf = conf;
+00010                 | }
+00010                 | void navkey_reset(NavKey *navkey)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);
+00010                 |   _waitms(10);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | void navkey_update_status(NavKey *navkey)
+00010                 | {
+00010                 |   int16_t reg = readNavKeyInt(navkey, REG_STATUSB2);
+00010                 |   navkey->status.UPR = reg & UPR;
+00010                 |   navkey->status.UPP = reg & UPP;
+00010                 |   navkey->status.DNR = reg & DNR;
+00010                 |   navkey->status.DNP = reg & DNP;
+00010                 |   navkey->status.RTR = reg & RTR;
+00010                 |   navkey->status.RTP = reg & RTP;
+00010                 |   navkey->status.LTR = reg & LTR;
+00010                 |   navkey->status.LTP = reg & LTP;
+00010                 |   navkey->status.CTRR = reg & CTRR;
+00010                 |   navkey->status.CTRP = reg & CTRP;
+00010                 |   navkey->status.CTRDP = reg & CTRDP;
+00010                 |   navkey->status.RINC = reg & RINC;
+00010                 |   navkey->status.RDEC = reg & RDEC;
+00010                 |   navkey->status.RMAX = reg & RMAX;
+00010                 |   navkey->status.RMIN = reg & RMIN;
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp1_conf(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP1CONF));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp2_conf(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP2CONF));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp3_conf(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP3CONF));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint16_t navkey_read_interrupt_config(NavKey *navkey)
+00010                 | {
+00010                 |   return ((uint16_t)readNavKeyInt(navkey, REG_INTCONFB2));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_fade_status(NavKey *navkey)
+00010                 | {
+00010                 |   return readNavKeyByte(navkey, REG_FSTATUS);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | float navkey_read_counter_float(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyFloat(navkey, REG_CVALB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int32_t navkey_read_counter_long(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyLong(navkey, REG_CVALB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int16_t navkey_read_counter_int(NavKey *navkey)
+00010                 | {
+00010                 |   return ((int16_t)readNavKeyInt(navkey, REG_CVALB2));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int8_t navkey_read_counter_byte(NavKey *navkey)
+00010                 | {
+00010                 |   return ((int8_t)readNavKeyByte(navkey, REG_CVALB1));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int32_t navkey_read_max(NavKey *navkey)
+00010                 | {
+00010                 |   return ((int32_t)readNavKeyLong(navkey, REG_CMAXB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int32_t navkey_read_min(NavKey *navkey)
+00010                 | {
+00010                 |   return ((int32_t)readNavKeyLong(navkey, REG_CMINB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | float navkey_read_max_float(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyFloat(navkey, REG_CMAXB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | float navkey_read_min_float(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyFloat(navkey, REG_CMINB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | int32_t navkey_read_step(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyInt(navkey, REG_ISTEPB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | float navkey_read_step_float(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyFloat(navkey, REG_ISTEPB4));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp1(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP1REG));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp2(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP2REG));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_gp3(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_GP3REG));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_double_push_period(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_DPPERIOD));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_fade_gp(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_FADEGP));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add)
+00010                 | {
+00010                 |   if (add <= 0x7f)
+00010                 |   {
+00010                 |     if ((navkey->_gconf & EEPROM_BANK1) != 0)
+00010                 |     {
+00010                 |       navkey->_gconf = navkey->_gconf & 0xBF;
+00010                 |       writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
+00010                 |     }
+00010                 |     return (readNavKeyByte(navkey, (REG_EEPROMS + add)));
+00010                 |   }
+00010                 |   else
+00010                 |   {
+00010                 |     if ((navkey->_gconf & EEPROM_BANK1) == 0)
+00010                 |     {
+00010                 |       navkey->_gconf = navkey->_gconf | 0x40;
+00010                 |       writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
+00010                 |     }
+00010                 |     return (readNavKeyByte(navkey, add));
+00010                 |   }
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_id_code(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_IDCODE));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | uint8_t navkey_read_version(NavKey *navkey)
+00010                 | {
+00010                 |   return (readNavKeyByte(navkey, REG_VERSION));
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP1CONF, gp1);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP2CONF, gp2);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP3CONF, gp3);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt)
+00010                 | {
+00010                 |   writeNavKey16(navkey, REG_INTCONFB2, interrupt);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_counter(NavKey *navkey, int value)
+00010                 | {
+00010                 |   writeNavKey32(navkey, REG_CVALB4, value);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_max(NavKey *navkey, int32_t max)
+00010                 | {
+00010                 |   writeNavKeyFloat(navkey, REG_CMAXB4, max);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_min(NavKey *navkey, int32_t min)
+00010                 | {
+00010                 |   writeNavKeyFloat(navkey, REG_CMINB4, min);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_step(NavKey *navkey, int32_t step)
+00010                 | {
+00010                 |   writeNavKey32(navkey, REG_ISTEPB4, step);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp1(NavKey *navkey, uint8_t gp1)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP1REG, gp1);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp2(NavKey *navkey, uint8_t gp2)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP2REG, gp2);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gp3(NavKey *navkey, uint8_t gp3)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GP3REG, gp3);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_DPPERIOD, dperiod);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_fade_gp(NavKey *navkey, uint8_t fade)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_FADEGP, fade);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GAMMAGP1, gamma);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GAMMAGP2, gamma);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma)
+00010                 | {
+00010                 |   writeNavKey8(navkey, REG_GAMMAGP3, gamma);
+00010                 | }
+00010                 | 
+00010                 | 
+00010                 | void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data)
+00010                 | {
+00010                 |   if (add <= 0x7f)
+00010                 |   {
+00010                 |     if ((navkey->_gconf & EEPROM_BANK1) != 0)
+00010                 |     {
+00010                 |       navkey->_gconf = navkey->_gconf & 0xBF;
+00010                 |       writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
+00010                 |     }
+00010                 |     writeNavKey8(navkey, (REG_EEPROMS + add), data);
+00010                 |   }
+00010                 |   else
+00010                 |   {
+00010                 |     if ((navkey->_gconf & EEPROM_BANK1) == 0)
+00010                 |     {
+00010                 |       navkey->_gconf = navkey->_gconf | 0x40;
+00010                 |       writeNavKey8(navkey, REG_GCONF, navkey->_gconf);
+00010                 |     }
+00010                 |     writeNavKey8(navkey, add, data);
+00010                 |   }
+00010                 | }
+00010                 | 

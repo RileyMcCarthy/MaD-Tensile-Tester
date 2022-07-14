@@ -11,6 +11,9 @@
 #define REG_GPPUB 0x0D  // Pull-up Register B
 #define REG_GPIOB 0x13  // I/O Register B
 #define REG_OLATB 0x15  // Output latch register B
+
+
+
 /*Private functions*/
 static uint8_t read_register(MCP23017 *mcp23017, uint8_t addr)
 {
@@ -38,17 +41,6 @@ static bool write_register(MCP23017 *mcp23017, uint8_t addr, uint8_t value)
     return ack == 0;
 }
 
-MCP23017 *mcp23017_create()
-{
-    return (MCP23017 *)malloc(sizeof(MCP23017));
-}
-
-void mcp23017_destroy(MCP23017 *mcp23017)
-{
-    mcp23017->i2cBus.stop();
-    free(mcp23017);
-}
-
 /**
  * @brief
  *
@@ -63,11 +55,13 @@ bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
     mcp23017->readAddr = ((0x20 | addr) << 1) | 0b00000001;
     int DIRAVALUE = 0b00001111;
     int DIRBVALUE = 0xFF;
-    write_register(mcp23017, DIRA, DIRAVALUE); // first 4 inputs and last 4 outputs
-    write_register(mcp23017, DIRB, DIRBVALUE); // all inputs
+
+    bool ack = false;
+    ack = write_register(mcp23017, DIRA, DIRAVALUE); // first 4 inputs and last 4 outputs
+    ack &= write_register(mcp23017, DIRB, DIRBVALUE); // all inputs
     if (read_register(mcp23017, DIRA) != DIRAVALUE || read_register(mcp23017, DIRB) != DIRBVALUE)
     {
-        printf("Error setting up MCP23017\n");
+        printf("Error setting up MCP23017: ACK:%d\n",ack);
         return false;
     }
     return true;

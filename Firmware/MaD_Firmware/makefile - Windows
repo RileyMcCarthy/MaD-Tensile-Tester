@@ -40,4 +40,4 @@ clear:
 
 clean:
 	-mkdir $(BIN)
-	del /s /q $(subst /,\,$(BIN))\*
+	del /S /Q $(subst /,\,$(BIN))\*

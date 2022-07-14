@@ -3,7 +3,6 @@
 #include "simpletools.h"
 #include "RA8876.h"
 #include "StateMachine.h"
-#include "Button.h"
 #include "Module.h"
 
 typedef struct FunctionWindow_t
@@ -12,9 +11,20 @@ typedef struct FunctionWindow_t
 
     char functionHeaderBuffer[30];
 
+    Module functionWindow;
+    Module functionHeader;
+    Module buttonArea;
+    Module offButton;
+    Module incrementalButton;
+    Module continuousButton;
+    Module positionalMoveButton;
+    Module homeButton;
+    Module gaugeForceButton;
+    Module gaugeLengthButton;
+
 } FunctionWindow;
 
-void function_window_create(Module *container, MachineState *state);
+void function_window_create(FunctionWindow *window, Module *container, MachineState *state);
 void function_window_destroy(FunctionWindow *window);
 void function_window_update(FunctionWindow *window);
 
