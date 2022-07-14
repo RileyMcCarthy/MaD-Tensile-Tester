@@ -77,65 +77,65 @@ typedef struct json_s
  * @retval Null pointer if any was wrong in the parse process.
  * @retval If the parser process was successfully a valid handler of a json.
  *         This property is always unnamed and its type is JSON_OBJ. */
-json_t const *json_create(char *str, json_t *mem, unsigned int qty);
+json_t const *json_create(char *str, json_t *mem, unsigned int qty)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the name of a json property.
  * @param json A valid handler of a json property.
  * @retval Pointer to null-terminated if property has name.
  * @retval Null pointer if the property is unnamed. */
-const char *json_getName(json_t const *json);
+const char *json_getName(json_t const *json)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the value of a json property.
  * The type of property cannot be JSON_OBJ or JSON_ARRAY.
  * @param property A valid handler of a json property.
  * @return Pointer to null-terminated string with the value. */
-const char *json_getValue(json_t const *property);
+const char *json_getValue(json_t const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the type of a json property.
  * @param json A valid handler of a json property.
  * @return The code of type.*/
-jsonType_t json_getType(json_t const *json);
+jsonType_t json_getType(json_t const *json)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the next sibling of a JSON property that is within a JSON object or array.
  * @param json A valid handler of a json property.
  * @retval The handler of the next sibling if found.
  * @retval Null pointer if the json property is the last one. */
-json_t const *json_getSibling(json_t const *json);
+json_t const *json_getSibling(json_t const *json)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Search a property by its name in a JSON object.
  * @param obj A valid handler of a json object. Its type must be JSON_OBJ.
  * @param property The name of property to get.
  * @retval The handler of the json property if found.
  * @retval Null pointer if not found. */
-json_t const *json_getProperty(json_t const *obj, char const *property);
+json_t const *json_getProperty(json_t const *obj, char const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Search a property by its name in a JSON object and return its value.
  * @param obj A valid handler of a json object. Its type must be JSON_OBJ.
  * @param property The name of property to get.
  * @retval If found a pointer to null-terminated string with the value.
  * @retval Null pointer if not found or it is an array or an object. */
-char const *json_getPropertyValue(json_t const *obj, char const *property);
+char const *json_getPropertyValue(json_t const *obj, char const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the first property of a JSON object or array.
  * @param json A valid handler of a json property.
  *             Its type must be JSON_OBJ or JSON_ARRAY.
  * @retval The handler of the first property if there is.
  * @retval Null pointer if the json object has not properties. */
-json_t *json_getChild(json_t const *json);
+json_t *json_getChild(json_t const *json)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the value of a json boolean property.
  * @param property A valid handler of a json object. Its type must be JSON_BOOLEAN.
  * @return The value stdbool. */
-bool json_getBoolean(json_t const *property);
+bool json_getBoolean(json_t const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Get the value of a json integer property.
  * @param property A valid handler of a json object. Its type must be JSON_INTEGER.
  * @return The value stdint. */
-int json_getInteger(json_t const *property);
+int json_getInteger(json_t const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 /** Get the value of a json real property.
  * @param property A valid handler of a json object. Its type must be JSON_REAL.
  * @return The value. */
-double json_getReal(json_t const *property);
+double json_getReal(json_t const *property)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** Structure to handle a heap of JSON properties. */
 typedef struct jsonPool_s jsonPool_t;
@@ -151,7 +151,7 @@ struct jsonPool_s
  * @retval Null pointer if any was wrong in the parse process.
  * @retval If the parser process was successfully a valid handler of a json.
  *         This property is always unnamed and its type is JSON_OBJ. */
-json_t const *json_createWithPool(char *str, jsonPool_t *pool);
+json_t const *json_createWithPool(char *str, jsonPool_t *pool)__fromfile("Librarys/tiny-json/tiny-json.c");
 
 /** @ } */
 

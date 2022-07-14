@@ -24,8 +24,7 @@ typedef struct FunctionWindow_t
 
 } FunctionWindow;
 
-void function_window_create(FunctionWindow *window, Module *container, MachineState *state);
-void function_window_destroy(FunctionWindow *window);
-void function_window_update(FunctionWindow *window);
+void function_window_init(FunctionWindow *window, Module *container, MachineState *state)__fromfile("src/Elements/FunctionWindow.c");
+void function_window_update(FunctionWindow *window)__fromfile("src/Elements/FunctionWindow.c");
 
 #endif

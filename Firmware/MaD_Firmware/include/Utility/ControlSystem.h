@@ -24,7 +24,6 @@ typedef struct control_t
     int cogid;
 } ControlSystem;
 
-void control_destry(ControlSystem *control);
-bool control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine,  MonitorData *monitorData);
+bool control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine,  MonitorData *monitorData)__fromfile("src/Utility/ControlSystem.c");
 
 #endif

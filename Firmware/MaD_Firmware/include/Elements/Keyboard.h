@@ -25,13 +25,13 @@ typedef struct keyboard_s
     Module keyText[KEYBOARDBUTTONCOUNT];
 } Keyboard;
 
-Keyboard *keyboard_create(Display *display, Images *images);
-void keyboard_destroy(Keyboard *keyboard);
+Keyboard *keyboard_create(Display *display, Images *images)__fromfile("src/Elements/Keyboard.c");
+void keyboard_destroy(Keyboard *keyboard)__fromfile("src/Elements/Keyboard.c");
 
 /**
  * @brief The keyboard class contains an ondisplay keyboard that can be used to gather user input
  *
  **/
-char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt);
+char *keyboard_get_input(Keyboard *keyboardObj, const char *prompt)__fromfile("src/Elements/Keyboard.c");
 
 #endif

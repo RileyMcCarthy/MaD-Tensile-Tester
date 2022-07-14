@@ -385,17 +385,6 @@ void mad_begin()
 {
   printf("Starting MAD P2\n");
 
-  if (monitor_begin(&monitor, &machineState, 10))
-  {
-    return;
-    loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
-  }
-  else
-  {
-    loading_overlay_display(&display, "Monitor Failed, please reset", OVERLAY_TYPE_LOADING);
-    return;
-  }
-
   if (!start_display())
   {
     printf("Error starting display\n");
@@ -418,7 +407,6 @@ void mad_begin()
 
   if (monitor_begin(&monitor, &machineState, 10))
   {
-    return;
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
   }
   else

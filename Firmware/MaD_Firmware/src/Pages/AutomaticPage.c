@@ -37,7 +37,6 @@ static void button_open(int id, void *arg)
     printf("Filepath: %s\n", explorer->pathBuffer);
     json_to_motion_profile(explorer->pathBuffer, &(page->control->motionProfile));
     json_print_motion_profile(&(page->control->motionProfile));
-    explorer_destroy(explorer);
 }
 
 static void update_profileName(Display *dis, Module *module, void *arg)

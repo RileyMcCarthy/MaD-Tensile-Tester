@@ -6,6 +6,8 @@
 #include "Style.h"
 #include <dirent.h>
 #include "Module.h"
+#include <compiler.h>
+#include <propeller2.h>
 
 #define EXPLORER_WIDTH 768
 #define EXPLORER_HEIGHT 400
@@ -51,8 +53,7 @@ typedef struct explorer_s
     int selection;
 } Explorer;
 
-Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path);
-char *explorer_run(Explorer *explorer);
-void explorer_destroy(Explorer *explorer);
+Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path) __fromfile("src/Elements/Explorer.c");
+char *explorer_run(Explorer *explorer) __fromfile("src/Elements/Explorer.c");
 
 #endif

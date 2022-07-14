@@ -106,6 +106,7 @@ int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
 
     if (read_register(forceGauge, CONFIG_1) != CONFIG_DATA1)
     {
+        printf("Force gauge not responding\n");
         seterror(err,FORCEGAUGE_CONNECTION_LOST);
         return 0;
     }

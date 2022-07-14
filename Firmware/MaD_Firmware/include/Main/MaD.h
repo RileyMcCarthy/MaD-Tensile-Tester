@@ -52,6 +52,6 @@
  * @brief Main class responsible for initializing and starting components
  *
  */
-void mad_begin();
+void mad_begin()__fromfile("src/Main/MaD.c");
 
 #endif

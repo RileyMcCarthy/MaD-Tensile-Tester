@@ -22,9 +22,5 @@ typedef struct monitor_cog_t
     int cogid;
 } Monitor;
 
-Monitor *monitor_create();
-void monitor_destroy(Monitor *monitor);
-
-bool monitor_begin(Monitor *monitor, MachineState *machineState, int sampleRate);
-void monitor_set_position(int position);
+bool monitor_begin(Monitor *monitor, MachineState *machineState, int sampleRate)__fromfile("src/Utility/Monitor.c");
 #endif

@@ -43,7 +43,7 @@ typedef enum Error_e
 
 } Error;
 
-void print_error(Error value);
-inline void seterror(Error *err, Error value);
+void print_error(Error value)__fromfile("src/Utility/Error.c");
+inline void seterror(Error *err, Error value)__fromfile("src/Utility/Error.c");
 
 #endif

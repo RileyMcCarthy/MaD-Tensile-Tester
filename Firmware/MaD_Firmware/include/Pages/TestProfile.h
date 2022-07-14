@@ -50,7 +50,6 @@ typedef struct TestProfilePage_s
     Selection selection;
 } TestProfilePage;
 
-void test_profile_page_init(TestProfilePage *page, Display *display, Images *images);
-void test_profile_page_destroy(TestProfilePage *page);
-void test_profile_page_run(TestProfilePage *page);
+void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)__fromfile("src/Pages/TestProfile.c");
+void test_profile_page_run(TestProfilePage *page)__fromfile("src/Pages/TestProfile.c");
 #endif

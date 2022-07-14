@@ -128,11 +128,6 @@ Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, con
     return &staticExplorer;
 }
 
-void explorer_destroy(Explorer *explorer)
-{
-    // free(explorer);
-}
-
 char *explorer_run(Explorer *explorer)
 {
     // Copy current page to memory

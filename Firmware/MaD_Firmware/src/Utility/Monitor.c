@@ -15,26 +15,6 @@ static Encoder encoder;
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
 {
-    _waitms(1000);
-    mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
-    FILE *file = fopen("/da/raw1.txt", "w");
-        if (file != NULL) {
-            printf("file opened\n");
-        }else {
-            printf("file failed to open\n");
-        }
-        fputs("time (ms),force (mN),position (mm),forceRaw,encoderRaw\n",file);
-        monitor->data.timems=1000;
-        monitor->data.forceRaw=0;
-        monitor->data.encoderRaw=50;
-        for (int i=0;i<1000000;i++)
-        {
-            putc('\n',file); 
-            //fprintf(file,"%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.encoderRaw);
-        }
-        fclose(file);
-        printf("done writing\n");
-        while(1);
     // Connect Force Gauge
     if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
     {
@@ -49,27 +29,11 @@ static void monitor_cog(Monitor *monitor)
 
     int delayCycles = _clkfreq / monitor->sampleRate;
     printf("Monitor Cog Started at %dHz with delay of:%d\n", monitor->sampleRate,delayCycles);
-    //FILE *file = NULL;
+    FILE *file = NULL;
 
     monitorWriteData = false;
     while (1)
     {
-        file = fopen("/da/raw1.txt", "w");
-        fprintf(file, "time (ms),force (mN),position (mm),forceRaw,encoderRaw\n");
-        monitor->data.timems=1000;
-        monitor->data.forceRaw=0;
-        monitor->data.encoderRaw=50;
-        if (file != NULL) {
-            printf("file opened\n");
-        }else {
-            printf("file failed to open\n");
-        }
-        for (int i=0;i<1000;i++)
-        {
-            fprintf(file,"%d,%d,%d\n", monitor->data.timems, monitor->data.forceRaw, monitor->data.encoderRaw);
-        }
-        fclose(file);
-        printf("done writing\n");
         /*Delay to run at sampleRate, replace with _waitcnt*/
         uint32_t waitcycles = _cnt() + delayCycles;
 
@@ -135,10 +99,4 @@ bool monitor_begin(Monitor *monitor, MachineState *machineState, int sampleRate)
         return true;
     }
     return false;
-}
-
-void monitor_set_position(int position)
-{
-  //  monitorNewPosition = position;
-  //  monitorHasNewPosition = true;
 }

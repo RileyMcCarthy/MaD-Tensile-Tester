@@ -407,7 +407,6 @@ static void control_cog(ControlSystem *control)
                             move_servo(control, MOVE_STOP, 0);
                             _waitms(1000);
                             dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
-                            monitor_set_position(0);
                             // move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
                             control->stateMachine->functionData = HOMING_COMPLETE;
                         }

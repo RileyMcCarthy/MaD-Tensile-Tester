@@ -62,14 +62,11 @@ typedef struct StatusPage_s
     char positionValueBuffer[20];
 } StatusPage;
 
-void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images);
-
-void status_page_destroy(StatusPage *statusPage);
-
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images)__fromfile("src/Pages/StatusPage.c");
 /**
  * @brief Runs the UI that displays machine information and status
  *
  */
-void status_page_run(StatusPage *statusPage);
+void status_page_run(StatusPage *statusPage)__fromfile("src/Pages/StatusPage.c");
 
 #endif

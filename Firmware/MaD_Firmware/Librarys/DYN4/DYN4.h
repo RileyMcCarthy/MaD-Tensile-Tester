@@ -95,12 +95,12 @@ typedef union Data_union
     uint8_t bval[4];
 } DataUnion;
 
-Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id);
+Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)__fromfile("Librarys/DYN4/DYN4.c");
 
-int dyn4_getPosition(DYN4 *dyn4);
+int dyn4_getPosition(DYN4 *dyn4)__fromfile("Librarys/DYN4/DYN4.c");
 
-void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data);
-int dyn4_read_command(DYN4 *dyn4, int command);
-Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status);
+void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)__fromfile("Librarys/DYN4/DYN4.c");
+int dyn4_read_command(DYN4 *dyn4, int command)__fromfile("Librarys/DYN4/DYN4.c");
+Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)__fromfile("Librarys/DYN4/DYN4.c");
 
 #endif

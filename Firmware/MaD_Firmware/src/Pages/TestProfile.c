@@ -99,7 +99,6 @@ static void button_open(int id, void *arg)
         break;
     }
     }
-    explorer_destroy(explorer);
 }
 
 static void button_new(int id, void *arg)
@@ -567,10 +566,6 @@ void test_profile_page_init(TestProfilePage *page, Display *display, Images *ima
     }
 }
 
-void test_profile_page_destroy(TestProfilePage *page)
-{
-    free(page);
-}
 void test_profile_page_run(TestProfilePage *page)
 {
     complete = false;

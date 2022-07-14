@@ -46,8 +46,8 @@ typedef struct AutomaticPage_t
     char profileNumberBuffer[50];
 } AutomaticPage;
 
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control);
-void automatic_page_destroy(AutomaticPage *page);
-void automatic_page_run(AutomaticPage *page);
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control)__fromfile("src/Pages/AutomaticPage.c");
+void automatic_page_destroy(AutomaticPage *page)__fromfile("src/Pages/AutomaticPage.c");
+void automatic_page_run(AutomaticPage *page)__fromfile("src/Pages/AutomaticPage.c");
 
 #endif

@@ -1,7 +1,9 @@
  CC = C:\flexprop\bin\flexspin.exe
  LOAD = C:\flexprop\bin\loadp2.exe
  
- CFLAGS=-2 -O1 -Wall -g -D_DEBUG_FATFS=1#-DFF_USE_LFN
+ CFLAGS=-2 -O1 #-Wall -g -D_DEBUG_FATFS=1#-DFF_USE_LFN
+
+#-I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Elements" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Pages" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/DYN4" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/Encoder" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/ESP32" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/ForceGauge" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/I2C" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MCP23017" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/NavKey" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/RA8876" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/Serial" -I "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/tiny-json"  "C:/Users/riley.m/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
 
  TARGET = MAD.binary
  BIN = bin

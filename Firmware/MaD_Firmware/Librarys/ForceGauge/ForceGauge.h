@@ -20,10 +20,10 @@ typedef struct ForceGauge_s
 
 } ForceGauge;
 
-int force_gauge_raw_to_force(ForceGauge *forceGauge, int raw);
-int raw_to_force(int raw, MachineConfiguration *configuration);
-int force_gauge_get_raw(ForceGauge *forceGauge, Error *err);
+int force_gauge_raw_to_force(int zero, double slope, int raw)__fromfile("Librarys/ForceGauge/ForceGauge.c");
+int raw_to_force(int raw, MachineConfiguration *configuration)__fromfile("Librarys/ForceGauge/ForceGauge.c");
+int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)__fromfile("Librarys/ForceGauge/ForceGauge.c");
 
-Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx);
-void force_gauge_stop(ForceGauge *forceGauge);
+Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)__fromfile("Librarys/ForceGauge/ForceGauge.c");
+void force_gauge_stop(ForceGauge *forceGauge)__fromfile("Librarys/ForceGauge/ForceGauge.c");
 #endif
