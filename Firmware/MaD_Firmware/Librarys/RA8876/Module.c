@@ -1,4 +1,5 @@
 #include "Module.h"
+#include "propeller2.h"
 
 #define ANIMATION_PAGE PAGE4_START_ADDR
 
@@ -166,7 +167,7 @@ int module_touch_check(Module *root, Display *display, void *arg)
         {
             if (root->onTouch != NULL)
             {
-                root->lastPressed = _getms();
+                root->lastPressed = (int)_getms();
                 root->onTouch(root->touchId, arg);
                 touchCount++;
                 if (root->touchAnimate != NULL)

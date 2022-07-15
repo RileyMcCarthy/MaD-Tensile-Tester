@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include "MotionPlanning.h"
 #include "ControlSystem.h"
+#include "W25QXX.h"
 
 static Monitor monitor;
 static ControlSystem control;
@@ -289,9 +290,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[0].parameters[0] = 10;    // Distance
   profile->sets[0].quartets[0].parameters[1] = 20;    // Strain rate
-  profile->sets[0].quartets[0].parameters[2] = 0.01; // Error
+  profile->sets[0].quartets[0].parameters[2] = 0.1; // Error
 
-  profile->sets[0].quartets[0].dwell = 500; // 500ms
+  profile->sets[0].quartets[0].dwell = 5; // 500ms
 
   // Create second quartet
   strcpy(profile->sets[0].quartets[1].name, "/sd/profiles/qrt2.qrt");
@@ -300,9 +301,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[1].parameters[0] = -10;   // Distance (m)
   profile->sets[0].quartets[1].parameters[1] = 2;     // Strain rate (m/s)
-  profile->sets[0].quartets[1].parameters[2] = 0.01; // Error (m)
+  profile->sets[0].quartets[1].parameters[2] = 0.1; // Error (m)
 
-  profile->sets[0].quartets[1].dwell = 200; // ms
+  profile->sets[0].quartets[1].dwell = 5; // ms
 
   // Create second set
   strcpy(profile->sets[1].name, "/sd/profiles/Set_2.set");
@@ -318,9 +319,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
   profile->sets[1].quartets[0].parameters[1] = 40;    // Strain rate
-  profile->sets[1].quartets[0].parameters[2] = 0.01; // Error
+  profile->sets[1].quartets[0].parameters[2] = 0.1; // Error
 
-  profile->sets[1].quartets[0].dwell = 500; // 500ms
+  profile->sets[1].quartets[0].dwell = 5; // 500ms
 
   // Create second quartet
   strcpy(profile->sets[1].quartets[1].name, "/sd/profiles/qrt4.qrt");
@@ -329,9 +330,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[1].quartets[1].parameters[0] = -10;   // Distance
   profile->sets[1].quartets[1].parameters[1] = 10;    // Strain rate
-  profile->sets[1].quartets[1].parameters[2] = 0.01; // Error
+  profile->sets[1].quartets[1].parameters[2] = 0.1; // Error
 
-  profile->sets[1].quartets[1].dwell = 500; // 500ms
+  profile->sets[1].quartets[1].dwell = 5; // 500ms
 
   motion_profile_to_json(profile, profile->name);
   motion_set_to_json(&(profile->sets[0]), profile->sets[0].name);
@@ -380,11 +381,79 @@ static bool start_display()
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
  */
-MCP23017 mcp;
+#define size 12
+
 void mad_begin()
 {
   printf("Starting MAD P2\n");
 
+  printf("Flash init\n");
+  BSP_W25Qx_Init();
+  printf("getting id\n");
+  uint8_t ID[4];
+  BSP_W25Qx_Read_ID(ID);
+  printf(" W25Qxx ID is : ");
+	for(int i=0;i<2;i++)
+	{
+		printf("0x%02X ",ID[i]);
+	}
+	printf("\r\n");
+
+  BSP_W25Qx_Erase_Block(0);
+
+  /*uint8_t temp[1];
+  temp[0] = 15;
+  MonitorData writeData;
+  writeData.forceRaw = 5;
+  writeData.encoderRaw = 2;
+  writeData.timems = 100;
+  printf("Writing to flash:%d\n",sizeof(writeData)/sizeof(uint8_t));
+  BSP_W25Qx_Write(temp,0x00,1);
+
+  MonitorData readData;
+  uint8_t temp1[1];
+  temp1[0] = 0;
+  BSP_W25Qx_Read(temp1,0x00,1);
+  printf("Read from flash:%d\n",temp1[0]);
+  printf("ReadData:%d,%d,%d\n",readData.forceRaw,readData.encoderRaw,readData.timems);
+  return;*/
+
+  union MonitorUnion {
+    MonitorData data;
+    uint8_t raw[size];
+  };
+
+  union MonitorUnion data1;
+  data1.data.forceRaw = 5;
+  data1.data.encoderRaw = 2;
+  data1.data.timems = 100;
+
+  union MonitorUnion data2;
+
+  uint8_t *wData= data1.raw;   // Write cache array 
+  uint8_t *rData= data2.raw;   // Read cache array 
+  //uint8_t wData[size];
+  //uint8_t rData[size];
+  for(int i =0;i<size;i++)
+	{
+			//wData[i] = i;
+      rData[i] = 0;
+	}
+
+
+	BSP_W25Qx_Write(wData,0x00,size);
+  _waitms(100);
+  /*-Step4-  Reading data   ************************************************Step4*/	
+	BSP_W25Qx_Read(rData,0x00,size);
+	
+	printf("QSPI Read Data : \r\n");
+	for(int i =0;i<size;i++)
+		printf("0x%02X  ",rData[i]);
+	printf("\r\n\r\n");
+  printf("ReadData:%d,%d,%d\n",data2.data.forceRaw,data2.data.encoderRaw,data2.data.timems);
+  return;
+
+  
   if (!start_display())
   {
     printf("Error starting display\n");

@@ -15,6 +15,7 @@ static Encoder encoder;
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
 {
+    mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
     // Connect Force Gauge
     if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
     {
@@ -65,8 +66,13 @@ static void monitor_cog(Monitor *monitor)
             if (file==NULL)
             {
                 file = fopen("/da/raw1.txt", "w");
-                printf("opening file\n");
-                fprintf(file, "time (ms),force (mN),position (mm),forceRaw,encoderRaw\n");
+                if (file==NULL)
+                {
+                    printf("Failed to open file\n");
+                }else {
+                    printf("opening file\n");
+                    fprintf(file, "time (ms),force (mN),position (mm),forceRaw,encoderRaw\n");
+                }
             }
             else
             {

@@ -560,7 +560,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return;
     }
 
     // Read file into string
@@ -579,7 +579,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
     if (mem == NULL)
     {
         printf("Error allocating memory\n");
-        return NULL;
+        return;
     }
 
     const json_t *parser = json_create(buffer, mem, MAX_TOKENS);
@@ -587,7 +587,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
     if (!parser || JSON_OBJ != json_getType(parser))
     {
         printf("Error, the  JSON cannot be parsed.\n");
-        return NULL;
+        return;
     }
 
     strncpy(profile->name, json_property_to_string(parser, "Name"), MAX_MACHINE_PROFILE_NAME);
@@ -615,7 +615,7 @@ void json_to_sample_profile(SampleProfile *sample, const char *filename)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return ;
     }
 
     // Read file into string
@@ -653,7 +653,7 @@ void json_to_test_profile(const char *filename, TestProfile *test)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return;
     }
 
     // Read file into string
@@ -691,7 +691,7 @@ void json_to_motion_profile(const char *filename, MotionProfile *profile)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return;
     }
     printf("before read\n");
 
@@ -738,7 +738,7 @@ void json_to_motion_set(const char *filename, MotionSet *set)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return;
     }
 
     // Read file into string
@@ -787,7 +787,7 @@ void json_to_motion_quartet(const char *filename, MotionQuartet *quartet)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return NULL;
+        return;
     }
     printf("file opened\n");
 

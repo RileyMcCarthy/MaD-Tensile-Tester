@@ -1,6 +1,7 @@
 // status page
 #include "StatusPage.h"
 #include "Images.h"
+#include "propeller2.h"
 
 #define BUTTONCOUNT 2
 #define BUTTON_MACHINE 0

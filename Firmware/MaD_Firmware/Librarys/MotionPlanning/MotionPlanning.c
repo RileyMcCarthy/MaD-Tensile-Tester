@@ -78,7 +78,7 @@ double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
     // printf("Position:%f\n", position);
     double lastQuartetDistance = run->lastQuartetDistance;
 
-    if (position == quartet->parameters[0]) // Still need to add Dwell
+    if (abs(position - quartet->parameters[0]) < 0.1) // Still need to add Dwell
     {
         run->lastQuartetTime = t;
         run->lastQuartetDistance += quartet->parameters[0];

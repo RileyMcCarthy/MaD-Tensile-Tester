@@ -67,7 +67,6 @@ typedef struct RunMotionProfile_s
     double dwellTime;
 } RunMotionProfile;
 
-RunMotionProfile *get_run_motion_profile()__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
 void run_motion_profile_init(RunMotionProfile *profile)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
 void destroy_run_motion_profile(RunMotionProfile *run)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
 
