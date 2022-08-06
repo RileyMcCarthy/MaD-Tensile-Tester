@@ -55,7 +55,7 @@ enum I2C_Register {
 };
 
 /* NavKey status bits and setting. Use with: INTCONF for set and with ESTATUS for read the bits  */
-static enum Int_Status {
+enum Int_Status {
   UPR = 0x0001,
   UPP = 0x0002,
   DNR = 0x0004,
@@ -75,7 +75,7 @@ static enum Int_Status {
 };
 
 /* NavKey Int2 bits. Use to read the bits of I2STATUS  */
-static enum Int2_Status {
+enum Int2_Status {
   GP1_POS = 0x01,
   GP1_NEG = 0x02,
   GP2_POS = 0x04,
@@ -86,14 +86,14 @@ static enum Int2_Status {
 };
 
 /* NavKey Fade status bits. Use to read the bits of FSTATUS  */
-static enum Fade_Status {
+enum Fade_Status {
   FADES_GP1 = 0x01,
   FADES_GP2 = 0x02,
   FADES_GP3 = 0x04,
 };
 
 /* GPIO Configuration. USe with GP1CONF,GP2CONF,GP3CONF */
-static enum GP_PARAMETER {
+enum GP_PARAMETER {
   GP_PWM = 0x00,
   GP_OUT = 0x01,
   GP_AN = 0x02,
@@ -106,7 +106,7 @@ static enum GP_PARAMETER {
   GP_INT_BE = 0x18,
 };
 
-static enum GAMMA_PARAMETER {
+enum GAMMA_PARAMETER {
   GAMMA_1 = 0,
   GAMMA_1_8 = 1,
   GAMMA_2 = 2,

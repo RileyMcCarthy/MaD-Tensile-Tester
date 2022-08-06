@@ -1,7 +1,6 @@
 #ifndef MaD_H
 #define MaD_H
 
-#include <propeller2sim.h>
 #include <simpletools.h>
 #include <stdio.h>
 #include <stdlib.h>
