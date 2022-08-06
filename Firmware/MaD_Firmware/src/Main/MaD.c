@@ -5,11 +5,11 @@
 #include "MCP23017.h"
 #include "tiny-json.h"
 #include "Images.h"
-#include "DYN4.h"
 #include <stdint.h>
 #include "MotionPlanning.h"
 #include "ControlSystem.h"
 #include "W25QXX.h"
+#include "DYN.h"
 
 static Monitor monitor;
 static ControlSystem control;
@@ -288,9 +288,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile->sets[0].quartets[0].parameters[0] = 10;    // Distance
-  profile->sets[0].quartets[0].parameters[1] = 20;    // Strain rate
-  profile->sets[0].quartets[0].parameters[2] = 0.1; // Error
+  profile->sets[0].quartets[0].parameters[0] = 20;    // Distance
+  profile->sets[0].quartets[0].parameters[1] = 200;    // Strain rate
+  profile->sets[0].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[0].quartets[0].dwell = 5; // 500ms
 
@@ -299,9 +299,9 @@ static MotionProfile *static_test_profile()
 
   profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
 
-  profile->sets[0].quartets[1].parameters[0] = -10;   // Distance (m)
-  profile->sets[0].quartets[1].parameters[1] = 2;     // Strain rate (m/s)
-  profile->sets[0].quartets[1].parameters[2] = 0.1; // Error (m)
+  profile->sets[0].quartets[1].parameters[0] = -20;   // Distance (m)
+  profile->sets[0].quartets[1].parameters[1] = 20;     // Strain rate (m/s)
+  profile->sets[0].quartets[1].parameters[2] = 0.01; // Error (m)
 
   profile->sets[0].quartets[1].dwell = 5; // ms
 
@@ -309,7 +309,7 @@ static MotionProfile *static_test_profile()
   strcpy(profile->sets[1].name, "/sd/profiles/Set_2.set");
 
   profile->sets[1].number = 2;
-  profile->sets[1].executions = 1;
+  profile->sets[1].executions = 3;
   profile->sets[1].quartetCount = 2;
 
   // Create first quartet
@@ -318,8 +318,8 @@ static MotionProfile *static_test_profile()
   profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
 
   profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
-  profile->sets[1].quartets[0].parameters[1] = 40;    // Strain rate
-  profile->sets[1].quartets[0].parameters[2] = 0.1; // Error
+  profile->sets[1].quartets[0].parameters[1] = 100;    // Strain rate
+  profile->sets[1].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[0].dwell = 5; // 500ms
 
@@ -329,8 +329,8 @@ static MotionProfile *static_test_profile()
   profile->sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
 
   profile->sets[1].quartets[1].parameters[0] = -10;   // Distance
-  profile->sets[1].quartets[1].parameters[1] = 10;    // Strain rate
-  profile->sets[1].quartets[1].parameters[2] = 0.1; // Error
+  profile->sets[1].quartets[1].parameters[1] = 50;    // Strain rate
+  profile->sets[1].quartets[1].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[1].dwell = 5; // 500ms
 
@@ -377,91 +377,70 @@ static bool start_display()
   return true;
 }
 
-/**
- * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
- *
- */
-#define size 12
-
-void mad_begin()
+static void test_flash()
 {
-  printf("Starting MAD P2\n");
-
   printf("Flash init\n");
-  BSP_W25Qx_Init();
+  int status = BSP_W25Qx_Init(NULL);
+  printf("Sttus: %d\n", status);
+   /* if (!BSP_W25Qx_Lock()) {
+    printf("Failed to lock flash\n");
+    return;
+  }*/
   printf("getting id\n");
   uint8_t ID[4];
   BSP_W25Qx_Read_ID(ID);
+  _waitms(1000);
   printf(" W25Qxx ID is : ");
 	for(int i=0;i<2;i++)
 	{
 		printf("0x%02X ",ID[i]);
 	}
 	printf("\r\n");
-
-  BSP_W25Qx_Erase_Block(0);
-
-  /*uint8_t temp[1];
-  temp[0] = 15;
-  MonitorData writeData;
-  writeData.forceRaw = 5;
-  writeData.encoderRaw = 2;
-  writeData.timems = 100;
-  printf("Writing to flash:%d\n",sizeof(writeData)/sizeof(uint8_t));
-  BSP_W25Qx_Write(temp,0x00,1);
-
-  MonitorData readData;
-  uint8_t temp1[1];
-  temp1[0] = 0;
-  BSP_W25Qx_Read(temp1,0x00,1);
-  printf("Read from flash:%d\n",temp1[0]);
-  printf("ReadData:%d,%d,%d\n",readData.forceRaw,readData.encoderRaw,readData.timems);
-  return;*/
-
-  union MonitorUnion {
-    MonitorData data;
-    uint8_t raw[size];
-  };
-
-  union MonitorUnion data1;
-  data1.data.forceRaw = 5;
-  data1.data.encoderRaw = 2;
-  data1.data.timems = 100;
-
-  union MonitorUnion data2;
-
-  uint8_t *wData= data1.raw;   // Write cache array 
-  uint8_t *rData= data2.raw;   // Read cache array 
-  //uint8_t wData[size];
-  //uint8_t rData[size];
-  for(int i =0;i<size;i++)
-	{
-			//wData[i] = i;
-      rData[i] = 0;
-	}
-
-
-	BSP_W25Qx_Write(wData,0x00,size);
-  _waitms(100);
-  /*-Step4-  Reading data   ************************************************Step4*/	
-	BSP_W25Qx_Read(rData,0x00,size);
-	
-	printf("QSPI Read Data : \r\n");
-	for(int i =0;i<size;i++)
-		printf("0x%02X  ",rData[i]);
-	printf("\r\n\r\n");
-  printf("ReadData:%d,%d,%d\n",data2.data.forceRaw,data2.data.encoderRaw,data2.data.timems);
-  return;
-
+  printf("Erasing flash\n");
+  BSP_W25Qx_Erase_Chip();
+  printf("Writing to flash\n");
+  #define size sizeof(MonitorData)
   
+  int currAddr = 0;
+  for (int i=0;i<1000;i++) {
+    MonitorData data;
+    data.forceRaw = i*2;
+    data.encoderRaw = i*2;
+    data.timems = i*4;
+  
+    BSP_W25Qx_Write(&data,size*i,size);
+  }
+
+  _waitms(1000);
+
+  for (int i=0;i<1000;i++) {
+    MonitorData data;
+    BSP_W25Qx_Read(&data,size*i,size);
+    printf("0x%04X %d %d %d\n",size*i, data.forceRaw, data.encoderRaw, data.timems);
+  }
+  BSP_W25Qx_Unlock();
+}
+
+static void test_dyn()
+{
+  dyn_init();
+}
+
+/**
+ * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
+ *
+ */
+
+void mad_begin()
+{
+  printf("Starting MAD P2\n");
+
   if (!start_display())
   {
     printf("Error starting display\n");
     return;
   }
   loading_overlay_display(&display, "Display Initialized!", OVERLAY_TYPE_LOADING);
-
-  _waitms(200);
 
   // Load machine profile from SD card
   load_machine_profile();
@@ -474,7 +453,7 @@ void mad_begin()
 
   machine_state_init(&machineState);
 
-  if (monitor_begin(&monitor, &machineState, 10))
+  if (monitor_begin(&monitor, &machineState,&(machineProfile.configuration), 10))
   {
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
   }
@@ -499,7 +478,7 @@ void mad_begin()
 
   status_page_init(&statusPage, &display, &machineState, &machineProfile, &(monitor.data), &images);
   //manual_page_init(&manualPage, &display, &machineState, &images);
-  automatic_page_init(&automaticPage, &display, &images, &machineState, &control); //@TODO: remove structure pointer and pass data only
+  automatic_page_init(&automaticPage, &display, &images, &machineState, &control,&(monitor.data)); //@TODO: remove structure pointer and pass data only
   //calibrate_force_page_init(&calibrateForcePage, &display, &monitor, &machineProfile, &images); //@TODO: remove structure pointer and pass data only
   //settings_page_init(&settingsPage, &display, &machineProfile, &images);
   test_profile_page_init(&testProfilePage, &display, &images);
@@ -507,7 +486,7 @@ void mad_begin()
 
   printf("Machine propfile size:%d\n", (int)sizeof(machineProfile));
   // Begin main loop
-  Page currentPage = PAGE_TEST_PROFILE;
+  Page currentPage = PAGE_STATUS;
   while (1)
   {
     switch (currentPage)

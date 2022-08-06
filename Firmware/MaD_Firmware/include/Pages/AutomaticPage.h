@@ -16,7 +16,7 @@
 #include "ControlSystem.h"
 #include "StateMachine.h"
 #include "Module.h"
-
+#include "MachineView.h"
 /**
  * @brief Runs the UI for running tests
  *
@@ -40,14 +40,19 @@ typedef struct AutomaticPage_t
     Module openText;
     Module runButton;
     Module runText;
-    Module navButton;
+    Module saveButton;
+    Module navigationButton;
+
+    Module machineInfoWindow;
+    MachineView machineView;
 
     char profileNameBuffer[50];
     char profileNumberBuffer[50];
+    MonitorData *data;
 } AutomaticPage;
 
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control)__fromfile("src/Pages/AutomaticPage.c");
-void automatic_page_destroy(AutomaticPage *page)__fromfile("src/Pages/AutomaticPage.c");
-void automatic_page_run(AutomaticPage *page)__fromfile("src/Pages/AutomaticPage.c");
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData*data);
+void automatic_page_destroy(AutomaticPage *page);
+void automatic_page_run(AutomaticPage *page);
 
 #endif

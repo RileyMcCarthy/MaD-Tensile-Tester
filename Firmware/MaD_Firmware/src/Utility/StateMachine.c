@@ -1,7 +1,5 @@
 #include "StateMachine.h"
 
-static long state_stack[64];
-
 /**
  * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state.
  *
@@ -137,7 +135,8 @@ static State state_machine_motion(MachineState *machineState)
 
 static void state_machine_update(MachineState *machineState)
 {
-    while(!_locktry(machineState->lock)); // waits for lock to be available then claims it
+    while(!_locktry(machineState->lock)) 
+        printf("waiting for lock to release\n"); // waits for lock to be available then claims it
     machineState->state = state_machine_motion(machineState);
     _lockrel(machineState->lock);
 }

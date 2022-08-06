@@ -48,6 +48,15 @@
 #define dyn4_is_config 0x1a
 #define dyn4_is_abs_pos 0x1b
 
+#define STATUS_ONRANGE 0x00
+#define STATUS_MOTORFREE 0x01
+#define STATUS_ALARM 0x02
+#define STATUS_MOTORBUSY 0x05
+#define STATUS_JP3STATUS 0x06
+
+#define READ_DRIVE_STATUS 0x09
+#define IS_STATUS 0x19
+
 /**Functions**/
 
 typedef struct __using("jm_fullduplexserial.spin2") FDS;
@@ -95,12 +104,12 @@ typedef union Data_union
     uint8_t bval[4];
 } DataUnion;
 
-Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)__fromfile("Librarys/DYN4/DYN4.c");
+Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id);
 
-int dyn4_getPosition(DYN4 *dyn4)__fromfile("Librarys/DYN4/DYN4.c");
+int dyn4_getPosition(DYN4 *dyn4);
 
-void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)__fromfile("Librarys/DYN4/DYN4.c");
-int dyn4_read_command(DYN4 *dyn4, int command)__fromfile("Librarys/DYN4/DYN4.c");
-Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)__fromfile("Librarys/DYN4/DYN4.c");
+void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data);
+int dyn4_read_command(DYN4 *dyn4, int command);
+Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status);
 
 #endif

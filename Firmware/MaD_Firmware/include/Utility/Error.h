@@ -1,8 +1,6 @@
 #ifndef Error_H
 #define Error_H
-#ifdef __MEMORY_CHECK__
-#include "leak_detector_c.h"
-#endif
+
 /**
  * @brief Error codes:
  * 0: Generic Success
@@ -41,9 +39,14 @@ typedef enum Error_e
 
     MCP23017_NOT_FOUND = 251,
 
+    W25QXX_NOT_FOUND = 301,
+    W25QXX_NOT_AVAILABLE,
+    W25QXX_INVALID_ID,
+
+    SEM_NOT_AVAILABLE = 351
 } Error;
 
-void print_error(Error value)__fromfile("src/Utility/Error.c");
-inline void seterror(Error *err, Error value)__fromfile("src/Utility/Error.c");
+void print_error(Error value);
+inline void seterror(Error *err, Error value);
 
 #endif

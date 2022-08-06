@@ -53,7 +53,7 @@ typedef struct explorer_s
     int selection;
 } Explorer;
 
-Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path) __fromfile("src/Elements/Explorer.c");
-char *explorer_run(Explorer *explorer) __fromfile("src/Elements/Explorer.c");
+Explorer *explorer_create(Display *display, int x, int y, ExplorerMode mode, const char *path) ;
+char *explorer_run(Explorer *explorer) ;
 
 #endif

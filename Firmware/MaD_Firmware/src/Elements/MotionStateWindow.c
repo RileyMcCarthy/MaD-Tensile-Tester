@@ -130,7 +130,7 @@ static void update_status(Display *display, Module *module, void *arg)
         break;
     }
 
-    if (module->foregroundColor == statusOutlineColor &&
+    if (module->borderColor == statusOutlineColor &&
         module->child[0]->backgroundColor == statusInnerColor &&
         module->child[0]->foregroundColor == statusTextColor)
     {
@@ -357,7 +357,7 @@ void motion_state_window_init(MotionStateWindow *window, Module *container, Mach
     module_fit_below(statusButton, statusHeader);
     module_align_space_even(statusButton, 1, 3);
     module_touch_callback(statusButton, button_callback, BUTTON_STATUS);
-    module_update_callback(statusButton, update_status);
+    module_redraw_callback(statusButton, update_status);
 
     // Create status Button Text
     Module *statusButtonText = &(window->statusButtonText);
@@ -381,7 +381,7 @@ void motion_state_window_init(MotionStateWindow *window, Module *container, Mach
     module_fit_space_even(conditionButton, 3);
     module_fit_below(conditionButton, statusHeader);
     module_align_space_even(conditionButton, 2, 3);
-    module_update_callback(conditionButton, update_condition);
+    module_redraw_callback(conditionButton, update_condition);
 
     // Create condition Button Text
     Module *conditionButtonText = &(window->conditionButtonText);
@@ -405,7 +405,7 @@ void motion_state_window_init(MotionStateWindow *window, Module *container, Mach
     module_fit_below(modeButton, statusHeader);
     module_align_space_even(modeButton, 3, 3);
     module_touch_callback(modeButton, button_callback, BUTTON_MODE);
-    module_update_callback(modeButton, update_mode);
+    module_redraw_callback(modeButton, update_mode);
 
     // Create Mode Button Text
     Module *modeButtonText = &(window->modeButtonText);

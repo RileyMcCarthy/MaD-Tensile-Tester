@@ -48,8 +48,8 @@ typedef struct CalibratePage_s
 
 } CalibratePage;
 
-void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *monitor, MachineProfile *machineProfile, Images *images)__fromfile("src/Pages/CalibratePage.c");
-void calibrate_force_page_destroy(CalibratePage *page)__fromfile("src/Pages/CalibratePage.c");
-bool calibrate_force_page_run(CalibratePage *page)__fromfile("src/Pages/CalibratePage.c");
+void calibrate_force_page_init(CalibratePage *page, Display *display, Monitor *monitor, MachineProfile *machineProfile, Images *images);
+void calibrate_force_page_destroy(CalibratePage *page);
+bool calibrate_force_page_run(CalibratePage *page);
 
 #endif

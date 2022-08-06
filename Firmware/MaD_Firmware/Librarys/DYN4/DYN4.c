@@ -1,14 +1,5 @@
 #include "DYN4.h"
 
-#define STATUS_ONRANGE 0x00
-#define STATUS_MOTORFREE 0x01
-#define STATUS_ALARM 0x02
-#define STATUS_MOTORBUSY 0x05
-#define STATUS_JP3STATUS 0x06
-
-#define READ_DRIVE_STATUS 0x09
-#define IS_STATUS 0x19
-
 /**
  * @brief Begin communication with the servo controller
  *
@@ -26,13 +17,10 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
     Error ret = dyn4_get_status(dyn4, &status);
     if (ret != SUCCESS)
     {
-        // printf("DYN4_NOT_RESPONDING\n");
+         printf("DYN4_NOT_RESPONDING\n");
         return ret;
     }
     // printf("status:alarm(%d),onrange(%d),motorFree(%d)motorBusy(%d)\n", status.alarm, status.onRange, status.motorFree, status.motorBusy);
-
-    // start encoder
-
     return ret;
 }
 
@@ -45,13 +33,14 @@ Error dyn4_begin(DYN4 *dyn4, int rx, int tx, int new_device_id)
  */
 Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
 {
-    uint8_t statusReg;
+    int8_t statusReg;
 
     dyn4_send_command(dyn4, READ_DRIVE_STATUS, 1);
     if ((statusReg = dyn4_read_command(dyn4, IS_STATUS)) == -1)
     {
         return DYN4_NOT_RESPONDING;
     }
+    printf("statusReg:%d\n", statusReg);
     status->onRange = (statusReg & (0x01 << STATUS_ONRANGE)) >> STATUS_ONRANGE;
     status->motorFree = (statusReg & (0x01 << STATUS_MOTORFREE)) >> STATUS_MOTORFREE;
     status->alarm = (statusReg & (0x07 << STATUS_ALARM)) >> STATUS_ALARM;
@@ -70,39 +59,31 @@ Error dyn4_get_status(DYN4 *dyn4, DYN4_Status *status)
  */
 int dyn4_read_command(DYN4 *dyn4, int command)
 {
-    uint8_t byte;
-
-    for (int i = 0; i < 10; i++)
+    int byte;
+    byte = dyn4->serial.rxtime(100);
+    if (byte == dyn4->device_id)
     {
-        // printf("getting info\n");
-        byte = (uint8_t)dyn4->serial.rxtime(100);
-        // printf("got info\n");
-        if (byte == dyn4->device_id)
-        {
-            break;
-        }
-        else
-        {
-            byte = -1;
-        }
     }
-    if (byte == -1)
+    else
     {
+        printf("dyn4_read_command: wrong device id:%d\n",byte);
         return -1;
     }
 
-    byte = (uint8_t)dyn4->serial.rxtime(200);
+    byte = dyn4->serial.rxtime(100);
 
     if (byte != command)
     {
+        //printf("dyn4_read_command: wrong command:%d\n",byte);
         // return -1;
     }
+
     int n = ((byte >> 5) & 0x03) + 1;
     // printf("n: %d\n", n);
     int data = 0;
     for (int i = n - 1; i >= 0; i--)
     {
-        data += ((uint8_t)dyn4->serial.rxtime(200) & 0x7F) << (7 * i);
+        data += ((uint8_t)dyn4->serial.rxtime(100) & 0x7F) << (7 * i);
     }
     return data;
 }
@@ -116,6 +97,7 @@ int dyn4_read_command(DYN4 *dyn4, int command)
  */
 void dyn4_send_command(DYN4 *dyn4, uint8_t command, int32_t data)
 {
+    dyn4->serial.rxflush();
     int n = 0;
     if (data > 0xFFFFF || data < -0x100000)
     {

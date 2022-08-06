@@ -5,6 +5,7 @@
 #include "Module.h"
 typedef struct graph_t
 {
+    double *dataPtr;
     double data[2];
     double maxY;
     double minY;
@@ -28,10 +29,9 @@ typedef struct graph_t
     char maxyBuffer[10];
 } ModuleGraph;
 
-void module_set_graph(Module *window, ModuleGraph *graph, const char *title, const char *units)__fromfile("Librarys/RA8876/Graph.c");
-void module_graph_add_marker(Module *module, double value)__fromfile("Librarys/RA8876/Graph.c");
-void module_graph_insert(Module *module, double value)__fromfile("Librarys/RA8876/Graph.c");
-void module_graph_set_range(Module *module, double maxY, double minY)__fromfile("Librarys/RA8876/Graph.c");
-int module_graph_get_max_data(Module *module)__fromfile("Librarys/RA8876/Graph.c");
-
+void module_set_graph(Module *window, ModuleGraph *graph, const char *title, const char *units, double *data);
+void module_graph_add_marker(Module *module, double value);
+void module_graph_insert(Module *module, double value);
+void module_graph_set_range(Module *module, double maxY, double minY);
+int module_graph_get_max_data(Module *module);
 #endif

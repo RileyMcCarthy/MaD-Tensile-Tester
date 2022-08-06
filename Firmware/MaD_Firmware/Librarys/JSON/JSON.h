@@ -28,6 +28,7 @@
 
 #define MAX_TEST_PROFILE_NAME MAX_PATH_LENGTH
 #define MAX_TEST_PROFILE_MP_FILENAME 20
+#define MAX_TEST_PROFILE_COMMENT 256
 
 #define MAX_MOTION_PROFILE_SET_NAME MAX_PATH_LENGTH
 #define MAX_MOTION_PROFILE_SET_TYPE 10
@@ -112,7 +113,7 @@ typedef struct MotionProfile_s
 #define SAMPLE_PROFILE_FIELD_COUNT 9
 typedef struct SampleProfile_s
 {
-    char *name;                // Name of the sample profile
+    char name[MAX_SAMPLE_PROFILE_NAME];                // Name of the sample profile
     int number;                // Number of the sample profile
     double length;              // Length of the sample profile (mm)
     double stretchMax;          // Maximum stretch of the sample profile (% of length)
@@ -127,46 +128,48 @@ typedef struct SampleProfile_s
 #define TEST_PROFILE_FIELD_COUNT 6
 typedef struct TestProfile_s
 {
-    char *name;                     // Descriptive test name
+    char name[MAX_TEST_PROFILE_NAME];                     // Descriptive test name
     int sampleSN;                   // Serial number of the sample
-    MachineProfile *machineProfile; // Name of the machine profile
-    SampleProfile *sampleProfile;   // Name of the sample profile
-    MotionProfile *motionProfile;   // Name of the motion profile
-    char *comment;                  // Comment for the test
+    MachineProfile machineProfile; // Name of the machine profile
+    SampleProfile sampleProfile;   // Name of the sample profile
+    MotionProfile motionProfile;   // Name of the motion profile
+    char comment[MAX_TEST_PROFILE_COMMENT];                  // Comment for the test
 } TestProfile;
 
 // Helper Functions
 
-void machine_configuration_init(MachineConfiguration *configuration)__fromfile("Librarys/JSON/JSON.c");
-void machine_performance_init(MachinePerformance *performance)__fromfile("Librarys/JSON/JSON.c");
-void machine_profile_init(MachineProfile *profile)__fromfile("Librarys/JSON/JSON.c");
-void motion_quartet_init(MotionQuartet *quartet)__fromfile("Librarys/JSON/JSON.c");
-void motion_set_init(MotionSet *set)__fromfile("Librarys/JSON/JSON.c");
-void motion_profile_init(MotionProfile *profile)__fromfile("Librarys/JSON/JSON.c");
+void machine_configuration_init(MachineConfiguration *configuration);
+void machine_performance_init(MachinePerformance *performance);
+void machine_profile_init(MachineProfile *profile);
+void motion_quartet_init(MotionQuartet *quartet);
+void motion_set_init(MotionSet *set);
+void sample_profile_init(SampleProfile *sample);
+void motion_profile_init(MotionProfile *profile);
+void test_profile_init(TestProfile *profile);
 
-Error machine_profile_to_json(MachineProfile *settings, const char *filename)__fromfile("Librarys/JSON/JSON.c"); // U
-Error sample_profile_to_json(SampleProfile *sample, const char *filename)__fromfile("Librarys/JSON/JSON.c");     // U
-Error test_profile_to_json(TestProfile *test, const char *filename)__fromfile("Librarys/JSON/JSON.c");           // U
-Error motion_profile_to_json(MotionProfile *motion, const char *filename)__fromfile("Librarys/JSON/JSON.c");     // U
-Error motion_set_to_json(MotionSet *set, char *filename)__fromfile("Librarys/JSON/JSON.c");                      // U
-Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename)__fromfile("Librarys/JSON/JSON.c");    // U
+Error machine_profile_to_json(MachineProfile *settings, const char *filename); // U
+Error sample_profile_to_json(SampleProfile *sample, const char *filename);     // U
+Error test_profile_to_json(TestProfile *test, const char *filename);           // U
+Error motion_profile_to_json(MotionProfile *motion, const char *filename);     // U
+Error motion_set_to_json(MotionSet *set, char *filename);                      // U
+Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename);    // U
 
-void json_to_machine_profile(MachineProfile *profile, const char *filename)__fromfile("Librarys/JSON/JSON.c");
-void json_to_sample_profile(SampleProfile *sample, const char *filename)__fromfile("Librarys/JSON/JSON.c");
-void json_to_test_profile(const char *filename, TestProfile *test)__fromfile("Librarys/JSON/JSON.c");        // U
-void json_to_motion_profile(const char *filename, MotionProfile *profile)__fromfile("Librarys/JSON/JSON.c"); // U
-void json_to_motion_set(const char *filename, MotionSet *set)__fromfile("Librarys/JSON/JSON.c");             // U
-void json_to_motion_quartet(const char *filename, MotionQuartet *quartet)__fromfile("Librarys/JSON/JSON.c"); // U
+void json_to_machine_profile(MachineProfile *profile, const char *filename);
+void json_to_sample_profile(SampleProfile *sample, const char *filename);
+void json_to_test_profile(const char *filename, TestProfile *test);        // U
+void json_to_motion_profile(const char *filename, MotionProfile *profile); // U
+void json_to_motion_set(const char *filename, MotionSet *set);             // U
+void json_to_motion_quartet(const char *filename, MotionQuartet *quartet); // U
 
-void json_print_machine_profile(MachineProfile *profile)__fromfile("Librarys/JSON/JSON.c");
-void json_print_motion_profile(MotionProfile *profile)__fromfile("Librarys/JSON/JSON.c");
+void json_print_machine_profile(MachineProfile *profile);
+void json_print_motion_profile(MotionProfile *profile);
 
-void free_machine_profile(MachineProfile *settings)__fromfile("Librarys/JSON/JSON.c");
-void free_machine_performance(MachinePerformance *performance)__fromfile("Librarys/JSON/JSON.c");
-void free_machine_configuration(MachineConfiguration *configuration)__fromfile("Librarys/JSON/JSON.c");
-void free_sample_profile(SampleProfile *sample)__fromfile("Librarys/JSON/JSON.c");
-void free_test_profile(TestProfile *test)__fromfile("Librarys/JSON/JSON.c");
-void free_motion_profile(MotionProfile *profile)__fromfile("Librarys/JSON/JSON.c");
-void free_motion_set(MotionSet *set)__fromfile("Librarys/JSON/JSON.c");
-void free_motion_quartet(MotionQuartet *quartet)__fromfile("Librarys/JSON/JSON.c");
+void free_machine_profile(MachineProfile *settings);
+void free_machine_performance(MachinePerformance *performance);
+void free_machine_configuration(MachineConfiguration *configuration);
+void free_sample_profile(SampleProfile *sample);
+void free_test_profile(TestProfile *test);
+void free_motion_profile(MotionProfile *profile);
+void free_motion_set(MotionSet *set);
+void free_motion_quartet(MotionQuartet *quartet);
 #endif

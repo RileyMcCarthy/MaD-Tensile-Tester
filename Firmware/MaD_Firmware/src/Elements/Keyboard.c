@@ -205,10 +205,6 @@ Keyboard *keyboard_create(Display *display, Images *images)
     strcpy(staticKeyboard.keyboard_buffer, "");
     return &staticKeyboard;
 }
-void keyboard_destroy(Keyboard *keyboard)
-{
-    // free(keyboard);
-}
 
 /**
  * @brief Gets user input using on display keyboard

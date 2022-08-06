@@ -11,7 +11,7 @@
 #include "FunctionWindow.h"
 #include "Graph.h"
 #include "JSON.h"
-
+#include "MachineView.h"
 typedef struct StatusPage_s
 {
     bool complete;
@@ -57,16 +57,16 @@ typedef struct StatusPage_s
     FunctionWindow functionWindowData;
     Module motionStateWindow;
     MotionStateWindow motionStateWindowData;
-
+    MachineView machineView;
     char forceValueBuffer[20];
     char positionValueBuffer[20];
 } StatusPage;
 
-void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images)__fromfile("src/Pages/StatusPage.c");
+void status_page_init(StatusPage *page, Display *display, MachineState *machineState, MachineProfile *machineProfile, MonitorData *data, Images *images);
 /**
  * @brief Runs the UI that displays machine information and status
  *
  */
-void status_page_run(StatusPage *statusPage)__fromfile("src/Pages/StatusPage.c");
+void status_page_run(StatusPage *statusPage);
 
 #endif

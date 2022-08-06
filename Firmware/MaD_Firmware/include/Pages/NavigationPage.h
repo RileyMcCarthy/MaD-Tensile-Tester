@@ -46,10 +46,10 @@ typedef struct NavigationPage_s
     Module tpText;
 } NavigationPage;
 
-void navigation_page_init(NavigationPage *page, Display *display, Images *images)__fromfile("src/Pages/NavigationPage.c");
+void navigation_page_init(NavigationPage *page, Display *display, Images *images);
 
-void navigation_page_destroy(NavigationPage *page)__fromfile("src/Pages/NavigationPage.c");
+void navigation_page_destroy(NavigationPage *page);
 
-Page navigation_page_run(NavigationPage *page)__fromfile("src/Pages/NavigationPage1.c");
+Page navigation_page_run(NavigationPage *page);
 
 #endif

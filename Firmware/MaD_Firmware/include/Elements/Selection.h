@@ -19,7 +19,7 @@ typedef struct selection_s
     int selected;
 } Selection;
 
-void selection_init(Selection *selection, Display *display)__fromfile("src/Elements/Selection.c");
-void selection_add_option(Selection *selection, char *option)__fromfile("src/Elements/Selection.c");
-int selection_run(Selection *selection)__fromfile("src/Elements/Selection.c");
+void selection_init(Selection *selection, Display *display);
+void selection_add_option(Selection *selection, char *option);
+int selection_run(Selection *selection);
 #endif

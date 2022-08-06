@@ -14,7 +14,7 @@
 
 #include "i2cNavKey.h"
 
-static enum I2C_Register {
+enum I2C_Register {
   REG_GCONF = 0x00,
   REG_GP1CONF = 0x01,
   REG_GP2CONF = 0x02,

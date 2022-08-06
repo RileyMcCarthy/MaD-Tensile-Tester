@@ -85,7 +85,7 @@ void module_init(Module *module, Module *parent)
     module->lastPressed = 0;
     module->debouncems = 100;
     module->onTouch = NULL;
-    module->onUpdate = NULL;
+    module->reDraw = NULL;
     module->draw = NULL;
 
     module->x = 0;
@@ -115,12 +115,12 @@ void module_init(Module *module, Module *parent)
     }
 }
 
-void module_update_callback(Module *module, void (*onUpdate)(Display *display, Module *module, void *arg))
+void module_redraw_callback(Module *module, ModuleReDraw reDraw)
 {
-    module->onUpdate = onUpdate;
+    module->reDraw = reDraw;
 }
 
-void module_update_check(Display *display, Module *module, void *arg)
+void module_redraw(Display *display, Module *module, void *arg)
 {
     if (module->type == MODULE_WINDOW)
     {
@@ -128,11 +128,11 @@ void module_update_check(Display *display, Module *module, void *arg)
     }
     for (int i = 0; i < module->numChildren; i++)
     {
-        module_update_check(display, module->child[i], arg);
+        module_redraw(display, module->child[i], arg);
     }
-    if (module->onUpdate != NULL)
+    if (module->reDraw != NULL)
     {
-        module->onUpdate(display, module, arg);
+        module->reDraw(display, module, arg);
     }
 }
 
@@ -211,7 +211,7 @@ void module_paste(Module *module, Display *display)
     display_bte_memory_copy(display, PAGE3_START_ADDR, SCREEN_WIDTH, module->x, module->y, PAGE1_START_ADDR, SCREEN_WIDTH, module->x, module->y, module->w, module->h);
 }
 
-void module_animate_draw(Module *module, void (*drawAnimate)(Display *display, struct Module_s *module))
+void module_animate_draw(Module *module, ModuleDrawAnimate drawAnimate)
 {
     module->drawAnimate = drawAnimate;
 }
@@ -593,10 +593,13 @@ void module_draw(Display *display, Module *module)
     {
         return;
     }
+
     if (module->drawAnimate != NULL)
     {
         display_canvas_image_start_address(display, ANIMATION_PAGE);
     }
+
+    // Draw standard module types
     switch (module->type)
     {
     case MODULE_TEXT:
@@ -690,17 +693,6 @@ void module_draw(Display *display, Module *module)
     }
 }
 
-void module_destroy_children(Module *module)
-{
-    for (int i = 0; i < module->numChildren; i++)
-    {
-        Module *toDestroy = module->child[i];
-        module_trim(toDestroy);    // Remove child from parent
-        module_destroy(toDestroy); // Destroy child
-    }
-    module->numChildren = 0;
-}
-
 void module_trim(Module *module)
 {
     // Remove module from parents children
@@ -719,27 +711,4 @@ void module_trim(Module *module)
         }
         module->parent->numChildren--;
     }
-}
-
-void module_destroy(Module *root)
-{
-    // Free module children
-    int children = root->numChildren;
-    for (int i = 0; i < children; i++)
-    {
-        module_destroy(root->child[i]);
-    }
-
-    // Free module
-    switch (root->type)
-    {
-    case MODULE_TEXT:
-    {
-        break;
-    }
-    default:
-        break;
-    }
-
-    free(root);
 }

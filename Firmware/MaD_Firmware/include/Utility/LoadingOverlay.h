@@ -8,4 +8,4 @@ typedef enum OverlayType_e
     OVERLAY_TYPE_ERROR,
 } OverlayType;
 
-void loading_overlay_display(Display *display, const char *message, OverlayType type)__fromfile("src/Utility/LoadingOverlay.c");
+void loading_overlay_display(Display *display, const char *message, OverlayType type);

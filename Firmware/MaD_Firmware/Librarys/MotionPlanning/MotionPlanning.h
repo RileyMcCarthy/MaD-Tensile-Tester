@@ -67,18 +67,18 @@ typedef struct RunMotionProfile_s
     double dwellTime;
 } RunMotionProfile;
 
-void run_motion_profile_init(RunMotionProfile *profile)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
-void destroy_run_motion_profile(RunMotionProfile *run)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
+void run_motion_profile_init(RunMotionProfile *profile);
+void destroy_run_motion_profile(RunMotionProfile *run);
 
-void get_function_info(FunctionInfo *info, QuartetFunctions id)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
+void get_function_info(FunctionInfo *info, QuartetFunctions id);
 
-double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
-double position_set(double t, RunMotionProfile *run, MotionSet *set)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
-double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
+double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
+double position_set(double t, RunMotionProfile *run, MotionSet *set);
+double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
 
-double sigmoid(double t, double *args)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
-void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
+double sigmoid(double t, double *args);
+void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);
 
-double steps_to_mm(int steps, MachineConfiguration *config)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
-int mm_to_steps(double mm, MachineConfiguration *config)__fromfile("Librarys/MotionPlanning/MotionPlanning.c");
+double steps_to_mm(int steps, MachineConfiguration *config);
+int mm_to_steps(double mm, MachineConfiguration *config);
 #endif

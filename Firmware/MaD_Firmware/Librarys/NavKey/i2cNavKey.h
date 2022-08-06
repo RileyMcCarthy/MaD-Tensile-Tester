@@ -71,91 +71,91 @@ typedef struct navkey_t
 	union Data_v _tem_data;
 } NavKey;
 
-void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_reset(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_auto_config_interrupt(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf);
+void navkey_reset(NavKey *navkey);
+void navkey_auto_config_interrupt(NavKey *navkey);
 
 /**    Read functions   **/
-void navkey_update_status(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_update_status(NavKey *navkey);
 /** Configuration function **/
-uint8_t navkey_read_gp1_conf(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_gp2_conf(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_gp3_conf(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint16_t navkey_read_interrupt_config(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_gp1_conf(NavKey *navkey);
+uint8_t navkey_read_gp2_conf(NavKey *navkey);
+uint8_t navkey_read_gp3_conf(NavKey *navkey);
+uint16_t navkey_read_interrupt_config(NavKey *navkey);
 
 /** Status function **/
-uint16_t navkey_read_status(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint16_t navkey_read_status(NavKey *navkey);
 
-uint8_t navkey_read_int2(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_int2(NavKey *navkey);
 
-uint8_t navkey_read_fade_status(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_fade_status(NavKey *navkey);
 
 /** NavKey functions **/
-float navkey_read_counter_float(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-int32_t navkey_read_counter_long(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-int16_t navkey_read_counter_int(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-int8_t navkey_read_counter_byte(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+float navkey_read_counter_float(NavKey *navkey);
+int32_t navkey_read_counter_long(NavKey *navkey);
+int16_t navkey_read_counter_int(NavKey *navkey);
+int8_t navkey_read_counter_byte(NavKey *navkey);
 
-int32_t navkey_read_max(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-float navkey_read_max_float(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+int32_t navkey_read_max(NavKey *navkey);
+float navkey_read_max_float(NavKey *navkey);
 
-int32_t navkey_read_min(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-float navkey_read_min_float(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+int32_t navkey_read_min(NavKey *navkey);
+float navkey_read_min_float(NavKey *navkey);
 
-int32_t navkey_readStep(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-float navkey_read_step_float(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+int32_t navkey_readStep(NavKey *navkey);
+float navkey_read_step_float(NavKey *navkey);
 
 /** GP LED Functions **/
-uint8_t navkey_read_gp1(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_gp2(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_gp3(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_gp1(NavKey *navkey);
+uint8_t navkey_read_gp2(NavKey *navkey);
+uint8_t navkey_read_gp3(NavKey *navkey);
 
 /** Timing registers **/
-uint8_t navkey_read_double_push_period(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_fade_gp(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_double_push_period(NavKey *navkey);
+uint8_t navkey_read_fade_gp(NavKey *navkey);
 
 /** EEPROM register **/
-uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add);
 
 /** **/
-uint8_t navkey_read_id_code(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
-uint8_t navkey_read_version(NavKey *navkey)__fromfile("Librarys/NavKey/i2cNavKey.c");
+uint8_t navkey_read_id_code(NavKey *navkey);
+uint8_t navkey_read_version(NavKey *navkey);
 
 /******    Write functions   ********/
-void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3);
+void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
 
 /** NavKey functions **/
-void navkey_write_counter(NavKey *navkey, int counter)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_counter(NavKey *navkey, int counter);
 
-void navkey_write_max(NavKey *navkey, int max)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_max(NavKey *navkey, int max);
 
-void navkey_write_min(NavKey *navkey, int min)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_min(NavKey *navkey, int min);
 
-void navkey_write_step(NavKey *navkey, int step)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_step(NavKey *navkey, int step);
 
 /** GP LED Functions **/
-void navkey_write_gp1(NavKey *navkey, uint8_t gp1)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gp2(NavKey *navkey, uint8_t gp2)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gp3(NavKey *navkey, uint8_t gp3)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_gp1(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3(NavKey *navkey, uint8_t gp3);
 
 /** Timing registers **/
-void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_fade_gp(NavKey *navkey, uint8_t fade)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod);
+void navkey_write_fade_gp(NavKey *navkey, uint8_t fade);
 
-void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma);
 
 /** EEPROM register **/
-void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data);
 
-void navkey_write8(NavKey *navkey, uint8_t reg, uint8_t data)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write16(NavKey *navkey, uint8_t reg, uint16_t data)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write32(NavKey *navkey, uint8_t reg, int32_t data)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write_float(NavKey *navkey, uint8_t reg, float data)__fromfile("Librarys/NavKey/i2cNavKey.c");
-void navkey_write24(NavKey *navkey, uint8_t reg, uint32_t data)__fromfile("Librarys/NavKey/i2cNavKey.c");
+void navkey_write8(NavKey *navkey, uint8_t reg, uint8_t data);
+void navkey_write16(NavKey *navkey, uint8_t reg, uint16_t data);
+void navkey_write32(NavKey *navkey, uint8_t reg, int32_t data);
+void navkey_write_float(NavKey *navkey, uint8_t reg, float data);
+void navkey_write24(NavKey *navkey, uint8_t reg, uint32_t data);
 
 #endif

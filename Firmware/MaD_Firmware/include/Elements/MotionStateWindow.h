@@ -22,7 +22,7 @@ typedef struct MotionStateWindow_t
 
 } MotionStateWindow;
 
-void motion_state_window_init(MotionStateWindow *window, Module *container, MachineState *state)__fromfile("src/Elements/MotionStateWindow.c");
-void motion_state_window_update(MotionStateWindow *window)__fromfile("src/Elements/MotionStateWindow.c");
+void motion_state_window_init(MotionStateWindow *window, Module *container, MachineState *state);
+void motion_state_window_update(MotionStateWindow *window);
 
 #endif

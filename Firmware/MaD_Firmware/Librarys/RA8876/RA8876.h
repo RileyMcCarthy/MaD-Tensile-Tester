@@ -816,131 +816,131 @@ typedef struct RA8876_s
     int currentPage;
 } Display;
 
-Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda)__fromfile("Librarys/RA8876/RA8876.c");
+Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int spi_miso, int spi_clk, int i2c_clk, int i2c_sda);
 
 /*SD Card*/
-void display_load_image(Display *display, Image *image)__fromfile("Librarys/RA8876/RA8876.c");
-void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos)__fromfile("Librarys/RA8876/RA8876.c");
+void display_load_image(Display *display, Image *image);
+void display_bte_memory_copy_image(Display *display, Image *image, int xpos, int ypos);
 
-void display_on(Display *display, bool on)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_horizontal_non_display(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_hsync_start_position(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_hsync_pulse_width(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_vertical_non_display(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_vsync_start_position(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_lcd_vsync_pulse_width(Display *display, uint16_t numbers)__fromfile("Librarys/RA8876/RA8876.c");
-void display_image_start_address(Display *display, uint32_t addr)__fromfile("Librarys/RA8876/RA8876.c");
-void display_image_width(Display *display, uint16_t width)__fromfile("Librarys/RA8876/RA8876.c");
-void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0)__fromfile("Librarys/RA8876/RA8876.c");
-void display_canvas_image_start_address(Display *display, uint32_t addr)__fromfile("Librarys/RA8876/RA8876.c");
-void display_canvas_image_width(Display *display, uint16_t width)__fromfile("Librarys/RA8876/RA8876.c");
-void display_active_window_xy(Display *display, uint16_t x0, uint16_t y0)__fromfile("Librarys/RA8876/RA8876.c");
-void display_active_window_wh(Display *display, uint16_t width, uint16_t height)__fromfile("Librarys/RA8876/RA8876.c");
+void display_on(Display *display, bool on);
+void display_lcd_horizontal_width_vertical_height(Display *display, uint16_t width, uint16_t height);
+void display_lcd_horizontal_non_display(Display *display, uint16_t numbers);
+void display_lcd_hsync_start_position(Display *display, uint16_t numbers);
+void display_lcd_hsync_pulse_width(Display *display, uint16_t numbers);
+void display_lcd_vertical_non_display(Display *display, uint16_t numbers);
+void display_lcd_vsync_start_position(Display *display, uint16_t numbers);
+void display_lcd_vsync_pulse_width(Display *display, uint16_t numbers);
+void display_image_start_address(Display *display, uint32_t addr);
+void display_image_width(Display *display, uint16_t width);
+void display_window_start_xy(Display *display, uint16_t x0, uint16_t y0);
+void display_canvas_image_start_address(Display *display, uint32_t addr);
+void display_canvas_image_width(Display *display, uint16_t width);
+void display_active_window_xy(Display *display, uint16_t x0, uint16_t y0);
+void display_active_window_wh(Display *display, uint16_t width, uint16_t height);
 
-void display_ram_access_prepare(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void display_fore_ground_color_16bpp(Display *display, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_back_ground_color_16bpp(Display *display, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
+void display_ram_access_prepare(Display *display);
+void display_fore_ground_color_16bpp(Display *display, uint16_t color);
+void display_back_ground_color_16bpp(Display *display, uint16_t color);
 
 /*graphic function*/
-void display_graphic_mode(Display *display, bool on)__fromfile("Librarys/RA8876/RA8876.c");
-void display_set_pixel_cursor(Display *display, uint16_t x, uint16_t y)__fromfile("Librarys/RA8876/RA8876.c");
-void display_put_pixel_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_put_picture_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height)__fromfile("Librarys/RA8876/RA8876.c");
-void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char *data)__fromfile("Librarys/RA8876/RA8876.c");
+void display_graphic_mode(Display *display, bool on);
+void display_set_pixel_cursor(Display *display, uint16_t x, uint16_t y);
+void display_put_pixel_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t color);
+void display_put_picture_16bpp(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+void display_put_picture_16bpp_data(Display *display, uint16_t x, uint16_t y, uint16_t width, uint16_t height, const unsigned char *data);
 
 /*text function*/
-void display_text_mode(Display *display, bool on)__fromfile("Librarys/RA8876/RA8876.c");
-void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_set_text_cursor(Display *display, uint16_t x, uint16_t y)__fromfile("Librarys/RA8876/RA8876.c");
-void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select)__fromfile("Librarys/RA8876/RA8876.c");                   // cch
-void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge)__fromfile("Librarys/RA8876/RA8876.c"); // cdh
+void display_text_mode(Display *display, bool on);
+void display_text_color(Display *display, uint16_t foreground_color, uint16_t background_color);
+void display_set_text_cursor(Display *display, uint16_t x, uint16_t y);
+void display_set_text_parameter1(Display *display, uint8_t source_select, uint8_t size_select, uint8_t iso_select);                   // cch
+void display_set_text_parameter2(Display *display, uint8_t align, uint8_t chroma_key, uint8_t width_enlarge, uint8_t height_enlarge); // cdh
 
-void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width)__fromfile("Librarys/RA8876/RA8876.c"); // b7h,bbh,ceh,cfh
+void display_genitop_character_rom_parameter(Display *display, uint8_t scs_select, uint8_t clk_div, uint8_t rom_select, uint8_t character_select, uint8_t gt_width); // b7h,bbh,ceh,cfh
 
-void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str)__fromfile("Librarys/RA8876/RA8876.c");
+void display_draw_string(Display *display, const uint16_t x0, const uint16_t y0, const char *str);
 
 /*draw function*/
-void display_draw_line(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_triangle(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_triangle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_circle(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_circle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_draw_ellipse_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color)__fromfile("Librarys/RA8876/RA8876.c");
+void display_draw_line(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
+void display_draw_circle_square(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_circle_square_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_triangle(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void display_draw_triangle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+void display_draw_circle(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+void display_draw_circle_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
+void display_draw_ellipse(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
+void display_draw_ellipse_fill(Display *display, uint16_t x0, uint16_t y0, uint16_t xr, uint16_t yr, uint16_t color);
 
 /*BTE function*/
 void display_bte_memory_copy(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t des_addr, uint16_t des_image_width,
-                             uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height)__fromfile("Librarys/RA8876/RA8876.c");
+                             uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height);
 void display_bte_memory_copy_with_rop(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y,
-                                      uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint8_t rop_code)__fromfile("Librarys/RA8876/RA8876.c");
+                                      uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint8_t rop_code);
 void display_bte_memory_copy_with_chroma_key(Display *display, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
-                                             uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint16_t chromakey_color)__fromfile("Librarys/RA8876/RA8876.c");
+                                             uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t copy_width, uint16_t copy_height, uint16_t chromakey_color);
 void display_bte_mpu_write_with_rop(Display *display, uint32_t s1_addr, uint16_t s1_image_width, uint16_t s1_x, uint16_t s1_y, uint32_t des_addr, uint16_t des_image_width,
-                                    uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint8_t rop_code)__fromfile("Librarys/RA8876/RA8876.c");
-void display_bte_mpu_write_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color)__fromfile("Librarys/RA8876/RA8876.c");
-void display_bte_mpu_write_color_expansion(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color)__fromfile("Librarys/RA8876/RA8876.c");
+                                    uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint8_t rop_code);
+void display_bte_mpu_write_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
+void display_bte_mpu_write_color_expansion(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
 void display_bte_mpu_write_color_expansion_with_chroma_key(Display *display, uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y,
-                                                           uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color)__fromfile("Librarys/RA8876/RA8876.c");
+                                                           uint16_t width, uint16_t height, uint16_t foreground_color, uint16_t background_color);
 
 void display_bte_pattern_fill(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
-                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height)__fromfile("Librarys/RA8876/RA8876.c");
+                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height);
 void display_bte_pattern_fill_with_chroma_key(Display *display, uint8_t p8x8or16x16, uint32_t s0_addr, uint16_t s0_image_width, uint16_t s0_x, uint16_t s0_y,
-                                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color)__fromfile("Librarys/RA8876/RA8876.c");
+                                              uint32_t des_addr, uint16_t des_image_width, uint16_t des_x, uint16_t des_y, uint16_t width, uint16_t height, uint16_t chromakey_color);
 
-Error display_initialize(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-bool display_pll_initial(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-bool display_sdram_initial(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
+Error display_initialize(Display *display);
+bool display_pll_initial(Display *display);
+bool display_sdram_initial(Display *display);
 
 /*Touch*/
-uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len)__fromfile("Librarys/RA8876/RA8876.c");
-void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num)__fromfile("Librarys/RA8876/RA8876.c");
-void button_update(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-int display_update_touch(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
+uint8_t display_gt9271_send_cfg(Display *display, uint8_t *buf, uint16_t cfg_len);
+void display_write_gt9271_touch_register(Display *display, uint16_t regAddr, uint8_t *val, uint16_t cnt);
+uint8_t display_read_gt9271_touch_addr(Display *display, uint16_t regAddr, uint8_t *pBuf, uint8_t len);
+uint8_t readGT9271TouchLocation(Display *display, TouchLocation *pLoc, uint8_t num);
+void button_update(Display *display);
+int display_update_touch(Display *display);
 /*access*/
-void lcdRegWrite(Display *display, uint8_t reg)__fromfile("Librarys/RA8876/RA8876.c");
-void lcdDataWrite(Display *display, uint8_t data)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t lcdDataRead(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t lcdStatusRead(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t lcdRegDataRead(Display *display, uint8_t reg)__fromfile("Librarys/RA8876/RA8876.c");
-void lcdDataWrite16bbp(Display *display, uint16_t data)__fromfile("Librarys/RA8876/RA8876.c");
+void lcdRegWrite(Display *display, uint8_t reg);
+void lcdDataWrite(Display *display, uint8_t data);
+uint8_t lcdDataRead(Display *display);
+uint8_t lcdStatusRead(Display *display);
+void lcdRegDataWrite(Display *display, uint8_t reg, uint8_t data);
+uint8_t lcdRegDataRead(Display *display, uint8_t reg);
+void lcdDataWrite16bbp(Display *display, uint16_t data);
 
 /*Staus*/
-void checkWriteFifoNotFull(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void checkWriteFifoEmpty(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void checkReadFifoNotFull(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void checkReadFifoFull(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void checkReadFifoNotEmpty(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-void check2dBusy(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-bool checkSdramReady(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-uint8_t powerSavingStatus(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
-bool checkIcReady(Display *display)__fromfile("Librarys/RA8876/RA8876.c");
+void checkWriteFifoNotFull(Display *display);
+void checkWriteFifoEmpty(Display *display);
+void checkReadFifoNotFull(Display *display);
+void checkReadFifoFull(Display *display);
+void checkReadFifoNotEmpty(Display *display);
+void check2dBusy(Display *display);
+bool checkSdramReady(Display *display);
+uint8_t powerSavingStatus(Display *display);
+bool checkIcReady(Display *display);
 
-void bte_Source0_MemoryStartAddr(Display *display, uint32_t addr)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_Source0_ImageWidth(Display *display, uint16_t width)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_Source0_WindowStartXY(Display *display, uint16_t x0, uint16_t y0)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_Source1_MemoryStartAddr(Display *display, uint32_t addr)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_Source1_ImageWidth(Display *display, uint16_t width)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_Source1_WindowStartXY(Display *display, uint16_t x0, uint16_t y0)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_DestinationMemoryStartAddr(Display *display, uint32_t addr)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_DestinationImageWidth(Display *display, uint16_t width)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_DestinationWindowStartXY(Display *display, uint16_t x0, uint16_t y0)__fromfile("Librarys/RA8876/RA8876.c");
-void bte_WindowSize(Display *display, uint16_t width, uint16_t height)__fromfile("Librarys/RA8876/RA8876.c");
+void bte_Source0_MemoryStartAddr(Display *display, uint32_t addr);
+void bte_Source0_ImageWidth(Display *display, uint16_t width);
+void bte_Source0_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_Source1_MemoryStartAddr(Display *display, uint32_t addr);
+void bte_Source1_ImageWidth(Display *display, uint16_t width);
+void bte_Source1_WindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_DestinationMemoryStartAddr(Display *display, uint32_t addr);
+void bte_DestinationImageWidth(Display *display, uint16_t width);
+void bte_DestinationWindowStartXY(Display *display, uint16_t x0, uint16_t y0);
+void bte_WindowSize(Display *display, uint16_t width, uint16_t height);
 
 /*PWM function*/
-void pwm_Prescaler(Display *display, uint8_t prescaler)__fromfile("Librarys/RA8876/RA8876.c");
-void pwm_ClockMuxReg(Display *display, uint8_t pwm1_clk_div, uint8_t pwm0_clk_div, uint8_t xpwm1_ctrl, uint8_t xpwm0_ctrl)__fromfile("Librarys/RA8876/RA8876.c");
-void pwm_Configuration(Display *display, uint8_t pwm1_inverter, uint8_t pwm1_auto_reload, uint8_t pwm1_start, uint8_t pwm0_dead_zone, uint8_t pwm0_inverter, uint8_t pwm0_auto_reload, uint8_t pwm0_start)__fromfile("Librarys/RA8876/RA8876.c");
+void pwm_Prescaler(Display *display, uint8_t prescaler);
+void pwm_ClockMuxReg(Display *display, uint8_t pwm1_clk_div, uint8_t pwm0_clk_div, uint8_t xpwm1_ctrl, uint8_t xpwm0_ctrl);
+void pwm_Configuration(Display *display, uint8_t pwm1_inverter, uint8_t pwm1_auto_reload, uint8_t pwm1_start, uint8_t pwm0_dead_zone, uint8_t pwm0_inverter, uint8_t pwm0_auto_reload, uint8_t pwm0_start);
 
-void pwm0_ClocksPerPeriod(Display *display, uint16_t clocks_per_period)__fromfile("Librarys/RA8876/RA8876.c");
-void pwm0_Duty(Display *display, uint16_t duty)__fromfile("Librarys/RA8876/RA8876.c");
-void pwm1_ClocksPerPeriod(Display *display, uint16_t clocks_per_period)__fromfile("Librarys/RA8876/RA8876.c");
-void pwm1_Duty(Display *display, uint16_t duty)__fromfile("Librarys/RA8876/RA8876.c");
+void pwm0_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+void pwm0_Duty(Display *display, uint16_t duty);
+void pwm1_ClocksPerPeriod(Display *display, uint16_t clocks_per_period);
+void pwm1_Duty(Display *display, uint16_t duty);
 #endif

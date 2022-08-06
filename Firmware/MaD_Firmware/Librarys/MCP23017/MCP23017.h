@@ -26,8 +26,8 @@ typedef struct MCP23017_t
     uint8_t dira, dirb;
 } MCP23017;
 
-bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)__fromfile("Librarys/MCP23017/MCP23017.c");
-void mcp_update_register(MCP23017 *mcp23017)__fromfile("Librarys/MCP23017/MCP23017.c");
+bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
+void mcp_update_register(MCP23017 *mcp23017);
 /**
  * @brief sets the direction of the pins
  *
@@ -35,13 +35,13 @@ void mcp_update_register(MCP23017 *mcp23017)__fromfile("Librarys/MCP23017/MCP230
  * @param pin the pin to set
  * @param direction 0: output, 1: input
  */
-void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction)__fromfile("Librarys/MCP23017/MCP23017.c");
-uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)__fromfile("Librarys/MCP23017/MCP23017.c");
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction);
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
 
-void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output)__fromfile("Librarys/MCP23017/MCP23017.c");
-uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)__fromfile("Librarys/MCP23017/MCP23017.c");
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
 
-void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output)__fromfile("Librarys/MCP23017/MCP23017.c");
-uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)__fromfile("Librarys/MCP23017/MCP23017.c");
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
 
 #endif

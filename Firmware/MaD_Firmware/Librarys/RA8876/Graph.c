@@ -13,14 +13,32 @@ static void module_graph_draw(Display *display, Module *module)
     display_draw_line(display, graph->graphArea.x + graph->graphArea.w, lastY, graph->graphArea.x + graph->graphArea.w + 2, y, COLOR65K_RED);
 }
 
-void module_set_graph(Module *window, ModuleGraph *graph, const char *title, const char *units)
+static void module_graph_redraw(Display *display, Module *module, void *arg)
+{
+    ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
+    double newData = *(graph->dataPtr);
+    //printf("Redrawing graph with newData: %f\n", newData);
+    if (newData > graph->maxY || newData < graph->minY)
+    {
+        return;
+    }
+    graph->data[1] = graph->data[0];
+    graph->data[0] = newData;
+    module_graph_draw(display, module);
+}
+
+void module_set_graph(Module *window, ModuleGraph *graph, const char *title, const char *units, double *data)
 {
     window->type = MODULE_GRAPH;
 
     window->draw = module_graph_draw;
+    window->reDraw = module_graph_redraw;
 
     window->data.ptr = graph;
     graph->initialDraw = true;
+
+    graph->dataPtr = data;
+
     strncpy(graph->title, title, MAX_GRAPH_TITLE_LENGTH);
 
     strncpy(graph->units, units, MAX_GRAPH_UNITS_LENGTH);

@@ -6,11 +6,12 @@
 #include "JSON.h"
 #include "Encoder.h"
 
-#define MONITOR_BUFFER_SIZE 10
 typedef struct monitor_data_t
 {
     int forceRaw;   // Raw force value
     int encoderRaw; // Raw encoder value
+    double force; // Force value in N
+    double position; // Position value in mm
     int timems;     // time in ms
 } MonitorData;
 
@@ -18,9 +19,14 @@ typedef struct monitor_cog_t
 {
     MonitorData data; // add list
     MachineState *machineState;
+    MachineConfiguration *configuration;
     int sampleRate;   // sample rate in hz
     int cogid;
+
+    MonitorData cache; // Cached data
+    int cacheLock;
 } Monitor;
 
-bool monitor_begin(Monitor *monitor, MachineState *machineState, int sampleRate)__fromfile("src/Utility/Monitor.c");
+MonitorData *monitor_read_data(int addr);
+bool monitor_begin(Monitor *monitor, MachineState *machineState, MachineConfiguration *configuration, int sampleRate);
 #endif

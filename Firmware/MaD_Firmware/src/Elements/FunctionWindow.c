@@ -95,9 +95,9 @@ static void update_off(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -136,9 +136,9 @@ static void update_incremental(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -177,9 +177,9 @@ static void update_continuous(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -218,9 +218,9 @@ static void update_positional(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -259,9 +259,9 @@ static void update_home(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -299,9 +299,9 @@ static void update_length(Display *display, Module *module, void *arg)
         innerColor = COLOR65K_BLACK;
         textColor = COLOR65K_WHITE;
     }
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+     if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -340,9 +340,9 @@ static void update_force(Display *display, Module *module, void *arg)
         textColor = COLOR65K_WHITE;
     }
 
-    if (module->foregroundColor == outlineColor &&
-        module->child[0]->backgroundColor == innerColor &&
-        module->child[0]->foregroundColor == textColor)
+    if (module->borderColor == outlineColor &&
+        module->backgroundColor == innerColor &&
+        module->foregroundColor == textColor)
     {
         return;
     }
@@ -381,7 +381,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_set_color(functionHeader, MAINTEXTCOLOR, functionHeader->parent->foregroundColor);
     module_text_align(functionHeader, MODULE_TEXT_ALIGN_INNER_CENTER); // used for dynamic updating of alignment
     module_align_inner_top(functionHeader);
-    module_update_callback(functionHeader, update_header);
+    module_redraw_callback(functionHeader, update_header);
 
     // Create Button Area
     Module *buttonArea = &(window->buttonArea);
@@ -406,7 +406,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_align_space_even(offButton, 1, 3);
     module_align_inner_top(offButton);
     module_touch_callback(offButton, button_set_function, FUNC_MANUAL_OFF);
-    module_update_callback(offButton, update_off);
+    module_redraw_callback(offButton, update_off);
 
     // Create Incremental Jog Button
     Module *incrementalButton = &(window->incrementalButton);
@@ -420,7 +420,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_fit_space_even_verticle(incrementalButton, 3);
     module_align_space_even(incrementalButton, 2, 3);
     module_touch_callback(incrementalButton, button_set_function, FUNC_MANUAL_INCREMENTAL_JOG);
-    module_update_callback(incrementalButton, update_incremental);
+    module_redraw_callback(incrementalButton, update_incremental);
 
     // Create Continuous Jog Button
     Module *continuousButton = &(window->continuousButton);
@@ -434,7 +434,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_fit_space_even_verticle(continuousButton, 3);
     module_align_space_even(continuousButton, 3, 3);
     module_touch_callback(continuousButton, button_set_function, FUNC_MANUAL_CONTINUOUS_JOG);
-    module_update_callback(continuousButton, update_continuous);
+    module_redraw_callback(continuousButton, update_continuous);
 
     // Create Position Move Button
     Module *positionalMoveButton = &(window->positionalMoveButton);
@@ -449,7 +449,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_align_space_even(positionalMoveButton, 1, 3);
     module_align_below(positionalMoveButton, offButton);
     module_touch_callback(positionalMoveButton, button_set_function, FUNC_MANUAL_POSITIONAL_MOVE);
-    module_update_callback(positionalMoveButton, update_positional);
+    module_redraw_callback(positionalMoveButton, update_positional);
 
     // Create Home Button
     Module *homeButton = &(window->homeButton);
@@ -463,7 +463,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_fit_space_even_verticle(homeButton, 3);
     module_align_space_even(homeButton, 2, 3);
     module_touch_callback(homeButton, button_set_function, FUNC_MANUAL_HOME);
-    module_update_callback(homeButton, update_home);
+    module_redraw_callback(homeButton, update_home);
 
     // Create Gauge Force Button
     Module *gaugeForceButton = &(window->gaugeForceButton);
@@ -477,7 +477,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_fit_space_even_verticle(gaugeForceButton, 3);
     module_align_space_even(gaugeForceButton, 3, 3);
     module_touch_callback(gaugeForceButton, button_set_function, FUNC_MANUAL_MOVE_FORCE);
-    module_update_callback(gaugeForceButton, update_force);
+    module_redraw_callback(gaugeForceButton, update_force);
 
     // Create Gauge Length Button
     Module *gaugeLengthButton = &(window->gaugeLengthButton);
@@ -492,5 +492,5 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
     module_align_space_even(gaugeLengthButton, 2, 3);
     module_align_below(gaugeLengthButton, positionalMoveButton);
     module_touch_callback(gaugeLengthButton, button_set_function, FUNC_MANUAL_MOVE_GAUGE_LENGTH);
-    module_update_callback(gaugeLengthButton, update_length);
+    module_redraw_callback(gaugeLengthButton, update_length);
 }

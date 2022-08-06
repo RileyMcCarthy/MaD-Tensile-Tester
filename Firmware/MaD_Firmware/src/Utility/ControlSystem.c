@@ -1,7 +1,11 @@
 #include "ControlSystem.h"
 #include "MotionPlanning.h"
 #include "ForceGauge.h"
+#include "DYN.h"
+
 #define CONTROL_MEMORY_SIZE 4096 * 1
+
+#define CONTROL_DEGUB 0
 
 static long control_stack[CONTROL_MEMORY_SIZE];
 
@@ -9,7 +13,6 @@ static long control_stack[CONTROL_MEMORY_SIZE];
 
 extern bool monitorWriteData;
 
-static DYN4 dyn4;
 static NavKey navkey;
 static MCP23017 mcp;
 
@@ -37,26 +40,27 @@ static bool move_servo(ControlSystem *control, MoveType type, int value)
     switch (type)
     {
     case MOVE_STOP:
-        dyn4_send_command(&dyn4, dyn4_go_rel_pos, 0); // stop servo
+        move_rel32(DYN1_ADDR, 0); // stop servo
         break;
     case MOVE_RELATIVE:
     {
         printf("moving relitive\n");
 
-        int positionSteps = mm_to_steps((double)value / 1000.0, &(control->machineProfile->configuration)) + control->monitorData->encoderRaw;
-        dyn4_send_command(&dyn4, dyn4_go_abs_pos, positionSteps);
+        int positionSteps = mm_to_steps(value / 1000.0, &(control->machineProfile->configuration)) + control->monitorData->encoderRaw;
+        printf("positionSteps:%d,%d\n", positionSteps, control->monitorData->encoderRaw);
+        move_abs32(DYN1_ADDR, positionSteps);
         break;
     }
     case MOVE_ABSOLUTE:
     {
         int deltaSteps = mm_to_steps((value) / 1000.0, &(control->machineProfile->configuration));
-        dyn4_send_command(&dyn4, dyn4_go_abs_pos, deltaSteps);
+        move_abs32(DYN1_ADDR, deltaSteps);
         break;
     }
     case MOVE_SPEED:
     {
         int rpm = ((double)value / 1000.0) * (60.0 / 80.0);              // um/s to rpm (mm/s)*((sec/min)/(mm/rev))
-        dyn4_send_command(&dyn4, dyn4_rotate_const_speed, rpm); // Stop motion (mm/r)*(r/min)/(sec/min)        break;
+        Turn_const_speed(DYN1_ADDR, rpm); // Stop motion (mm/r)*(r/min)/(sec/min)        break;
     }
     }
 
@@ -75,8 +79,8 @@ static void control_cog(ControlSystem *control)
         _waitms(100);
     }
 
-    // Create DYN4 object
-    dyn4_begin(&dyn4, DYN4_RX, DYN4_TX, 0);
+    // Start dyn communication
+    dyn_init();
 
     /*Initialize NavKey*/
     navkey_begin(&navkey, 29, 28, I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
@@ -94,19 +98,34 @@ static void control_cog(ControlSystem *control)
 
     // For running test profiles;
     long startTime = 0;
+    int startPosition = 0;
     int lastPosition = 0;
+
+    int lastEncoderRead = 0;
 
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
     MonitorData lastData = *control->monitorData;
+#if CONTROL_DEGUB
+    int testms = 0;  
+#endif
     while (1)
     {
+#if CONTROL_DEGUB
+        testms=_getms();
+#endif
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
         int forcemN = raw_to_force(control->monitorData->forceRaw, &(control->machineProfile->configuration));
         MachinePerformance machinePerformance = control->machineProfile->performance;
         mcp_update_register(&mcp);
-        mcp_set_pin(&mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 1);
+        mcp_set_pin(&mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0);
+        
+#if CONTROL_DEGUB
+        printf("TIME1: %d\n", _getms()-testms);
+        testms=_getms();
+#endif
+
         /*Check self check state*/
         // Charge Pump
         if (currentMachineState.selfCheckParameters.chargePump)
@@ -163,22 +182,33 @@ static void control_cog(ControlSystem *control)
             state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int)false);
         }
 
-        // DYN4
-        DYN4_Status status;
-        if (dyn4_get_status(&dyn4, &status) != SUCCESS)
+#if CONTROL_DEGUB
+        printf("TIME2: %d\n", _getms()-testms);
+        testms=_getms();
+#endif
+        // DYN$
+        if (servoCheckCount == 0)
         {
+            ReadMotorPosition32(DYN1_ADDR); 
             servoCheckCount++;
-            if (servoCheckCount > SERVO_CHECK_COUNT_MAX)
-            {
+        }else{
+            if (!GetMotorPosition32()) {
+                servoCheckCount++;
+            }else {
+                state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)true);
+                servoCheckCount = 0;
+            }
+            if (servoCheckCount > 1000) {
+                servoCheckCount = 0;
                 state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)false);
             }
         }
-        else
-        {
-            servoCheckCount = 0;
-            state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)true);
-        }
         // RTC
+
+#if CONTROL_DEGUB
+        printf("TIME3: %d\n", _getms()-testms);
+        testms=_getms();
+#endif
 
         /*Update Motion State parameters*/
         // Check conditions for motion
@@ -214,7 +244,7 @@ static void control_cog(ControlSystem *control)
             // Update state machine
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_DOOR);
         }
-        else if (!status.motorBusy) // STOPPED
+        else if (abs(lastEncoderRead - control->monitorData->encoderRaw) < 2) // STOPPED
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_STOPPED);
         }
@@ -222,6 +252,11 @@ static void control_cog(ControlSystem *control)
         {
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_MOVING);
         }
+
+#if CONTROL_DEGUB
+        printf("TIME4: %d\n", _getms()-testms);
+        testms=_getms();
+#endif
 
         if (currentMachineState.state == STATE_MOTION) // Motion Enabled
         {
@@ -406,7 +441,7 @@ static void control_cog(ControlSystem *control)
                         {
                             move_servo(control, MOVE_STOP, 0);
                             _waitms(1000);
-                            dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
+                            //dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
                             // move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
                             control->stateMachine->functionData = HOMING_COMPLETE;
                         }
@@ -473,11 +508,13 @@ static void control_cog(ControlSystem *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        // printf("running test\n");
+                         printf("running test\n");
                         run_motion_profile_init(&run); // Create new RunMotionProfile structure
                         startTime = _getus();
+                        startPosition = control->monitorData->position;
                         //printf("start time: %d\n", startTime);
                         // json_print_motion_profile(&(control->motionProfile));
+
                         monitorWriteData = true;
                     }
                     // Run the loaded test profile
@@ -486,13 +523,13 @@ static void control_cog(ControlSystem *control)
                     {
                         double t = (_getus() - startTime) / 1000000.0;
                         double position = position_profile(t, &run, &(control->motionProfile));
-                        // printf("%f,%f,%f\n", t, position, control->monitorData->positionum / 1000.0);
-                        move_servo(control, MOVE_ABSOLUTE, position * 1000);
+                        printf("%f,%f,%f\n", t, position, control->monitorData->position);
+                        move_servo(control, MOVE_ABSOLUTE, startPosition + position * 1000);
                         lastPosition = position;
                     }
                     else
                     {
-                        //printf("test complete\n");
+                        printf("test complete\n");
                         monitorWriteData = false;
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }
@@ -503,6 +540,7 @@ static void control_cog(ControlSystem *control)
         {
             move_servo(control, MOVE_STOP, 0);
         }
+        lastEncoderRead = control->monitorData->encoderRaw;
         lastState = currentMachineState;
         lastData = data;
         initial = false;

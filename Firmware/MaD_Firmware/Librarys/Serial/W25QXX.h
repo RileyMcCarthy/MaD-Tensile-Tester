@@ -1,10 +1,12 @@
 #ifndef __W25Qxx_H
 #define __W25Qxx_H
 
+//https://blog.katastros.com/a?ID=01550-699b4794-b8da-4938-8ffa-ebe26e0603dd
+
 #include <simpletools.h>
 #include <stdlib.h>
-
-typedef struct __using("jm_spi.spin2") SPI; 
+#include <stdbool.h>
+#include "Error.h"
 
 #define _W25QXX_CS_PIN                41
 #define _W25QXX_DI                    42
@@ -18,13 +20,16 @@ typedef struct __using("jm_spi.spin2") SPI;
 #define W25Q128FV_SUBSECTOR_SIZE              0x1000    /* 4096 subsectors of 4kBytes */
 #define W25Q128FV_PAGE_SIZE                   0x100     /* 65536 pages of 256 bytes */
 
-#define W25Q128FV_DUMMY_CYCLES_READ           4
-#define W25Q128FV_DUMMY_CYCLES_READ_QUAD      10
+#define W25Q64FV_FLASH_SIZE                  0x1000000 /* 128 MBits => 16MBytes NOT USED*/
+#define W25Q64FV_SECTOR_SIZE                 0x10000   /* 256 sectors of 64KBytes NOT USED*/
+#define W25Q64FV_SUBSECTOR_SIZE              0x1000    /* 4096 subsectors of 4kBytes NOT USED*/
+#define W25Q64FV_PAGE_SIZE                   0x100     /* 65536 pages of 256 bytes VALID*/
+
 
 #define W25Q128FV_BULK_ERASE_MAX_TIME         250000
 #define W25Q128FV_SECTOR_ERASE_MAX_TIME       3000
 #define W25Q128FV_SUBSECTOR_ERASE_MAX_TIME    800
-#define W25Qx_TIMEOUT_VALUE 1000
+#define W25Qx_TIMEOUT_VALUE 100
 
 /* Reset Operations */
 #define RESET_ENABLE_CMD                     0x66
@@ -84,16 +89,17 @@ typedef struct __using("jm_spi.spin2") SPI;
 #define W25Qx_BUSY          ((uint8_t)0x02)
 #define W25Qx_TIMEOUT		((uint8_t)0x03)
 
-
-uint8_t BSP_W25Qx_Init(void)__fromfile("W25QXX.c");
-static void	BSP_W25Qx_Reset(void)__fromfile("W25QXX.c");
-static uint8_t BSP_W25Qx_GetStatus(void)__fromfile("W25QXX.c");
-uint8_t BSP_W25Qx_WriteEnable(void)__fromfile("W25QXX.c");
-void BSP_W25Qx_Read_ID(uint8_t *ID)__fromfile("W25QXX.c");
-uint8_t BSP_W25Qx_Read(uint8_t* pData, uint32_t ReadAddr, uint32_t Size)__fromfile("W25QXX.c");
-uint8_t BSP_W25Qx_Write(uint8_t* pData, uint32_t WriteAddr, uint32_t Size)__fromfile("W25QXX.c");
-uint8_t BSP_W25Qx_Erase_Block(uint32_t Address)__fromfile("W25QXX.c");
-uint8_t BSP_W25Qx_Erase_Chip(void)__fromfile("W25QXX.c");
+uint8_t BSP_W25Qx_Init(Error *err);
+bool BSP_W25Qx_Lock();
+void BSP_W25Qx_Unlock();
+static void	BSP_W25Qx_Reset(void);
+static uint8_t BSP_W25Qx_GetStatus(void);
+uint8_t BSP_W25Qx_WriteEnable(void);
+void BSP_W25Qx_Read_ID(uint8_t *ID);
+uint8_t BSP_W25Qx_Read(uint8_t* pData, uint32_t ReadAddr, uint32_t Size);
+uint8_t BSP_W25Qx_Write(uint8_t* pData, uint32_t WriteAddr, uint32_t Size);
+uint8_t BSP_W25Qx_Erase_Block(uint32_t Address);
+uint8_t BSP_W25Qx_Erase_Chip(void);
 
 
 #endif

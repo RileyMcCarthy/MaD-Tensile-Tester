@@ -9,6 +9,7 @@
 static char runTitleBuffer[] = "Run Test Profile";
 static char openTextBuffer[] = "Open";
 static char runTextBuffer[] = "Run!";
+static char saveBuffer[] = "Save";
 
 // Private functions
 static void button_run(int id, void *arg)
@@ -22,6 +23,28 @@ static void button_nav(int id, void *arg)
 {
     AutomaticPage *page = (AutomaticPage *)arg;
     page->complete = true;
+}
+
+static void button_save(int id, void *arg)
+{
+    AutomaticPage *page = (AutomaticPage *)arg;
+    printf("Saving profile\n");
+
+    FILE *file = fopen("/sd/raw.txt","w");
+    if (file == NULL)
+    {
+        printf("Error opening file:%s\n", page->profileNameBuffer);
+        return;
+    }
+    
+    MonitorData* data=monitor_read_data(0); // Read flash from address 0
+    while(data->timems != -1)
+    {
+        fprintf(file,"%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw,data->force,data->position);
+        //printf("%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw,data->force,data->position);
+        monitor_read_data(-1); // Read next address in flash
+    }
+    fclose(file);
 }
 
 static void button_open(int id, void *arg)
@@ -68,12 +91,13 @@ static void update_profileNumber(Display *dis, Module *module, void *arg)
 }
 
 // Public Functions
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control)
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData*data)
 {
     page->display = display;
     page->images = images;
     page->machineState = state;
     page->control = control;
+    page->data = data;
 
     int padding = 20;
 
@@ -123,7 +147,7 @@ void automatic_page_init(AutomaticPage *page, Display *display, Images *images, 
     module_align_below(selectedProfileNameText, runTitle);
     module_align_center(selectedProfileNameText);
     module_set_color(selectedProfileNameText, COLOR65K_BLACK, selectedProfileNameText->parent->foregroundColor);
-    module_update_callback(selectedProfileNameText, update_profileName);
+    module_redraw_callback(selectedProfileNameText, update_profileName);
 
     Module *selectedProfileNumberText = &(page->selectedProfileNumberText);
     module_init(selectedProfileNumberText, runProfile);
@@ -135,7 +159,7 @@ void automatic_page_init(AutomaticPage *page, Display *display, Images *images, 
     module_align_center(selectedProfileNumberText);
     module_align_below(selectedProfileNumberText, selectedProfileNameText);
     module_set_color(selectedProfileNumberText, COLOR65K_BLACK, selectedProfileNumberText->parent->foregroundColor);
-    module_update_callback(selectedProfileNumberText, update_profileNumber);
+    module_redraw_callback(selectedProfileNumberText, update_profileNumber);
 
     // Create Open Button
     Module *openButton = &(page->openButton);
@@ -143,7 +167,7 @@ void automatic_page_init(AutomaticPage *page, Display *display, Images *images, 
     module_set_rectangle_circle(openButton, 100, 50);
     module_set_color(openButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_set_padding(openButton, padding, padding);
-    module_align_space_even(openButton, 1, 2);
+    module_align_space_even(openButton, 1, 3);
     module_align_inner_bottom(openButton);
     module_touch_callback(openButton, button_open, 0);
 
@@ -163,7 +187,7 @@ void automatic_page_init(AutomaticPage *page, Display *display, Images *images, 
     module_set_rectangle_circle(runButton, 100, 50);
     module_set_color(runButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
     module_set_padding(runButton, padding, padding);
-    module_align_space_even(runButton, 2, 2);
+    module_align_space_even(runButton, 2, 3);
     module_align_inner_bottom(runButton);
     module_touch_callback(runButton, button_run, 0);
 
@@ -177,15 +201,41 @@ void automatic_page_init(AutomaticPage *page, Display *display, Images *images, 
     module_align_middle(runText);
     module_set_color(runText, SECONDARYTEXTCOLOR, runText->parent->foregroundColor);
 
-    // Create Nav Button
-    Module *navButton = &(page->navButton);
-    module_init(navButton, background);
-    module_set_rectangle_circle(navButton, 100, 100);
-    module_set_color(navButton, COLOR65K_LIGHTGREEN, COLOR65K_LIGHTGREEN);
-    module_set_padding(navButton, padding, padding);
-    module_align_inner_right(navButton);
-    module_align_inner_top(navButton);
-    module_touch_callback(navButton, button_nav, 0);
+    // Create Off Button
+    Module *saveButton = &(page->saveButton);
+    module_init(saveButton, runProfile);
+    module_set_text(saveButton, saveBuffer);
+    module_set_color(saveButton, MAINTEXTCOLOR, COLOR65K_LIGHTGREEN);
+    module_set_margin(saveButton, padding, padding);
+    module_text_align(saveButton, MODULE_TEXT_ALIGN_INNER_CENTER);
+    module_text_align_verticle(saveButton, MODULE_TEXT_ALIGN_VCENTER);
+    module_add_border(saveButton, COLOR65K_BLACK, 3);
+    module_fit_space_even(saveButton, 3);
+    module_align_inner_bottom(saveButton);
+    module_align_space_even(saveButton, 3, 3);
+    module_touch_callback(saveButton, button_save, FUNC_MANUAL_OFF);
+
+    // Create navigation button
+    Module *navigationButton = &(page->navigationButton);
+    module_init(navigationButton, background);
+    module_set_image(navigationButton, &(page->images->navigationImage));
+    module_align_inner_top(navigationButton);
+    module_align_inner_right(navigationButton);
+    module_touch_callback(navigationButton, button_nav, 0);
+
+    Module *machineInfoWindow = &(page->machineInfoWindow);
+    module_init(machineInfoWindow, background);
+    module_set_padding(machineInfoWindow, padding, padding);
+    module_set_margin(machineInfoWindow, 10, 10);
+    module_set_rectangle_circle(machineInfoWindow, 0, 0);
+    module_set_padding(machineInfoWindow, padding, padding);
+    module_fit_space_even(machineInfoWindow, 3);
+    module_fit_height(machineInfoWindow);
+    module_set_color(machineInfoWindow, MAINCOLOR, BACKCOLOR);
+    module_align_inner_left(machineInfoWindow);
+    module_align_inner_top(machineInfoWindow);
+
+    machine_view_init(&(page->machineView), machineInfoWindow, page->data);
 }
 
 void automatic_page_run(AutomaticPage *page)
@@ -195,9 +245,8 @@ void automatic_page_run(AutomaticPage *page)
 
     while (!page->complete)
     {
+        display_update_touch(page->display);
         module_touch_check(&(page->root), page->display, page);
-        module_update_check(page->display, &(page->root), page);
-        while (display_update_touch(page->display) == 0)
-            ;
+        module_redraw(page->display, &(page->root), page);
     }
 }

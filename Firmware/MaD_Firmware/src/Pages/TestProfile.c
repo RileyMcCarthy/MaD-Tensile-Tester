@@ -17,18 +17,35 @@
 #define BUTTON_SET_EXECUTIONS 3
 #define BUTTON_SET_QUARTETS 4
 
-#define PROFILE_TYPES 4
+#define BUTTON_PROFILE_COUNT 3
+#define BUTTON_PROFILE_NAME 0
+#define BUTTON_PROFILE_NUMBER 1
+#define BUTTON_PROFILE_SETS 2
+
+#define BUTTON_SAMMPMLE_COUNT 3
+#define BUTTON_SAMPLE_NAME 0
+#define BUTTON_SAMPLE_NUMBER 1
+#define BUTTON_SAMPLE_LENGTH 2
+#define BUTTON_SAMPLE_STRETCH 3
+#define BUTTON_SAMPLE_MAX_VELOCITY 4
+#define BUTTON_SAMPLE_MAX_ACCELERATION 5
+#define BUTTON_SAMPLE_MAX_JERK 6
+#define BUTTON_SAMPLE_MAX_FORCE_TENSILE 7
+#define BUTTON_SAMPLE_MAX_FORCE_COMPRESSION 8
+
+#define PROFILE_TYPES 5
 #define PROFILE_QUARTET 0
 #define PROFILE_SET 1
 #define PROFILE_MOTION 2
-#define PROFILE_TEST 3
+#define PROFILE_SAMPLE 3
+#define PROFILE_TEST 4
 
 static const char openTextBuffer[] = "Open";
 static const char newTextBuffer[] = "New";
 static const char saveTextBuffer[] = "Save";
 
-static const char *optionNames[] = {"Quartet", "Set", "Motion", "Test"};
-static const char *extension[] = {".QRT", ".SET", ".MOT", ".TST"};
+static const char *optionNames[] = {"Quartet", "Set", "Motion", "Sample", "Test"};
+static const char *extension[] = {".QRT", ".SET", ".MOT", ".SMP", ".TST"};
 
 static bool complete;
 
@@ -56,10 +73,6 @@ static void button_open(int id, void *arg)
     {
         return;
     }
-
-    // char *filename = strrchr(filepath, '/') + 1;
-    //  strcpy(page->filename, filename);
-    //  strncpy(page->path, filepath, strlen(filepath) - strlen(filename));
 
     for (int i = 0; i < PROFILE_TYPES; i++)
     {
@@ -93,9 +106,14 @@ static void button_open(int id, void *arg)
         json_to_motion_profile(filepath, &(page->profile));
         break;
     }
+    case PROFILE_SAMPLE:
+    {
+        json_to_sample_profile(filepath, &(page->sample));
+        break;
+    }
     case PROFILE_TEST:
     {
-        json_to_test_profile(filepath, &(page->test));
+//        json_to_test_profile(filepath, &(page->test));
         break;
     }
     }
@@ -126,10 +144,6 @@ static void button_new(int id, void *arg)
         return;
     }
 
-    // strcpy(page->filename, filename);
-
-    keyboard_destroy(keyboard);
-
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_DIRECTORY, "/sd");
     if (explorer == NULL)
     {
@@ -159,18 +173,18 @@ static void button_new(int id, void *arg)
         create_filepath(page->set.name, newpath, filename, extension[PROFILE_SET]);
         break;
     }
+    case PROFILE_SAMPLE:
+    {
+        sample_profile_init(&(page->sample));
+        create_filepath(page->sample.name, newpath, filename, extension[PROFILE_SAMPLE]);
+        break;
+    }
     case PROFILE_MOTION:
     {
         motion_profile_init(&(page->profile));
         create_filepath(page->profile.name, newpath, filename, extension[PROFILE_MOTION]);
         break;
     }
-        /*case PROFILE_TEST:
-        {
-            test_profile_init(&(page->test));
-            create_filepath(page->test.name, newpath, filename, extension[PROFILE_TEST]);
-            break;
-        }*/
     }
 }
 
@@ -241,8 +255,8 @@ static void button_simulate(int id, void *arg)
     {
         double position = getPosition(t, run, profile);
         printf("Position, Time: %f,%f\n", position, t);
-        module_graph_insert(&(page->graphPositionContainer), position);
-        module_draw(page->display, &(page->graphPositionContainer));
+        page->graphValue = position;
+        module_redraw(page->display, &(page->graphPositionContainer), &position);
         t += dt;
     }
 }
@@ -302,8 +316,6 @@ static void button_quartet(int id, void *arg)
         }
 
         update_filename(page->quartet.name, filename, extension[PROFILE_QUARTET]);
-
-        keyboard_destroy(keyboard);
         break;
     }
     case BUTTON_QUARTET_FUNC:
@@ -323,7 +335,6 @@ static void button_quartet(int id, void *arg)
         Keyboard *keyboard = keyboard_create(page->display, page->images);
         char *dwell = keyboard_get_input(keyboard, "Dwell: ");
         page->quartet.dwell = atof(dwell);
-        keyboard_destroy(keyboard);
         break;
     }
     default:
@@ -342,7 +353,6 @@ static void button_quartet_parameters(int id, void *arg)
     strcat(prompt, ": ");
     char *param = keyboard_get_input(keyboard, prompt);
     page->quartet.parameters[id] = atof(param);
-    keyboard_destroy(keyboard);
 }
 
 static void button_set(int id, void *arg)
@@ -411,6 +421,125 @@ void button_set_remove(int id, void *arg)
 
     memmove(&(page->set.quartets[id]), &(page->set.quartets[id + 1]), sizeof(MotionQuartet) * (page->set.quartetCount - id - 1));
     page->set.quartetCount--;
+}
+
+static void button_profile(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+    switch (id)
+    {
+    case BUTTON_PROFILE_NAME:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *filename = keyboard_get_input(keyboard, "Enter file name: ");
+        if (strcmp(filename, "") == 0)
+        {
+            return;
+        }
+
+        update_filename(page->profile.name, filename, extension[PROFILE_MOTION]);
+        break;
+    }
+    case BUTTON_PROFILE_NUMBER:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Number: ");
+        page->profile.number = atoi(number);
+        break;
+    }
+    }
+}
+
+void button_profile_add(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+
+    Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_FILE, "/sd");
+    char *filepath = explorer_run(explorer);
+    if (strcmp(filepath, "") == 0)
+    {
+        return;
+    }
+
+    json_to_motion_set(filepath, &(page->profile.sets[page->profile.setCount]));
+    page->profile.setCount++;
+}
+
+void button_profile_remove(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+
+    memmove(&(page->profile.sets[id]), &(page->profile.sets[id + 1]), sizeof(MotionQuartet) * (page->profile.setCount - id - 1));
+    page->profile.setCount--;
+}
+
+static void button_sample(int id, void *arg)
+{
+    TestProfilePage *page = (TestProfilePage *)arg;
+    switch (id)
+    {
+    case BUTTON_SAMPLE_NAME:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *filename = keyboard_get_input(keyboard, "Enter file name: ");
+        if (strcmp(filename, "") == 0)
+        {
+            return;
+        }
+
+        update_filename(page->sample.name, filename, extension[PROFILE_SAMPLE]);
+        break;
+    }
+    case BUTTON_SAMPLE_NUMBER:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Number: ");
+        page->sample.number = atoi(number);
+        break;
+    }
+    case BUTTON_SAMPLE_STRETCH:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Stretch: ");
+        page->sample.stretchMax = atof(number);
+        break;
+    }
+    case BUTTON_SAMPLE_MAX_VELOCITY:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Max Velocity: ");
+        page->sample.maxVelocity = atof(number);
+        break;
+    }
+    case BUTTON_SAMPLE_MAX_ACCELERATION:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Max Acceleration: ");
+        page->sample.maxAcceleration = atof(number);
+        break;
+    }
+    case BUTTON_SAMPLE_MAX_JERK:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Max Jerk: ");
+        page->sample.maxJerk = atof(number);
+        break;
+    }
+    case BUTTON_SAMPLE_MAX_FORCE_TENSILE:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Max Tensile: ");
+        page->sample.maxForceTensile = atof(number);
+        break;
+    }
+    case BUTTON_SAMPLE_MAX_FORCE_COMPRESSION:
+    {
+        Keyboard *keyboard = keyboard_create(page->display, page->images);
+        char *number = keyboard_get_input(keyboard, "Max Compression: ");
+        page->sample.maxForceCompression = atof(number);
+        break;
+    }
+    }
 }
 
 void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)
@@ -515,7 +644,7 @@ void test_profile_page_init(TestProfilePage *page, Display *display, Images *ima
     module_align_right(graphPositionContainer, editWindow);
     module_align_inner_top(graphPositionContainer);
     module_set_color(graphPositionContainer, graphPositionContainer->parent->foregroundColor, graphPositionContainer->parent->backgroundColor);
-    module_set_graph(graphPositionContainer, &(page->graphPosition), "Position Vs. Time", "mm");
+    module_set_graph(graphPositionContainer, &(page->graphPosition), "Position Vs. Time", "mm", &(page->graphValue));
     module_graph_set_range(graphPositionContainer, 5, -5);
 
     Module *subroot = &(page->subroot);
@@ -671,17 +800,112 @@ void test_profile_page_run(TestProfilePage *page)
 
             paramIndex++;
             Module *quartetModule = &(page->profileParameters[paramIndex]);
-            sprintf(page->profileParametersBuffer[paramIndex], "New Quartet");
+            sprintf(page->profileParametersBuffer[paramIndex], "Add Quartet");
             module_touch_callback(quartetModule, button_set_add, 0);
             module_set_visable(quartetModule, true);
             break;
         }
         case PROFILE_MOTION:
         {
+            if (lastMode != PROFILE_MOTION)
+            {
+                strcpy(page->editWindowTitleBuffer, "Motion Profile");
+                module_draw(page->display, &(page->root));
+                // strcpy(page->set.name, page->filename);
+            }
+            printf("Motion Profile\n");
+            int paramIndex = 0;
+
+            Module *nameModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Name: %s", page->profile.name);
+            module_touch_callback(nameModule, button_profile, BUTTON_PROFILE_NAME);
+            module_set_visable(nameModule, true);
+
+            paramIndex++;
+            Module *numberModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Number: %d", page->profile.number);
+            module_touch_callback(numberModule, button_profile, BUTTON_PROFILE_NUMBER);
+            module_set_visable(numberModule, true);
+
+            for (int i = 0; i < page->profile.setCount; i++)
+            {
+                paramIndex++;
+                Module *setModule = &(page->profileParameters[paramIndex]);
+                sprintf(page->profileParametersBuffer[paramIndex], "%s", page->profile.sets[i].name);
+                module_touch_callback(setModule, button_profile_remove, i);
+                module_set_visable(setModule, true);
+            }
+
+            paramIndex++;
+            Module *setModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Add Set");
+            module_touch_callback(setModule, button_profile_add, 0);
+            module_set_visable(setModule, true);
             break;
         }
-        case PROFILE_TEST:
+        case PROFILE_SAMPLE:
         {
+             if (lastMode != PROFILE_SAMPLE)
+            {
+                strcpy(page->editWindowTitleBuffer, "Sample Profile");
+                module_draw(page->display, &(page->root));
+                // strcpy(page->set.name, page->filename);
+            }
+            printf("Sample Profile\n");
+            int paramIndex = 0;
+
+            Module *nameModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Name: %s", page->sample.name);
+            module_touch_callback(nameModule, button_sample, BUTTON_SAMPLE_NAME);
+            module_set_visable(nameModule, true);
+
+            paramIndex++;
+            Module *numberModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Number: %d", page->sample.number);
+            module_touch_callback(numberModule, button_sample, BUTTON_SAMPLE_NUMBER);
+            module_set_visable(numberModule, true);
+
+            paramIndex++;
+            Module *lengthModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Length: %f", page->sample.length);
+            module_touch_callback(lengthModule, button_sample, BUTTON_SAMPLE_LENGTH);
+            module_set_visable(lengthModule, true);
+            
+            paramIndex++;
+            Module *stretchModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Stretch: %f", page->sample.number);
+            module_touch_callback(stretchModule, button_sample, BUTTON_SAMPLE_STRETCH);
+            module_set_visable(stretchModule, true);
+
+            paramIndex++;
+            Module *maxVelocityModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Max Velocity: %f", page->sample.maxVelocity);
+            module_touch_callback(maxVelocityModule, button_sample, BUTTON_SAMPLE_MAX_VELOCITY);
+            module_set_visable(maxVelocityModule, true);
+
+            paramIndex++;
+            Module *maxAccelerationModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Max Acceleration: %f", page->sample.maxAcceleration);
+            module_touch_callback(maxAccelerationModule, button_sample, BUTTON_SAMPLE_MAX_ACCELERATION);
+            module_set_visable(maxAccelerationModule, true);
+
+            paramIndex++;
+            Module *maxJerkModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Max Jerk: %f", page->sample.maxJerk);
+            module_touch_callback(maxJerkModule, button_sample, BUTTON_SAMPLE_MAX_JERK);
+            module_set_visable(maxJerkModule, true);
+
+            paramIndex++;
+            Module *maxForceTensileModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Max Tensile: %f", page->sample.maxForceTensile);
+            module_touch_callback(maxForceTensileModule, button_sample, BUTTON_SAMPLE_MAX_FORCE_TENSILE);
+            module_set_visable(maxForceTensileModule, true);
+
+            paramIndex++;
+            Module *maxForceCompressionModule = &(page->profileParameters[paramIndex]);
+            sprintf(page->profileParametersBuffer[paramIndex], "Max Compression: %f", page->sample.maxForceCompression);
+            module_touch_callback(maxForceCompressionModule, button_sample, BUTTON_SAMPLE_MAX_FORCE_COMPRESSION);
+            module_set_visable(maxForceCompressionModule, true);
             break;
         }
         default:

@@ -267,6 +267,29 @@ void motion_profile_init(MotionProfile *profile)
     }
 }
 
+void sample_profile_init(SampleProfile *sample)
+{
+    strcpy(sample->name, "");
+    sample->number = 0;
+    sample->length = 0.0;
+    sample->stretchMax = 0.0;
+    sample->maxVelocity = 0.0;
+    sample->maxAcceleration = 0.0;
+    sample->maxJerk = 0.0;
+    sample->maxForceTensile = 0.0;
+    sample->maxForceCompression = 0.0;
+}
+
+void test_profile_init(TestProfile *profile)
+{
+    strcpy(profile->name, "");
+    profile->sampleSN = 0;
+    machine_profile_init(&(profile->machineProfile));
+    motion_profile_init(&(profile->motionProfile));
+    sample_profile_init(&(profile->sampleProfile));
+    strcpy(profile->comment, "");
+}
+
 Error machine_profile_to_json(MachineProfile *settings, const char *filename)
 {
     FILE *file = fopen(filename, "w");
@@ -452,13 +475,13 @@ Error test_profile_to_json(TestProfile *test, const char *filename)
     int_to_json(file, "Sample Serial Number", test->sampleSN);
     fprintf(file, ",");
 
-    string_to_json(file, "Machine Profile Name", test->machineProfile->name);
+    string_to_json(file, "Machine Profile Name", test->machineProfile.name);
     fprintf(file, ",");
 
-    string_to_json(file, "Sample Profile Name", test->sampleProfile->name);
+    string_to_json(file, "Sample Profile Name", test->sampleProfile.name);
     fprintf(file, ",");
 
-    string_to_json(file, "Motion Profile Name", test->sampleProfile->name);
+    string_to_json(file, "Motion Profile Name", test->sampleProfile.name);
     fprintf(file, ",");
 
     string_to_json(file, "Comment", test->comment);
@@ -645,7 +668,7 @@ void json_to_sample_profile(SampleProfile *sample, const char *filename)
     bufferSem = false; // Unlock buffer
 }
 
-void json_to_test_profile(const char *filename, TestProfile *test)
+/*void json_to_test_profile(const char *filename, TestProfile *test)
 {
     printf("before open\n");
     FILE *file = fopen(filename, "r");
@@ -683,7 +706,7 @@ void json_to_test_profile(const char *filename, TestProfile *test)
     json_to_motion_profile(motionProfileFileName, test->motionProfile);
 
     bufferSem = false; // Unlock buffer
-}
+}*/
 
 void json_to_motion_profile(const char *filename, MotionProfile *profile)
 {

@@ -23,6 +23,7 @@ typedef struct TestProfilePage_s
     MotionQuartet quartet;
     MotionSet set;
     MotionProfile profile;
+    SampleProfile sample;
     TestProfile test;
 
     Module root;
@@ -48,8 +49,9 @@ typedef struct TestProfilePage_s
     char profileParametersBuffer[20][30];
     FunctionInfo info;
     Selection selection;
+    double graphValue;
 } TestProfilePage;
 
-void test_profile_page_init(TestProfilePage *page, Display *display, Images *images)__fromfile("src/Pages/TestProfile.c");
-void test_profile_page_run(TestProfilePage *page)__fromfile("src/Pages/TestProfile.c");
+void test_profile_page_init(TestProfilePage *page, Display *display, Images *images);
+void test_profile_page_run(TestProfilePage *page);
 #endif

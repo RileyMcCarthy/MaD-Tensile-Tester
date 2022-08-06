@@ -2,6 +2,7 @@
 #include "StatusPage.h"
 #include "Images.h"
 #include "propeller2.h"
+#include "MachineView.h"
 
 #define BUTTONCOUNT 2
 #define BUTTON_MACHINE 0
@@ -205,7 +206,7 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     module_align_below(servoComImage, forceGaugeComText);
     module_align_inner_right(servoComImage);
 
-    // Create machine info window
+    /*// Create machine info window
     Module *machineInfoWindow = &(page->machineInfoWindow);
     module_init(machineInfoWindow, background);
     module_set_padding(machineInfoWindow, padding, padding);
@@ -292,7 +293,21 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     module_set_color(forceGraphContainer, forceGraphContainer->parent->foregroundColor, forceGraphContainer->parent->backgroundColor);
     module_fit_width(forceGraphContainer);
     module_set_graph(forceGraphContainer, &(page->forceGraph), "Force", "N");
-    module_graph_set_range(forceGraphContainer, 5.0, -5.0);
+    module_graph_set_range(forceGraphContainer, 5.0, -5.0);*/
+
+    Module *machineInfoWindow = &(page->machineInfoWindow);
+    module_init(machineInfoWindow, background);
+    module_set_padding(machineInfoWindow, padding, padding);
+    module_set_margin(machineInfoWindow, 10, 10);
+    module_set_rectangle_circle(machineInfoWindow, 0, 0);
+    module_set_padding(machineInfoWindow, padding, padding);
+    module_fit_space_even(machineInfoWindow, 3);
+    module_fit_height(machineInfoWindow);
+    module_set_color(machineInfoWindow, MAINCOLOR, BACKCOLOR);
+    module_align_right(machineInfoWindow, machineStateWindow);
+    module_align_inner_top(machineInfoWindow);
+
+    machine_view_init(&(page->machineView), machineInfoWindow, page->data);
 
     // Create Function Window Container
     Module *functionWindow = &(page->functionWindow);
@@ -315,6 +330,8 @@ void status_page_init(StatusPage *page, Display *display, MachineState *machineS
     module_fit_space_even(motionStateWindow, 3);
     module_align_space_even(motionStateWindow, 3, 3);
     module_align_above(motionStateWindow, functionWindow);
+
+
 
     motion_state_window_init(&(page->motionStateWindowData), motionStateWindow, page->stateMachine);
 }
@@ -447,37 +464,15 @@ void status_page_run(StatusPage *page)
             }
         }
 
+        display_update_touch(page->display);
         module_touch_check(&(page->root), page->display, page); // Check for button presses
-        module_update_check(page->display, &(page->root), page);
+        module_redraw(page->display, &(page->root), page);
 
-        // module_draw(page->display, positionGraphContainer);
-        // module_draw(page->display, machineStateImages);
-
-        // module_draw(page->display, functionWindow);
-        // module_draw(page->display, motionStateWindow);
         if (updateMachineState)
         {
             module_draw(page->display, &(page->machineStateWindow));
             updateMachineState = false;
         }
-        while (display_update_touch(page->display) == 0 && state_machine_equal(page->stateMachine, &currentState))
-        {
-            if ((_getms() - lastDataUpdate) > 100)
-            {
-                lastDataUpdate = _getms();
-                sprintf(page->positionValueBuffer, "%0.3fmm", steps_to_mm(page->data->encoderRaw, &(page->machineProfile->configuration)));
-                // module_set_text(&(page->positionValue), page->positionValueBuffer);
-                sprintf(page->forceValueBuffer, "%0.3fN", raw_to_force(page->data->forceRaw, &(page->machineProfile->configuration))/1000.0);
-                // module_set_text(&(page->forceValue), page->forceValueBuffer);
-                module_draw(page->display, &(page->forceValue));
-                module_draw(page->display, &(page->positionValue));
-            }
-            module_graph_insert(&(page->positionGraphContainer), steps_to_mm(page->data->encoderRaw, &(page->machineProfile->configuration)));
-            module_draw(page->display, &(page->positionGraphContainer));
-
-            module_graph_insert(&(page->forceGraphContainer), raw_to_force(page->data->forceRaw, &(page->machineProfile->configuration))/1000.0);
-            module_draw(page->display, &(page->forceGraphContainer));
-        } // Update touch register
 
         previousState = currentState;
         initial = false;
