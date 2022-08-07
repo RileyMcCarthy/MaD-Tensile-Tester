@@ -56,268 +56,213 @@ static bool isDouble(char *string)
     return true;
 }
 
-static bool check_buttons(SettingsPage *page)
+static bool setting_button(int id, void *arg)
 {
-    button_update(page->display);
-
-    if (button_check(page->display, page->buttons, BUTTONCOUNT) > 0)
+    SettingsPage *page = (SettingsPage *)arg;
+    Keyboard *keyboard = keyboard_create(page->display, page->images);
+    switch (id)
     {
-        for (int i = 0; i < BUTTONCOUNT; i++)
+    case BUTTON_NAVIGATION:
+        complete = true;
+        break;
+    case BUTTON_NAME:
+    {
+        char *name = keyboard_get_input(keyboard, "Name: ");
+        if (name != NULL && strlen(name) > 0)
         {
-            if (page->buttons[i].pressed)
-            {
-                switch (page->buttons[i].name)
-                {
-                case BUTTON_NAVIGATION:
-                    complete = true;
-                    break;
-                case BUTTON_NAME:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *name = keyboard_get_input(keyboard, "Name: ");
-                    if (name != NULL && strlen(name) > 0)
-                    {
-                        strcpy(page->machineProfile->name, name);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_NUMBER:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *number = keyboard_get_input(keyboard, "Number: ");
-                    if (number != NULL && isNumber(number))
-                    {
-                        page->machineProfile->number = atoi(number);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_MOTORTYPE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *type = keyboard_get_input(keyboard, "Motor Type: ");
-                    if (type != NULL && strlen(type) > 0)
-                    {
-                        strcpy(page->machineProfile->configuration.motorType, type);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_MAXMOTORTORQUE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *torque = keyboard_get_input(keyboard, "Max Torque: ");
-                    if (torque != NULL && isDouble(torque))
-                    {
-                        page->machineProfile->configuration.maxMotorTorque = atof(torque);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_MAXMOTORRPM:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *rpm = keyboard_get_input(keyboard, "Max RPM: ");
-                    if (rpm != NULL && isDouble(rpm))
-                    {
-                        page->machineProfile->configuration.maxMotorRPM = atof(rpm);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_GEARDIAMETER:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *diameter = keyboard_get_input(keyboard, "Gear Diameter: ");
-                    if (diameter != NULL && isDouble(diameter))
-                    {
-                        page->machineProfile->configuration.gearDiameter = atof(diameter);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_GEARPITCH:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *pitch = keyboard_get_input(keyboard, "Gear Pitch: ");
-                    if (pitch != NULL && isDouble(pitch))
-                    {
-                        page->machineProfile->configuration.gearPitch = atof(pitch);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_SYSTEMINTERTIA:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *inertia = keyboard_get_input(keyboard, "Inertia: ");
-                    if (inertia != NULL && isDouble(inertia))
-                    {
-                        page->machineProfile->configuration.systemIntertia = atof(inertia);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_STATICTORQUE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *torque = keyboard_get_input(keyboard, "Static Torque: ");
-                    if (torque != NULL && isDouble(torque))
-                    {
-                        page->machineProfile->configuration.staticTorque = atof(torque);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_LOAD:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *load = keyboard_get_input(keyboard, "Load: ");
-                    if (load != NULL && isDouble(load))
-                    {
-                        page->machineProfile->configuration.load = atof(load);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_POSITIONENCODERTYPE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *encoder = keyboard_get_input(keyboard, "Encoder Type: ");
-                    if (encoder != NULL && strlen(encoder) > 0)
-                    {
-                        strcpy(page->machineProfile->configuration.positionEncoderType, encoder);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_POSITIONENCODERSCALEFACTOR:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
-                    if (scale != NULL && isDouble(scale))
-                    {
-                        page->machineProfile->configuration.positionEncoderStepsPerRev = atof(scale);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_FORCEGAUGE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *forcegauge = keyboard_get_input(keyboard, "Force Gauge: ");
-                    if (forcegauge != NULL && strlen(forcegauge) > 0)
-                    {
-                        strcpy(page->machineProfile->configuration.forceGauge, forcegauge);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_FORCEGAUGESCALEFACTOR:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *scale = keyboard_get_input(keyboard, "Scale: ");
-                    if (scale != NULL && isDouble(scale))
-                    {
-                        page->machineProfile->configuration.forceGaugeScaleFactor = atof(scale);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_CONFIGURATION_FORCEGAUGENEUTRALOFFSET:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *zero = keyboard_get_input(keyboard, "Force Zero: ");
-                    if (zero != NULL && isNumber(zero))
-                    {
-                        page->machineProfile->configuration.forceGaugeZeroFactor = atoi(zero);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MINPOSITION:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *minpos = keyboard_get_input(keyboard, "Minimum Position: ");
-                    if (minpos != NULL && isDouble(minpos))
-                    {
-                        page->machineProfile->performance.minPosition = atof(minpos);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MAXPOSITION:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *maxpos = keyboard_get_input(keyboard, "Maximum Position: ");
-                    if (maxpos != NULL && isDouble(maxpos))
-                    {
-                        page->machineProfile->performance.maxPosition = atof(maxpos);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MAXVELOCITY:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *maxvel = keyboard_get_input(keyboard, "Maximum Velocity: ");
-                    if (maxvel != NULL && isDouble(maxvel))
-                    {
-                        page->machineProfile->performance.maxVelocity = atof(maxvel);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MAXACCELERATION:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *maxaccel = keyboard_get_input(keyboard, "Maximum Acceleration: ");
-                    if (maxaccel != NULL && isDouble(maxaccel))
-                    {
-                        page->machineProfile->performance.maxAcceleration = atof(maxaccel);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MAXFORCETENSILE:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *maxtensile = keyboard_get_input(keyboard, "Maximum Tensile: ");
-                    if (maxtensile != NULL && isDouble(maxtensile))
-                    {
-                        page->machineProfile->performance.maxForceTensile = atof(maxtensile);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_MAXFORCECOMPRESSION:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *maxcompression = keyboard_get_input(keyboard, "Maximum Compression: ");
-                    if (maxcompression != NULL && isDouble(maxcompression))
-                    {
-                        page->machineProfile->performance.maxForceCompression = atof(maxcompression);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                case BUTTON_PERFORMANCE_FORCEGAUGENEUTRALOFFSET:
-                {
-                    Keyboard *keyboard = keyboard_create(page->display, page->images);
-                    char *neutral = keyboard_get_input(keyboard, "Force Offset: ");
-                    if (neutral != NULL && isDouble(neutral))
-                    {
-                        page->machineProfile->performance.forceGaugeNeutralOffset = atof(neutral);
-                    }
-                    keyboard_destroy(keyboard);
-                    break;
-                }
-                }
-                return true;
-            }
+            strcpy(page->machineProfile->name, name);
         }
-        return false;
+        break;
+    }
+    case BUTTON_NUMBER:
+    {
+        char *number = keyboard_get_input(keyboard, "Number: ");
+        if (number != NULL && isNumber(number))
+        {
+            page->machineProfile->number = atoi(number);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_MOTORTYPE:
+    {
+        char *type = keyboard_get_input(keyboard, "Motor Type: ");
+        if (type != NULL && strlen(type) > 0)
+        {
+            strcpy(page->machineProfile->configuration.motorType, type);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_MAXMOTORTORQUE:
+    {
+        char *torque = keyboard_get_input(keyboard, "Max Torque: ");
+        if (torque != NULL && isDouble(torque))
+        {
+            page->machineProfile->configuration.maxMotorTorque = atof(torque);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_MAXMOTORRPM:
+    {
+        char *rpm = keyboard_get_input(keyboard, "Max RPM: ");
+        if (rpm != NULL && isDouble(rpm))
+        {
+            page->machineProfile->configuration.maxMotorRPM = atof(rpm);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_GEARDIAMETER:
+    {
+        char *diameter = keyboard_get_input(keyboard, "Gear Diameter: ");
+        if (diameter != NULL && isDouble(diameter))
+        {
+            page->machineProfile->configuration.gearDiameter = atof(diameter);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_GEARPITCH:
+    {
+        char *pitch = keyboard_get_input(keyboard, "Gear Pitch: ");
+        if (pitch != NULL && isDouble(pitch))
+        {
+            page->machineProfile->configuration.gearPitch = atof(pitch);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_SYSTEMINTERTIA:
+    {
+        char *inertia = keyboard_get_input(keyboard, "Inertia: ");
+        if (inertia != NULL && isDouble(inertia))
+        {
+            page->machineProfile->configuration.systemIntertia = atof(inertia);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_STATICTORQUE:
+    {
+        char *torque = keyboard_get_input(keyboard, "Static Torque: ");
+        if (torque != NULL && isDouble(torque))
+        {
+            page->machineProfile->configuration.staticTorque = atof(torque);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_LOAD:
+    {
+        char *load = keyboard_get_input(keyboard, "Load: ");
+        if (load != NULL && isDouble(load))
+        {
+            page->machineProfile->configuration.load = atof(load);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_POSITIONENCODERTYPE:
+    {
+        char *encoder = keyboard_get_input(keyboard, "Encoder Type: ");
+        if (encoder != NULL && strlen(encoder) > 0)
+        {
+            strcpy(page->machineProfile->configuration.positionEncoderType, encoder);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_POSITIONENCODERSCALEFACTOR:
+    {
+        char *scale = keyboard_get_input(keyboard, "Encoder Slope: ");
+        if (scale != NULL && isDouble(scale))
+        {
+            page->machineProfile->configuration.positionEncoderStepsPerRev = atof(scale);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_FORCEGAUGE:
+    {
+        char *forcegauge = keyboard_get_input(keyboard, "Force Gauge: ");
+        if (forcegauge != NULL && strlen(forcegauge) > 0)
+        {
+            strcpy(page->machineProfile->configuration.forceGauge, forcegauge);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_FORCEGAUGESCALEFACTOR:
+    {
+        char *scale = keyboard_get_input(keyboard, "Scale: ");
+        if (scale != NULL && isDouble(scale))
+        {
+            page->machineProfile->configuration.forceGaugeScaleFactor = atof(scale);
+        }
+        break;
+    }
+    case BUTTON_CONFIGURATION_FORCEGAUGENEUTRALOFFSET:
+    {
+        char *zero = keyboard_get_input(keyboard, "Force Zero: ");
+        if (zero != NULL && isNumber(zero))
+        {
+            page->machineProfile->configuration.forceGaugeZeroFactor = atoi(zero);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MINPOSITION:
+    {
+        char *minpos = keyboard_get_input(keyboard, "Minimum Position: ");
+        if (minpos != NULL && isDouble(minpos))
+        {
+            page->machineProfile->performance.minPosition = atof(minpos);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MAXPOSITION:
+    {
+        char *maxpos = keyboard_get_input(keyboard, "Maximum Position: ");
+        if (maxpos != NULL && isDouble(maxpos))
+        {
+            page->machineProfile->performance.maxPosition = atof(maxpos);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MAXVELOCITY:
+    {
+        char *maxvel = keyboard_get_input(keyboard, "Maximum Velocity: ");
+        if (maxvel != NULL && isDouble(maxvel))
+        {
+            page->machineProfile->performance.maxVelocity = atof(maxvel);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MAXACCELERATION:
+    {
+        char *maxaccel = keyboard_get_input(keyboard, "Maximum Acceleration: ");
+        if (maxaccel != NULL && isDouble(maxaccel))
+        {
+            page->machineProfile->performance.maxAcceleration = atof(maxaccel);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MAXFORCETENSILE:
+    {
+        char *maxtensile = keyboard_get_input(keyboard, "Maximum Tensile: ");
+        if (maxtensile != NULL && isDouble(maxtensile))
+        {
+            page->machineProfile->performance.maxForceTensile = atof(maxtensile);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_MAXFORCECOMPRESSION:
+    {
+        char *maxcompression = keyboard_get_input(keyboard, "Maximum Compression: ");
+        if (maxcompression != NULL && isDouble(maxcompression))
+        {
+            page->machineProfile->performance.maxForceCompression = atof(maxcompression);
+        }
+        break;
+    }
+    case BUTTON_PERFORMANCE_FORCEGAUGENEUTRALOFFSET:
+    {
+        char *neutral = keyboard_get_input(keyboard, "Force Offset: ");
+        if (neutral != NULL && isDouble(neutral))
+        {
+            page->machineProfile->performance.forceGaugeNeutralOffset = atof(neutral);
+        }
+        break;
+    }
     }
 }
 
@@ -326,7 +271,6 @@ void settings_page_init(SettingsPage *page, Display *display, MachineProfile *ma
     page->display = display;
     page->images = images;
     page->machineProfile = machineProfile;
-    page->buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
 }
 
 bool settings_page_run(SettingsPage *page)
