@@ -65,19 +65,6 @@ static int json_property_to_double_array(double *array, const json_t *json, cons
     return index;
 }
 
-static int json_property_to_string_array(char array[][], const json_t *json, const char *name)
-{
-    const json_t *properties = json_getProperty(json, name);
-    int index = 0;
-    for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
-    {
-        const char *value = json_getValue(property);
-        strcpy(array[index], value);
-        index++;
-    }
-    return index;
-}
-
 /**Json to structure functions**/
 
 /**
@@ -594,7 +581,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
 
     fread(buffer, fileSize, 1, file);
     fclose(file);
-    
+
     buffer[fileSize] = '\0';
     printf("%s\n", buffer);
 
@@ -638,7 +625,7 @@ void json_to_sample_profile(SampleProfile *sample, const char *filename)
     if (file == NULL)
     {
         printf("Error opening file:%s\n", filename);
-        return ;
+        return;
     }
 
     // Read file into string

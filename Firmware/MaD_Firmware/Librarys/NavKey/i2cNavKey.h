@@ -16,12 +16,17 @@
 #ifndef i2cNavKey_H
 #define i2cNavKey_H
 
-#include "simpletools.h"
 #include "stdbool.h"
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifndef SIMULATION
+#include <simpletools.h>
 typedef struct __using("jm_i2c.spin2") Bus;
+#else
+#include "SimI2C.h"
+typedef SimI2C Bus;
+#endif
 
 /* NavKey configuration bit. Use with GCONF */
 enum GCONF_PARAMETER

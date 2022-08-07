@@ -109,7 +109,7 @@ pub shiftin(mode, bits) : value
 
   pinf(sdi)                                                     ' reset di
   wxpin(sdi, %0_00000 | (bits-1))                               ' configure di sampling/bits
-  pinl(sdi)                                                     ' enable di
+  _pinl(sdi)                                                     ' enable di
   wypin(sck, bits)                                              ' start clocking data
   repeat until pinr(sck)                                        ' wait until clocks finished
 

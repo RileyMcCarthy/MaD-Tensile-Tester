@@ -11,15 +11,15 @@
  */
 typedef enum Error_e
 {
-    SUCCESS, //Generic Success
-    FAIL,    //Generic failure
+    SUCCESS, // Generic Success
+    FAIL,    // Generic failure
 
-    DISPLAY_NOT_FOUND = 2, //Display RA8876 chip not responding
-    DISPLAY_PLL_FAIL,      //PLL status fail
-    DISPLAY_SDRAM_FAIL,    //SDRAM status fail
+    DISPLAY_NOT_FOUND = 2, // Display RA8876 chip not responding
+    DISPLAY_PLL_FAIL,      // PLL status fail
+    DISPLAY_SDRAM_FAIL,    // SDRAM status fail
 
-    RTC_RESET = 51, //RTC power was lost, reset time
-    RTC_NOT_FOUND,  //RTC communication failed
+    RTC_RESET = 51, // RTC power was lost, reset time
+    RTC_NOT_FOUND,  // RTC communication failed
 
     DYN4_NOT_RESPONDING = 101,
     DYN4_CONNECTION_LOST,
@@ -47,6 +47,6 @@ typedef enum Error_e
 } Error;
 
 void print_error(Error value);
-inline void seterror(Error *err, Error value);
+void seterror(Error *err, Error value);
 
 #endif

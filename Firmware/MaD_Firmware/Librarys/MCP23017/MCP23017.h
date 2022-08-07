@@ -1,7 +1,6 @@
 #ifndef MCP23017_H
 #define MCP23017_H
 
-#include <simpletools.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -17,8 +16,13 @@
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
+#ifndef SIMULATION
+#include <simpletools.h>
 typedef struct __using("jm_i2c.spin2") I2CBus;
-
+#else
+#include "SimI2C.h"
+typedef SimI2C I2CBus;
+#endif
 typedef struct MCP23017_t
 {
     I2CBus i2cBus;

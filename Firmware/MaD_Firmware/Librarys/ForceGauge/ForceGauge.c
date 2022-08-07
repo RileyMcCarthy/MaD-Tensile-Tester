@@ -1,5 +1,4 @@
 #include "ForceGauge.h"
-#include "simpletools.h"
 #include <math.h>
 
 #define CONFIG_0 0x00 // Configuration register 0
@@ -94,7 +93,7 @@ int force_gauge_raw_to_force(int zero, double slope, int raw)
     return round(raw - zero) / (slope);
 }
 
-//returns force in milliNewtons
+// returns force in milliNewtons
 int raw_to_force(int raw, MachineConfiguration *configuration)
 {
     return round(raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor);
@@ -102,11 +101,11 @@ int raw_to_force(int raw, MachineConfiguration *configuration)
 
 int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
 {
-    seterror(err,SUCCESS);
+    seterror(err, SUCCESS);
 
     if (read_register(forceGauge, CONFIG_1) != CONFIG_DATA1)
     {
-        seterror(err,FORCEGAUGE_CONNECTION_LOST);
+        seterror(err, FORCEGAUGE_CONNECTION_LOST);
         return 0;
     }
 

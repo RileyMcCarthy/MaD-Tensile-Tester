@@ -1,6 +1,6 @@
 #include "Graph.h"
 #include "Module.h"
-
+#include <string.h>
 static void module_graph_draw(Display *display, Module *module)
 {
     ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
@@ -17,7 +17,7 @@ static void module_graph_redraw(Display *display, Module *module, void *arg)
 {
     ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     double newData = *(graph->dataPtr);
-    //printf("Redrawing graph with newData: %f\n", newData);
+    // printf("Redrawing graph with newData: %f\n", newData);
     if (newData > graph->maxY || newData < graph->minY)
     {
         return;

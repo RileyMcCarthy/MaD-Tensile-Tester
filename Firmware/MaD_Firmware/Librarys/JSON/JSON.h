@@ -1,7 +1,6 @@
 #ifndef JSON_H
 #define JSON_H
 
-#include "simpletools.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include "string.h"
@@ -44,17 +43,17 @@
 typedef struct MachineConfiguration_s
 {
     char motorType[MAX_CONFIGURATION_MOTOR_TYPE];             // Motor used for the machine (model)
-    double maxMotorTorque;                                     // Maximum torque of the motor (Nm)
-    double maxMotorRPM;                                        // Maximum RPM of the motor (RPM)
-    double gearDiameter;                                       // Diameter of the gear (mm)
-    double gearPitch;                                          // Pitch of the gear (mm)
-    double systemIntertia;                                     // Total inertia of the system (kgm2)
-    double staticTorque;                                       // Static torque of the motor (Nm)
-    double load;                                               // Estimated load of the system (N)
+    double maxMotorTorque;                                    // Maximum torque of the motor (Nm)
+    double maxMotorRPM;                                       // Maximum RPM of the motor (RPM)
+    double gearDiameter;                                      // Diameter of the gear (mm)
+    double gearPitch;                                         // Pitch of the gear (mm)
+    double systemIntertia;                                    // Total inertia of the system (kgm2)
+    double staticTorque;                                      // Static torque of the motor (Nm)
+    double load;                                              // Estimated load of the system (N)
     char positionEncoderType[MAX_CONFIGURATION_ENCODER_TYPE]; // Encoder used for the position measurement (encoder or distance scale)
-    double positionEncoderStepsPerRev;                         // steps per mm of position encoder (step/mm)
+    double positionEncoderStepsPerRev;                        // steps per mm of position encoder (step/mm)
     char forceGauge[MAX_CONFIGURATION_FORCE_GAUGE];           // Force gauge used (model)
-    double forceGaugeScaleFactor;                              // Force scale factor (mN/step)
+    double forceGaugeScaleFactor;                             // Force scale factor (mN/step)
     int forceGaugeZeroFactor;                                 // Force offset (steps)
 } MachineConfiguration;
 
@@ -84,8 +83,8 @@ typedef struct MachineProfile_s
 #define MOTION_QUARTET_FIELD_COUNT 4 + 10
 typedef struct MotionQuartet_s
 {
-    char name[MAX_MOTION_QUARTET_NAME];              // Filename of the motion quartet
-    int function;                                    // Motion function type
+    char name[MAX_MOTION_QUARTET_NAME];               // Filename of the motion quartet
+    int function;                                     // Motion function type
     double parameters[MAX_MOTION_QUARTET_PARAMETERS]; // Parameters of the motion quartet (max 10)
     double dwell;                                     // Dwell of the motion quartet (us)
 } MotionQuartet;
@@ -113,27 +112,27 @@ typedef struct MotionProfile_s
 #define SAMPLE_PROFILE_FIELD_COUNT 9
 typedef struct SampleProfile_s
 {
-    char name[MAX_SAMPLE_PROFILE_NAME];                // Name of the sample profile
-    int number;                // Number of the sample profile
-    double length;              // Length of the sample profile (mm)
-    double stretchMax;          // Maximum stretch of the sample profile (% of length)
-    double maxVelocity;         // Maximum velocity of the sample profile (mm/s)
-    double maxAcceleration;     // Maximum acceleration of the sample profile (mm/s2)
-    double maxJerk;             // Maximum jerk of the sample profile (mm/s3)
-    double maxForceTensile;     // Maximum force tensile of the sample profile (N)
-    double maxForceCompression; // Maximum force compression of the sample profile (N)
+    char name[MAX_SAMPLE_PROFILE_NAME]; // Name of the sample profile
+    int number;                         // Number of the sample profile
+    double length;                      // Length of the sample profile (mm)
+    double stretchMax;                  // Maximum stretch of the sample profile (% of length)
+    double maxVelocity;                 // Maximum velocity of the sample profile (mm/s)
+    double maxAcceleration;             // Maximum acceleration of the sample profile (mm/s2)
+    double maxJerk;                     // Maximum jerk of the sample profile (mm/s3)
+    double maxForceTensile;             // Maximum force tensile of the sample profile (N)
+    double maxForceCompression;         // Maximum force compression of the sample profile (N)
 
 } SampleProfile;
 
 #define TEST_PROFILE_FIELD_COUNT 6
 typedef struct TestProfile_s
 {
-    char name[MAX_TEST_PROFILE_NAME];                     // Descriptive test name
-    int sampleSN;                   // Serial number of the sample
-    MachineProfile machineProfile; // Name of the machine profile
-    SampleProfile sampleProfile;   // Name of the sample profile
-    MotionProfile motionProfile;   // Name of the motion profile
-    char comment[MAX_TEST_PROFILE_COMMENT];                  // Comment for the test
+    char name[MAX_TEST_PROFILE_NAME];       // Descriptive test name
+    int sampleSN;                           // Serial number of the sample
+    MachineProfile machineProfile;          // Name of the machine profile
+    SampleProfile sampleProfile;            // Name of the sample profile
+    MotionProfile motionProfile;            // Name of the motion profile
+    char comment[MAX_TEST_PROFILE_COMMENT]; // Comment for the test
 } TestProfile;
 
 // Helper Functions

@@ -1,7 +1,6 @@
 #ifndef ForceGauge_H
 #define ForceGauge_H
 
-#include <simpletools.h>
 #include <Error.h>
 #include <stdlib.h>
 #include "JSON.h"
@@ -9,8 +8,13 @@
 #define FORCE_GAUGE_RX 15
 #define FORCE_GAUGE_TX 16
 
+#ifndef SIMULATION
+#include <simpletools.h>
 typedef struct __using("jm_fullduplexserial.spin2") FDS;
-
+#else
+#include "SimSerial.h"
+typedef SimSerial FDS;
+#endif
 typedef struct ForceGauge_s
 {
     int counter;

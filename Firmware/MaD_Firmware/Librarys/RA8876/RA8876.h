@@ -10,15 +10,22 @@ Version   : v1.0
 #ifndef Ra8876_Lite_H
 #define Ra8876_Lite_H
 
-#include "simpletools.h"
 #include "Error.h"
 #include "stdbool.h"
 #include "stdint.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef SIMULATION
+#include <simpletools.h>
 typedef struct __using("jm_i2c.spin2") I2CBus;
 typedef struct __using("jm_spi.spin2") SPI;
+#else
+#include "SimI2C.h"
+#include "SimSPI.h"
+typedef SimI2C I2CBus;
+typedef SimSPI SPI;
+#endif
 
 #define RA8876_SPI_CMDWRITE 0x00
 #define RA8876_SPI_DATAWRITE 0x80

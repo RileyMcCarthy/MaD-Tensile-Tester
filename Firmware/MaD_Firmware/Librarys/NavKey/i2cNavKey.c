@@ -13,8 +13,9 @@
 //
 
 #include "i2cNavKey.h"
-
-enum I2C_Register {
+#include <stdio.h>
+enum I2C_Register
+{
   REG_GCONF = 0x00,
   REG_GP1CONF = 0x01,
   REG_GP2CONF = 0x02,
@@ -55,7 +56,8 @@ enum I2C_Register {
 };
 
 /* NavKey status bits and setting. Use with: INTCONF for set and with ESTATUS for read the bits  */
-enum Int_Status {
+enum Int_Status
+{
   UPR = 0x0001,
   UPP = 0x0002,
   DNR = 0x0004,
@@ -75,7 +77,8 @@ enum Int_Status {
 };
 
 /* NavKey Int2 bits. Use to read the bits of I2STATUS  */
-enum Int2_Status {
+enum Int2_Status
+{
   GP1_POS = 0x01,
   GP1_NEG = 0x02,
   GP2_POS = 0x04,
@@ -86,14 +89,16 @@ enum Int2_Status {
 };
 
 /* NavKey Fade status bits. Use to read the bits of FSTATUS  */
-enum Fade_Status {
+enum Fade_Status
+{
   FADES_GP1 = 0x01,
   FADES_GP2 = 0x02,
   FADES_GP3 = 0x04,
 };
 
 /* GPIO Configuration. USe with GP1CONF,GP2CONF,GP3CONF */
-enum GP_PARAMETER {
+enum GP_PARAMETER
+{
   GP_PWM = 0x00,
   GP_OUT = 0x01,
   GP_AN = 0x02,
@@ -106,7 +111,8 @@ enum GP_PARAMETER {
   GP_INT_BE = 0x18,
 };
 
-enum GAMMA_PARAMETER {
+enum GAMMA_PARAMETER
+{
   GAMMA_1 = 0,
   GAMMA_1_8 = 1,
   GAMMA_2 = 2,
@@ -347,6 +353,7 @@ void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf)
   navkey->_gconf = conf;
 }
 void navkey_reset(NavKey *navkey)
+
 {
   writeNavKey8(navkey, REG_GCONF, (uint8_t)0x80);
   _waitms(10);

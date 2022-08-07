@@ -1,4 +1,5 @@
 #include "MCP23017.h"
+#include <stdio.h>
 // registers
 #define REG_IODIRA 0x00 // Direction Register A
 #define REG_IPOLA 0x02  // Polarity Register A
@@ -11,8 +12,6 @@
 #define REG_GPPUB 0x0D  // Pull-up Register B
 #define REG_GPIOB 0x13  // I/O Register B
 #define REG_OLATB 0x15  // Output latch register B
-
-
 
 /*Private functions*/
 static uint8_t read_register(MCP23017 *mcp23017, uint8_t addr)
@@ -57,11 +56,11 @@ bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
     int DIRBVALUE = 0xFF;
 
     bool ack = false;
-    ack = write_register(mcp23017, DIRA, DIRAVALUE); // first 4 inputs and last 4 outputs
+    ack = write_register(mcp23017, DIRA, DIRAVALUE);  // first 4 inputs and last 4 outputs
     ack &= write_register(mcp23017, DIRB, DIRBVALUE); // all inputs
     if (read_register(mcp23017, DIRA) != DIRAVALUE || read_register(mcp23017, DIRB) != DIRBVALUE)
     {
-        printf("Error setting up MCP23017: ACK:%d\n",ack);
+        printf("Error setting up MCP23017: ACK:%d\n", ack);
         return false;
     }
     return true;
@@ -85,7 +84,7 @@ void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t di
     }
     int value = read_register(mcp23017, reg);
     bitWrite(value, pin, direction);
-    bool ack = write_register(mcp23017, reg, value);
+    write_register(mcp23017, reg, value);
 }
 
 uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg)

@@ -1,0 +1,2886 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Total Spectrum Software" />
+  <meta name="dcterms.date" content="2022-07-22" />
+  <title>FlexBASIC Language Reference</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FlexBASIC Language Reference</h1>
+<p class="subtitle">5.9.14</p>
+<p class="author">Total Spectrum Software</p>
+<p class="date">07/22/2022</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#flexbasic">FlexBASIC</a><ul>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#command-line-compilation">Command Line compilation</a></li>
+</ul></li>
+<li><a href="#preprocessor">Preprocessor</a><ul>
+<li><a href="#directives">Directives</a></li>
+<li><a href="#predefined-symbols">Predefined Symbols</a></li>
+</ul></li>
+<li><a href="#language-syntax">Language Syntax</a><ul>
+<li><a href="#comments">Comments</a></li>
+<li><a href="#integers">Integers</a></li>
+<li><a href="#keywords">Keywords</a></li>
+<li><a href="#predefined-functions-and-variables">Predefined functions and variables</a></li>
+<li><a href="#variable-subroutine-and-function-names">Variable, Subroutine, and Function names</a></li>
+<li><a href="#operators">Operators</a></li>
+<li><a href="#extending-lines">Extending lines</a></li>
+<li><a href="#multiple-statements-per-line">Multiple statements per line</a></li>
+</ul></li>
+<li><a href="#data-types">Data Types</a><ul>
+<li><a href="#numeric-data-types">Numeric Data types</a></li>
+<li><a href="#pointer-types">Pointer types</a></li>
+<li><a href="#string-type">String type</a></li>
+<li><a href="#classes">Classes</a></li>
+<li><a href="#type-aliases">Type Aliases</a></li>
+</ul></li>
+<li><a href="#language-features">Language features</a><ul>
+<li><a href="#true-and-false">TRUE and FALSE</a></li>
+<li><a href="#function-declarations">Function declarations</a></li>
+<li><a href="#memory-allocation">Memory allocation</a></li>
+<li><a href="#templates">Templates</a></li>
+<li><a href="#selecting-code-based-on-type-properties">Selecting code based on type properties</a></li>
+</ul></li>
+<li><a href="#libraries">Libraries</a><ul>
+<li><a href="#classes-1">Classes</a></li>
+<li><a href="#include-files">Include files</a></li>
+</ul></li>
+<li><a href="#propeller-hardware-features">Propeller Hardware Features</a><ul>
+<li><a href="#input-output-and-direction">Input, Output, and Direction</a></li>
+<li><a href="#hardware-registers">Hardware registers</a></li>
+</ul></li>
+<li><a href="#alphabetical-list-of-keywords-and-built-in-functions">Alphabetical List of Keywords and Built In Functions</a><ul>
+<li><a href="#abs">ABS</a></li>
+<li><a href="#acos">ACOS</a></li>
+<li><a href="#alias">ALIAS</a></li>
+<li><a href="#and">AND</a></li>
+<li><a href="#andalso">ANDALSO</a></li>
+<li><a href="#any">ANY</a></li>
+<li><a href="#append">APPEND</a></li>
+<li><a href="#as">AS</a></li>
+<li><a href="#asc">ASC</a></li>
+<li><a href="#asin">ASIN</a></li>
+<li><a href="#asm">ASM</a></li>
+<li><a href="#atan">ATAN</a></li>
+<li><a href="#atan2">ATAN2</a></li>
+<li><a href="#bin">BIN$</a></li>
+<li><a href="#bitrev">BITREV</a></li>
+<li><a href="#boolean">BOOLEAN</a></li>
+<li><a href="#__builtin_alloca-1">__BUILTIN_ALLOCA</a></li>
+<li><a href="#byref">BYREF</a></li>
+<li><a href="#byte">BYTE</a></li>
+<li><a href="#bytefill">BYTEFILL</a></li>
+<li><a href="#bytemove">BYTEMOVE</a></li>
+<li><a href="#byval">BYVAL</a></li>
+<li><a href="#call">CALL</a></li>
+<li><a href="#case">CASE</a></li>
+<li><a href="#cast">CAST</a></li>
+<li><a href="#catch">CATCH</a></li>
+<li><a href="#chr">CHR$</a></li>
+<li><a href="#class">CLASS</a></li>
+<li><a href="#chain">CHAIN</a></li>
+<li><a href="#chdir">CHDIR</a></li>
+<li><a href="#_clkfreq">_CLKFREQ</a></li>
+<li><a href="#clkfreq">CLKFREQ</a></li>
+<li><a href="#clkset">CLKSET</a></li>
+<li><a href="#close">CLOSE</a></li>
+<li><a href="#const">CONST</a></li>
+<li><a href="#continue">CONTINUE</a></li>
+<li><a href="#cos">COS</a></li>
+<li><a href="#countstr">COUNTSTR</a></li>
+<li><a href="#cpu">CPU</a></li>
+<li><a href="#cpuchk">CPUCHK</a></li>
+<li><a href="#cpuid">CPUID</a></li>
+<li><a href="#cpustop">CPUSTOP</a></li>
+<li><a href="#cpuwait">CPUWAIT</a></li>
+<li><a href="#curdir">CURDIR$</a></li>
+<li><a href="#data">DATA</a></li>
+<li><a href="#declare">DECLARE</a></li>
+<li><a href="#decuns">DECUNS$</a></li>
+<li><a href="#def">DEF</a></li>
+<li><a href="#defint">DEFINT</a></li>
+<li><a href="#defsng">DEFSNG</a></li>
+<li><a href="#delete">DELETE</a></li>
+<li><a href="#delete-1">DELETE$</a></li>
+<li><a href="#dim">DIM</a></li>
+<li><a href="#dir">DIR$</a></li>
+<li><a href="#direction">DIRECTION</a></li>
+<li><a href="#do">DO</a></li>
+<li><a href="#double">DOUBLE</a></li>
+<li><a href="#dpeek">DPEEK</a></li>
+<li><a href="#dpoke">DPOKE</a></li>
+<li><a href="#else-1">ELSE</a></li>
+<li><a href="#end">END</a></li>
+<li><a href="#endif">ENDIF</a></li>
+<li><a href="#enum">ENUM</a></li>
+<li><a href="#exit">EXIT</a></li>
+<li><a href="#exp">EXP</a></li>
+<li><a href="#false">FALSE</a></li>
+<li><a href="#fixed">FIXED</a></li>
+<li><a href="#for">FOR</a></li>
+<li><a href="#freefile">FREEFILE</a></li>
+<li><a href="#function">FUNCTION</a></li>
+<li><a href="#function-1"><strong>FUNCTION</strong></a></li>
+<li><a href="#get">GET</a></li>
+<li><a href="#getcnt">GETCNT</a></li>
+<li><a href="#geterr">GETERR</a></li>
+<li><a href="#getms">GETMS</a></li>
+<li><a href="#getrnd">GETRND</a></li>
+<li><a href="#getsec">GETSEC</a></li>
+<li><a href="#getus">GETUS</a></li>
+<li><a href="#gosub">GOSUB</a></li>
+<li><a href="#goto">GOTO</a></li>
+<li><a href="#_hasmethod">_HASMETHOD</a></li>
+<li><a href="#heapsize">HEAPSIZE</a></li>
+<li><a href="#hex">HEX$</a></li>
+<li><a href="#if">IF</a></li>
+<li><a href="#import">IMPORT</a></li>
+<li><a href="#input">INPUT</a></li>
+<li><a href="#input-1">INPUT$</a></li>
+<li><a href="#insert">INSERT$</a></li>
+<li><a href="#instr">INSTR</a></li>
+<li><a href="#instrrev">INSTRREV</a></li>
+<li><a href="#int">INT</a></li>
+<li><a href="#integer">INTEGER</a></li>
+<li><a href="#kill">KILL</a></li>
+<li><a href="#lcase">LCASE$</a></li>
+<li><a href="#left">LEFT$</a></li>
+<li><a href="#len">LEN</a></li>
+<li><a href="#let">LET</a></li>
+<li><a href="#lib">LIB</a></li>
+<li><a href="#line">LINE</a></li>
+<li><a href="#line-input">LINE INPUT</a></li>
+<li><a href="#_lockclr">_LOCKCLR</a></li>
+<li><a href="#_locknew">_LOCKNEW</a></li>
+<li><a href="#_lockrel">_LOCKREL</a></li>
+<li><a href="#_locktry">_LOCKTRY</a></li>
+<li><a href="#log">LOG</a></li>
+<li><a href="#long">LONG</a></li>
+<li><a href="#longint">LONGINT</a></li>
+<li><a href="#longfill">LONGFILL</a></li>
+<li><a href="#longmove">LONGMOVE</a></li>
+<li><a href="#loop">LOOP</a></li>
+<li><a href="#lpad">LPAD$</a></li>
+<li><a href="#lpeek">LPEEK</a></li>
+<li><a href="#lpoke">LPOKE</a></li>
+<li><a href="#ltrim">LTRIM$</a></li>
+<li><a href="#mid">MID$</a></li>
+<li><a href="#mod">MOD</a></li>
+<li><a href="#mount">MOUNT</a></li>
+<li><a href="#new">NEW</a></li>
+<li><a href="#next">NEXT</a></li>
+<li><a href="#nil">NIL</a></li>
+<li><a href="#not">NOT</a></li>
+<li><a href="#number">NUMBER$</a></li>
+<li><a href="#oct">OCT$</a></li>
+<li><a href="#on-x-goto">ON X GOTO</a></li>
+<li><a href="#open">OPEN</a></li>
+<li><a href="#option">OPTION</a></li>
+<li><a href="#or">OR</a></li>
+<li><a href="#orelse">ORELSE</a></li>
+<li><a href="#output">OUTPUT</a></li>
+<li><a href="#pausems">PAUSEMS</a></li>
+<li><a href="#pausesec">PAUSESEC</a></li>
+<li><a href="#pauseus">PAUSEUS</a></li>
+<li><a href="#peek">PEEK</a></li>
+<li><a href="#pi">PI</a></li>
+<li><a href="#pinfloat">PINFLOAT</a></li>
+<li><a href="#pinlo">PINLO</a></li>
+<li><a href="#pinhi">PINHI</a></li>
+<li><a href="#pinread">PINREAD</a></li>
+<li><a href="#pinrnd-p2-only">PINRND (P2 only)</a></li>
+<li><a href="#pinset">PINSET</a></li>
+<li><a href="#pinstart-available-on-p2-only">PINSTART (available on P2 only)</a></li>
+<li><a href="#pintoggle">PINTOGGLE</a></li>
+<li><a href="#pointer">POINTER</a></li>
+<li><a href="#poke">POKE</a></li>
+<li><a href="#preserve">PRESERVE</a></li>
+<li><a href="#print">PRINT</a></li>
+<li><a href="#print-using">PRINT USING</a></li>
+<li><a href="#private">PRIVATE</a></li>
+<li><a href="#program">PROGRAM</a></li>
+<li><a href="#ptr">PTR</a></li>
+<li><a href="#put">PUT</a></li>
+<li><a href="#rdpin-available-on-p2-only">RDPIN (available on P2 only)</a></li>
+<li><a href="#read">READ</a></li>
+<li><a href="#_reboot">_REBOOT</a></li>
+<li><a href="#redim">REDIM</a></li>
+<li><a href="#rem">REM</a></li>
+<li><a href="#removechar">REMOVECHAR</a></li>
+<li><a href="#replacechar">REPLACECHAR</a></li>
+<li><a href="#restore">RESTORE</a></li>
+<li><a href="#return">RETURN</a></li>
+<li><a href="#reverse">REVERSE$</a></li>
+<li><a href="#right">RIGHT$</a></li>
+<li><a href="#rnd">RND</a></li>
+<li><a href="#round">ROUND</a></li>
+<li><a href="#rpad">RPAD$</a></li>
+<li><a href="#rtrim">RTRIM$</a></li>
+<li><a href="#_sametypes">_SAMETYPES</a></li>
+<li><a href="#select-case">SELECT CASE</a></li>
+<li><a href="#self">SELF</a></li>
+<li><a href="#sendrecvdevice">SENDRECVDEVICE</a></li>
+<li><a href="#_setbaud">_SETBAUD</a></li>
+<li><a href="#shared">SHARED</a></li>
+<li><a href="#shl">SHL</a></li>
+<li><a href="#short">SHORT</a></li>
+<li><a href="#shr">SHR</a></li>
+<li><a href="#sin">SIN</a></li>
+<li><a href="#single">SINGLE</a></li>
+<li><a href="#sizeof">SIZEOF</a></li>
+<li><a href="#space">SPACE$</a></li>
+<li><a href="#sqr">SQR</a></li>
+<li><a href="#sqrt">SQRT</a></li>
+<li><a href="#step">STEP</a></li>
+<li><a href="#str">STR$</a></li>
+<li><a href="#strerror">STRERROR$</a></li>
+<li><a href="#string">STRING$</a></li>
+<li><a href="#strint">STRINT$</a></li>
+<li><a href="#sub">SUB</a></li>
+<li><a href="#tan">TAN</a></li>
+<li><a href="#then">THEN</a></li>
+<li><a href="#throw">THROW</a></li>
+<li><a href="#throwifcaught">THROWIFCAUGHT</a></li>
+<li><a href="#to">TO</a></li>
+<li><a href="#trim">TRIM$</a></li>
+<li><a href="#true">TRUE</a></li>
+<li><a href="#try">TRY</a></li>
+<li><a href="#type">TYPE</a></li>
+<li><a href="#ubyte">UBYTE</a></li>
+<li><a href="#ucase">UCASE$</a></li>
+<li><a href="#uinteger">UINTEGER</a></li>
+<li><a href="#ulong">ULONG</a></li>
+<li><a href="#ulongint">ULONGINT</a></li>
+<li><a href="#ushort">USHORT</a></li>
+<li><a href="#using">USING</a></li>
+<li><a href="#val">VAL</a></li>
+<li><a href="#val-1">VAL%</a></li>
+<li><a href="#var">VAR</a></li>
+<li><a href="#varptr">VARPTR</a></li>
+<li><a href="#waitcnt">WAITCNT</a></li>
+<li><a href="#waitpeq-only-available-on-p1">WAITPEQ (only available on P1)</a></li>
+<li><a href="#waitpne-only-available-on-p1">WAITPNE (only available on P1)</a></li>
+<li><a href="#wend">WEND</a></li>
+<li><a href="#with">WITH</a></li>
+<li><a href="#while">WHILE</a></li>
+<li><a href="#word">WORD</a></li>
+<li><a href="#wordfill">WORDFILL</a></li>
+<li><a href="#wordmove">WORDMOVE</a></li>
+<li><a href="#wrpin-only-available-on-p2">WRPIN (only available on P2)</a></li>
+<li><a href="#wxpin-only-available-on-p2">WXPIN (only available on P2)</a></li>
+<li><a href="#wypin-only-available-on-p2">WYPIN (only available on P2)</a></li>
+<li><a href="#xor">XOR</a></li>
+</ul></li>
+<li><a href="#tips-and-tricks">Tips and Tricks</a><ul>
+<li><a href="#including-binary-data">Including binary data</a></li>
+</ul></li>
+<li><a href="#sample-programs">Sample Programs</a><ul>
+<li><a href="#toggle-a-pin">Toggle a pin</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="flexbasic">FlexBASIC</h1>
+<h2 id="introduction">Introduction</h2>
+<p>FlexBASIC is the BASIC language supported by the FlexProp compiler for the Parallax Propeller and Prop2. It is a BASIC dialect similar to FreeBASIC or Microsoft BASIC, but with a few differences. On the Propeller chip it compiles to LMM code (machine language) which runs quite quickly.</p>
+<p>The FlexProp GUI supports BASIC development.</p>
+<h3 id="command-line-compilation">Command Line compilation</h3>
+<p>At the moment there is no stand-alone BASIC compiler, but both the C compiler (flexcc) and Spin compiler (flexspin) can compile BASIC programs. The compiler recognizes the language in a file by the extension. If a file has a ".bas" extension it is assumed to be BASIC. Otherwise it is assumed to be a different language (the default is Spin for flexspin and C for flexcc).</p>
+<p>Because Spin has similar comment structures to BASIC, the flexspin compiler front end is generally a good choice for BASIC development.</p>
+<h2 id="preprocessor">Preprocessor</h2>
+<p>flexspin has a pre-processor that understands basic directives like <code>#include</code>, <code>#define</code>, and<code>#ifdef / #ifndef / #else / #endif</code>.</p>
+<h3 id="directives">Directives</h3>
+<h4 id="define">DEFINE</h4>
+<pre><code>#define FOO hello
+</code></pre>
+<p>Defines a new macro <code>FOO</code> with the value <code>hello</code>. Whenever the symbol <code>FOO</code> appears in the text, the preprocessor will substitute <code>hello</code>.</p>
+<p>Note that unlike the C preprocessor, this one cannot accept arguments. Only simple defines are permitted.</p>
+<p>Also note that by default the preprocessor is case sensitive, like the C preprocessor but unlike the rest of the BASIC language. This is for compatibility with older releases, and may change at some point. However, the preprocessor may be made case insensitive with the <code>#pragma ignore_case</code> directive (see below).</p>
+<p>If no value is given, e.g.</p>
+<pre><code>#define BAR
+</code></pre>
+<p>then the symbol <code>BAR</code> is defined as the string <code>1</code>.</p>
+<h4 id="ifdef">IFDEF</h4>
+<p>Introduces a conditional compilation section, which is only compiled if the symbol after the <code>#ifdef</code> is in fact defined. For example:</p>
+<pre><code>#ifdef __P2__
+&#39;&#39; propeller 2 code goes here
+#else
+&#39;&#39; propeller 1 code goes here
+#endif
+</code></pre>
+<h4 id="ifndef">IFNDEF</h4>
+<p>Introduces a conditional compilation section, which is only compiled if the symbol after the <code>#ifndef</code> is <em>not</em> defined.</p>
+<h4 id="else">ELSE</h4>
+<p>Switches the meaning of conditional compilation.</p>
+<h4 id="elseifdef">ELSEIFDEF</h4>
+<p>A combination of <code>#else</code> and <code>#ifdef</code>.</p>
+<h4 id="elseifndef">ELSEIFNDEF</h4>
+<p>A combination of <code>#else</code> and <code>#ifndef</code>.</p>
+<h4 id="error">ERROR</h4>
+<p>Prints an error message. Mainly used in conditional compilation to report an unhandled condition. Everything after the <code>#error</code> directive is printed. Example:</p>
+<pre><code>#ifndef __P2__
+#error This code only works on Propeller 2
+#endif
+</code></pre>
+<h4 id="include">INCLUDE</h4>
+<p>Includes a file. The contents of the file are placed in the compilation just as if everything in that file was typed into the original file instead. This is often used</p>
+<pre><code>#include &quot;foo.h&quot;
+</code></pre>
+<p>Included files are searched for first in the same directory as the file that contains the <code>#include</code>. If they are not found there, then they are searched for in any directories specified by a <code>-I</code> or <code>-L</code> option on the command line. If the environment variable <code>FLEXCC_INCLUDE</code> is defined, that gives a directory to be searched after command line options. Finally the path <code>../include</code> relative to the FlexProp executable binary is checked.</p>
+<h4 id="pragma">PRAGMA</h4>
+<p>Provide a compiler or preprocessor hint. Only two pragmas are currently supported:</p>
+<pre><code>#pragma ignore_case
+</code></pre>
+<p>Makes the preprocessor, like the rest of the compiler, case insensitive. This will probably become the default in some future release.</p>
+<pre><code>#pragma keep_case
+</code></pre>
+<p>Forces the preprocessor to be case sensitive.</p>
+<h4 id="warn">WARN</h4>
+<p><code>#warn</code> prints a warning message; otherwise it is similar to <code>#error</code>.</p>
+<h4 id="undef">UNDEF</h4>
+<p>Removes the definition of a symbol, e.g. to undefine <code>FOO</code> do:</p>
+<pre><code>#undef FOO
+</code></pre>
+<h3 id="predefined-symbols">Predefined Symbols</h3>
+<p>There are several predefined symbols:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>When Defined</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>__propeller__</code></td>
+<td>always defined to 1 (for P1) or 2 (for P2)</td>
+</tr>
+<tr class="even">
+<td><code>__propeller2__</code></td>
+<td>only defined if compiling for Propeller 2</td>
+</tr>
+<tr class="odd">
+<td><code>__P2__</code></td>
+<td>obsolete version of <code>__propeller2__</code></td>
+</tr>
+<tr class="even">
+<td><code>__FLEXBASIC__</code></td>
+<td>always defined to the FlexProp major version number</td>
+</tr>
+<tr class="odd">
+<td><code>__FLEXSPIN__</code></td>
+<td>if the <code>flexspin</code> front end is used</td>
+</tr>
+<tr class="even">
+<td><code>__SPINCVT__</code></td>
+<td>always defined to the FlexProp major version number</td>
+</tr>
+<tr class="odd">
+<td><code>__SPIN2PASM__</code></td>
+<td>if --asm is given (PASM output) (always defined by flexspin)</td>
+</tr>
+<tr class="even">
+<td><code>__SPIN2CPP__</code></td>
+<td>if C++ or C is being output (never in flexspin)</td>
+</tr>
+<tr class="odd">
+<td><code>__HAVE_FCACHE__</code></td>
+<td>if the FCACHE optimization is enabled</td>
+</tr>
+<tr class="even">
+<td><code>__cplusplus</code></td>
+<td>if C++ is being output (never in flexspin)</td>
+</tr>
+<tr class="odd">
+<td><code>__DATE__</code></td>
+<td>a string containing the date when compilation was begun</td>
+</tr>
+<tr class="even">
+<td><code>__FILE__</code></td>
+<td>a string giving the current file being compiled</td>
+</tr>
+<tr class="odd">
+<td><code>__LINE__</code></td>
+<td>the current source line number</td>
+</tr>
+<tr class="even">
+<td><code>__TIME__</code></td>
+<td>a string containing the time when compilation was begun</td>
+</tr>
+<tr class="odd">
+<td><code>__VERSION__</code></td>
+<td>a string containing the full version of flexspin in use</td>
+</tr>
+</tbody>
+</table>
+<p>A predefined symbol is also generated for type of output being created:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Symbol</th>
+<th>When Defined</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>__OUTPUT_ASM__</code></td>
+<td>if PASM code is being generated</td>
+</tr>
+<tr class="even">
+<td><code>__OUTPUT_BYTECODE__</code></td>
+<td>if bytecode is being generated</td>
+</tr>
+<tr class="odd">
+<td><code>__OUTPUT_C__</code></td>
+<td>if C code is being generated</td>
+</tr>
+<tr class="even">
+<td><code>__OUTPUT_CPP__</code></td>
+<td>if C++ code is being generated</td>
+</tr>
+</tbody>
+</table>
+<h2 id="language-syntax">Language Syntax</h2>
+<h3 id="comments">Comments</h3>
+<p>Comments start with <code>rem</code> or a single quote character, and go to the end of line. Note that you need a space or non-alphabetical character after the <code>rem</code>; the word <code>remark</code> does not start a comment. The <code>rem</code> or single quote character may appear anywhere on the line; it does not have to be the first thing on the line.</p>
+<p>There are also inline or multi-line comments, which start with <code>/'</code> and end with <code>'/</code>.</p>
+<p>Examples:</p>
+<pre><code>rem this is a comment
+&#39; so is this
+print &quot;hello&quot; &#39; this part is a comment too
+/&#39; here is a multi
+   line comment &#39;/
+print /&#39; this inline comment is ignored &#39;/ &quot;hello, world&quot;
+</code></pre>
+<h3 id="integers">Integers</h3>
+<p>Decimal integers are a sequence of digits, 0-9.</p>
+<p>Hexadecimal (base 16) integers start with the sequence "&amp;h", "0h", or "0x" followed by digits and/or the letters A-F or a-f.</p>
+<p>Binary (base 2) integers start with the sequence "&amp;b" or "0b" followed by the digits 0 and 1.</p>
+<p>Base 4 integers start with the sequence "&amp;q" or "0q" followed by digits 0-3.</p>
+<p>Octal (base 8) integers start with the sequence "&amp;o" or "0o" followed by digits 0-7.</p>
+<p>Numbers may contain underscores anywhere to separate digits; those underscores are ignored.</p>
+<p>For example, the following are all ways to represent the decimal number <code>10</code>:</p>
+<pre><code>   10
+   1_0
+   0xA
+   &amp;h_a
+   &amp;B1010
+   &amp;q22
+   &amp;o12
+</code></pre>
+<h3 id="keywords">Keywords</h3>
+<p>Keywords are always treated specially by the compiler, and no identifier may be named the same as a keyword.</p>
+<pre><code>abs
+alias
+and
+andalso
+any
+append
+as
+asm
+boolean
+__builtin_alloca
+byref
+byte
+byval
+call
+case
+cast
+catch
+chain
+class
+close
+const
+continue
+cpu
+data
+declare
+def
+defint
+defsng
+delete
+dim
+direction
+do
+double
+else
+end
+endif
+enum
+exit
+extern
+fixed
+for
+function
+__function__
+get
+gosub
+goto
+_hasmethod
+if
+import
+input
+integer
+let
+lib
+line
+long
+longint
+loop
+mod
+next
+new
+nil
+not
+open
+option
+or
+orelse
+output
+pointer
+preserve
+print
+private
+program
+ptr
+put
+read
+redim
+rem
+restore
+return
+_sametypes
+select
+self
+shared
+shl
+short
+shr
+single
+sizeof
+sqrt
+step
+sub
+then
+throw
+throwifcaught
+to
+try
+type
+ubyte
+uinteger
+ulong
+ulongint
+until
+ushort
+using
+var
+wend
+while
+with
+word
+xor
+</code></pre>
+<h3 id="predefined-functions-and-variables">Predefined functions and variables</h3>
+<p>A number of functions and variables are predefined. These names may be redefined (for example as local variable names inside a function), but changing them at the global level is probably unwise; at the very least it will cause confusion for readers of your code.</p>
+<pre><code>bin$
+bitrev
+bytefill
+bytemove
+chdir
+_clkfreq
+clkfreq
+clkset
+cos
+countstr
+cpuchk
+cpuid
+cpustop
+cpuwait
+curdir$
+decuns$
+delete$
+dir$
+dira
+dirb
+dpeek
+dpoke
+exp
+false
+freefile
+_gc_alloc
+_gc_alloc_managed
+_gc_collect
+_gc_free
+getcnt
+geterr
+getms
+getrnd
+getsec
+getus
+hex$
+ina
+inb
+input$
+insert$
+instr
+instrrev
+lcase$
+kill
+left$
+len
+_lockclr
+_locknew
+_lockrel
+_locktry
+log
+longfill
+longmove
+lpad$
+lpeek
+lpoke
+ltrim$
+mid$
+mkdir
+mount
+number$
+oct$
+outa
+outb
+pausems
+pausesec
+pauseus
+peek
+pi
+pinfloat
+pinhi
+pinlo
+pinread
+pinrnd
+pinset
+pinstart
+pintoggle
+poke
+rdpin
+_reboot
+removechar$
+replacechar$
+reverse$
+right$
+rnd
+round
+rtrim$
+sendrecvdevice
+_setbaud
+sin
+space$
+str$
+strerror$
+string$
+strint$
+tan
+trim$
+true
+ucase$
+val
+val%
+varptr
+waitcnt
+waitpeq
+waitpne
+waitx
+wordfill
+wordmove
+wrpin
+wxpin
+wypin
+</code></pre>
+<h3 id="variable-subroutine-and-function-names">Variable, Subroutine, and Function names</h3>
+<p>Names of variables, subroutines, or functions ("identifiers") consist of a letter or underscore, followed by any sequence of letters, underscores, or digits. Names beginning with an underscore are reserved for system use. Case is ignored; thus the names <code>avar</code>, <code>aVar</code>, <code>AVar</code>, <code>AVAR</code>, etc. all refer to the same variable.</p>
+<p>Identifiers may have a type specifier appended to them. <code>$</code> indicates a string variable or function, <code>%</code> an integer variable or function, and <code>#</code> or <code>!</code> a floating point variable or function. The type specifier is part of the name, so <code>a$</code> and <code>a#</code> are different identifiers (the first is a string variable and the second is a floating point variable). If no type specifier is appended, the identifier is assumed to be an integer. This may be overridden with the <code>defsng</code> directive, which specifies that variables starting with certain letters are to be assumed to be single precision floating point.</p>
+<p>Variable or function types may also be explicitly given, and in this case the type overrides any implicit type defined by the name. However, we strongly recommend that you not use type specifiers like <code>$</code> for variables (or functions) that you give an explicit type to.</p>
+<p>Examples:</p>
+<pre><code>   dim a%            &#39; defines an integer variable
+   dim a#            &#39; defines a different floating point variable
+   dim a as string   &#39; defines another variable, this time a string
+   dim a$ as integer &#39; NOT RECOMMENDED: overrides the $ suffix to make an integer variable
+
+   &#39;&#39; this function returns a string and takes a float and string as parameters
+   function f$(a#, b$)
+     ...
+   end function
+
+   &#39;&#39; this function also returns a string from a float and string
+   function g(a as single, b as string) as string
+     ...
+   end function
+</code></pre>
+<h4 id="arrays">Arrays</h4>
+<p>Arrays must be declared with the <code>dim</code> keyword. FlexBASIC supports only one and two dimensional arrays, but they may be of any type. Higher dimensional arrays may be emulated by creating type definitions and making arrays of those, i.e. arrays of arrays.</p>
+<p>Examples of array declarations:</p>
+<pre><code>  rem an array of 10 integers
+  rem note that dim gives the last index
+  dim a(9)
+  rem same thing but more verbose
+  dim c(0 to 9) as integer
+  rem an array of 10 strings
+  dim a$(9)
+  rem another array of strings
+  dim d(9) as string
+  rem a two dimensional array of strings
+  dim g$(9, 9)
+</code></pre>
+<p>Arrays are by default indexed starting at 0. That is, if <code>a</code> is an array, then <code>a(0)</code> is the first thing in the array, <code>a(1)</code> the second, and so on. This is similar to other languages (such as Spin and C), where array indexes start at 0. The value given in the <code>dim</code> is the last array index. This is different from Spin and C, where arrays are declared with their sizes rather than last array index.</p>
+<p>Code to initialize an array to 0 could look like:</p>
+<pre><code>   dim a(9) as integer
+   sub zero_a
+     for i = 0 to 9
+       a(i) = 0
+     next i
+   end sub
+</code></pre>
+<p>It is possible to change the array base by using</p>
+<pre><code>   option base 1  &#39; make arrays start at 1 by default
+</code></pre>
+<p>The array definition may have an explicit lower bound given, for example:</p>
+<pre><code>   dim a(1 to 10)  &#39; array of 10 items
+   dim b(0 to 10)  &#39; array of 11 items
+</code></pre>
+<p>For two dimensional arrays both dimensions must have the same lower bound.</p>
+<p>Note that pointer dereferences (using array notation) always use the last value set for <code>option base</code> in the file, since we cannot know at run time what the actual base of the pointed to object was. So it is best to set this just once.</p>
+<h4 id="global-member-and-local-variables">Global, Member, and Local variables.</h4>
+<p>There are three kinds of variables: global variables, member variables, and local variables.</p>
+<p>Global (shared) variables may be accessed from anywhere in the program, and exist for the duration of the program. They are created with the <code>dim shared</code> declaration, and may be given an initial value. For example,</p>
+<pre><code>   dim shared x = 2
+</code></pre>
+<p>creates a global variable with an initial value of 2.</p>
+<p>A global variable is shared by all instances of the object that creates it. For example, if "foo.bas" contains</p>
+<pre><code>   dim shared ctr as integer
+
+   function set_ctr(x)
+     ctr = x
+   end function
+   function get_ctr()
+     return ctr
+   end function
+   function inc_ctr()
+     ctr = ctr + 1
+   end function
+</code></pre>
+<p>then a program like:</p>
+<pre><code>   dim x as class using &quot;foo.bas&quot;
+   dim y as class using &quot;foo.bas&quot;
+
+   x.set_ctr(0)
+   y.set_ctr(1)
+   print y.get_ctr()
+   y.inc_ctr()
+   print x.get_ctr()
+</code></pre>
+<p>will print 1 and then 2, because <code>x.ctr</code> and <code>y.ctr</code> are the same (shared) global variable.</p>
+<p>Member variables, on the other hand, are unique to each instance of a class. They are created with regular <code>dim</code> outside of any function or subroutine. If we modified the sample above to remove the <code>shared</code> from the declaration of <code>ctr</code>, then the program would print 1 and then 0, because the <code>y.inc_ctr()</code> invocation would not affect the value of <code>x.ctr</code>.</p>
+<p>Member variables are not automatically initialized to any value. Due to the way classes are implemented, it's not possible to write an initialization in the declaration of a member variable. They must be explicitly set with an assignment statement before being used.</p>
+<p>Local variables are only available inside the function or subroutine where they are declared, and only exist for as long as that function or subroutine is running. When the routine returns, the variables lose any values they had at the time. They are re-created afresh the next time the function is called. Local variables may be initialized to values, but this initialization is done at run time so it has some overhead.</p>
+<h3 id="operators">Operators</h3>
+<p>FlexBASIC contains a number of built in operators.</p>
+<h4 id="unary-operators">Unary operators</h4>
+<p><code>-x</code> is the negative of <code>x</code>, basically the same as <code>0-x</code>. It is defined for both integers and floats.</p>
+<p><code>NOT x</code> is the bitwise inverse of <code>x</code>. It is defined only for integers; when applied to a float the float will be converted to an integer first, and then the result will be an integer.</p>
+<p><code>@x</code> takes the address of <code>x</code>, producing a pointer to the variable <code>x</code>,</p>
+<h4 id="binary-arithmetic-operators">Binary arithmetic operators</h4>
+<pre><code>+, -, *, /
+</code></pre>
+<p>These are the usual arithmetic operations. <code>*</code> is used for multiplication, and <code>/</code> for division. If both arguments to the operators are integers, then the result is an integer. If any argument is a float, the result is a float. This is particularly important for division, since integer division will truncate (round towards 0). For example, <code>3/2</code> produces the result <code>1</code>, whereas <code>3.0/2.0</code> produces the result <code>1.5</code>.</p>
+<pre><code>MOD
+</code></pre>
+<p>This is the integer modulo operator; <code>a mod b</code> is the remainder when <code>a</code> is divided by <code>b</code>. It is only well defined for integers. The sign of the result is the same as the sign of <code>a</code>. <code>mod</code> and <code>/</code> are related: if <code>x = a / b</code> and <code>y = a mod b</code> then <code>x * b + y</code> will equal <code>a</code> (this assumes that all of the values are integers, of course).</p>
+<p>Any floating point arguments will be converted to integer before <code>mod</code> is applied.</p>
+<pre><code>^
+</code></pre>
+<p><code>x^y</code> means <code>x</code> raised to the power <code>y</code>. The result is always a floating point value, and is evaluated using floating point arithmetic.</p>
+<h4 id="bitwise-logical-operators">Bitwise logical operators</h4>
+<p>All of the bitwise logical operators work only on integers. If given a float argument, the float will be converted to a signed 32 bit integer before the operator is applied.</p>
+<p><code>a and b</code> is the bitwise and of <code>a</code> and <code>b</code>.</p>
+<p><code>a or b</code> is the bitwise (inclusive) or of <code>a</code> and <code>b</code>.</p>
+<p><code>a xor b</code> is the bitwise exclusive or of <code>a</code> and <code>b</code>.</p>
+<p><code>a &lt;&lt; b</code> shifts <code>a</code> left by <code>b</code> places, filling the new bits with <code>0</code>. The result is undefined if <code>b</code> is greater than or equal to 32 (in practice only the bottom 5 bits of <code>b</code> are used, but it is better not to rely on this).</p>
+<p><code>a shl b</code> is a synonym for <code>a &lt;&lt; b</code></p>
+<p><code>a &gt;&gt; b</code> shifts <code>a</code> right by <code>b</code> places. If <code>a</code> is a signed integer then its sign bit is used to fill in the new bits, otherwise <code>0</code> is used.</p>
+<p><code>a shr b</code> is a synonym for <code>a &gt;&gt; b</code></p>
+<h4 id="comparison-operators">Comparison operators</h4>
+<p>In general for all of the comparison operators, if either <code>a</code> or <code>b</code> is a float, the comparison is done in floating point. If both <code>a</code> and <code>b</code> are strings then the comparison is done on the usual lexicographical ordering of strings. Comparisons produce <code>0</code> if false, and <code>-1</code> (all bits set) if true.</p>
+<p><code>a=b</code> compares <code>a</code> and <code>b</code> for equality. <code>a&lt;&gt;b</code> compares for inequality. <code>!=</code> means the same as <code>&lt;&gt;</code>, and <code>==</code> means the same as <code>=</code>.</p>
+<p><code>a&lt;b</code> and <code>a&lt;=b</code> compare for <code>a</code> less than or less than or equal to <code>b</code>.</p>
+<p><code>a&gt;b</code> and <code>a&gt;=b</code> compare for <code>a</code> greater than or greater than or equal to <code>b</code>.</p>
+<p><code>=&lt;</code> means the same as <code>&lt;=</code>; similarly <code>=&gt;</code> means the same as <code>&gt;=</code>.</p>
+<h4 id="boolean-operators">Boolean operators</h4>
+<p><code>a andalso b</code> evaluates <code>a</code>, and then only if <code>a</code> is true (nonzero) it evaluates <code>b</code>. It is similar to <code>and</code> but avoids evaluating one argument if it is not necessary. This is useful if the second argument is an expression which is only valid if the first argument is true, e.g. something like:</p>
+<pre><code>   if a &lt;&gt; nil andalso a(0) == 2 then
+      &#39; do something
+   end if
+</code></pre>
+<p><code>a orelse b</code> evaluates <code>a</code>, and then only if <code>a</code> is false (zero) it evaluates <code>b</code>. It is similar to <code>or</code> but avoids evaluating one argument if it is not necessary.</p>
+<h4 id="string-operators">String operators</h4>
+<p>The <code>+</code> operator normally means addition, but for strings it means concatentation. That is,</p>
+<pre><code>&quot;hello, &quot; + &quot;world&quot;
+</code></pre>
+<p>produces the string "hello, world".</p>
+<p>As noted above, comparison operators work as expected on string values, which are compared greater than or less than according to the UTF-8 values of the characters in the strings.</p>
+<h4 id="assignment-operators">Assignment operators</h4>
+<p>Normally assignment is performed with the <code>=</code> symbol:</p>
+<pre><code>  a = b
+</code></pre>
+<p>It is possible to combine assignment and the basic arithmetic operators (<code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>) or some logic operators (<code>and</code>, <code>or</code>, <code>xor</code>). That is, the assignments:</p>
+<pre><code>  a = a + b
+  x = x and y
+</code></pre>
+<p>may also be written as</p>
+<pre><code>  a += b
+  x and= y
+</code></pre>
+<h4 id="multiple-assignment">Multiple assignment</h4>
+<p>The plain assignment operator <code>=</code> may be applied to multiple values. For example, to set three variables <code>x</code>, <code>y</code>, and <code>z</code> to 1, 2, and 3 respectively, one may write:</p>
+<pre><code>   x,y,z = 1,2,3
+</code></pre>
+<p>The values on the right hand side of the <code>=</code> are evaluated before any assignments are performed. This means that:</p>
+<pre><code>   x, y = y, x
+</code></pre>
+<p>works, and will swap <code>x</code> and <code>y</code>.</p>
+<h3 id="extending-lines">Extending lines</h3>
+<p>It is possible to extend a long expression or array initializer over several lines. To do this, add a single <code>_</code> immediately before the end of the line. This causes the compiler to treat the end of line like a space rather than an end of line. For example:</p>
+<pre><code>  x = y + _
+      z
+</code></pre>
+<p>is parsed like <code>x = y + z</code>. This is especially useful for array initializers, which can often be quite long:</p>
+<pre><code>dim shared as integer a(5) = { _
+  1, 2, 3, _
+  4, 5 _
+  }
+</code></pre>
+<p>Note that only shared arrays may be initialized like this.</p>
+<p>IMPORTANT: the <code>_</code> character <em>must</em> be the last thing on the line. Nothing can come after it, not even space or comments.</p>
+<h3 id="multiple-statements-per-line">Multiple statements per line</h3>
+<p>Generally speaking, you may place multiple statements on one line if you separate them with a colon (<code>:</code>). For example, these two bits of code are the same:</p>
+<pre><code>   x = 1
+   y = 2
+</code></pre>
+<p>and</p>
+<pre><code>   x = 1 : y = 2
+</code></pre>
+<h2 id="data-types">Data Types</h2>
+<p>There are a number of data types built in to the FlexBASIC language.</p>
+<h3 id="numeric-data-types">Numeric Data types</h3>
+<h4 id="unsigned-integer-types">Unsigned integer types</h4>
+<p><code>ubyte</code>, <code>ushort</code>, and <code>uinteger</code> are the names for 8 bit, 16 bit, and 32 bit unsigned integers, respectively. The Propeller load instructions do not sign extend by default, so <code>ubyte</code> and <code>ushort</code> are the preferred names for 8 and 16 bit integers on the Propeller.</p>
+<p><code>ulong</code> is an alias for <code>uinteger</code>. <code>ulongint</code> is used for 64 bit integers (which are experimental).</p>
+<h4 id="signed-integer-types">Signed integer types</h4>
+<p><code>byte</code>, <code>short</code>, and <code>integer</code> are 8 bit, 16 bit, and 32 bit signed integers. <code>long</code> is an alias for <code>integer</code>. <code>longint</code> is used for 64 bit integers (which are experimental).</p>
+<h4 id="floating-point-types">Floating point types</h4>
+<p><code>single</code> is, by default, a 32 bit IEEE floating point number. There is an option to use a 16.16 fixed point number instead; this results in much faster calculations, but at the cost of much less precision and range.</p>
+<p><code>double</code> is reserved for future use as a double precision (64 bit) floating point number, but this is not implemented yet.</p>
+<h4 id="numeric-data-types-summary">Numeric data types summary</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Storage size</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ubyte</td>
+<td>1 byte</td>
+<td>0 to 255</td>
+</tr>
+<tr class="even">
+<td>byte</td>
+<td>1 byte</td>
+<td>-128 to 127</td>
+</tr>
+<tr class="odd">
+<td>short</td>
+<td>2 bytes</td>
+<td>0 to 65,535</td>
+</tr>
+<tr class="even">
+<td>ushort</td>
+<td>2 bytes</td>
+<td>-32,768 to 32,767</td>
+</tr>
+<tr class="odd">
+<td>integer</td>
+<td>4 bytes</td>
+<td>-2,147,483,648 to 2,147,483,647</td>
+</tr>
+<tr class="even">
+<td>uinteger</td>
+<td>4 bytes</td>
+<td>0 to 4,294,967,295</td>
+</tr>
+<tr class="odd">
+<td>long</td>
+<td>4 bytes</td>
+<td>-2,147,483,648 to 2,147,483,647</td>
+</tr>
+<tr class="even">
+<td>ulong</td>
+<td>4 bytes</td>
+<td>0 to 4,294,967,295</td>
+</tr>
+<tr class="odd">
+<td>longint</td>
+<td>8 bytes</td>
+<td>-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807</td>
+</tr>
+<tr class="even">
+<td>ulongint</td>
+<td>8 bytes</td>
+<td>0 to 18,446,744,073,709,551,615</td>
+</tr>
+<tr class="odd">
+<td>single</td>
+<td>4 bytes</td>
+<td>1.2E-38 to 3.4E+38 (~6 decimal places of precision)</td>
+</tr>
+<tr class="even">
+<td>double</td>
+<td>8 bytes</td>
+<td>2.3E-308 to 1.7E+308 (~15 decimal places of precision)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Notes: Types INTEGER and LONG are synonyms and may be used interchangably. Types UINTEGER and ULONG are synonyms and may be used interchangably. Types LONGINT, and ULONGINT are experimental. Type DOUBLE is not implemented yet, instead being a synonym for the SINGLE type at this time</p>
+<h3 id="pointer-types">Pointer types</h3>
+<p>Pointers to any other type may be declared. <code>T pointer</code> is a pointer to type <code>T</code>. Thus <code>ushort pointer</code> is a pointer to an unsigned 16 bit number, and <code>ubyte pointer pointer</code> is a pointer to a pointer to an unsigned 8 bit number.</p>
+<h3 id="string-type">String type</h3>
+<p>The <code>string</code> type is a special pointer. Functionally it is almost the same as a <code>const ubyte pointer</code>, but there is one big difference; comparisons involving a string compare the pointed to data, rather than the pointer itself. For example:</p>
+<pre><code>sub cmpstrings(a as string, b as string)
+  if (a = b) then
+    print &quot;strings equal&quot;
+  else
+    print &quot;strings differ&quot;
+  end if
+end sub
+
+sub cmpptrs(a as const ubyte pointer, b as const ubyte pointer)
+  if (a = b) then
+    print &quot;pointers equal&quot;
+  else
+    print &quot;pointers differ&quot;
+  end if
+end sub
+
+dim x as string
+dim y as string
+
+x = &quot;hello&quot;
+y = &quot;he&quot; + &quot;llo&quot;
+cmpstrings(x, y)
+cmpptrs(x, y)
+</code></pre>
+<p>will always print "strings equal" followed by "pointers differ". That is because the <code>cmpstrings</code> function does a comparison with strings (so the contents are tested) but <code>cmppointers</code> does a pointer comparison. While the pointers point at memory containing the same values, they are located in two distinct regions of memory and hence have different addresses.</p>
+<h3 id="classes">Classes</h3>
+<p>FlexBASIC supports classes, which are similar to records or structs in other languages. There are two ways to define classes. A whole BASIC (or Spin, or C) file may be included as a class with the <code>using</code> keyword:</p>
+<pre><code>dim ser as class using &quot;FullDuplexSerial.spin&quot;
+</code></pre>
+<p>declares the variable <code>ser</code> as a class, using the Spin variables and methods from the given file. This also works for <code>.bas</code> or <code>.c</code> files. Any functions declared in the file become methods of the new class.</p>
+<p>Classes may also be declared directly, with the variables and methods of the class specified between <code>class</code> and <code>end class</code></p>
+<pre><code>class counter
+  dim as integer c
+  sub inc()
+    c = c + 1
+  end sub
+  function get() as integer
+    return c
+  end function
+end class
+
+dim x as counter
+...
+x.inc
+print x.get()
+</code></pre>
+<p>Note that <code>end class</code> must be spelled out in full (unlike many "<code>end x</code>" pairs which may be abbreviated as just <code>end</code>).</p>
+<h3 id="type-aliases">Type Aliases</h3>
+<p>An alias for an existing type may be declared with the <code>type</code> keyword. For example:</p>
+<pre><code>type numptr as integer pointer
+type fullduplexserial as class using &quot;FullDuplexSerial.spin&quot;
+</code></pre>
+<h2 id="language-features">Language features</h2>
+<h3 id="true-and-false">TRUE and FALSE</h3>
+<p>In general <code>false</code> is the value 0, and <code>true</code> is normally the value with all bits set (<code>$FFFFFFFF</code>). These are the "canonical" values that are returned from comparisons like <code>x &lt; y</code>.</p>
+<p>However, note that <em>any</em> non-zero value can act as <code>true</code>. For example, in an IF statement if the condition evaluates to non-zero then it will be regarded as <code>true</code>.</p>
+<h3 id="function-declarations">Function declarations</h3>
+<p>Function names follow the same rules as variable names. Like variable names, function names may have a type specifier appended, and the type specifier gives the type that the function returns.</p>
+<pre><code>function Add(a, b)
+  return a+b
+end function
+</code></pre>
+<p>This could be written more verbosely as</p>
+<pre><code>function Add(a as integer, b as integer) as integer
+  return a+b
+end function
+</code></pre>
+<p>It is often useful for documentation to explicitly specify all types like this, even when the default types specified by the variable names would work.</p>
+<h4 id="multiple-return-values">Multiple return values</h4>
+<p>Functions may return multiple values; for example, a function to compute both the quotient and remainder of division could be defined as:</p>
+<pre><code>function quotrem(a as integer, b as integer) as integer,integer
+  return a/b, a mod b
+end function
+</code></pre>
+<p>This may be used like:</p>
+<pre><code>q, r = quotrem(x, y)
+</code></pre>
+<h4 id="default-arguments">Default arguments</h4>
+<p>Parameters to functions or subroutines may be given default arguments:</p>
+<pre><code>function incr(x, n=1)
+  return x + n
+end function
+print incr(2, 2)
+print incr(2)
+</code></pre>
+<p>prints <code>4</code> and then <code>3</code>; the invocation of <code>incr(2)</code> behaves the same as <code>incr(2, 1)</code>, because the second parameter (<code>n</code>) has a default value of 1.</p>
+<h4 id="parameter-passing">Parameter passing</h4>
+<p>Parameters to functions (and subroutines) may be passed "by value" or "by reference". The default for integer, floating point, and string variables is for them to be passed by value. Classes and arrays are passed by reference by default. The defaults may be overridden with the <code>byref</code> and <code>byval</code> keywords.</p>
+<h3 id="memory-allocation">Memory allocation</h3>
+<p>FlexBASIC supports allocation of memory and garbage collection. Memory allocation is done from a small built-in heap. This heap defaults to 256 bytes in size on Propeller 1, and 4096 bytes on Propeller 2. This may be changed by defining a constant <code>HEAPSIZE</code> in the top level file of the program.</p>
+<p>Garbage collection works by scanning memory for pointers that were returned from the memory allocation function. As long as references to the original pointers returned by functions like <code>left$</code> or <code>right$</code> exist, the memory will not be re-used for anything else. The memory is treated purely as binary blocks; no special interpretation of strings is performed, for example.</p>
+<p>Note that a CPU ("COG" in Spin terms) cannot scan the internal memory of other CPUs, so memory allocated by one CPU will only be garbage collected by that same CPU. This can lead to an out of memory situation even if in fact there is memory available to be claimed. For this reason we suggest that all allocation of temporary memory be done in one CPU only.</p>
+<h4 id="new-and-delete">new and delete</h4>
+<p>The <code>new</code> operator may be used to allocate memory. <code>new</code> returns a pointer to enough memory to hold objects, or <code>nil</code> if not enough space is available for the allocation. For example, to allocate 40 bytes one can do:</p>
+<pre><code>  var p = new ubyte(40)
+  if p then
+    &#39;&#39; do stuff with the allocated memory
+    ...
+    &#39;&#39; now free it (this is optional)
+    delete p
+  else
+    print &quot;not enough memory&quot;
+  endif
+</code></pre>
+<p>The memory allocated by <code>new</code> is managed by the garbage collector, so it will be reclaimed when all references to it have been removed. One may also explicitly free it with <code>delete</code>.</p>
+<h4 id="string-functions">String functions</h4>
+<p>String functions and operators like <code>left$</code>, <code>right$</code>, and <code>+</code> (string concatenation) also work with allocated memory. If there is not enough memory to allocate for a string, these functions/operators will return <code>nil</code>.</p>
+<h4 id="function-pointers">Function pointers</h4>
+<p>Pointers to functions require 8 bytes of memory to be allocated at run time (to hold information about the object to be called). So for example in:</p>
+<pre><code>  &#39;&#39; create a Spin FullDuplexSerial object
+  dim ser as class using &quot;FullDuplexSerial.spin&quot;
+  &#39;&#39; get a pointer to its transmit function
+  var tx = @ser.tx
+</code></pre>
+<p>the variable <code>tx</code> holds a pointer both to the <code>ser</code> object and to the particular method <code>tx</code> within it. Since this is dynamically allocated, it is possible for the <code>@</code> operator to fail and return <code>nil</code>.</p>
+<h4 id="__builtin_alloca">__builtin_alloca</h4>
+<p>Instead of <code>new</code>, which allocates persistent memory on the heap, it is possible to allocate temporary memory on the stack with the <code>__builtin_alloca</code> operator. Memory allocated in this way may only be used during the lifetime of the function which allocated it, and may not be returned from that function or assigned to a global variable. Almost always it is better to use <code>new</code> than <code>__builtin_alloca</code>, but the latter is more efficient (but dangerous, because the pointer becomes invalid after the function that uses <code>__builtin_alloca</code> exits).</p>
+<h4 id="_gc_alloc_managed">_gc_alloc_managed</h4>
+<p>The low-level function used by <code>new</code> is <code>_gc_alloc_managed</code>. You may call it directly, although it is rare that you will need to do this:</p>
+<pre><code>  ptr = _gc_alloc_managed(size)
+</code></pre>
+<h4 id="_gc_alloc">_gc_alloc</h4>
+<p>The <code>_gc_alloc</code> function allocates memory on the heap, but unlike <code>_gc_alloc_managed</code> the memory will <em>not</em> be reclaimed by garbage collection. It must be explicitly freed with <code>_gc_free</code>.</p>
+<h4 id="_gc_free">_gc_free</h4>
+<p><code>_gc_free</code> frees memory previously allocated by <code>_gc_alloc</code> or <code>_gc_alloc_managed</code>. Its use for managed memory is optional (the garbage collector can usually reclaim the memory when it is unused).</p>
+<h4 id="_gc_collect">_gc_collect</h4>
+<p>The <code>_gc_collect</code> function forces garbage collection to be run</p>
+<h3 id="templates">Templates</h3>
+<p>FlexBASIC supports polymorphic programming via templates. These are like parameterized function or class declarations. Only function templates are supported at this time.</p>
+<p>Templates are introduced by the keyword <code>any</code> followed by a parenthesized list of identifiers which are the types to be subsituted in the declaration. That is, each identifier in the list represents a type, which may vary at compile time.</p>
+<h4 id="function-templates">Function Templates</h4>
+<p>A function to find the smaller of two items with the same type <code>t</code>, which can be string, integer, single, or any other type that supports the <code>&lt;</code> operator, may be declared as:</p>
+<pre><code>any(t) function mymin(x as t, y as t) as t
+  if x &lt; y then
+    return x
+  else
+    return y
+  end if
+end function
+</code></pre>
+<p>This declares a family of functions <code>mymin__T</code>, where <code>T</code> can be any type. Whenever the compiler sees <code>mymin(some_expr)</code> it checks the type of <code>some_expr</code> and changes the function call to <code>mymin__xxx(some_expr)</code>, where <code>xxx</code> is the type of <code>some_expr</code>. So for example:</p>
+<pre><code>   print mymin(1.7, 2.4), mymin(&quot;zzz&quot;, &quot;aaa&quot;)
+</code></pre>
+<p>will create functions <code>mymin__single</code> and <code>mymin__string</code> which will be called and ultimately cause <code>1.7</code> and <code>aaa</code> to be printed.</p>
+<h3 id="selecting-code-based-on-type-properties">Selecting code based on type properties</h3>
+<p>Within a template the builtin functions <code>_SameTypes</code> and <code>_HasMethod</code> may be used to check properties of the types passed to the templates. For example, a templated function to concatenate values as strings might be written:</p>
+<pre><code>any(T) function concat(a as T, b as T) as string
+  if _SameTypes(T, string) then
+    return a+b
+  else if _SameTypes(T, integer) then
+    return strInt$(a)+strInt$(b)
+  else if _HasMethod(T, asString) then
+    return a.asString() + b.asString()
+  else
+    return &quot;do not know how to concatenate these&quot;
+  end if
+end function
+</code></pre>
+<p>We could use this like:</p>
+<pre><code>class point
+  dim x, y as single
+  function asString() as string
+    return &quot;(&quot; + str$(x) + &quot;, &quot; + str$(y) + &quot;)&quot;
+  end function
+  sub set(x0 as single, y0 as single)
+    x, y = x0, y0
+  end sub
+end class
+
+dim as point P, Q
+
+P.set(-9.1, +2.0)
+Q.set(0.5, 0.1)
+
+print concat(1, 2)
+print concat(&quot;hi &quot;, &quot;there&quot;)
+print concat(P, Q)
+</code></pre>
+<p>which will print:</p>
+<pre><code>12
+hi there
+(-9.1, 2)(-0.5, 0.1)
+</code></pre>
+<h2 id="libraries">Libraries</h2>
+<p>There are two ways to create and use libraries of useful functions.</p>
+<h3 id="classes-1">Classes</h3>
+<p>Probably the cleanest way to create libraries is to use classes. For each group of related functions, put them into a .bas file, and then instantiate a class using that file. For example:</p>
+<pre><code>&#39; mylib.bas
+&#39; simple library with just one entry point, greet
+sub greet(msg as string)
+  print msg
+end sub
+&#39; test program
+greet &quot;hello, world&quot;
+</code></pre>
+<p>This file may be compiled on its own, in which case it will run as a normal BASIC program would (and will print "hello, world". To use it in another program, for example "main.bas", create a class from it:</p>
+<pre><code>&#39; main.bas
+dim G as class using &quot;mylib.bas&quot;
+G.greet(&quot;hello&quot;)
+G.greet(&quot;goodbye&quot;)
+</code></pre>
+<p>If you compile this program, it will print "hello" and then "goodbye". Note that the main program code of <code>mylib.bas</code> is not executed in this case. In general the statements in a BASIC file outside of any <code>sub</code> or <code>function</code> are placed into a subroutine called <code>program</code>. So in the above case if we called <code>G.program</code> it would print "hello, world". However, if the <code>program</code> subroutine is never called it will automatically be removed by the compiler.</p>
+<h3 id="include-files">Include files</h3>
+<p>A .bas file may also be included with the <code>#include</code> directive. This places all of the code in the included file directly into the main file, as if it had been typed in by the user. The downside of this is that there is no namespace protection, and any test code outside of <code>sub</code> and <code>function</code> will be executed. To avoid this, use <code>#ifdef TEST</code> or something similar around such code.</p>
+<p>The above example as an include file would be:</p>
+<pre><code>&#39; mylib.bas
+&#39; simple library with just one entry point, greet
+sub greet(msg as string)
+  print msg
+end sub
+#ifdef TEST
+&#39; test program
+greet &quot;hello, world&quot;
+#endif
+</code></pre>
+<p>which may be compiled for testing with <code>-DTEST</code> on the command line; to use it, do:</p>
+<pre><code>&#39; main.bas
+#include &quot;mylib.bas&quot;
+greet &quot;hello&quot;
+greet &quot;goodbye&quot;
+</code></pre>
+<h2 id="propeller-hardware-features">Propeller Hardware Features</h2>
+<h3 id="input-output-and-direction">Input, Output, and Direction</h3>
+<p>For the Propeller we have some special pseudo-variables <code>direction</code>, <code>input</code>, and <code>output</code>. These may be used to directly control pins of the processor. For example, to set pin 1 as output and then set it high do:</p>
+<pre><code>  direction(1) = output
+  output(1) = 1
+</code></pre>
+<p>Similarly, to set pin 2 as input and read it:</p>
+<pre><code>  direction(2) = input
+  x = input(2)
+</code></pre>
+<p>On the Propeller 1 pins 0-31 may be used. On Propeller 2 this expands to 0-63.</p>
+<h4 id="pin-ranges">Pin Ranges</h4>
+<p>Ranges of pins may be specified with <code>hi,lo</code> or <code>lo,hi</code>. The first form is preferred; if you do</p>
+<pre><code>  output(2, 0) = x
+</code></pre>
+<p>then the bottom 3 bits of x are copied directly to the first 3 output pins. If you use the other form</p>
+<pre><code>  output(0, 2) = x     &#39; note: x is reversed!
+  output(0, 2) = &amp;b110 &#39; sets bits 0 and 1 to 1, and bit 2 to 0
+</code></pre>
+<p>then the lower 3 bits are reversed; this is useful if you're directly coding a binary constant, but otherwise is probably not what you want.</p>
+<p>A pin range should not extend over pin 32. That is, each range must fit into either 0 to 31 or 32 to 63.</p>
+<h3 id="hardware-registers">Hardware registers</h3>
+<p>The builtin Propeller hardware registers are available with their usual names, unless they are redeclared. For example, the OUTA register is available as "outa" (or "OUTA", or "Outa"; case does not matter).</p>
+<p>The hardware registers are not keywords, so they are not reserved to the system. Thus, it is possible to use <code>dim</code> to declare variables with the same name. Of course, if that is done then the original hardware register will not be accessible in the scope of the variable name.</p>
+<h2 id="alphabetical-list-of-keywords-and-built-in-functions">Alphabetical List of Keywords and Built In Functions</h2>
+<h3 id="abs">ABS</h3>
+<pre><code>  y = abs x
+</code></pre>
+<p>Returns the absolute value of x. If x is a floating point number then so will be the result; if x is an unsigned number then it will be unchanged; otherwise the result will be an Integer.</p>
+<h3 id="acos">ACOS</h3>
+<p>Predefined function. <code>acos(x)</code> returns the inverse cosine of <code>x</code>. The result is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="alias">ALIAS</h3>
+<p>Keyword used in <code>DECLARE</code> to declare variable aliases.</p>
+<h3 id="and">AND</h3>
+<pre><code>  a = x and y
+</code></pre>
+<p>Returns the bit-wise AND of x and y. If x or y is a floating point number then it will be converted to integer before the operation is performed.</p>
+<p>Also useful in boolean operations. The comparison operators return 0 for false conditions and all bits set for true conditions, so you can do things like:</p>
+<pre><code>  if (x &lt; y AND x = z) then
+    &#39; code that runs if both conditions are true
+  end if
+</code></pre>
+<h3 id="andalso">ANDALSO</h3>
+<pre><code>  if a andalso b then
+    dosomething
+  end if
+</code></pre>
+<p>Evaluates <code>a</code>, and if it is true then it evaluates <code>b</code> and returns <code>b</code>; otherwise it returns <code>false</code>. This is similar to <code>and</code>, but avoids evaluating its second argument if the first is false.</p>
+<h3 id="any">ANY</h3>
+<pre><code>  dim x as any
+</code></pre>
+<p>Declares x as a generic 32 bit variable compatible with any other type. Basically this is a way to treat a variable as a raw 32 bit value. Note that no type checking at all is performed on variables declared with type <code>any</code>, nor are any conversions applied to them. This means that the compiler will not be able to catch many common errors.</p>
+<p><code>any</code> should be used only in exceptional circumstances.</p>
+<p>Example: a subroutine to print the raw bit pattern of a floating point number:</p>
+<pre><code>  sub printbits(x as single)
+    dim a as any
+    dim u as uinteger
+    &#39;&#39; just plain u=x would convert x from single to unsigned
+    &#39;&#39; instead go through an ANY type, which will do no conversion
+    a = x
+    u = a
+    print u
+  end sub
+</code></pre>
+<h3 id="append">APPEND</h3>
+<p>Reserved word. For now, its only use is in <code>open</code> statements to specify that an existing file should be opened in append mode.</p>
+<h3 id="as">AS</h3>
+<p><code>as</code> is a keyword that introduces a type for a function, function parameter, or dimensioned variable.</p>
+<pre><code>  &#39; declare a function with an integer parameter that returns a string
+  function f(x as integer) as string
+  ...
+</code></pre>
+<h3 id="asc">ASC</h3>
+<pre><code>  i = ASC(s$)
+</code></pre>
+<p>returns the integer (ASCII) value of the first character of a string. If the argument is not a string it is an error.</p>
+<h3 id="asin">ASIN</h3>
+<p>Predefined function. <code>asin(x)</code> returns the inverse sine of <code>x</code>. The result is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="asm">ASM</h3>
+<p>Introduces inline assembly. The block between <code>asm</code> and <code>end asm</code> is parsed slightly differently than usual; in particular, instruction names are treated as reserved identifiers. There are two kinds of <code>asm</code> blocks. A regular <code>asm</code> block introduces some assembly code to be executed when the block is reached. An <code>asm shared</code> block declares some assembly code and/or data that exists outside of any function. Such code is typically executed with a <code>cpu</code> directive. Another use for <code>asm shared</code> is to declare static data.</p>
+<h4 id="asm-1">ASM</h4>
+<p>A normal ASM block specifies some code to be executed when the block is reached. If it is outside of any function or subroutine, then it Inside inline assembly any instructions may be used, but the only legal operands are integer constants, registers, and local variables (or parameters) to the function which contains the inline assembly. Labels may be defined, and may be used as the target for <code>goto</code> elsewhere in the function. Any attempt to leave the function, either by jumping out of it or returning, will cause undefined behavior. In other words, don't do that!</p>
+<p>If you need temporary variables inside some inline assembly, <code>dim</code> them as locals in the enclosing function.</p>
+<p>Example: to implement a wait (like the built-in <code>waitcnt</code>) on Propeller 1:</p>
+<pre><code>sub wait_until_cycle(x as uinteger)
+  asm
+    waitcnt x, #0
+  end asm
+end sub
+</code></pre>
+<p>Example: to create a function that rotates an unsigned integer x left by y:</p>
+<pre><code>function rotleft(x as uinteger, y as uinteger)
+  asm
+    rol x, y
+  end asm
+  return x
+end function
+</code></pre>
+<h4 id="const-asm">CONST ASM</h4>
+<p>If a <code>const</code> keyword appears before <code>asm</code> then the optimizer will leave untouched all code within the <code>asm</code> block. Normally this code is optimized along with the generated code, and this is usually what is desired, because often the compiler can make helpful changes like re-using registers for arguments and local variables. <code>asm const</code> should thus be avoided in general, but if there is some particular sequence that you need to have compiled exactly as-is, then you may use it.</p>
+<h4 id="cpu-asm">CPU ASM</h4>
+<p><code>cpu asm</code> is like <code>const asm</code> but as well as leaving the code unoptimized it will copy it to the internal FCACHE area (rather than executing it from HUB memory). This can be useful if precise timing is required for loops.</p>
+<h4 id="shared-asm">SHARED ASM</h4>
+<p>A <code>shared asm</code> block declares some static code and/or data which is not intended to be executed immediately, but may be invoked with <code>cpu</code>. In this respect it is like a Spin language <code>DAT</code> block.</p>
+<p>The main difference between <code>asm</code> and <code>shared asm</code> is that the <code>shared asm</code> blocks are kept separate, outside of all functions and subroutines, whereas <code>asm</code> blocks are always part of a function or subroutine (or the main program). <code>asm</code> blocks are executed when control flow reaches them; code within <code>shared asm</code> must be explicitly invoked via <code>cpu</code>.</p>
+<p><code>shared asm</code> blocks, like <code>const asm</code>, are not optimized by the optimizer.</p>
+<h3 id="atan">ATAN</h3>
+<p>Predefined function. <code>atan(x)</code> returns the inverse tangent of <code>x</code>. The result is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="atan2">ATAN2</h3>
+<p>Predefined function. <code>atan2(y, x)</code> returns the angle (in radians) that the line from the origin to <code>(x, y)</code> makes with the x-axis. Note the order of arguments to <code>atan2</code> (the y comes first!)</p>
+<h3 id="bin">BIN$</h3>
+<pre><code>  s = bin$(x, n)
+  t = bin$(x)
+</code></pre>
+<p>Returns a string representing the unsigned integer <code>x</code> in binary notation. Only the lowest <code>n</code> digits of the representation are included; use 32 if you want to get all of the digits. If <code>n</code> is omitted or is 0 then the returned string is the minimum length needed to represent the unsigned value.</p>
+<h3 id="bitrev">BITREV</h3>
+<pre><code>  x = bitrev(y)
+</code></pre>
+<p>Returns the bits of the 32 bit unsigned integer <code>y</code> in reverse order. For example, <code>bitrev(1)</code> will give <code>$80000000</code>, and <code>bitrev($5555)</code> will give <code>$aaaa0000</code>.</p>
+<h3 id="boolean">BOOLEAN</h3>
+<p>Represents a true or false result. Represented as a 32 bit integer, with TRUE set to all 1's and FALSE set to all 0's. In practice any non-zero value will be accepted as being "true".</p>
+<h3 id="__builtin_alloca-1">__BUILTIN_ALLOCA</h3>
+<p>Allocates memory on the stack. The argument is an integer specifying how much memory to allocate. For example:</p>
+<pre><code>   sub mysub
+     dim as integer ptr x = __builtin_alloca(256)
+     ...
+   end sub
+</code></pre>
+<p>creates an array of 64 integers (which needs 256 bytes) and makes <code>x</code> into a pointer to it, which may be used anywhere within the subroutine or function.</p>
+<p>The pointer returned from <code>__builtin_alloca</code> will become invalid as soon as the current function returns (or throws an exception), so it should never be assigned to a global variable, a member variable (one declared outside of functions or subroutines), or be returned from a function.</p>
+<p><code>__builtin_alloca</code> is awkward to work with, and dangerous. In most cases you should use <code>new</code> instead. The only advantages of <code>__builtin_alloca</code> is that it is more efficient than <code>new</code>, and does not use up heap space (but uses stack space instead).</p>
+<h3 id="byref">BYREF</h3>
+<p>Specifies that a parameter is to be passed by reference. This means that changes to the parameter inside the subroutine or function are reflected in the variable outside, so for example in:</p>
+<pre><code>   sub incr(byref a as integer)
+     a += 1
+   end sub
+
+   var x = 2
+   incr(x)
+</code></pre>
+<p>the final value of <code>x</code> is 3. Normally simple parameters (integers and floats) are passed by value, which means that changes inside the function do not affect the caller's variables. However, classes and arrays default to being passed by reference, so the <code>byref</code> declaration is optional for these. Strings and pointers are a special case: the pointers themselves are typically passed by value, but the underlying memory area is not copied. This means that changes to the pointer value itself do not propagate back to the caller, but changes to memory pointed to by the pointer do.</p>
+<p>Note that if a parameter is specified as <code>byref</code> then literal constants like <code>1</code> or <code>-2.0</code> cannot be passed to it; only variables (or pointers to values) may be passed as <code>byref</code> parameters.</p>
+<h3 id="byte">BYTE</h3>
+<p>A signed 8 bit integer, occupying one byte of computer memory. The unsigned version of this is <code>ubyte</code>. The difference arises with the treatment of the upper bit. Both <code>byte</code> and <code>ubyte</code> treat 0-127 the same, but for <code>byte</code> 128 to 255 are considered equivalent to -128 to -1 respectively (that is, when a <code>byte</code> is copied to a larger sized integer the upper bit is repeated into all the other bits; for <code>ubyte</code> the new bytes are filled with 0 instead).</p>
+<h3 id="bytefill">BYTEFILL</h3>
+<pre><code>bytefill(p as ubyte pointer, val as ubyte, count as long)
+</code></pre>
+<p>Fills a block of memory with the <code>count</code> copies of the byte <code>val</code>.</p>
+<h3 id="bytemove">BYTEMOVE</h3>
+<pre><code>bytemove(dst as ubyte pointer, src as ubyte pointer, count as long)
+</code></pre>
+<p>Copies <code>count</code> bytes from <code>src</code> to <code>dst</code>. Will work correctly even if <code>src</code> and <code>dst</code> overlap.</p>
+<h3 id="byval">BYVAL</h3>
+<p>Specifies that a parameter is to be passed by value. This is the default for simple integers, floats, and strings, but arrays and classes are normally passed by reference. If <code>byval</code> is specified for such a parameter, a copy will be made of the array or class and that copy will be passed in to the function. This can be expensive if the parameter is large.</p>
+<p>Note that strings and pointers that are passed <code>byval</code> do <em>not</em> cause the underlying memory to be copied. Changes to the pointer value itself do not affect the caller, but changes to the pointed to memory <em>are</em> globally visible.</p>
+<h3 id="call">CALL</h3>
+<p>Used to explicitly signify a subroutine call. Its use is optional, and in fact deprecated; <code>call</code> is included mainly for compatibility with older BASIC dialects. If <code>foo</code> is a subroutine that expects one argument, the following statements are basically equivalent:</p>
+<pre><code>call foo(x)
+foo(x)
+foo x
+</code></pre>
+<h3 id="case">CASE</h3>
+<p>Used in a <code>select</code> statement to indicate a possible case to match. Only a subset of FreeBasic's <code>case</code> options are available. After the <code>case</code> can be a list of items, seperated by commas. Each item is either <code>else</code> (which always matches), an expression (which matches if the original expression equals the <code>case</code> one), or an inclusive range <code>a to b</code> which will match if the original expression is between <code>a</code> and <code>b</code> (inclusive).</p>
+<p>Example:</p>
+<pre><code>select case x
+case 1, 9
+  print &quot;it was 1 or 9&quot;
+case 2 to 4, 12 to 16
+  print &quot;it was between 2 and 4 or 12 and 16&quot;
+  print &quot;sorry for being vague!&quot;
+case 8
+  print &quot;it was 8&quot;
+case else
+  print &quot;it was something else&quot;
+end select
+</code></pre>
+<p>All of the statements between the <code>case</code> and the next <code>case</code> (or <code>end select</code>) are executed if the <code>case</code> is the first one to match the expression in the <code>select case</code>.</p>
+<h3 id="cast">CAST</h3>
+<p>Used to convert between types. <code>cast(type1, expr)</code> will calculate <code>expr</code> and then convert it to type <code>type1</code>. This could involve calculation (if <code>expr</code> has an integer type, for example, and <code>type1</code> is <code>single</code> then the bit pattern of <code>expr</code> is changed) or could just mean a different way of interpreting the bits in a value.</p>
+<p>For example, to get a pointer to the Propeller 1 LOG table, located in ROM at address <code>0xC000</code>, you could do:</p>
+<pre><code>   dim logptr as ushort ptr
+   logptr = cast(ushort ptr, 0xC000)
+</code></pre>
+<h3 id="catch">CATCH</h3>
+<p>Used in a <code>try</code> statement to indicate the start of an error handling block.</p>
+<h3 id="chr">CHR$</h3>
+<p>Not actually a reserved word, but a built-in function. Converts an ascii value to a string (so the reverse of ASC). For example:</p>
+<pre><code>print chr$(65)
+</code></pre>
+<p>prints <code>A</code> (the character whose ASCII value is 65)</p>
+<h3 id="class">CLASS</h3>
+<p>A <code>class</code> is an abstract collection of variables and functions. If you've used the Spin language, a class is like a Spin object.</p>
+<h4 id="class-using">Class Using</h4>
+<p>Spin objects may be directly imported as classes:</p>
+<pre><code>#ifdef __P2__
+   dim ser as class using &quot;spin/SmartSerial&quot;
+#else
+   dim ser as class using &quot;spin/FullDuplexSerial&quot;
+#endif   
+</code></pre>
+<p>creates an object <code>ser</code> based on the Spin file "SmartSerial.spin" (for P2) or "FullDuplexSerial"; this may then be used directly, e.g.:</p>
+<pre><code>   ser.str(&quot;hello, world!&quot;)
+   ser.tx(13)  &#39; send a carriage return
+   ser.dec(100) &#39; print 100 as a decimal number
+</code></pre>
+<p>BASIC files may also be used as classes. When they are, all the functions and subroutines in the BASIC file are exposed as methods (there are no private methods in BASIC yet). Any BASIC code that is not in a function or subroutine is gathered into a method called <code>program</code>.</p>
+<h4 id="abstract-classes">Abstract classes</h4>
+<p>Another way to define an object is to first declare an abstract <code>class</code> with a name, and then use that name in the <code>dim</code> statement:</p>
+<pre><code>  &#39; create abstract class fds representing Spin FullDuplexSerial
+  &#39; NOTE: use SmartSerial.spin instead if trying on P2
+  class fds using &quot;FullDuplexSerial.spin&quot;
+  &#39; create a variable of that type
+  dim ser as fds
+</code></pre>
+<p>This is more convenient if there are many references to the class, or if you want to pass pointers to the class to functions.</p>
+<h4 id="inline-classes">Inline Classes</h4>
+<p>Finally, the functions, subroutines, and variables associated with a class may be defined directly inline, between the <code>class</code> and a finishing <code>end class</code>. In this case the class name may be used as a type name. For example:</p>
+<pre><code>  class counter
+    dim x as integer
+
+    sub reset
+      x = 0
+    end sub
+
+    sub inc(n = 1)
+      x = x + n
+    end sub
+
+    function getval()
+      return x
+    end function
+  end class
+
+  dim cnt as counter
+
+  cnt.reset
+  cnt.inc
+  cnt.inc
+  print cnt.getval() &#39; prints 2
+  cnt.inc
+  print cnt.getval() &#39; prints 3
+</code></pre>
+<h4 id="interoperation-with-spin">Interoperation with Spin</h4>
+<p>Using Spin objects with <code>class using</code> is straightforward, but there are some things to watch out for:</p>
+<ul>
+<li>Spin does not have any notion of types, so most Spin functions will return type <code>any</code> and take parameters of type <code>any</code>. This can cause problems if you expect them to return something special like a pointer or float and want to use them in the middle of an expression. You can either use explicit <code>cast</code> operations, or assign the results of Spin methods to a typed variable, and then use that variable in the expression instead.</li>
+<li>Spin treats strings differently than BASIC does. For example, in the Spin expression <code>ser.tx("A")</code>, <code>"A"</code> is an integer (a single element list). That would be written in BASIC as <code>ser.tx(asc("A"))</code>. Conversely, in Spin you have to write <code>ser.str(string("hello"))</code> where in BASIC you would write just <code>ser.str("hello")</code>.</li>
+</ul>
+<h4 id="interoperation-with-c">Interoperation with C</h4>
+<p>C files may be used as classes, but there are some restrictions. BASIC and Spin are both case insensitive languages, which means that the BASIC symbols <code>AVariable</code>, <code>avariable</code>, and <code>AVARIABLE</code> are all the same, and all are translated internally to <code>avariable</code>. In C the case of identifiers matters. This makes accessing C symbols from BASIC somewhat tricky. Only C symbols that are all lower case may be accessed from BASIC.</p>
+<h3 id="chain">CHAIN</h3>
+<p>Replaces the currently running program with another one loaded from a file system (which must previously have been set up using <code>mount</code>. For example, something like:</p>
+<pre><code>mount &quot;/sd&quot;, _vfs_open_sdcard()
+chain &quot;/sd/prog.bin&quot;
+</code></pre>
+<p>will start the program "prog.bin" from the SD card. The new program completely replaces the currently running program, and will not return to it (although it may itself use <code>chain</code> to start the original again.</p>
+<p>Alternatively, <code>chain</code> may be used to run a program from a previously opened file descriptor, e.g.:</p>
+<pre><code>&#39; this example uses a made up myspi class
+&#39; which has methods &#39;init&#39; and &#39;rx&#39;
+&#39; rx() reads a single byte
+dim spi as class using(&quot;myspi.spin&quot;)
+&#39; start the SPI class
+spi.init(pin1, pin2, pin3, pin4)
+open SendRecvDevice(nil, @spi.rx, nil) as #4
+chain #4
+</code></pre>
+<h4 id="limitations-of-chain">Limitations of CHAIN</h4>
+<p><code>chain</code> has a number of significant limitations:</p>
+<p>(1) The most significant is memory. Both the original program and the new program must (briefly) both be in memory together, so the total size of both programs cannot exceed the memory available. Note that once the new program has started it will have access to all of HUB memory, as usual, it's just during the transition that both programs must fit. This makes <code>chain</code> of very limited utility on P1.</p>
+<p>(2) <code>chain</code> does not automatically stop any other running cpus (COGs). This is a feature, but a dangerous one, since HUB memory is about to be replaced by the contents of the new program. In practice it will be difficult to craft a stand-alone routine that can survive its HUB memory being replaced. Usually you should manually stop any processes running in other CPUs before calling <code>chain</code>.</p>
+<p>(3) On P2, the clock frequency is reset to its default boot value (RCFAST) before the chained program starts.</p>
+<h3 id="chdir">CHDIR</h3>
+<p>Changes the current (default) directory for the program. Note that using this function requires that the "dir.bi" header be included. For example:</p>
+<pre><code>#include &quot;dir.bi&quot;
+...
+chdir(&quot;/host/dir&quot;)
+</code></pre>
+<h3 id="_clkfreq">_CLKFREQ</h3>
+<pre><code>  const _clkfreq = 200_000_000
+</code></pre>
+<p>Declares a default value for the clock frequency. If this constant is not defined, the program will default to 160 MHz. This may be overridden by an explicit <code>clkset</code> call, or by changing the initial clkfreq and clkmode values in the program binary (at 0x14 and 0x18), e.g. via <code>loadp2 -PATCH</code>.</p>
+<h3 id="clkfreq">CLKFREQ</h3>
+<pre><code>  current_freq = clkfreq
+</code></pre>
+<p>Propeller built in variable which gives the current clock frequency.</p>
+<h3 id="clkset">CLKSET</h3>
+<pre><code>  clkset(mode, freq)
+</code></pre>
+<p>Propeller built in function. On the P1, this acts the same as the Spin <code>clkset</code> function. On P2, this does two <code>hubset</code> instructions, the first to set the oscillator and the second (after a short delay) to actually enable it. The <code>mode</code> parameter gives the setup value for the oscillator. For backwards compatibility, if the xsel field (bottom 2 bits) is 0b00 then 0b11 is used instead.</p>
+<p>For example:</p>
+<pre><code>  clkset(0x010c3f04, 160_000_000)  &#39; set P2 Eval board to 160 MHz
+</code></pre>
+<p>After a <code>clkset</code> it is usually necessary to call <code>_setbaud</code> to reset the serial baud rate correctly.</p>
+<p>Also note that no sanity check is performed on the parameters; it is up to the programmer to ensure that the frequency actually matches the mode on the board being used.</p>
+<h3 id="close">CLOSE</h3>
+<p>Closes a file previously opened by <code>open</code>. This causes the <code>closef</code> function specified in the device driver (if any) to be called, and then invalidates the handle so that it may not be used for further I/O operations. Any attempt to use a closed handle produces no result.</p>
+<pre><code>  close #2  &#39; close handle #2
+</code></pre>
+<p>Note that handles 0 and 1 are reserved by the system; closing them may produce undefined results.</p>
+<h3 id="const">CONST</h3>
+<p>At the beginning of a statement, <code>const</code> declares a constant value. For example:</p>
+<pre><code>  const x = 1, msg = &quot;hello&quot;, y = 2.0
+</code></pre>
+<p>declares x to be the integer 1, msg to be the string "hello", and y to be the floating point value 2.0. Only numeric values (integers and floats) and strings may be declared with <code>const</code>.</p>
+<p>Inside a type name, <code>const</code> signifies that variables of this type may not be modified. This is mainly useful for indicating that pointers should be treated as read-only.</p>
+<pre><code>   sub trychange(s as const ubyte ptr)
+     s(1) = 0  &#39;&#39; illegal, s points to const ubytes
+     if (s(1) = 2) then &#39;&#39; OK, s may be read
+       print &quot;it was 2&quot;
+     end if
+   end sub
+</code></pre>
+<h3 id="continue">CONTINUE</h3>
+<p>Used to resume loop execution early. The type of loop (FOR, DO, or WHILE) may optionally be given after CONTINUE. However, note that only the innermost containing loop may be continued. This is different from FreeBasic, where for example <code>continue for</code> may be placed in a <code>while</code> loop that is itself inside a <code>for</code> loop. In FlexBasic this will produce an error.</p>
+<p>Example:</p>
+<pre><code>for i = 1 to 5
+  if (i = 3) then
+    continue for
+  end if
+  print i
+next i
+</code></pre>
+<p>will print 1, 2, 4, and 5, but will skip the 3 because the <code>continue for</code> will cause the next iteration of the <code>for</code> loop to start as soon as it is seen.</p>
+<p>The example above could be written more succinctly as:</p>
+<pre><code>for i = 1 to 5
+  if i = 3 continue
+  print i
+next
+</code></pre>
+<h3 id="cos">COS</h3>
+<p>Predefined function. <code>cos(x)</code> returns the cosine of <code>x</code>, which is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="countstr">COUNTSTR</h3>
+<p>Predefined function. <code>countstr(x$, s$)</code> counts the number of occurences of substring s$ in the string x$. If <code>x$</code> is an empty string, returns 0. If <code>s$</code> is an empty string returns the length of <code>x$</code>.</p>
+<h3 id="cpu">CPU</h3>
+<p>Used to start a subroutine running on another CPU. The parameters are the subroutine call to execute, and a stack for the other CPU to use. For example:</p>
+<pre><code>&#39; blink a pin at a given frequency
+sub blink(pin, freq)
+  direction(pin) = output
+  do
+    output(pin) = not output(pin)
+    waitcnt(getcnt() + freq)
+  loop
+end sub
+...
+dim stack(8) &#39; small stack, blink does not call many other functions
+
+&#39; start the blinking up on another CPU
+var a = cpu(blink(LED, 80_000_000), @stack(1))
+</code></pre>
+<p>Note that <code>cpu</code> is not a function call, it is a special form which does not evaluate its arguments in the usual way. The first parameter is actually preserved and called in the context of the new CPU.</p>
+<p><code>cpu</code> returns the CPU id ("cog id") of the CPU that the new function is running on. If no free CPU is available, <code>cpu</code> returns -1.</p>
+<h4 id="using-cpu-to-run-shared-asm">Using CPU to run shared ASM</h4>
+<p>The <code>cpu</code> directive may also be used to execute shared assembly code, that is, assembly code started with <code>asm shared</code>. In this case the first parameter to <code>cpu</code> is the address of a label in the assembly code, where the program should start, and the second parameter is the parameter to be passed to the assembly code. This parameter is passed in the <code>par</code> register in P1, and in <code>ptra</code> in P2.</p>
+<h3 id="cpuchk">CPUCHK</h3>
+<pre><code>i = cpuchk(n)
+</code></pre>
+<p>Checks to see if the CPU whose id is <code>n</code> is running. Returns <code>true</code> (-1) if running, <code>false</code> (0) if not.</p>
+<h3 id="cpuid">CPUID</h3>
+<pre><code>i = cpuid()
+</code></pre>
+<p>Finds the ID of the currently running CPU.</p>
+<h3 id="cpustop">CPUSTOP</h3>
+<pre><code>cpustop(id)
+</code></pre>
+<p>Stops a specific CPU. If the CPU is not currently running, then does nothing.</p>
+<h3 id="cpuwait">CPUWAIT</h3>
+<p>This builtin subroutine waits for a CPU started via <code>cpu</code> to finish. For example, to launch 4 helper programs and then wait for them you could do:</p>
+<pre><code>const STACKSIZE = 64
+dim taskid(3)
+&#39; start the tasks
+for i = 0 to 3
+  taskid(i) = cpu(helperfunc, new ulong(STACKSIZE))
+next i
+&#39; wait for them
+for i = 0 to 3
+  cpuwait(taskid(i))
+next i
+</code></pre>
+<h3 id="curdir">CURDIR$</h3>
+<p><code>curdir$()</code> returns a string containing the name of the current directory. This may be changed via <code>chdir</code>. Before using this function, make sure to <code>#include "dir.bi"</code>:</p>
+<pre><code>#include &quot;dir.bi&quot;
+print &quot;current directory is: &quot;; curdir$()
+</code></pre>
+<h3 id="data">DATA</h3>
+<p>Introduces raw data to be read via the <code>read</code> keyword. This is usually used for initializing arrays or other data structures. The calculations for converting values from strings to integers or floats are done at run time, so consider using array initializers instead (which are more efficient).</p>
+<p>In contrast to some other BASICs, no parsing at all is done of the information following the <code>data</code> keyword; it is simply dumped into memory as a raw string. Subsequent <code>read</code> commands will read the bytes from memory and convert them to the appropriate type, as if they were <code>input</code> by the user.</p>
+<p>Unlike most other statements, the <code>data</code> statement always extends to the end of the line; any colons (for example) within the data are treated as data.</p>
+<pre><code>dim x as integer
+dim y as string
+dim z as single
+read x, y, z
+print x, y, z
+data 1.1, hello
+data 2.2
+</code></pre>
+<p>will print <code>1</code> (<code>x</code> is an integer, so the fractional part is ignored), <code>hello</code>, and <code>2.2000</code>.</p>
+<p>The order of <code>data</code> statements matters, but they may be intermixed with other statements. <code>data</code> statements should only appear at the top level, not within functions or subroutines.</p>
+<h3 id="declare">DECLARE</h3>
+<p>Used to declare an alias, or a function or subroutine in another file. Only a subset of the usual FreeBasic <code>declare</code> keyword is supported.</p>
+<h4 id="declare-function-in-another-file">DECLARE function in another file</h4>
+<p>The syntax is:</p>
+<pre><code>DECLARE FUNCTION ident1 LIB &quot;path/to/file1&quot; ( parameters ) AS type
+DECLARE SUB ident2 LIB &quot;path/to/file2&quot; ( parameters )
+</code></pre>
+<p>The string following <code>lib</code> specifies the path to the file containing the implementation of the routine (subroutine or function). Note that with <code>declare</code> the type of a function must be explicitly given with <code>as</code>.</p>
+<p>External Spin and C routines may be declared in this fashion. Note however that C is a case sensitive language, whereas BASIC is not. BASIC identifiers are converted to all lower case, so C functions containing upper case letters cannot be accessed via <code>declare</code>.</p>
+<p>Also note that functions declared with the <code>LIB</code> keyword are global, and will not be limited to the current module.</p>
+<h4 id="declare-alias">DECLARE ALIAS</h4>
+<p>This form of declare defines an alias for an existing identifier or address. The simple form is just:</p>
+<pre><code>DECLARE newIdent ALIAS oldIdent
+</code></pre>
+<p>With this form, every reference to <code>newIdent</code> in the code is translated behind the scenes to <code>oldIdent</code>. This will work for any kind of identifier, including functions, subroutines, and constants.</p>
+<p>For identifiers that represent variables, it is also possible to have the alias represent a different "view" of the variable (using a different type). For example, after:</p>
+<pre><code>DIM x as single
+DECLARE xi ALIAS x AS integer
+</code></pre>
+<p>then both <code>x</code> and <code>xi</code> point to the same variable; when referred to as <code>x</code> the data is interpreted as a single, but when referred to as <code>xi</code> it is interpreted as an integer. Note that no type checking or conversion is performed, so this is potentially a dangerous way to alias variables, and should be used with care.</p>
+<p>For global variables and members of classes, it is also possible to alias the individual bytes of the variable:</p>
+<pre><code>DIM x as single
+DECLARE xa ALIAS x AS ubyte(4)
+</code></pre>
+<p>Then the individual bytes of the variable <code>x</code> may be addressed as <code>xa(0)</code>, <code>xa(1)</code>, and so forth. There are some big caveats associated with this:</p>
+<p>(1) Again, no type checking is performed (including checking of the size of the array), so it is the programmer's responsibility to make sure the array is of the appropriate size.</p>
+<p>(2) This form of ALIAS will <em>not</em> usually work as expected with local variables and subroutine/function parameters, which are placed in registers.</p>
+<p>Finally, it is possible to use DECLARE ALIAS to declare references to parts of memory, although this is something that should be used with great care indeed:</p>
+<pre><code>DECLARE xa ALIAS 0x12300 AS uinteger
+</code></pre>
+<p>declares <code>xa</code> to be a <code>uinteger</code> stored at address <code>0x12300</code>. With this form of <code>declare</code> the aliased value must be a literal integer, and the <code>AS type</code> clause must be present.</p>
+<h3 id="decuns">DECUNS$</h3>
+<pre><code>  s = decuns$(x, n)
+  t = decuns$(x)
+</code></pre>
+<p>Returns a string representing the unsigned integer <code>x</code> in decimal notation (base 10). Only the lowest <code>n</code> digits of the representation are included; use 10 if you want to get all of the digits. If <code>n</code> is omitted or is 0 then the returned string is the minimum length needed to represent the unsigned value.</p>
+<h3 id="def">DEF</h3>
+<p>Define a simple function. This is mostly intended for porting existing BASIC code, but could be convenient for creating very simple functions. The syntax consists of the function name, parameter list, <code>=</code>, and then the return value from the expression. All of the types are inferred from the names. So for example to define a function <code>sum</code> to return the sum of two integers we would do:</p>
+<pre><code>DEF sum(x, y) = x+y
+</code></pre>
+<h3 id="defint">DEFINT</h3>
+<p>Dictates the default type for variable names starting with certain letters.</p>
+<pre><code>defint i-j
+</code></pre>
+<p>says that variables starting with the letters <code>i</code> through <code>j</code> are assumed to be integers.</p>
+<p>The default setting is <code>defint a-z</code> (i.e. all variables are assumed to be integer unless given an explicit suffix or type in their declaration). A combination of <code>defsng</code> and <code>defint</code> may be used to modify this.</p>
+<h3 id="defsng">DEFSNG</h3>
+<p>Dictates the default type for variable names starting with certain letters.</p>
+<pre><code>defsng a-f
+</code></pre>
+<p>says that variables starting with the letters <code>a</code> through <code>f</code> are assumed to be floating point.</p>
+<p>The default setting is <code>defint a-z</code> (i.e. all variables are assumed to be integer unless given an explicit suffix or type in their declaration). A combination of <code>defsng</code> and <code>defint</code> may be used to modify this.</p>
+<p>Putting <code>defsng a-z</code> at the start of a file may be useful for porting legacy BASIC code.</p>
+<h3 id="delete">DELETE</h3>
+<p>Free memory allocated by <code>new</code> or by one of the string functions (<code>+</code>, <code>left$</code>, <code>right$</code>, etc.).</p>
+<p>Use of <code>delete</code> is a nice hint and makes sure the memory is free, but it is not strictly necessary since the memory is garbage collected automatically.</p>
+<h3 id="delete-1">DELETE$</h3>
+<p>Deletes part of a string.</p>
+<pre><code>   x$ = delete$(t$, off, len)
+</code></pre>
+<p>sets <code>x$</code> to a string that is the same as <code>t$</code> except that the characters starting at offset <code>off</code> and continuing for <code>len</code> are removed.</p>
+<h3 id="dim">DIM</h3>
+<p>Dimension variables. This defines variables and allocate memory for them. <code>dim</code> is the most common way to declare that variables exist. The simplest form just lists the variable names and (optionally) array sizes. The variable types are inferred from the names. For example, you can declare an array <code>a</code> of 10 integers, a single integer <code>b</code>, and a string <code>c$</code> with:</p>
+<pre><code>dim a(10), b, c$
+</code></pre>
+<p>It's also possible to give explicit types with <code>as</code>:</p>
+<pre><code>dim a(10) as integer
+dim b as ubyte
+dim s as string
+</code></pre>
+<p>Only one explicit type may be given per line (this is different from FreeBASIC). If you give an explicit type, it will apply to all the variables on the line:</p>
+<pre><code>&#39; this makes all the variables singles, despite their names
+&#39; (probably NOT a good idea!)
+dim a(10), b%, c$, d as single
+</code></pre>
+<p>If you want to be compatible with FreeBASIC, put the <code>as</code> first:</p>
+<pre><code>dim as single a(10), b%, c$, d
+</code></pre>
+<p>Variables declared inside a function or subroutine are "local" to that function or subroutine, and are not available outside or to other functions or subroutines. Variables dimensioned at the top level may be used by all functions and subroutines in the file.</p>
+<p>See also VAR.</p>
+<h3 id="dir">DIR$</h3>
+<p>Scan the current directory for files. The first call to <code>dir$</code> should have the form <code>r = dir$(patrn, attrib)</code>, where <code>patrn</code> is a simple file name pattern, and <code>attrib</code> is either 0 (to match all files or directories), or some combination of the bits:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Bit</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>fbDirectory</code></td>
+<td>find directories</td>
+</tr>
+<tr class="even">
+<td><code>fbReadOnly</code></td>
+<td>find read only files</td>
+</tr>
+<tr class="odd">
+<td><code>fbArchive</code></td>
+<td>find writable files</td>
+</tr>
+<tr class="even">
+<td><code>fbHidden</code></td>
+<td>find hidden files</td>
+</tr>
+<tr class="odd">
+<td><code>fbSystem</code></td>
+<td>find system files</td>
+</tr>
+<tr class="even">
+<td><code>fbNormal</code></td>
+<td>find read only or writable files</td>
+</tr>
+</tbody>
+</table>
+<p><code>patrn</code> is a very simple file pattern, such as <code>*</code> to match any names, <code>*.txt</code> to match all files ending in <code>.txt</code>, <code>foo.txt</code> to match only the file named <code>foo.txt</code>, or <code>abc*</code> to match files starting with <code>abc</code>. The pattern is case insensitive, so <code>*.c</code> will match both files ending in <code>.c</code> and <code>.C</code>.</p>
+<p>The <code>dir$</code> call will return the first file name matching both the string pattern and the requested attributes. Subsequent <code>dir$</code> calls without patterns will continue matching the pattern and attributes set up by the first call. An empty string <code>""</code> will be returned when there are no more matches. A <code>nil</code> will be returned if there is an error.</p>
+<p>Example:</p>
+<pre><code>#include &quot;dir.bi&quot;
+...
+dim filename as string
+chdir(&quot;/host/dir&quot;)       &#39; set working directory
+filename = dir$(&quot;*&quot;, 0)  &#39; start scan for all files and directories
+while filename &lt;&gt; &quot;&quot; and filename &lt;&gt; nil
+  print filename
+  filename = dir$()      &#39; continue scan
+end while
+</code></pre>
+<p>Note that <code>dir$</code> is not thread-safe: it should always be called from one CPU / thread at a time, and if multiple CPUs try to call it at the same time then the results are utterly unpredictable.</p>
+<h3 id="direction">DIRECTION</h3>
+<p>Pseudo-array of bits describing the direction (input or output) of pins. In Propeller 1 this array is 32 bits long, in Propeller 2 it is 64 bits.</p>
+<pre><code>  direction(2) = input &#39; set pin 2 as input
+  direction(6,4) = output &#39; set pins 6, 5, 4 as outputs
+</code></pre>
+<p>Note that pin ranges may not cross a 32 bit boundary; that is,</p>
+<pre><code>  direction(33, 30) = input
+</code></pre>
+<p>is illegal and produces undefined behavior.</p>
+<h3 id="do">DO</h3>
+<p>Main loop construct. A <code>do</code> loop may have the loop test either at the beginning or end, and it may run the loop while a condition is true or until a condition is true. For example:</p>
+<pre><code>  do
+    x = input(9)
+  loop until x = 0
+</code></pre>
+<p>will wait until pin 9 is 0.</p>
+<p>The various forms are discussed below</p>
+<h4 id="do--loop">DO / LOOP</h4>
+<pre><code>  do
+    &#39; do stuff here
+  loop
+</code></pre>
+<p>This is the basic form, which loops forever (unless an <code>exit</code> statement is invoked within the loop).</p>
+<h4 id="do-until--loop">DO UNTIL / LOOP</h4>
+<pre><code>  do until (condition)
+    &#39; do stuff here
+  loop
+</code></pre>
+<p>Code within the loop is executed until a specific condition is met. If the condition is true before entry to the loop, the loop is never executed.</p>
+<h4 id="do--loop-until">DO / LOOP UNTIL</h4>
+<pre><code>  do
+    &#39; do stuff here
+  loop until (condition)
+</code></pre>
+<p>In this variant the code within the loop is always executed at least once, and will continue to be executed until the specified condition is met.</p>
+<h4 id="do-while--loop">DO WHILE / LOOP</h4>
+<pre><code>  do while (condition)
+    &#39; do stuff here
+  loop
+</code></pre>
+<p>Similar to <code>do until</code> but the sense of the condition is reversed; as long as the condition is true the loop is executed. If the condition is false the first time the loop is encountered, then the loop body is never executed.</p>
+<h4 id="do--loop-while">DO / LOOP WHILE</h4>
+<pre><code>  do
+    &#39; do stuff here
+  loop while (condition)
+</code></pre>
+<p>Executes the loop body at least once, and continues to execute it as long as the condition remains true.</p>
+<h3 id="double">DOUBLE</h3>
+<p>The type for a double precision (64 bit) floating point number. <code>double</code> is not actually implemented in the compiler, and is treated the same as <code>single</code> (so it occupies only 32 bits).</p>
+<h3 id="dpeek">DPEEK</h3>
+<pre><code>  val = dpeek(addr)
+</code></pre>
+<p>Returns the 16 bit value at the given address in memory.</p>
+<h3 id="dpoke">DPOKE</h3>
+<pre><code>dpoke(addr, val)
+</code></pre>
+<p>Changes the 16 bits of memory at <code>addr</code> to have the value <code>val</code>.</p>
+<h3 id="else-1">ELSE</h3>
+<p>See IF</p>
+<h3 id="end">END</h3>
+<p>Used to mark the end of most blocks. For example, <code>end function</code> marks the end of a function declaration, and <code>end if</code> the end of a multi-line <code>if</code> statement. In most cases the name after the <code>end</code> is optional.</p>
+<h4 id="end-asm">END ASM</h4>
+<p>Closes an <code>asm</code> (inline assembly) block.</p>
+<h4 id="end-class">END CLASS</h4>
+<p>Closes a <code>class</code> definition.</p>
+<h4 id="end-function">END FUNCTION</h4>
+<p>Closes a function definition.</p>
+<h4 id="end-if">END IF</h4>
+<p>Marks the end of an <code>if</code> statement. As a special exception to the normal rules, this may also be written without the space (as <code>endif</code>). This is for compatibility with some other BASIC dialects.</p>
+<h4 id="end-select">END SELECT</h4>
+<p>Closes a <code>select case</code> block.</p>
+<h4 id="end-sub">END SUB</h4>
+<p>Closes a subroutine definition.</p>
+<h4 id="end-try">END TRY</h4>
+<p>Closes a <code>try</code>/<code>catch</code> error handling block.</p>
+<h4 id="end-while">END WHILE</h4>
+<p>Marks the end of a <code>while</code> loop; this may be used in place of <code>wend</code>.</p>
+<h3 id="endif">ENDIF</h3>
+<p>Marks the end of a multi-line <code>if</code> statement. Same as <code>end if</code>. Note that this is the only special form of <code>end</code>. For example, it is <em>not</em> legal to write <code>endasm</code>; only <code>end asm</code> will work.</p>
+<h3 id="enum">ENUM</h3>
+<p>Reserved for future use.</p>
+<h3 id="exit">EXIT</h3>
+<p>Exit early from a loop, function, or subroutine.</p>
+<p>Just plain <code>exit</code> on its own will exit early from the innermost enclosing loop, and will produce an error if given outside a loop.</p>
+<p>The <code>exit</code> may also have an explicit <code>do</code>, <code>for</code>, or <code>while</code> after it to say what kind of loop it is exiting. In this case the innermost loop must be of the appropriate type. This is different from FreeBasic, where for example <code>exit while</code> may be used in a <code>for</code> loop that is inside a <code>while</code> loop; we do not allow that.</p>
+<p>Finally <code>exit function</code> and <code>exit sub</code> are synonyms for <code>return</code>.</p>
+<h4 id="exit-do">EXIT DO</h4>
+<p>Exit from the innermost enclosing loop if it is a <code>do</code> loop. If it is not a <code>do</code> loop then the compiler will print an error.</p>
+<h4 id="exit-for">EXIT FOR</h4>
+<p>Exit from the innermost enclosing loop if it is a <code>for</code> loop. If it is not a <code>for</code> loop then the compiler will print an error.</p>
+<h4 id="exit-function">EXIT FUNCTION</h4>
+<p>Returns from the current function (just like a plain <code>return</code>). The value of the function will be the last default value established by assigning a value to the function's name, or 0 if no such value has been established. For example:</p>
+<pre><code>function sumif(a, x, y)
+  sumif = x + y
+  if (a &lt;&gt; 0) then
+    exit function
+  end if
+  sumif = 0
+end function
+</code></pre>
+<p>returns <code>x+y</code> if a is nonzero, and 0 otherwise.</p>
+<h4 id="exit-loop">EXIT LOOP</h4>
+<p>Exit from the innermost enclosing loop if it is a <code>do</code> loop. If it is not a <code>do</code> loop then the compiler will print an error. (This is the same as <code>exit do</code>)</p>
+<h4 id="exit-sub">EXIT SUB</h4>
+<p>Returns from the current subroutine. Same as the <code>return</code> statement.</p>
+<h4 id="exit-while">EXIT WHILE</h4>
+<p>Exit from the innermost enclosing loop if it is a <code>while</code> loop. If it is not a <code>while</code> loop then the compiler will print an error.</p>
+<h3 id="exp">EXP</h3>
+<p>Predefined function. <code>exp(x)</code> returns the natural exponential of <code>x</code>, that is <code>e ^ x</code> where <code>e</code> is 2.71828...</p>
+<h3 id="false">FALSE</h3>
+<p>A predefined constant 0. Any value equal to 0 or <code>nil</code> will be considered as false in a boolean context.</p>
+<h3 id="fixed">FIXED</h3>
+<p>Reserved for future use as a fixed point data type.</p>
+<h3 id="for">FOR</h3>
+<p>Repeat a loop while incrementing (or decrementing) a variable. The default step value is 1, but if an explicit <code>step</code> is given this is used instead:</p>
+<pre><code>&#39; print 1 to 10
+for i = 1 to 10
+  print i
+next i
+&#39; print 1, 3, 5, ..., 9
+for i = 1 to 10 step 2
+  print i
+next i
+</code></pre>
+<p>If the variable given in the loop is not already defined, it is created as a local variable (local to the current sub or function, or to the implicit program function for loops outside of any sub or function).</p>
+<h4 id="as-a-function-modifier">As a function modifier</h4>
+<p><code>for</code> placed after <code>function</code> or <code>sub</code> may be used to specify some attributes of that function or subroutine. For example, to place a function in COG memory one may write:</p>
+<pre><code>function for &quot;cog&quot; add(x, y)
+  return x+y
+end
+</code></pre>
+<p>Note that there are some restrictions on functions placed in COG or LUT memory. See the general FlexSpin documentation for details.</p>
+<p>The following attributes are supported:</p>
+<p><code>cog</code>: places the function in COG memory</p>
+<p><code>lut</code>: places the function in LUT memory</p>
+<p><code>noinline</code>: specifies that the function should not be inlined</p>
+<p><code>opt(xxx)</code>: specifies explicitly which optimizations should be applied to the function; see the general compiler documentation for details. For example, if a subroutine starts with <code>sub for "opt(0,peephole)"</code> it will be compiled with no optimization (like <code>-O0</code>) except for peepholes.</p>
+<p>Attributes may be grouped together in the same string, e.g. to compile a function for LUT and with all optimizations always enabled regardless of the compiler setting, you can do:</p>
+<pre><code>function for &quot;lut,opt(all)&quot; fastfunc()
+...
+end function
+</code></pre>
+<h3 id="freefile">FREEFILE</h3>
+<pre><code>  f = freefile()
+  if f &gt;= 0 then
+    open &quot;somefile&quot; for input as #f
+  else
+    print &quot;no free files available&quot;
+  endif
+</code></pre>
+<p><code>freefile</code> returns a file handle for use with OPEN, if one is free; otherwise returns -1.</p>
+<h3 id="function">FUNCTION</h3>
+<p>Defines a new function. The type of the function may be given explicitly with an <code>as</code> <em>type</em> clause; if no such clause exists the function's type is deduced from its name. For example, a function whose name ends in <code>$</code> is assumed to return a string unless an <code>as</code> is given.</p>
+<p>Functions have a fixed number and type of arguments, but the last arguments may be given default values with an initializer. For example,</p>
+<pre><code>  function inc(n as integer, delta = 1 as integer) as integer
+    return n + delta
+  end function
+</code></pre>
+<p>defines a function which adds two integers and returns an integer result. Since the default type of variables is integer, this could also be written as:</p>
+<pre><code>  function inc(n, delta = 1)
+    return n+delta
+  end function
+</code></pre>
+<p>In this case because the final argument <code>delta</code> is given a default value of 1, callers may omit this argument. That is, a call <code>inc(x)</code> is exactly equivalent to <code>inc(x, 1)</code>.</p>
+<h4 id="anonymous-functions">Anonymous functions</h4>
+<p><code>function</code> may also be used in expressions to specify a temporary, unnamed function. There are three forms for this. The long form is very similar to ordinary function declarations. For example, suppose we want to define a function "plusn" which itself returns a function which adds one to its argument. This would look like:</p>
+<pre><code>  &#39; define an alias for the type of a function which takes an integer
+  &#39; and returns another; this isn&#39;t strictly necessary, but saves typing
+  type intfunc as function(x as integer) as integer
+
+  &#39; plusn(n) returns a function which adds n to its argument
+  function plusn(n as integer) as intfunc
+    return function(x as integer) as integer
+              return x + n
+       end function
+  end function
+
+  dim as intfunc f, g
+  f = plusn(1) &#39; function which returns 1 + its argument
+  g = plusn(7) &#39; function which returns 7 + its argument
+
+  &#39; this will print 1 2 8
+  print 1, f(1), g(1)
+</code></pre>
+<p>The long anonymous form is basically the same as an ordinary function definition, but without the function name. The major difference is that an explicit definition of the return type (e.g. <code>as integer</code>) is required, since the compiler cannot use a name to determine a default type for the function.</p>
+<p>For simple functions which just return a single expression, an abbreviated anonymous form is available. This omits the return type, which is determined by the expression itself, and puts the expression on the same line. This means we could write the <code>plusn</code> function above as:</p>
+<pre><code>  function plusn(n as integer) as intfunc
+    return (function(x as integer) x+n)
+  end function
+</code></pre>
+<p>The long and abbreviated forms are compatible with QBasic and some other PC BASICs. FlexBasic also supports a much more convenient short form. This short form starts with <code>[</code>, followed by the function parameter list, followed by ':', the statements in the anonymous function, and finally <code>=&gt;</code> and a result expression. This sounds more complicated than it is. The above <code>plusn</code> function in short notation is:</p>
+<pre><code>  function plusn(n as integer) as intfunc
+    return [x:=&gt;x+n]
+  end function
+</code></pre>
+<p>This short form is much easier to write for many inline uses, and is very flexible, but is not compatible with other BASICs.</p>
+<h4 id="closures">Closures</h4>
+<p>You'll note in the examples of anonymous functions that the anonymous function inside <code>plusn</code> is accessing the parameter <code>n</code> of its parent. This is allowed, and the value of <code>n</code> is in fact saved in a special object called a "closure". This closure is persistent, and functions are allowed to modify the variables in a closure. For example, we can implement a simple counter object as follows:</p>
+<pre><code>type intfunc as function() as integer
+
+&#39; makecounter returns a counter with a given initial value and step
+function makecounter(value = 1, stepval = 1) as intfunc
+  return (function () as integer
+            var r = value
+        value = value + stepval
+        return r
+      end function)
+end function
+
+var c = makecounter(7, 3)
+
+&#39; prints 7, 10, 13, 16
+for i = 1 to 4
+  print c()
+next
+</code></pre>
+<p>Using the more compact notation for functions this may be written as:</p>
+<pre><code>type intfunc as function() as integer
+
+function makecounter(value = 1, stepval = 1) as intfunc
+  return [:var r = value : value = value + stepval : =&gt; r]
+end function
+
+var c = makecounter(7, 3)
+for i = 1 to 4
+  print c()
+next
+</code></pre>
+<h4 id="declaring-external-functions">Declaring external functions</h4>
+<p>The <code>declare</code> and <code>lib</code> keywords may be used to declare functions from other files ("libraries"), for example:</p>
+<pre><code>declare function rename lib &quot;libc/unix/rename.c&quot; (oldpath as string, newpath as string) as integer
+</code></pre>
+<p>Declares that the function <code>rename(oldpath, newpath)</code> may be found in the file <code>"libc/unix/rename.c"</code>. See <code>declare</code> for more details.</p>
+<h4 id="placing-functions-in-internal-memory">Placing functions in internal memory</h4>
+<p>If <code>for "cog"</code> follows the <code>function</code> keyword, the function will be placed in CPU internal memory rather than main memory. This memory is generally much faster, but is a very limited resource. This directive should be used only for small leaf functions (which do not call other functions) and should be used sparingly.</p>
+<pre><code>function for &quot;cog&quot; toupper(c as ubyte) as ubyte
+  if c &gt;= asc(&quot;a&quot;) and c &lt;= asc(&quot;z&quot;) then
+    c = c + (asc(&quot;A&quot;) - asc(&quot;a&quot;))
+  end if
+  return c
+end function
+</code></pre>
+<h3 id="function-1"><strong>FUNCTION</strong></h3>
+<p><code>__FUNCTION__</code> is a special symbol that is replaced with the name of the currently enclosing function or subroutine. It is similar to a preprocessor macro, but not actually implemented that way (because the preprocessor doesn't know about functions or subroutines). Mainly used for reporting errors, e.g.:</p>
+<pre><code>  print &quot;Error found in subroutine &quot;; __FUNCTION__
+</code></pre>
+<h3 id="get">GET</h3>
+<pre><code>get #handle, pos, var [,items [,r]]
+</code></pre>
+<p><code>get</code> is used to read binary data from the open file whose handle is <code>handle</code>, starting at position <code>pos</code> in the file (where <code>pos</code> is 1-based). The position is optional, but if omitted a comma must still be placed to indicate that it is missing. <code>var</code> is the first variable into which to read the binary data, and <code>items</code> is the number of variables to read starting at <code>var</code>. <code>items</code> is often omitted, in which case just one variable is read. <code>r</code> is an optional return value with, if present, is a variable which is set to the number of items actually read.</p>
+<p>For example, to read 128 bytes into an array <code>x</code> from the current position in file handle 3 one would use:</p>
+<pre><code>dim x(128) as ubyte
+...
+get #3,, x(0), 128
+</code></pre>
+<p>Note the two commas indicating a missing position argument. To read the first 4 bytes of the file into a long variable y, regardless of where we currently are in the file, we could do:</p>
+<pre><code>dim y as long
+...
+get #3, 1, y
+</code></pre>
+<p>Several important caveats apply:</p>
+<p>(1) The bytes are read as <em>binary</em> data, not ASCII. (2) Strings may not be read in this way. The compiler will not throw an error for using a string type, but what is read is the 4 byte pointer for the string, not the string data itself. (3) The return value <code>r</code> is "items read" rather than "bytes read" as it is in FreeBasic. (4) If an error occurs, <code>r</code> is set to -1.</p>
+<h3 id="getcnt">GETCNT</h3>
+<p>Propeller specific builtin function.</p>
+<pre><code>  function getcnt() as uinteger
+  x = getcnt()
+</code></pre>
+<p>Returns the current cycle counter. This is an unsigned 32 bit value that counts the number of system clocks elapsed since the device was turned on. It wraps after approximately 54 seconds on propeller 1 and 27 seconds on propeller 2.</p>
+<h3 id="geterr">GETERR</h3>
+<p>Propeller specific builtin function.</p>
+<pre><code>  function geterr() as integer
+  e = geterr()
+</code></pre>
+<p>Returns the error number <code>e</code> corresponding to the last system error. (This is the same as <code>errno</code> in C.) This number may be converted to a user-displayable string via <code>strerror$(e)</code>.</p>
+<h3 id="getms">GETMS</h3>
+<pre><code>  function getms() as uinteger
+  x = getms()
+</code></pre>
+<p>Builtin function. Returns the number of milliseconds since the device was turned on. On the Propeller 1 this wraps around after approximately 54 seconds. On the P2 the system counter has 64 bits, so it will work for about 49 days.</p>
+<h3 id="getrnd">GETRND</h3>
+<pre><code>  function getrnd() as uinteger
+  x = getrnd()
+</code></pre>
+<p>Builtin function. Returns a 32 bit random number (unsigned integer).</p>
+<h3 id="getsec">GETSEC</h3>
+<pre><code>  function getsec() as uinteger
+  x = getsec()
+</code></pre>
+<p>Builtin function. Returns the number of seconds since the device was turned on. On the Propeller 1 this wraps around after approximately 54 seconds. On the P2 the system counter has 64 bits, so it will work for millions of years.</p>
+<h3 id="getus">GETUS</h3>
+<pre><code>  function getus() as uinteger
+  x = getus()
+</code></pre>
+<p>Builtin function. Returns the number of microseconds since the device was turned on. On the Propeller 1 this wraps around after approximately 54 seconds. On the P2 the system counter has 64 bits, so it will work for about an hour.</p>
+<h3 id="gosub">GOSUB</h3>
+<p><code>gosub x</code> pushes a return value on the stack and jumps to the label <code>x</code> (which may be a numeric label). A <code>return</code> statement will pop the return value off the stack and resume execution after the original <code>gosub</code>.</p>
+<p><code>gosub</code> may not be used inside a subroutine or function, it may only be used in top level code.</p>
+<p><code>gosub</code> is supported for compatibility with old BASIC code, but should not be used in new code. In new code you should create a subroutine or function instead. See <code>sub</code>.</p>
+<h3 id="goto">GOTO</h3>
+<p><code>goto x</code> jumps to a label <code>x</code>, which must be defined in the same function. Labels are defined by giving an identifier, followed by a <code>:</code>, followed by an end-of-line; that is, a label is the only thing which may be on a line.</p>
+<p>For example:</p>
+<pre><code>  if x=y goto xyequal
+  print &quot;x differs from y&quot;
+  goto done
+xyequal:
+  print &quot;x and y are equal&quot;
+done:
+</code></pre>
+<p>Note that in most cases code written with a <code>goto</code> could better be written with <code>if</code> or <code>do</code> (for instance the example above would be easier to read if written with <code>if</code> ... <code>then</code> ... <code>else</code>). <code>goto</code> should be used sparingly.</p>
+<p>Also note that a label must be the only thing on the line; that is:</p>
+<pre><code>   foo: bar
+</code></pre>
+<p>is interpreted as two statements</p>
+<pre><code>   foo
+   bar
+</code></pre>
+<p>whereas</p>
+<pre><code>   foo:
+   bar
+</code></pre>
+<p>is a label <code>foo</code> followed by a statement <code>bar</code>.</p>
+<p>In old source code integers may also be used as labels. The integer must be at the start of the line, followed by white space. This form of label is supported for legacy use only and may not work as expected in all circumstances (e.g. before an <code>END</code> or <code>LOOP</code> keyword).</p>
+<h3 id="_hasmethod">_HASMETHOD</h3>
+<p>A special keyword which may be used to check whether a types has a particular method. This is mainly useful for checking the types passed to template functions and selecting alternatives. For example, a template for showing data in a class might be written:</p>
+<pre><code>any(T) sub show(x as T)
+  if _SameTypes(T, long) or _SameTypes(T, short) then
+    print &quot;integer: &quot;; x
+  else if _HasMethod(T, asInt) then
+    print &quot;object as integer: &quot;; x.asInt()
+  else if _HasMethod(T, asString) then
+    print &quot;object as string: &quot;; x.asString()
+  else
+    print &quot;do not know how to show values of this type&quot;
+  end if
+end function
+</code></pre>
+<p>Then if <code>x</code> is a value of some class which contains either an <code>asInt</code> or <code>asString</code> method, then <code>show(x)</code> may be used to print <code>x</code> out. If the class has both methods, the first one chosen (in this case (<code>asInt</code>)) will be used.</p>
+<h3 id="heapsize">HEAPSIZE</h3>
+<pre><code>  const HEAPSIZE = 256
+</code></pre>
+<p>Declares the amount of space to be used for internal memory allocation by things like string functions. The default is 256 bytes for P1 and 4096 bytes for P2. If your program does a lot of string manipulation and/or needs to hold on to the allocations for a long time, you may need to increase this by explicitly declaring <code>const HEAPSIZE</code> with a larger value.</p>
+<h3 id="hex">HEX$</h3>
+<pre><code>  s = hex$(x, n)
+  t = hex$(x)
+</code></pre>
+<p>Returns a string representing the unsigned integer <code>x</code> in hexadecimal notation (base 10). Only the lowest <code>n</code> digits of the representation are included; use 8 if you want to get all of the digits. If <code>n</code> is omitted or is 0 then the returned string is the minimum length needed to represent the unsigned value.</p>
+<h3 id="if">IF</h3>
+<p>An IF statement introduces some code that should be executed only if a condition is true:</p>
+<pre><code>if x = y then
+  print &quot;x and y are the same&quot;
+else
+  print &quot;x and y are different&quot;
+end if
+</code></pre>
+<p>There are several forms of <code>if</code>.</p>
+<p>A "simple if" executes just one statement if the condition is true, and has no <code>else</code> clause. Simple ifs do not have a <code>then</code>:</p>
+<pre><code>&#39; simple if example
+if x = y print &quot;they are equal&quot;
+</code></pre>
+<p>A one line if executes the rest of the statements on the current line if the condition is true. This form of <code>if</code> has a <code>then</code> that is followed by one or more statements, seperated by <code>:</code>. For example:</p>
+<pre><code>if x = y then print &quot;they are equal&quot; : print &quot;they are still equal&quot;
+</code></pre>
+<p>which will print "they are equal" followed by "they are still equal" if <code>x</code> equals <code>y</code>, but which will print nothing if they are not equal. This form of <code>if</code> is provided for compatibility with old code, but is not recommended for use in new code.</p>
+<p>An <code>else</code> clause may be provided by following the last statement in the <code>if</code> branch immediately by the <code>else</code> keyword (note that no <code>:</code> should separate them):</p>
+<pre><code>if x = y then print &quot;x and y are the same&quot; : z = 1 else print &quot;x and y are different&quot; : z = 0
+</code></pre>
+<p>Nesting <code>if</code> and <code>else</code> on the same line may produce unexpected results, so do <em>not</em> do this (only one <code>if</code> should appear on a line).</p>
+<p>Compound if statements have a <code>then</code> which ends the line. These statements continue on until the next matching <code>else</code> or <code>end if</code>. If you want to have an <code>else</code> condition then you will have to use this form of if:</p>
+<pre><code>if x = y then
+  print &quot;they are equal&quot;
+else
+  print &quot;they differ&quot;
+end if
+</code></pre>
+<p>You may also put an if statement after an else:</p>
+<pre><code>if x = y then
+  print &quot;x and y are the same&quot;
+  print &quot;I don&#39;t know about z&quot;
+else if x = z then
+  print &quot;x and z are the same, and different from y&quot;
+else
+  print &quot;x does not equal either of the others&quot;
+end if
+</code></pre>
+<h3 id="import">IMPORT</h3>
+<p>Keyword reserved for future use.</p>
+<h3 id="input">INPUT</h3>
+<h4 id="used-for-reading-data">Used for reading data</h4>
+<p>The <code>input</code> keyword when used as a command acts to read data from a handle. It is followed by a list of variables. The data are separated by commas.</p>
+<pre><code>  print &quot;enter a string and a number: &quot;;
+  input s$, n
+  print &quot;you entered: &quot;, s, &quot;and&quot;, n
+</code></pre>
+<p>The input may optionally be preceded by a prompt string, so the above could be re-written as:</p>
+<pre><code>   input &quot;enter a string and a number: &quot;, s$, n
+   print &quot;you entered: &quot;, s, &quot;and&quot;, n
+</code></pre>
+<p>If the prompt string is separated from the variables by a semicolon <code>;</code> rather than a comma, then <code>"? "</code> is automatically appended to the prompt.</p>
+<p>A file handle may be specified after the <code>input</code> keyword with a <code>#</code> and an integer, for any of these variations:</p>
+<pre><code>  input #2, &quot;enter a string and a number: &quot;, s$, n
+</code></pre>
+<p>Note that <code>input</code> processes the input data as comma seperated values (similar to <code>read</code>). To read a whole line of text without any processing, use <code>line input</code>.</p>
+<h4 id="used-for-accessing-pins">Used for accessing pins</h4>
+<p><code>input</code> may also be used to refer to a pseudo-array of bits representing the state of input pins. On the Propeller 1 this is the 32 bit INA register, but on Propeller 2 it is 64 bits.</p>
+<p>Bits in the <code>input</code> array may be read with an array-like syntax:</p>
+<pre><code>   x = input(0)    &#39; read pin 0
+   y = input(4,2)  &#39; read pins 4,3,2
+</code></pre>
+<p>Note that usually you will want to read the pins with the larger pin number first, as the bits are labelled with bit 31 at the high bit and bit 0 as the low bit.</p>
+<p>Also note that before using a pin as input its direction should be set as input somewhere in the program:</p>
+<pre><code>   direction(4,0) = input  &#39; set pins 4-0 as inputs
+</code></pre>
+<h3 id="input-1">INPUT$</h3>
+<p>A predefined string function. There are two ways to use this.</p>
+<p>The first, and simpler way, is just as <code>input$(n)</code>, which reads <code>n</code> characters from the default serial port and returns a string made of those characters. <code>input$(1)</code> is thus a kind of <code>getchar</code> to read a single character.</p>
+<p>The second form, <code>input$(n, h)</code> reads up to <code>n</code> characters from handle <code>h</code>, as created by an <code>open device as #h</code> statement. If there are not enough characters to fulfil the request then a shorter string is returned; for example, at end of file an empty string "" will be returned.</p>
+<p>Example:</p>
+<pre><code>file$ = &quot;&quot;           &#39; initialize read data
+do
+  s$ = input$(80, h) &#39; read up to 80 characters at a time
+  file$ = file$ + s$ &#39; append to the data
+loop until s$ = &quot;&quot;        &#39; stop at end of file
+&#39; now the whole file is in file$
+</code></pre>
+<h3 id="insert">INSERT$</h3>
+<pre><code>  a$ = insert$(b$, y$, pos)
+</code></pre>
+<p><code>insert$</code> inserts string <code>y$</code> into (a copy of) <code>b$</code> at position <code>pos</code>. If <code>pos</code> is greater than the length of <code>b$</code> then it is appended to <code>b$</code>. Note that string positions start at 1.</p>
+<h3 id="instr">INSTR</h3>
+<pre><code>  n = instr(off, src$, target$)
+</code></pre>
+<p>Returns the position (with 1 being the first character) of the first occurance of the string <code>target$</code> in the string <code>src$</code>. The search begins at offset <code>off</code>. If the string is not found, then 0 is returned.</p>
+<h3 id="instrrev">INSTRREV</h3>
+<pre><code>  n = instrrev(off, src$, target$)
+</code></pre>
+<p>Returns the position of the last occurance of the string <code>target$</code> in the string <code>src$</code>. The search begins at offset <code>off</code>. If the string is not found, then 0 is returned. Positions count from 1 up.</p>
+<h3 id="int">INT</h3>
+<p>Convert a floating point value to integer. Any fractional parts are truncated.</p>
+<pre><code>  i = int(3.1415) &#39; now i will be set to 3
+</code></pre>
+<p>Warning: truncation will sometimes result in surprising results (e.g. <code>int(23.99999)</code> will produce <code>23</code> rather than <code>24</code>). For many purposes the <code>round</code> function is preferable to <code>int</code>.</p>
+<h3 id="integer">INTEGER</h3>
+<p>A 32 bit signed integer type. The unsigned 32 bit integer type is <code>uinteger</code>.</p>
+<h3 id="kill">KILL</h3>
+<pre><code>kill(filename$)
+</code></pre>
+<p>Deletes a file or directory.</p>
+<h3 id="lcase">LCASE$</h3>
+<pre><code>y$ = lcase$(x$)
+</code></pre>
+<p>Returns a new string which is the same as the original string but with all alphabetical characters converted to lower case.</p>
+<h3 id="left">LEFT$</h3>
+<p>A predefined string function. <code>left$(s, n)</code> returns the left-most <code>n</code> characters of <code>s</code>. If <code>n</code> is longer than the length of <code>s</code>, returns <code>s</code>. If <code>n</code> =&lt; 0, returns an empty string. If a memory allocation error occurs, returns <code>nil</code>.</p>
+<h3 id="len">LEN</h3>
+<p>A predefined function which returns the length of a string.</p>
+<pre><code>  var s$ = &quot;hello&quot;
+  var n = len(s$) &#39; now n = 5
+</code></pre>
+<h3 id="let">LET</h3>
+<p>Variable assignment:</p>
+<pre><code>  let a = b
+</code></pre>
+<p>sets <code>a</code> to be equal to <code>b</code>. This can usually be written as:</p>
+<pre><code>  a = b
+</code></pre>
+<p>the only difference is that in the <code>let</code> form if <code>a</code> does not already exist it is created as a member variable (one accessible in all functions of this file). The <code>let</code> keyword is deprecated in some versions of BASIC (such as FreeBASIC) so it's probably better to use <code>var</code> or <code>dim</code> to explicitly declare your variables.</p>
+<h3 id="lib">LIB</h3>
+<p>Keyword used with DECLARE to define functions in other files.</p>
+<h3 id="line">LINE</h3>
+<p>Used with <code>INPUT</code>, see below.</p>
+<h3 id="line-input">LINE INPUT</h3>
+<pre><code>line input #3, a$
+</code></pre>
+<p>Used to read an entire line of text from a file, without doing any processing on it. Regular <code>input</code> treats commas as field seperators, and so typically reading a string with <code>input</code> will read only up to the first comma. <code>line input</code> will just read the entire line of text without processing.</p>
+<h3 id="_lockclr">_LOCKCLR</h3>
+<pre><code>_lockclr(lockNum)
+</code></pre>
+<p>Clears (releases) a lock previously claimed by <code>_locktry</code>.</p>
+<h3 id="_locknew">_LOCKNEW</h3>
+<pre><code>  dim lockNum as integer
+  lockNum = _locknew()
+</code></pre>
+<p>Allocates a new hardware lock. If no more locks are available (there are only 8 of them) returns -1.</p>
+<h3 id="_lockrel">_LOCKREL</h3>
+<pre><code>  _lockrel(lockNum)
+</code></pre>
+<p>Frees (returns to inventory) a lock previously allocated by <code>_locknew</code>.</p>
+<h3 id="_locktry">_LOCKTRY</h3>
+<pre><code>  do
+    x = _locktry(n)
+  while x = 0
+</code></pre>
+<p>Tries to capture a lock previously allocated by <code>_locknew</code>; returns 0 on failure, -1 on success.</p>
+<h3 id="log">LOG</h3>
+<p>Predefined function. <code>log(x)</code> returns the natural logarithm of <code>x</code>, that is the logarithm base <code>e</code> where <code>e</code> is 2.71828...</p>
+<h3 id="long">LONG</h3>
+<p>A signed 32 bit integer. An alias for <code>integer</code>. The unsigned version of this is <code>ulong</code>.</p>
+<h3 id="longint">LONGINT</h3>
+<p>A signed 64 bit integer. The unsigned version of this is <code>ulongint</code>. This type is implemented, but the implementation is new; please report any bugs.</p>
+<h3 id="longfill">LONGFILL</h3>
+<pre><code>longfill(p as long pointer, val as long, count as long)
+</code></pre>
+<p>Fills a block of memory with the <code>count</code> copies of the 32 bit value <code>val</code>. Note that a total of 4*<code>count</code> bytes will be written.</p>
+<h3 id="longmove">LONGMOVE</h3>
+<pre><code>longmove(dst as long pointer, src as long pointer, count as long)
+</code></pre>
+<p>Copies <code>count</code> 32 bit values from <code>src</code> to <code>dst</code>.</p>
+<h3 id="loop">LOOP</h3>
+<p>Marks the end of a loop introduced by <code>do</code>. See DO for details.</p>
+<h3 id="lpad">LPAD$</h3>
+<pre><code>y$ = lpad$(x$, w, ch$)
+</code></pre>
+<p>Returns a new string which is like the original string but padded on the left so that it has length <code>w</code>. If <code>w</code> is less than the current length of the string, the function returns the rightmost <code>w</code> characters, otherwise it prepends enough copies of <code>ch$</code> to make the string <code>w</code> characters long.</p>
+<h3 id="lpeek">LPEEK</h3>
+<pre><code>  val = lpeek(addr)
+</code></pre>
+<p>Returns the 32 bit value at the given address in memory. <code>addr</code> is a simple unsigned integer address.</p>
+<h3 id="lpoke">LPOKE</h3>
+<pre><code>lpoke(addr, val)
+</code></pre>
+<p>Changes the 32 bits of memory at <code>addr</code> to have the value <code>val</code>. <code>addr</code> is a simple unsigned integer address.</p>
+<h3 id="ltrim">LTRIM$</h3>
+<pre><code>y$ = ltrim$(x$)
+</code></pre>
+<p>Returns a new string which is like the original string but with leading spaces removed.</p>
+<h3 id="mid">MID$</h3>
+<p>A predefined string function. <code>mid$(s, i, j)</code> returns (up to) <code>j</code> characters of <code>s</code>, starting at position <code>i</code>. The first position is position 1. This function allocates memory from the heap, and if it is unable to do so it will return <code>nil</code>.</p>
+<p>Example:</p>
+<pre><code>a$=&quot;abcde&quot;
+print mid$(a$, 3, 2)
+</code></pre>
+<p>prints "cd".</p>
+<h3 id="mod">MOD</h3>
+<p><code>x mod y</code> finds the integer remainder when <code>x</code> is divided by <code>y</code>.</p>
+<p>Note that if both the quotient and remainder are desired, it is best to put the calculations close together; that way the compiler may be able to combine the two operations into one (since the software division code produces both quotient and remainder). For example:</p>
+<pre><code>  q = x / y
+  r = x mod y
+</code></pre>
+<h3 id="mount">MOUNT</h3>
+<p>Gives a name to a file system. For example, after</p>
+<pre><code>mount &quot;/host&quot;, _vfs_open_host()
+mount &quot;/sd&quot;, _vfs_open_sdcard()
+</code></pre>
+<p>files on the host PC may be accessed via names like "/host/foo.txt", "/host/bar/bar.txt", and so on, and files on the SD card may be accessed by names like "/sd/root.txt", "/sd/subdir/file.txt", and so on.</p>
+<p>This only works on P2, because it requires a lot of HUB memory, and also needs the host file server built in to <code>loadp2</code>.</p>
+<p>Available file systems are:</p>
+<ul>
+<li><code>_vfs_open_host()</code> (for the loadp2 Plan 9 file system)</li>
+<li><code>_vfs_open_sdcard()</code> for a FAT file system on the P2 SD card.</li>
+<li><code>_vfs_open_sdcardx(clk, sel, di, do)</code> is the same, but allows explicit specification of which pins to use for the SD card</li>
+</ul>
+<h3 id="new">NEW</h3>
+<p>Allocates memory from the heap for a new object, and returns a pointer to it. May also be used to allocate arrays of objects. The name of the type of the new object appears after the <code>new</code>, optionally followed by an array limit. Note that as in <code>dim</code> statements, the value given is the last valid index, so for arrays starting at 0 (the default) it is one greater than the number of elements.</p>
+<pre><code>  var x = new ubyte(10)  &#39; allocate 11 (not 10) bytes and return a pointer to it
+  x(1) = 1               &#39; set a variable in it
+  
+  class FDS using &quot;FullDuplexSerial.spin&quot; &#39; Use &quot;SmartSerial.spin&quot; on P2
+  var ser = new FDS      &#39; allocate space for a new full duplex serial object
+  ser.start(31, 30, 0, 115_200) &#39; start up the new object
+</code></pre>
+<p>See the discussion of memory allocation for tips on using <code>new</code>. Note that the default heap is rather small, so you will probably need to declare a larger <code>HEAPSIZE</code> if you use <code>new</code> a lot.</p>
+<p>Memory allocated by <code>new</code> may be explicitly freed with <code>delete</code>; or, it may left to be garbage collected automatically.</p>
+<h3 id="next">NEXT</h3>
+<p>Indicates the end of a <code>for</code> loop. The variable used in the loop may be placed after the <code>next</code> keyword, but this is not mandatory. If a variable is present though then it must match the loop.</p>
+<p>See FOR.</p>
+<h3 id="nil">NIL</h3>
+<p>A special pointer value that indicates an invalid pointer. <code>nil</code> may be returned from any string function or other function that allocates memory if there is not enough space to fulfil the request. <code>nil</code> is of type <code>any</code> and may be assigned to any variable. When assigned to a numeric variable it will cause the variable to become 0.</p>
+<h3 id="not">NOT</h3>
+<pre><code>  a = NOT b
+</code></pre>
+<p>Inverts all bits in the destination. This is basically the same as <code>b xor -1</code>.</p>
+<p>In logical (boolean) conditions, since the TRUE condition is all 1 bits set, this operation has its usual effect of reversing TRUE and FALSE. Beware though that <code>not x</code> will behave differently if <code>x</code> is neither the canonical TRUE nor canonical FALSE value; in this case, <code>x</code> will act like TRUE (since it is non-zero) but <code>not x</code> may as well (the inverted bits may not all be 0 if <code>x</code> wasn't the usual TRUE).</p>
+<h3 id="number">NUMBER$</h3>
+<pre><code>  s = number$(x, d, base)
+</code></pre>
+<p>Convert <code>x</code> into a string with <code>d</code> digits in base <code>base</code>. If <code>x</code> is too big to fit in <code>d</code> digits then only the lower <code>d</code> digits are returned.</p>
+<h3 id="oct">OCT$</h3>
+<pre><code>  s = oct$(x, n)
+  t = oct$(x)
+</code></pre>
+<p>Returns a string representing the unsigned integer <code>x</code> in base 8. Only the lowest <code>n</code> digits of the representation are included. If <code>n</code> is omitted or is 0 then the returned string is the minimum length needed to represent the unsigned value.</p>
+<h3 id="on-x-goto">ON X GOTO</h3>
+<p>For compatibility only, FlexBASIC accepts statements like:</p>
+<pre><code>on x goto 100, 110, 120
+</code></pre>
+<p>This is equivalent to</p>
+<pre><code>select case x
+case 1
+  goto 100
+case 2
+  goto 110
+case 3
+  goto 120
+end select
+</code></pre>
+<p>This construct is deprecated, and should not be used in new programs.</p>
+<h3 id="open">OPEN</h3>
+<p>Open a handle for input and/or output. There are two forms. The most general form is:</p>
+<pre><code>  open device as #n
+</code></pre>
+<p>where <code>device</code> is a device driver structure returned by a system function such as <code>SendRecvDevice</code>, and <code>n</code> evaluates to an integer between 2 and 9. (Handles 0 and 1 also exist, but are reserved for system use.) The function <code>freefile</code> may be used to obtain a free file handle for use by <code>open</code>.</p>
+<p>Example (for P1):</p>
+<pre><code>  &#39; declare ser as an object based on a Spin object
+  dim ser as class using(&quot;spin/FullDuplexSerial.spin&quot;)
+  &#39; initialize the serial device
+  ser.start(31, 30, 0, 115_200)
+  &#39; now connect it to handle #2
+  open SendRecvDevice(@ser.tx, @ser.rx, @ser.stop) as #2
+</code></pre>
+<p>Here <code>SendRecvDevice</code> is given pointers to functions to call to send a single character, to receive a single character, and to be called when the handle is closed. Any of these may be <code>nil</code>, in which case the corresponding function (output, input, or close) does nothing.</p>
+<p>For P2 you would replace "FullDuplexSerial.spin" with "SmartSerial.spin" and adjust the pins and baud rates accordingly.</p>
+<p>The second form of <code>open</code> uses a file name:</p>
+<pre><code>   open &quot;/host/file.txt&quot; for input as #2
+   open name$ for output as #3
+   open name$ for append as #4
+</code></pre>
+<p>This opens the given file for input, output, or append. A file opened for output will be created if it does not already exist, otherwise it will be truncated to 0 bytes long. A file opened for append will be created if it does not exist, but if it does exist it will be opened for output at the end of the file.</p>
+<p>This second form of <code>open</code> is only useful after a <code>mount</code> call is used to establish a file system.</p>
+<p>Note that file data is buffered internally, and may not actually be written to the disk until <code>close</code> is called for the file; if <code>close</code> is never called then the data may never be written.</p>
+<h4 id="error-handling">Error Handling</h4>
+<p>The <code>open</code> command will throw an integer error corresponding to one of the error numbers in the C <code>errno.h</code> header file. This may be caught using the usual <code>try</code> / <code>catch</code> paradigm. Alternatively, if no <code>try</code> / <code>catch</code> block is in effect, the error may be checked with <code>geterr()</code>.</p>
+<h3 id="option">OPTION</h3>
+<p>Gives a compiler option. The following options are supported:</p>
+<h4 id="option-base">OPTION BASE</h4>
+<p><code>option base N</code>, where <code>N</code> is an integer constant, causes the default base of arrays to be set to <code>N</code>. After this directive, arrays declared without an explicit base will start at <code>N</code>. Typically <code>N</code> is either <code>0</code> or <code>1</code>. The default is <code>0</code>.</p>
+<pre><code>dim a(9) as integer  &#39; declares an array with indices 0-9
+option base 0        &#39; note: changing option base after declarations is not recommended, but works
+dim b(5) as integer  &#39; declares an array with indices 1-5 (5 elements)
+</code></pre>
+<p>It is possible to use <code>option base</code> more than once in a file, but we do not recommend it. Indeed if you do use <code>option base</code> it is probably best to use it at the very beginning of the file, before any array declarations</p>
+<h4 id="option-explicit">OPTION EXPLICIT</h4>
+<p>Requires that all variables be explicitly declared with DIM or VAR before use. The default is to allow variables in LET and FOR statements to be implicitly declared.</p>
+<h4 id="option-implicit">OPTION IMPLICIT</h4>
+<p>Allows variables to be automatically declared in any assignment statement, <code>read</code>, or <code>input</code>. The type of the variable will be inferred from its name if it has not already been declared.</p>
+<h3 id="or">OR</h3>
+<pre><code>  a = x or y
+</code></pre>
+<p>Returns the bit-wise inclusive OR of x and y. If x or y is a floating point number then it will be converted to integer before the operation is performed.</p>
+<p>Also useful in boolean operations. The comparison operators return 0 for false conditions and all bits set for true conditions, so you can do things like:</p>
+<pre><code>  if (x &lt; y OR x = z) then
+    &#39; code that runs if either condition is true
+  end if
+</code></pre>
+<p>However, the <code>orelse</code> operator is more efficient for boolean operations (see below).</p>
+<h3 id="orelse">ORELSE</h3>
+<pre><code>  if a orelse b then
+    dosomething
+  end if
+</code></pre>
+<p>Evaluates <code>a</code>, and if it is true then it returns true; otherwise it evaluates <code>b</code> and returns <code>b</code>. This is similar to <code>or</code>, but avoids evaluating its second argument if the first is true.</p>
+<h3 id="output">OUTPUT</h3>
+<p>A pseudo-array of bits representing the state of output bits. On the Propeller 1 this is the 32 bit <code>OUTA</code> register, but on Propeller 2 it is 64 bits (comprising both <code>OUTA</code> and <code>OUTB</code>).</p>
+<p>Bits in <code>output</code> may be read and written an array-like syntax which gives a range of pins to set:</p>
+<pre><code>   output(0) = not output(0)   &#39; toggle pin 0
+   output(4,2) = 1  &#39; set 4,3,2: pins 4 and 3 to 0 and pin 2 to 1
+</code></pre>
+<p>Note that usually you will want to access the pins with the larger pin number first, as the bits are labelled with bit 31 at the high bit and bit 0 as the low bit.</p>
+<p>Also note that before using a pin as output its direction should be set as output somewhere in the program:</p>
+<pre><code>   direction(4,0) = output  &#39; set pins 4-0 as outputs
+</code></pre>
+<h3 id="pausems">PAUSEMS</h3>
+<p>A built-in subroutine to pause for a number of milliseconds. For example, to pause for 2 seconds, do</p>
+<pre><code>  pausems 2000
+</code></pre>
+<h3 id="pausesec">PAUSESEC</h3>
+<p>A built-in subroutine to pause for a number of seconds. For example, to pause for 60 seconds, do</p>
+<pre><code>  pausesec 60
+</code></pre>
+<h3 id="pauseus">PAUSEUS</h3>
+<p>A built-in subroutine to pause for a number of microseconds. For example, to pause for 1/2 millisecond, do</p>
+<pre><code>  pauseus 500
+</code></pre>
+<h3 id="peek">PEEK</h3>
+<pre><code>  val = peek(addr)
+</code></pre>
+<p>Returns the 8 bit value at the given address in memory.</p>
+<h3 id="pi">PI</h3>
+<p>Predefined single precision constant 3.1415926.</p>
+<h3 id="pinfloat">PINFLOAT</h3>
+<p>Force a pin to be an input</p>
+<pre><code>  pinfloat(p)
+</code></pre>
+<h3 id="pinlo">PINLO</h3>
+<p>Force a pin to be output as 0.</p>
+<pre><code>  pinlo(p)
+</code></pre>
+<h3 id="pinhi">PINHI</h3>
+<p>Force a pin to be output as 1.</p>
+<pre><code>  pinhi(p)
+</code></pre>
+<h3 id="pinread">PINREAD</h3>
+<pre><code>  b = pinread(p)
+</code></pre>
+<p>Reads a bit from a pin. The pin is not necessarily forced to be an input (so this function can read the current output state of a pin); use <code>pinflt</code> or some other mechanism to set it as input if desired.</p>
+<h3 id="pinrnd-p2-only">PINRND (P2 only)</h3>
+<p>Forces a pin to be an output, and sets its value randomly to either 0 or 1. This function is only available on P2.</p>
+<h3 id="pinset">PINSET</h3>
+<p>Force a pin to be an output, and set its value (new value must be either 0 or 1).</p>
+<pre><code>  pinset(p, v)
+</code></pre>
+<h3 id="pinstart-available-on-p2-only">PINSTART (available on P2 only)</h3>
+<p>Set up and start a P2 smart pin. This is similar to the Spin2 function:</p>
+<pre><code>pinstart(pin, mode, xval, yval)
+</code></pre>
+<p><code>pin</code> is the pin to start, <code>mode</code> is the smart pin mode, and <code>xval</code> and <code>yval</code> are the (mode dependent) initial values for the smartpin X and Y registers. See the P2 documentation for details on the smart pins.</p>
+<h3 id="pintoggle">PINTOGGLE</h3>
+<p>Force a pin to be an output, and invert its current value.</p>
+<pre><code>  pintoggle(p)
+</code></pre>
+<h3 id="pointer">POINTER</h3>
+<p><code>pointer</code> is a keyword used in type declarations to declare a pointer, for example:</p>
+<pre><code>   dim x as ulong pointer
+</code></pre>
+<p>declares <code>x</code> as a pointer to an unsigned long value.</p>
+<h3 id="poke">POKE</h3>
+<pre><code>poke(addr, val)
+</code></pre>
+<p>Changes the 8 bits of memory at <code>addr</code> to have the value <code>val</code>.</p>
+<h3 id="preserve">PRESERVE</h3>
+<p><code>preserve</code> is reserved as a keyword for future use.</p>
+<h3 id="print">PRINT</h3>
+<p><code>print</code> is a special subroutine that prints data to a serial port or other stream. The default destination for <code>print</code> is the pin 30 (pin 62 on P2) serial port, running at 115_200 baud (230_400 baud on P2).</p>
+<p>More than one item may appear in a print statement. If items are separated by commas, a tab character is printed between them. If they are separated by semicolons, nothing is printed between them, not even a space; this differs from some other BASICs.</p>
+<p>If the print statement ends in a comma, a tab is printed at the end. If it ends in a semicolon, nothing is printed at the end. Otherwise, a newline (carriage return plus line feed) is printed.</p>
+<p>As a special case, if a backslash character <code>\</code> appears in front of an expression, the value of that expression is printed as a single byte character.</p>
+<p>Examples</p>
+<pre><code>   &#39; basic one item print
+   print &quot;hello, world!&quot;
+   &#39; two items separated by a tab
+   print &quot;hello&quot;, &quot;world!&quot;
+   &#39; two items with no separator
+   print &quot;hello&quot;; &quot;world&quot;
+   &#39; an integer, with no newline
+   print 1;
+   &#39; a string and then an integer, nothing between them
+   print &quot;then &quot;; 2
+</code></pre>
+<p>prints</p>
+<pre><code>hello, world!
+hello  world
+helloworld
+1then 2
+</code></pre>
+<p><code>print</code> may be redirected. For example,</p>
+<pre><code>print #2, &quot;hello, world&quot;
+</code></pre>
+<p>prints its message to the device previously <code>open</code>ed as device #2.</p>
+<h3 id="print-using">PRINT USING</h3>
+<p>Formats output using a string. The general form of this is:</p>
+<pre><code>  print [#n] using STRING; expr [,expr...] [;]
+</code></pre>
+<p>where <code>STRING</code> is a string literal and <code>expr</code> is one or more expressions. To use it with an opened file, put the <code>using</code> after the file number, like:</p>
+<pre><code>  print #2 using &quot;##.# Degrees&quot;; x#
+</code></pre>
+<p>Within the string literal output fields are specified by special forms, which are replaced by the various expressions.</p>
+<p><code>&amp;</code> indicates a variable width field, within which the numbers or strings are printed with the minimum number of characters.</p>
+<p><code>#</code> starts a numeric field with space padding; the number of <code>#</code> characters indicates the width of the field. The numeric value is printed right-justified within the field. If it cannot fit, the first digit which will fit is replaced with '#' and the rest are printed normally. If the field is preceded by a <code>-</code> or <code>+</code> the sign is printed there; otherwise, if the value is negative then the <code>-</code> sign is included in the digits to print.</p>
+<p><code>%</code> starts a numeric field with 0 padding; the number of <code>%</code> characters indicates the width of the field. Leading zeros are explicitly printed. If the number cannot fit in the indicated number of digits, the first digit which will fit is replaced with '#' and the rest are printed normally.</p>
+<p><code>+</code> indicates that a place should be reserved for a sign character (<code>+</code> for non-negative, <code>-</code> for negative). <code>+</code> must immediately be followed by a numeric field. If the argument is an unsigned integer, instead of <code>+</code> a space is always printed.</p>
+<p><code>-</code> indicates that a place should be reserved for a sign character (space for non-negative, <code>-</code> for negative). <code>-</code> must immediately be followed by a numeric field. If the argument is an unsigned integer, a space is always printed.</p>
+<p><code>!</code> indicates to print a single character (the first character of the string argument).</p>
+<p><code>\</code> indicates a string field, which continues until the next <code>\</code>. The width of the field is the total number of characters, including the beginning and ending <code>\</code>. The string will be printed left justified within the field. Centering or right justification may be achieved for fields of length 3 or more by using <code>=</code> or '&gt;' characters, respectively, as fillers between <code>\</code>. If the string is too long to fit within the field, only the first <code>N</code> characters of the string are printed.</p>
+<p><code>_</code> (underscore) indicates that the next character is to be escaped; this prevents the usual interpretation of characters like <code>%</code> and <code>#</code> and allows them to be inserted into the format string.</p>
+<pre><code>&#39; print x with 4 digits (including leading 0&#39;s)
+print using &quot;%%%%&quot;; x
+</code></pre>
+<h3 id="private">PRIVATE</h3>
+<p>This keyword is reserved for future use.</p>
+<h3 id="program">PROGRAM</h3>
+<p>This keyword is reserved for future use.</p>
+<p>The statements in the top level of the file (not inside any subroutine or function) are placed in a method called <code>program</code>. This is only really useful for calling them from another language (for example a Spin program using a BASIC program as an object).</p>
+<h3 id="ptr">PTR</h3>
+<p><code>ptr</code> is a synonym for <code>pointer</code> used for compatibility with FreeBasic. Please use the longer <code>pointer</code> form; <code>ptr</code> may go away in future versions of FlexBASIC.</p>
+<h3 id="put">PUT</h3>
+<pre><code>put #handle, pos, var [,items [,r]]
+</code></pre>
+<p><code>put</code> is used to write binary data to the open file whose handle is <code>handle</code>, starting at position <code>pos</code> in the file (where <code>pos</code> is 1-based). The position is optional, but if omitted a comma must still be placed to indicate that it is missing. <code>var</code> is the variable containing the first binary data to write, and <code>items</code> is the number of variables to write starting at <code>var</code>. <code>items</code> is often omitted, in which case only 1 item is written. Note that the total number of bytes written is <code>items</code> times the size of each variable.</p>
+<p>The optional variable <code>r</code>, if present, is set to the number of items actually written.</p>
+<p>For example, to write the 128 bytes from an array of ubytes into the current position in file handle 3 one would use:</p>
+<pre><code>dim a(128 as ubyte
+dim r as integer
+...
+put #3,, a(0), 128, r
+if r &lt;&gt; 128
+  print &quot;unable to write all of the bytes&quot;
+end if
+</code></pre>
+<p>To write a single long integer <code>x</code> to the first 4 bytes of the file, regardless of where we currently are in the file, we could do:</p>
+<pre><code>put #3, 1, x
+</code></pre>
+<p>In this case, if <code>x</code> contains <code>0xabcd</code> then the 4 bytes <code>0xcd</code>, <code>0xab</code>, <code>0x00</code>, and <code>0x00</code> are written to the file (the Propeller is a little endian chip, and the data is written directly).</p>
+<p>Several important caveats apply:</p>
+<p>(1) The bytes are written as <em>binary</em> data, not ASCII. (2) Strings may not be written in this way. The compiler will not throw an error for using a string type, but what is written is the 4 byte pointer for the string, i.e. the address of the string data, which is not generally useful. (3) The optional variable <code>r</code> is set to the number of <em>items</em> written, not to the number of bytes. This is different from FreeBasic. (4) If an error occurs, <code>r</code> is set to -1.</p>
+<h3 id="rdpin-available-on-p2-only">RDPIN (available on P2 only)</h3>
+<p><code>rdpin(p)</code> reads the current value of the smartpin Z register for pin <code>p</code>. Do not confuse this with <code>pinread</code>, which reads the value of the underlying pin itself. Use <code>rdpin</code> with pins configured as smartpins, and <code>pinread</code> for pins configured for bit-banged I/O.</p>
+<h3 id="read">READ</h3>
+<p><code>read</code> reads data items declared by <code>data</code>. All of the strings following <code>data</code> keywords are lumped together, and then parsed by <code>read</code> in the same way as <code>input</code> parses data typed by the user.</p>
+<h3 id="_reboot">_REBOOT</h3>
+<p><code>_reboot</code> is a built in function which will reset the P2. It is not used very often.</p>
+<h3 id="redim">REDIM</h3>
+<p><code>redim</code> is reserved as a keyword for future use in the compiler.</p>
+<h3 id="rem">REM</h3>
+<p>Introduces a comment, which continues until the end of the line. A single quote character <code>'</code> may also be used for this.</p>
+<h3 id="removechar">REMOVECHAR</h3>
+<pre><code>y$ = removechar$(x$, c$)
+</code></pre>
+<p>Returns a new string which is like the original, but with all occurances of the single character <code>c$</code> removed. If the string <code>c$</code> is longer than one character, only the first character is removed.</p>
+<h3 id="replacechar">REPLACECHAR</h3>
+<pre><code>y$ = replacechar$(x$, o$, n$)
+</code></pre>
+<p>Returns a new string which is like the original, but with all occurances of the single character <code>o$</code> replaced by the first character of <code>n$</code>. Only the first characters of <code>o$</code> and <code>n$</code> are significant.</p>
+<h3 id="restore">RESTORE</h3>
+<p>Resets the internal pointer for <code>read</code> so that it starts again at the first <code>data</code> statement.</p>
+<h3 id="return">RETURN</h3>
+<p>Return from a subroutine or function. If this statement occurs inside a function, then the <code>return</code> keyword may be followed by an expression giving the value to return; this expression should have a type compatible with the function's return value.</p>
+<p>A <code>return</code> with a value sets the function's result value and exits. If the <code>return</code> does not have a value (or indeed if there is no <code>return</code>), then the function's result value is the last value assigned to the pseudo-variable that has the same name as the function. That is, two equivalent ways of writing a sum function are:</p>
+<pre><code>function sum(x, y)
+  sum = x+y
+end function
+</code></pre>
+<p>or</p>
+<pre><code>function sum(x, y)
+  return x+y
+end function
+</code></pre>
+<h3 id="reverse">REVERSE$</h3>
+<pre><code>y$ = reverse$(x$)
+</code></pre>
+<p>Returns a new string which has the same characters as the original, but in the reverse order (so for example <code>reverse$("abc")</code> would return "cba").</p>
+<h3 id="right">RIGHT$</h3>
+<p>A predefined string function. <code>right$(s, n)</code> returns the right-most <code>n</code> characters of <code>s</code>. If <code>n</code> is longer than the length of <code>s</code>, returns <code>s</code>. If <code>n</code> =&lt; 0, returns an empty string. If a memory allocation error occurs, returns <code>nil</code>.</p>
+<h3 id="rnd">RND</h3>
+<p>A predefined function which returns a random floating point number <code>x</code> such that <code>0.0 &lt;= x and x &lt; 1.0</code>. A single argument <code>n</code> is given. If <code>n</code> is negative, then it is used as the seed for the random number sequence. If <code>n</code> is 0, a new sequence is started with a random seed. If <code>n</code> is positive, the next value in the sequence is returned.</p>
+<pre><code>  f = rnd(0) &#39; start a new sequence
+  i = int(rnd(1)*6) + 1 &#39; generate random between 1 and 6
+</code></pre>
+<h3 id="round">ROUND</h3>
+<p>A predefined function which takes a floating point number and converts it to an integer, doing rounding towards the nearest integer.</p>
+<h3 id="rpad">RPAD$</h3>
+<pre><code>y$ = rpad$(x$, w, ch$)
+</code></pre>
+<p>Returns a new string which is like the original string but padded on the right so that it has length <code>w</code>. If <code>w</code> is less than the current length of the string, the function returns the leftmost <code>w</code> characters, otherwise it appends enough copies of <code>ch$</code> to make the string <code>w</code> characters long.</p>
+<h3 id="rtrim">RTRIM$</h3>
+<pre><code>y$ = rtrim$(x$)
+</code></pre>
+<p>Returns a new string which is like the original string but with trailing spaces removed.</p>
+<h3 id="_sametypes">_SAMETYPES</h3>
+<p>A special keyword which may be used to check whether two types are the same. This is especially useful for checking the types passed to template functions, e.g.:</p>
+<pre><code>any(T) function checkType(x as T) as string
+  if _SameTypes(T, long) or _SameTypes(T, short) then
+    return &quot;integer&quot;
+  else if _SameTypes(T, string) then
+    return &quot;string&quot;
+  else if _SameTypes(T, single) then
+    return &quot;float&quot;
+  else if _SameTypes(T, any) then
+    return &quot;generic&quot;
+  else
+    return &quot;unknown type&quot;
+  end if
+end function
+</code></pre>
+<h3 id="select-case">SELECT CASE</h3>
+<p>Selects between alternatives. The expression after the initial <code>select case</code> is evaluated once, then matched against each of the <code>case</code> statements (in order) until one matches or <code>end select</code> is reached. <code>case else</code> will match anything (and hence should be placed last, since no <code>case</code> after it can ever match).</p>
+<p>In case of a match, all of the statements between the matching <code>case</code> and the next <code>case</code> (or <code>end select</code>) will be executed.</p>
+<pre><code>var keepgoing = -1
+do
+   print &quot;continue? &quot;;
+   a$ = input$(1)
+   print
+   a$ = input$(1)
+   select case a$
+   case &quot;y&quot;
+     keepgoing = 1
+     print &quot;great!&quot;
+   case &quot;n&quot;
+     keepgoing = 0
+     print &quot;ok, not continuing &quot;
+   case else
+     print &quot;I did not understand your answer of &quot;; a$
+   end select   
+loop while keepgoing = -1
+</code></pre>
+<h3 id="self">SELF</h3>
+<p>Indicates the current object. Not implemented yet.</p>
+<h3 id="sendrecvdevice">SENDRECVDEVICE</h3>
+<p>A built-in function rather than a keyword. <code>SendRecvDevice(sendf, recvf, closef)</code> constructs a simple device driver based on three functions: <code>sendf</code> to send a single byte, <code>recvf</code> to receive a byte (or return -1 if no byte is available), and <code>closef</code> to be called when the device is closed. The value(s) returned by <code>SendRecvDevice</code> is only useful for passing directly to the <code>open</code> statement, and should not be used in any other context (at least not at this time).</p>
+<h3 id="_setbaud">_SETBAUD</h3>
+<p>Set up the serial port baud rate, based on the current clock frequency.</p>
+<pre><code>  _setbaud(115_200) &#39; set baud rate to 115_200
+</code></pre>
+<p>The default serial rate on P1 is 115_200 baud, and assuming a clock frequency of 80_000_000 (on P2 both defaults are doubled). If these are changed, it is necessary to call <code>_setbaud</code> again in order for serial I/O to work.</p>
+<h3 id="shared">SHARED</h3>
+<p>The <code>shared</code> keyword may be applied to variables and to assembly code.</p>
+<p>When applied to a variable, it means that a single version of the variable exists for all instances of a class. In this respect it is like <code>static</code> in C++, or putting data in the <code>dat</code> block of Spin. Shared variables are also called "global".</p>
+<p>When applied to assembly code, it indicates that the code is "global" code intended to be executed by a <code>cpu</code> directive. Again, this is similar to putting code in a <code>dat</code> block in Spin.</p>
+<h3 id="shl">SHL</h3>
+<p>Operator for shifting left. For example:</p>
+<pre><code>  y = x shl 3
+</code></pre>
+<p>is the same as <code>y = x &lt;&lt; 3</code> and sets <code>y</code> to <code>x</code> multiplied by 8 (2 raised to the power 3).</p>
+<h3 id="short">SHORT</h3>
+<p>A signed 16 bit integer, occupying two bytes of computer memory. The unsigned version of this is <code>ushort</code>. The difference arises with the treatment of the upper bit. Both <code>short</code> and <code>ushort</code> treat 0-32767 the same, but for <code>short</code> 32768 to 65535 are considered equivalent to -32768 to -1 respectively (that is, when a <code>short</code> is copied to a larger sized integer the upper bit is repeated into all the other bits; for <code>ushort</code> the new bits are filled with 0 instead).</p>
+<h3 id="shr">SHR</h3>
+<p>Operator for shifting bits right. For example:</p>
+<pre><code>  y = x shr 3
+</code></pre>
+<p>is the same as <code>y = x &gt;&gt; 3</code> and sets <code>y</code> to the bits of <code>x</code> shifted right by 3. If <code>x</code> is unsigned the new bits are filled with 0, otherwise they are filled with the sign bit of <code>x</code>. Note that the original value of <code>x</code> is left unchanged.</p>
+<h3 id="sin">SIN</h3>
+<p>Predefined function. <code>sin(x)</code> returns the sine of <code>x</code>, which is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="single">SINGLE</h3>
+<p>Single precision floating point data type. By default this is an IEEE 32 bit single precision float, but compiler options may change this (for example to a 16.16 fixed point number).</p>
+<h3 id="sizeof">SIZEOF</h3>
+<p>Returns the size of a variable or type, in bytes. Note that for strings this is not the length of the string, but rather the size of the string descriptor (pointer).</p>
+<h3 id="space">SPACE$</h3>
+<pre><code>y$ = space$(n)
+</code></pre>
+<p>Returns a string consisting of <code>n</code> space characters.</p>
+<h3 id="sqr">SQR</h3>
+<p>An alias for <code>sqrt</code>, for compatibility with older BASICs.</p>
+<h3 id="sqrt">SQRT</h3>
+<p>Calculate the square root of a number.</p>
+<pre><code>x = sqrt(y)
+</code></pre>
+<p>This is not a true function, but a pseudo-function whose result type depends on the input type. If the parameter to <code>sqrt</code> is an integer then the result will be an integer as well. If the parameter is a single then the result is a single.</p>
+<h3 id="step">STEP</h3>
+<p>Gives the increment to apply in a FOR loop.</p>
+<pre><code>for i = 2 to 8 step 2
+  print i
+next
+</code></pre>
+<p>will print 2, 4, 6, and 8 on separate lines.</p>
+<h3 id="str">STR$</h3>
+<p>Convert a number to a string. The input is a floating point number (integers will automatically be converted to <code>single</code>) and the output is a string representing the number. Unlike the format used for regular <code>print</code>, <code>str$</code> tries to avoid trailing zeros, so the output is somewhat more compact than <code>print</code>.</p>
+<h3 id="strerror">STRERROR$</h3>
+<pre><code>msg$ = strerror$(e)
+</code></pre>
+<p>Find an error message corresponding to the integer error number <code>e</code>. <code>e</code> is either the value thrown as an error by <code>open</code> (or a similar function), or else the system error returned by the <code>geterr()</code> function.</p>
+<h3 id="string">STRING$</h3>
+<pre><code>a$ = string$(cnt, x$)
+</code></pre>
+<p>Returns a new string consisting of <code>cnt</code> copies of the first character of <code>x$</code>.</p>
+<h3 id="strint">STRINT$</h3>
+<p>Convert an integer to a string. This is similar to <code>str$</code> but faster since the input is known to be an integer.</p>
+<h3 id="sub">SUB</h3>
+<p>Defines a new subroutine. This is like a <code>function</code> but with no return value. Subroutines have a fixed number and type of arguments, but the last arguments may be given default values with an initializer. For example:</p>
+<pre><code>  sub say(msg$=&quot;hello&quot;)
+    print msg$
+  end sub
+</code></pre>
+<p>If you call <code>say</code> with an argument, it will print that argument. If you call <code>say</code> with no argument it will print the default of <code>hello</code>:</p>
+<pre><code>   say(&quot;hi!&quot;)  &#39; prints &quot;hi!&quot;
+   say &quot;hi!&quot;   &#39; the same
+   say         &#39; prints &quot;hello&quot;
+</code></pre>
+<p>Subroutines may be invoked with function notation (arguments enclosed in parentheses) or with the arguments separated from the subroutine name by white space, as in the example above.</p>
+<h4 id="anonymous-subroutines">Anonymous subroutines</h4>
+<p><code>sub</code> may also be used in expressions to specify a temporary, unnamed subroutine. The syntax for this is very like anonymous functions. For example, here is a way to construct a subroutine which executes another subroutine <code>n</code> times:</p>
+<pre><code>   &#39; define an alias for a subroutine with no arguments
+   type voidsub as sub()
+
+   &#39; execute subroutine S n times
+   sub doit(s as voidsub, n as integer)
+     if n &gt; 0 then
+       s()
+       doit(s, n-1)
+     end if
+   end sub
+
+   dim f as voidsub
+   f = sub()
+         print &quot;hello&quot;
+       end sub
+   &#39; print hello 4 times
+   doit( f, 4 )
+</code></pre>
+<p>There is also a short form of subroutine definitions, starting with <code>[</code> followed by the subroutine parameters, <code>:</code>, and then the subroutine statements. So the above example could be written more compactly as:</p>
+<pre><code>   &#39; define an alias for a subroutine with no arguments
+   type voidsub as sub()
+
+   &#39; execute subroutine S n times
+   sub doit(s as voidsub, n as integer)
+     if n &gt; 0 then
+       s()
+       doit(s, n-1)
+     end if
+   end sub
+   doit( [: print &quot;hello&quot; ], 4 )
+</code></pre>
+<h3 id="tan">TAN</h3>
+<p>Predefined function. <code>tan(x)</code> returns the tangent of <code>x</code>, which is a floating point value given in radians (<em>not</em> degrees). To convert from degrees to radians, multiply by <code>3.1415926536 / 180.0</code>.</p>
+<h3 id="then">THEN</h3>
+<p>Introduces a multi-line series of statements for an <code>if</code> statement. See IF for details.</p>
+<h3 id="throw">THROW</h3>
+<p>Throws an error which may be caught by a caller's <code>try</code>/<code>catch</code> block. If none of our callers has established a <code>try</code> / <code>catch</code> block, the program is ended. To avoid ending the program, use <code>throwifcaught</code> instead.</p>
+<p>The argument to <code>throw</code> must (for now) be an integral type, or <code>any</code>. Earlier versions of FlexBASIC allowed other types, but this is deprecated and a warning will be issued. To pass a string or similar message, use <code>cast</code> to cast the pointer to <code>any</code>.</p>
+<p>Example:</p>
+<pre><code>  if n &lt; 0 then
+    throw &quot;illegal negative value&quot;
+  endif
+</code></pre>
+<h3 id="throwifcaught">THROWIFCAUGHT</h3>
+<p>Like <code>throw</code>, throws an exception which may be caught by <code>try</code> / <code>catch</code>. Unlike regular <code>throw</code>, if there is no <code>try</code> / <code>catch</code> handler, <code>throwifcaught</code> continues execution instead of terminating the program.</p>
+<h3 id="to">TO</h3>
+<p>A syntactical element typically used for giving ranges of items.</p>
+<h3 id="trim">TRIM$</h3>
+<pre><code>y$ = trim$(x$)
+</code></pre>
+<p>Returns a new string which is like the original string but with both leading and trailing spaces removed.</p>
+<h3 id="true">TRUE</h3>
+<p>A predefined constant equal to <code>$ffffffff</code> (all bits set). This is the official result returned by comparison operators if they evaluate to true. However, note that any non-zero result will be considered "true" in the context of a boolean test. So the constant <code>true</code> is not unique, and you should never write <code>if a = true</code> or anything like that.</p>
+<h3 id="try">TRY</h3>
+<p>Example:</p>
+<pre><code>  dim errmsg as integer
+  try
+    &#39; run sub1, sub2, then sub3. If any one of them
+    &#39; throws an error, we will immediately stop execution
+    &#39; and jump to the catch block
+    sub1
+    sub2
+    sub3
+  catch errmsg
+    print &quot;a subroutine reports error number: &quot; errmsg
+  end try
+</code></pre>
+<h3 id="type">TYPE</h3>
+<p>Creates an alias for a type. For example,</p>
+<pre><code>  type uptr as ubyte ptr
+</code></pre>
+<p>creates a new type name <code>uptr</code> which is a pointer to a <code>ubyte</code>. You may use the new type name anywhere a type is required.</p>
+<h3 id="ubyte">UBYTE</h3>
+<p>An unsigned 8 bit integer, occupying one byte of computer memory. The signed version of this is <code>byte</code>. The difference arises with the treatment of the upper bit. Both <code>byte</code> and <code>ubyte</code> treat 0-127 the same, but for <code>byte</code> 128 to 255 are considered equivalent to -128 to -1 respectively (that is, when a <code>byte</code> is copied to a larger sized integer the upper bit is repeated into all the other bits; for <code>ubyte</code> the new bytes are filled with 0 instead).</p>
+<h3 id="ucase">UCASE$</h3>
+<pre><code>y$ = ucase$(x$)
+</code></pre>
+<p>Returns a new string which is the same as the original string but with all alphabetical characters converted to upper case.</p>
+<h3 id="uinteger">UINTEGER</h3>
+<p>An unsigned 32 bit integer.</p>
+<h3 id="ulong">ULONG</h3>
+<p>An unsigned 32 bit integer, occupying four bytes of computer memory. The signed version of this is <code>long</code>.</p>
+<h3 id="ulongint">ULONGINT</h3>
+<p>An unsigned 64 bit integer, occupying eight bytes of computer memory. The signed version of this is <code>longint</code>.</p>
+<h3 id="ushort">USHORT</h3>
+<p>An unsigned 16 bit integer, occupying two bytes of computer memory. The signed version of this is <code>short</code>. The difference arises with the treatment of the upper bit. Both <code>short</code> and <code>ushort</code> treat 0-32767 the same, but for <code>short</code> 32768 to 65535 are considered equivalent to -32768 to -1 respectively (that is, when a <code>short</code> is copied to a larger sized integer the upper bit is repeated into all the other bits; for <code>ushort</code> the new bits are filled with 0 instead).</p>
+<h3 id="using">USING</h3>
+<p>Keyword intended for use in PRINT statements, and also to indicate the file to be used for a CLASS.</p>
+<h3 id="val">VAL</h3>
+<p>Predefined function to convert a string to a floating point number.</p>
+<pre><code>  dim x as single
+  x = val(a$) &#39; convert a$ to a float
+</code></pre>
+<p>If you know the input string represents an integer, consider using the more efficient <code>val%</code> instead.</p>
+<h3 id="val-1">VAL%</h3>
+<p>Predefined function to convert a string to an integer.</p>
+<h3 id="var">VAR</h3>
+<p>Declare a local variable:</p>
+<pre><code>VAR i = 2
+VAR msg$ = &quot;hello&quot;
+</code></pre>
+<p><code>var</code> creates and initializes a new local variable (only available inside the function in which it is declared). The type of the new variable is inferred from the type of the expression used to initialize it; if for some reason that cannot be determined, the type is set according to the variable suffix (if any is present).</p>
+<p><code>var</code> is somewhat similar to <code>dim</code>, except that the type isn't given explicitly (it is determined by the initializer expression) and the variables created are always local, even if the <code>var</code> is in the main program (in the main program <code>dim</code> creates member variables that may be used by functions or subroutines in this file).</p>
+<h3 id="varptr">VARPTR</h3>
+<p>Finds the address of a variable (similar to the <code>@</code> operator, but returns a plain integer rather than a pointer):</p>
+<pre><code>dim x as uinteger
+dim y as uinteger
+x = varptr(y)
+</code></pre>
+<h3 id="waitcnt">WAITCNT</h3>
+<p>Propeller specific builtin function. Waits until the cycle counter is a specific value</p>
+<pre><code>  waitcnt(getcnt() + clkfreq) &#39; wait one second
+</code></pre>
+<h3 id="waitpeq-only-available-on-p1">WAITPEQ (only available on P1)</h3>
+<p>Propeller specific builtin function. Waits for pins to have a specific value (given by a bit mask). Same as the Spin <code>waitpeq</code> routine. Note that the arguments are bit masks, not pin numbers, so take care when porting code from PropBasic.</p>
+<h3 id="waitpne-only-available-on-p1">WAITPNE (only available on P1)</h3>
+<p>Propeller specific builtin function. Waits for pins to not have a specific value (given by a bit mask). Same as the Spin <code>waitpne</code> routine. Note that the arguments are bit masks, not pin numbers, so take care when porting code from PropBasic.</p>
+<h3 id="wend">WEND</h3>
+<p>Marks the end of a <code>while</code> loop; this is a short form of <code>end while</code>.</p>
+<h3 id="with">WITH</h3>
+<p>Keyword reserved for future use.</p>
+<h3 id="while">WHILE</h3>
+<p>Begins a loop which continues as long as a specified condition is true.</p>
+<pre><code>  &#39; wait for pin to go low
+  loopcount = 0
+  while input(1) &lt;&gt; 0
+    loopcount = loopcount + 1
+  wend
+  print &quot;waited &quot;; loopcount; &quot; times until pin went high&quot;
+</code></pre>
+<p>The end of the repeated code may be terminated either with <code>wend</code> or with <code>end while</code>.</p>
+<p>The <code>while</code> loop may also be written as <code>do while</code>:</p>
+<pre><code>  do while input(1) &lt;&gt; 0
+    loopcount = loopcount + 1
+  loop
+</code></pre>
+<p>or</p>
+<pre><code>  do until input(1) = 0
+    loopcount = loopcount + 1
+  loop
+</code></pre>
+<h3 id="word">WORD</h3>
+<p>Reserved for use in inline assembler.</p>
+<h3 id="wordfill">WORDFILL</h3>
+<pre><code>wordfill(p as ushort pointer, val as ushort, count as long)
+</code></pre>
+<p>Fills a block of memory with the <code>count</code> copies of the 16 bit value <code>val</code>. Note that a total of 2*<code>count</code> bytes will be written.</p>
+<h3 id="wordmove">WORDMOVE</h3>
+<pre><code>wordmove(dst as ushort pointer, src as ushort pointer, count as long)
+</code></pre>
+<p>Copies <code>count</code> 16 bit values from <code>src</code> to <code>dst</code>.</p>
+<h3 id="wrpin-only-available-on-p2">WRPIN (only available on P2)</h3>
+<p>Writes a value to a smartpin register. <code>wrpin(pin, val)</code> writes the value <code>val</code> to the smartpin.</p>
+<h3 id="wxpin-only-available-on-p2">WXPIN (only available on P2)</h3>
+<p>Writes a value to a smartpin X register. <code>wxpin(pin, val)</code> writes the value <code>val</code> to the smartpin.</p>
+<h3 id="wypin-only-available-on-p2">WYPIN (only available on P2)</h3>
+<p>Writes a value to a smartpin Y register. <code>wypin(pin, val)</code> writes the value <code>val</code> to the smartpin.</p>
+<h3 id="xor">XOR</h3>
+<pre><code>  a = x xor y
+</code></pre>
+<p>Returns the bit-wise exclusive or of x and y. If x or y is a floating point number then it will be converted to integer before the operation is performed. <code>xor</code> is often used for flipping bits.</p>
+<h2 id="tips-and-tricks">Tips and Tricks</h2>
+<h3 id="including-binary-data">Including binary data</h3>
+<h4 id="initialized-arrays">Initialized Arrays</h4>
+<p>There are a variety of ways to include binary data in a BASIC program. You can use an initialized array. So for example to declare an array <code>mydata</code> with bytes from 1 to 8 you could do:</p>
+<pre><code>dim shared as ubyte mydata(8) = { _
+   0x01, 0x02, 0x03, 0x04,   _
+   0x05, 0x06, 0x07, 0x08    _
+}
+</code></pre>
+<h4 id="data-in-inline-assembly">Data in inline assembly</h4>
+<p>Another alternative is to use the <code>asm shared</code> directive, and the assembler <code>byte</code>, <code>word</code>, and <code>long</code> directives. There is an important difference between the <code>asm shared</code> way and the initialized array. The initialized array has an array type. The <code>asm shared</code> declares a plain label which isn't intrinsically an array. That means that in practice you will usually want to use a pointer to the label.</p>
+<pre><code>asm shared
+mydata
+   byte 0x01, 0x02, 0x03, 0x04
+   byte $05, $06, $07, $08
+end asm
+...
+&#39; declare a pointer for the initialized data
+dim p as ubyte pointer
+p = @mydata
+&#39; now we can access the data as p(0), p(1), and so on
+</code></pre>
+<p>Note that BASIC is pretty forgiving about the syntax for hex constants, more so than Spin.</p>
+<p>Finally, the PASM <code>FILE</code> directive may be used inside <code>asm shared</code> to include a file full of binary data:</p>
+<pre><code>asm shared
+mydata
+   file &quot;mydata.bin&quot;
+</code></pre>
+<h2 id="sample-programs">Sample Programs</h2>
+<h3 id="toggle-a-pin">Toggle a pin</h3>
+<p>This program toggles a pin once per second.</p>
+<pre><code>rem simple program to toggle a pin
+
+const pin = 16
+
+direction(pin) = output
+
+do
+  output(pin) = not output(pin)
+  pausems 1000
+loop
+</code></pre>
+</body>
+</html>

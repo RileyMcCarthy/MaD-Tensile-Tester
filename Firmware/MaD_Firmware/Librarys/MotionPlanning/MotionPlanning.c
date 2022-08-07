@@ -113,7 +113,7 @@ double sigmoid(double t, double *args)
     return dir * position;
 }
 
-void get_function_info(FunctionInfo *info, QuartetFunctions id)
+void get_function_info(FunctionInfo *info, int id)
 {
     switch (id)
     {
@@ -240,7 +240,7 @@ static void compute_setpoint(SetPoint *setpoint, double t, MotionPeriod *periods
     }
 }
 
-void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), void *args)
+/*void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), void *args)
 {
 
     // Computesetpoint
@@ -248,7 +248,7 @@ void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, 
     compute_period(&motionPeriod, sigmoid(t, args), setpoint->x, setpoint->v, v_max, a_max);
     compute_setpoint(setpoint, t - setpoint->t, &motionPeriod);
     setpoint->t = t;
-}
+}*/
 
 double steps_to_mm(int steps, MachineConfiguration *config)
 {

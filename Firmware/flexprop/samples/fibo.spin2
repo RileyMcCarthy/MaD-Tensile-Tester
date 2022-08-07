@@ -1,0 +1,41 @@
+'' simple fibonacci program
+
+#ifndef _BAUD
+#define _BAUD 115_200
+#endif
+
+CON
+#ifdef __P2__
+  _clkfreq = 200_000_000
+#else
+  _clkmode = xtal1 + pll16x
+  _clkfreq = 80_000_000
+#endif
+  baud = _BAUD
+  
+OBJ
+  ser: "spin/SimpleSerial"  ' basic serial object
+  fmt: "spin/ers_fmt"       ' format output with SEND
+  
+PUB demo() | i, n, t
+  ser.start(baud)
+  send := @ser.tx
+  
+  _waitms(100)
+  repeat i from 1 to 10 step 1
+    t := CNT
+    n := fiborec(i)
+    t := CNT - t
+    send( "fibo(", fmt.dec(i), ") = ", fmt.dec(n) )
+    send( "; cycles = ", fmt.unsdec(t), 13, 10 )
+
+'' iterative version
+PUB fibolp(n) : r | lastr
+  r := 1
+  lastr := 0
+  repeat n-1
+    (lastr,r) := (r, r+lastr)
+
+'' recursive version
+PUB fiborec(n) : r
+  return (n < 2) ? n : fiborec(n-1)+fiborec(n-2)

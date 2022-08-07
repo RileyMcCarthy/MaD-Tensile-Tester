@@ -1,6 +1,5 @@
 #ifndef MotionPlanning_H
 #define MotionPlanning_H
-#include <simpletools.h>
 #include <stddef.h>
 #include <JSON.h>
 #include <math.h>
@@ -29,11 +28,8 @@ typedef struct setPoint_s
 } SetPoint;
 
 #define FUNCTION_COUNT 2
-typedef enum quartetFunc_s
-{
-    QUARTET_FUNC_LINE,
-    QUARTET_FUNC_SIGMOIDAL,
-} QuartetFunctions;
+#define QUARTET_FUNC_LINE 0
+#define QUARTET_FUNC_SIGMOIDAL 1
 
 #define FUNCTION_MAX_NAME_LENGTH 10
 #define FUNCTION_MAX_ARGS 10
@@ -43,7 +39,7 @@ typedef struct functioninfo_s
 {
     int id;
     char name[20];
-    double (*func)(double, void *args);
+    double (*func)(double, double *args);
     int args_count;
     char args[FUNCTION_MAX_ARGS * 2][FUNCTION_MAX_ARG_LENGTH]; // max 10 args with 20 chars each
 } FunctionInfo;
@@ -70,14 +66,14 @@ typedef struct RunMotionProfile_s
 void run_motion_profile_init(RunMotionProfile *profile);
 void destroy_run_motion_profile(RunMotionProfile *run);
 
-void get_function_info(FunctionInfo *info, QuartetFunctions id);
+void get_function_info(FunctionInfo *info, int id);
 
 double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
 double position_set(double t, RunMotionProfile *run, MotionSet *set);
 double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
 
 double sigmoid(double t, double *args);
-void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);
+// void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);
 
 double steps_to_mm(int steps, MachineConfiguration *config);
 int mm_to_steps(double mm, MachineConfiguration *config);

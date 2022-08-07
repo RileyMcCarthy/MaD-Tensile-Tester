@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Total Spectrum Software" />
+  <meta name="dcterms.date" content="2022-07-22" />
+  <title>FlexProp Reference</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FlexProp Reference</h1>
+<p class="subtitle">5.9.14</p>
+<p class="author">Total Spectrum Software</p>
+<p class="date">07/22/2022</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#flexspin">Flexspin</a><ul>
+<li><a href="#propeller-2-support">Propeller 2 Support</a></li>
+<li><a href="#speed-and-size">Speed and Size</a></li>
+<li><a href="#spin-wrappers">Spin wrappers</a><ul>
+<li><a href="#example">Example</a></li>
+</ul></li>
+<li><a href="#command-line-options">Command Line Options</a><ul>
+<li><a href="#changing-hub-address">Changing Hub address</a></li>
+</ul></li>
+<li><a href="#spin-language-extensions">Spin Language Extensions</a></li>
+<li><a href="#basic-and-c-support">BASIC and C support</a></li>
+<li><a href="#limitations">Limitations</a></li>
+<li><a href="#license">License</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="flexspin">Flexspin</h1>
+<p>(Flexspin is copyright 2011-2020 Total Spectrum Software Inc., and is distributed under the terms of the MIT License (see the end of this file for details)</p>
+<p>Flexspin is a compiler from the Spin language to assembly (PASM). It also now supports BASIC and C input.</p>
+<p>Normally Spin is translated to a special kind of bytecode which is interpreted by a program in the Propeller's ROM. This bytecode is very compact, but it is slow to run. Flexspin produces much larger code, but it is also much faster. Flexspin also supports the Propeller 2 as well as the original Propeller chip.</p>
+<p>The command line options for flexspin are very similar to those of the openspin compiler.</p>
+<p>The ordinary usage is very simple:</p>
+<pre><code>    flexspin program.spin
+</code></pre>
+<p>will compile <code>program.spin</code> into <code>program.binary</code>, which may then be loaded into the Propeller. There are many methods to do this; most IDEs (including the Propeller Tool) have a way to run a binary file. There are also command line tools (such as <code>propeller-load</code>) to run binaries. My workflow with Spin programs typically looks like:</p>
+<pre><code>    emacs program.spin &amp; # or use your favorite text editor
+    flexspin program.spin
+    propeller-load program.binary -r -t
+</code></pre>
+<h2 id="propeller-2-support">Propeller 2 Support</h2>
+<p>flexspin supports the Propeller 2 instruction set (both rev A and rev B). To compile programs for Propeller 2, you can use the -2 option. Binaries may be downloaded to the board using Dave Hein's loadp2 program:</p>
+<pre><code>    flexspin -2 program.spin2
+    loadp2 -b230400 program.binary -t
+</code></pre>
+<p>If the flexspin program is named something that ends in "spin2" (for example "flexspin2.exe") then it will use the -2 flag automatically. This may be more convenient for integration with IDEs.</p>
+<h2 id="speed-and-size">Speed and Size</h2>
+<p>If you compile with flexspin, your binary program will be much larger than when compiled with openspin or bstc. That's because flexspin outputs native Propeller instructions (PASM) instead of Spin bytecode. It also means the flexspin compiled binary is much faster.</p>
+<p>For example, the fftbench demo program compiled with</p>
+<pre><code>bstc -b -Oa fftbench.spin
+</code></pre>
+<p>is 3048 bytes long and runs in 1460 milliseconds. With</p>
+<pre><code>flexspin -O fftbench.spin
+</code></pre>
+<p>it is 4968 bytes long and runs in 170 milliseconds; so it is a bit less than twice as big and runs more than 8 times as fast.</p>
+<p>The SPI test benchmark gives:</p>
+<pre><code>openspin -u: 11732816 cycles  796 bytes
+bstc -Oa:    11699984 cycles  796 bytes
+flexspin -O:    98848 cycles 2056 bytes
+</code></pre>
+<h2 id="spin-wrappers">Spin wrappers</h2>
+<p>The simplest way to use flexspin is just to compile a whole program (convert everything to PASM). However, sometimes a program compiled this way may be too big to fit in memory; or sometimes you may want to convert some Spin module to PASM and make it easy to use in other Spin projects (which may be compiled with openspin or bstc).</p>
+<p>flexspin may be used to convert a Spin object into PASM code that has Spin wrappers. This is achieved with the <code>-w</code> ("wrap") command line flag. The output is a generic Spin module with a <code>.cog.spin</code> extension. The wrapped Spin must fit in a single COG (so no LMM mode is used) and is designed basically for converting device drivers from Spin to PASM easily. All of the PUB functions of the original <code>.spin</code> will be available in in the <code>.cog.spin</code>, but instead of running Spin bytecode they will send a message to the PASM code (which must be running in another COG) for execution there. There will also be a <code>__cognew</code> method to start a COG up. <code>__cognew</code> must be called before any other methods.</p>
+<h3 id="example">Example</h3>
+<p>Suppose you have a file <code>Fibo.spin</code> that has:</p>
+<pre><code>PUB fibo(n)
+  if (n &lt; 2)
+    return n
+  return fibo(n-1) + fibo(n-2)
+</code></pre>
+<p>To use the Spin version of this you would do something like:</p>
+<pre><code>OBJ f : &quot;Fibo&quot;
+
+PUB test
+  answer1 := f.fibo(1)
+  answer9 := f.fibo(9)
+</code></pre>
+<p>To convert this to COG PASM you would do:</p>
+<pre><code>flexspin -w Fibo.spin
+</code></pre>
+<p>which would produce <code>Fibo.cog.spin</code>; and you would modify your program to</p>
+<pre><code>OBJ f : &quot;Fibo.cog&quot;
+
+PUB test
+  f.__cognew &#39;&#39; start the COG PASM running
+  answer1 := f.fibo(1)
+  answer9 := f.fibo(9)
+</code></pre>
+<p>The usage is exactly the same, except that you have to insert the call to <code>__cognew</code> to start up the remote COG; but now the time critical <code>fibo</code> function will actually run in the other COG, as PASM code.</p>
+<h2 id="command-line-options">Command Line Options</h2>
+<p>There are various command line options which may modify the compilation:</p>
+<pre><code>  [ -h ]              display this help
+  [ -L or -I &lt;path&gt; ] add a directory to the include path
+  [ -o ]             output filename
+  [ -b ]             output binary file format
+  [ -e ]             output eeprom file format
+  [ -c ]             output only DAT sections
+  [ -l ]             output a .lst listing file
+  [ -f ]             output list of file names
+  [ -g ]             enable debug statements (default printf method)
+  [ -gbrk ]          enable BRK based debugging
+  [ -q ]             quiet mode (suppress banner and non-error text)
+  [ -p ]             disable the preprocessor
+  [ -O[#] ]          set optimization level
+                       -O0 disable all optimization
+                       -O1 apply default optimization (same as no -O flag)
+               -O2 apply all optimization (same as -O)
+  [ -D &lt;define&gt; ]    add a define
+  [ -2 ]             compile for Prop2
+  [ -w ]             produce Spin wrappers for PASM code
+  [ -H nnnn ]        change the base HUB address (see below)
+  [ -E ]             omit any coginit header
+  [ --code=cog  ]    compile to run in COG memory instead of HUB
+  [ --fcache=N  ]    set size of FCACHE space in longs (0 to disable)
+  [ --fixed ]        use 16.16 fixed point instead of IEEE floating point
+</code></pre>
+<p>The <code>-2</code> option is new: it is for compiling for the Propeller 2.</p>
+<p><code>flexspin.exe</code> checks the name it was invoked by. If the name starts with the string "bstc" (case matters) then its output messages mimic that of the bstc compiler; otherwise it tries to match openspin's messages. This is for compatibility with Propeller IDE. For example, you can use flexspin with the PropellerIDE by renaming <code>bstc.exe</code> to <code>bstc.orig.exe</code> and then copying <code>flexspin.exe</code> to <code>bstc.exe</code>.</p>
+<h3 id="changing-hub-address">Changing Hub address</h3>
+<p>In P2 mode, you may want to change the base hub address for the binary. Normally P2 binaries start at the standard offset of <code>0x400</code>. But if you want, for example, to load a flexspin compiled program from TAQOZ or some similar program, you may want to start at a different address (TAQOZ uses the first 64K of RAM). To do this, you may use some combination of the <code>-H</code> and <code>-E</code> flags.</p>
+<p><code>-H nnnn</code> changes the base HUB address from <code>0x400</code> to <code>nnnn</code>, where <code>nnnn</code> is either a decimal number like <code>65536</code> or a hex number prefixed with <code>0x</code>. By default the binary still expects to be loaded at address 0, so it starts with a <code>coginit #0, ##nnnn</code> instruction and then zero padding until the hub start. To skip the <code>coginit</code> and padding, add the <code>-E</code> flag.</p>
+<h4 id="example-1">Example</h4>
+<p>To compile a program to start at address 65536 (at the 64K boundary), do:</p>
+<pre><code>flexspin -2 -H 0x10000 -E fibo.bas
+</code></pre>
+<h2 id="spin-language-extensions">Spin Language Extensions</h2>
+<p>flexspin supports a number of extensions to the Spin language, including a preprocessor (also found in some other Spin compilers), multiple values in return and assignments, conditional assignment, inline assembly, and abstract function pointers.</p>
+<p>See the <code>spin.md</code> file (or <code>spin.pdf</code>) in the <code>docs</code> directory for more details.</p>
+<h2 id="basic-and-c-support">BASIC and C support</h2>
+<p>If an input file ends in <code>.bas</code> it is compiled as a BASIC program. See the <code>basic.md</code> file (or <code>basic.pdf</code>) for details of the BASIC language supported by flexspin.</p>
+<p>If an input file ends in <code>.c</code>, <code>.cc</code>, or <code>.cpp</code> it is compiled as a C program. See the <code>c.md</code> file for details of the C language support in flexspin.</p>
+<h2 id="limitations">Limitations</h2>
+<p>Beware when compiling P1 objects that contain PASM for P2: some instructions have changed in subtle ways.</p>
+<p>Programs compiled with flexspin will always be larger than those compiled with openspin or bstc. If the spin code is mostly PASM (as is the case with, for example, PropBASIC compiler output) then the flexspin overhead will be relatively small and probably fixed, but for large programs with lots of Spin methods the difference could be significant.</p>
+<h2 id="license">License</h2>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+</body>
+</html>

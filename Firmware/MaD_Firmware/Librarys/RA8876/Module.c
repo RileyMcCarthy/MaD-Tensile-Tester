@@ -1,5 +1,5 @@
 #include "Module.h"
-#include "propeller2.h"
+#include <string.h>
 
 #define ANIMATION_PAGE PAGE4_START_ADDR
 
