@@ -7,7 +7,6 @@
 #include "Style.h"
 #include "StateMachine.h"
 #include "IOBoard.h"
-#include "DYN4.h"
 #include "Monitor.h"
 #include "stdbool.h"
 #include "string.h"
@@ -51,7 +50,7 @@ typedef struct AutomaticPage_t
     MonitorData *data;
 } AutomaticPage;
 
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData*data);
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData *data);
 void automatic_page_destroy(AutomaticPage *page);
 void automatic_page_run(AutomaticPage *page);
 

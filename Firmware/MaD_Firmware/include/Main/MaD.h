@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <dirent.h> 
+#include <dirent.h>
 
 #include "IOBoard.h"
 #include "MCP23017.h"
@@ -13,7 +13,6 @@
 #include "Style.h"
 #include "RA8876.h"
 #include "ForceGauge.h"
-#include "DYN4.h"
 #include "Keyboard.h"
 #include "NavigationPage.h"
 #include "LoadingOverlay.h"

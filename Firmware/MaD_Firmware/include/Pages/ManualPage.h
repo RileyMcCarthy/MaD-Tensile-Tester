@@ -5,7 +5,6 @@
 #include "Error.h"
 #include "Style.h"
 #include "StateMachine.h"
-#include "DYN4.h"
 #include "Monitor.h"
 #include "i2cNavKey.h"
 #include "Images.h"

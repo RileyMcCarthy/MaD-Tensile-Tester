@@ -1,6 +1,5 @@
 #ifndef Motion_H
 #define Motion_H
-#include "DYN4.h"
 #include "ForceGauge.h"
 #include "StateMachine.h"
 #include "JSON.h"
@@ -8,11 +7,11 @@
 
 typedef struct monitor_data_t
 {
-    int forceRaw;   // Raw force value
-    int encoderRaw; // Raw encoder value
-    double force; // Force value in N
+    int forceRaw;    // Raw force value
+    int encoderRaw;  // Raw encoder value
+    double force;    // Force value in N
     double position; // Position value in mm
-    int timems;     // time in ms
+    int timems;      // time in ms
 } MonitorData;
 
 typedef struct monitor_cog_t
@@ -20,7 +19,7 @@ typedef struct monitor_cog_t
     MonitorData data; // add list
     MachineState *machineState;
     MachineConfiguration *configuration;
-    int sampleRate;   // sample rate in hz
+    int sampleRate; // sample rate in hz
     int cogid;
 
     MonitorData cache; // Cached data

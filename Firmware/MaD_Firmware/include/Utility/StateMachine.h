@@ -1,8 +1,6 @@
 #ifndef StateMachine_H
 #define StateMachine_H
-#include <simpletools.h>
 #include <stdbool.h>
-#include "DYN4.h"
 #include "MCP23017.h"
 
 typedef enum States_e
