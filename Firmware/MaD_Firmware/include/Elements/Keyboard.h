@@ -1,7 +1,6 @@
 #ifndef Keyboard_H
 #define Keyboard_H
 
-#include "simpletools.h"
 #include "RA8876.h"
 #include "Images.h"
 #include "Module.h"

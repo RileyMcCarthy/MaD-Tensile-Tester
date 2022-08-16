@@ -12,6 +12,7 @@ typedef struct monitor_data_t
     double force;    // Force value in N
     double position; // Position value in mm
     int timems;      // time in ms
+    int timeus;      // time in us
 } MonitorData;
 
 typedef struct monitor_cog_t

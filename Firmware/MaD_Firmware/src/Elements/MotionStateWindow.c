@@ -39,11 +39,11 @@ static void button_callback(int id, void *arg)
         switch (window->state->motionParameters.status)
         {
         case STATUS_DISABLED:
-            printf("Status: Disabled");
+            serial_debug("Status: Disabled");
             state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_ENABLED);
             break;
         case STATUS_ENABLED:
-            printf("Status: enabled");
+            serial_debug("Status: enabled");
             state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_DISABLED);
             break;
         }

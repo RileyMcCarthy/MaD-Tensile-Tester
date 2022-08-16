@@ -1,7 +1,6 @@
 #ifndef AutomaticPage_H
 #define AutomaticPage_H
 
-#include <simpletools.h>
 #include "RA8876.h"
 #include "Error.h"
 #include "Style.h"

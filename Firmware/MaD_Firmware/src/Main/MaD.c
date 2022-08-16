@@ -39,7 +39,7 @@ static void load_images()
   images.keyboardImage.backgroundColor = NULL;
   images.keyboardImage.colorToReplace = 0;
   images.keyboardImage.replacementColor = 0;
-  printf("Name:%s\n", (images.keyboardImage.name));
+  serial_debug("Name:%s\n", (images.keyboardImage.name));
 
   strcpy(images.manualPageImage.name, "manual.bin");
   images.manualPageImage.page = 2;
@@ -208,7 +208,7 @@ static void load_images()
 static void write_machine_profile(MachineProfile *profile)
 {
   mkdir("/sd/settings", 0);
-  printf("Writing machine profile to settings file\n");
+  serial_debug("Writing machine profile to settings file\n");
   machine_profile_to_json(profile, "/sd/settings/Default.mcp");
 }
 
@@ -222,13 +222,13 @@ static void load_machine_profile()
 {
   if (access("/sd/settings/Default.mcp", F_OK) == 0) // Check for machine profile in filesyste
   {
-    printf("Opening existing profile\n");
+    serial_debug("Opening existing profile\n");
     json_to_machine_profile(&machineProfile, "/sd/settings/Default.mcp"); // Load machine profile from file
     json_print_machine_profile(&machineProfile);                          // Print machine profile to console
     return;
   }
 
-  printf("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
+  serial_debug("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
   // MachineSettings
 
   strcpy(machineProfile.name, "Tensile_Test_1");
@@ -286,22 +286,22 @@ static MotionProfile *static_test_profile()
   // Create first quartet
   strcpy(profile->sets[0].quartets[0].name, "/sd/profiles/qrt1.qrt");
 
-  profile->sets[0].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[0].quartets[0].function = QUARTET_FUNC_LINE;
 
-  profile->sets[0].quartets[0].parameters[0] = 20;    // Distance
-  profile->sets[0].quartets[0].parameters[1] = 200;    // Strain rate
-  profile->sets[0].quartets[0].parameters[2] = 0.01; // Error
+  profile->sets[0].quartets[0].parameters[0] = 20;  // Distance
+  profile->sets[0].quartets[0].parameters[1] = 200; // Strain rate
+                                                    // profile->sets[0].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[0].quartets[0].dwell = 5; // 500ms
 
   // Create second quartet
   strcpy(profile->sets[0].quartets[1].name, "/sd/profiles/qrt2.qrt");
 
-  profile->sets[0].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[0].quartets[1].function = QUARTET_FUNC_LINE;
 
-  profile->sets[0].quartets[1].parameters[0] = -20;   // Distance (m)
-  profile->sets[0].quartets[1].parameters[1] = 20;     // Strain rate (m/s)
-  profile->sets[0].quartets[1].parameters[2] = 0.01; // Error (m)
+  profile->sets[0].quartets[1].parameters[0] = -20; // Distance (m)
+  profile->sets[0].quartets[1].parameters[1] = 20;  // Strain rate (m/s)
+  // profile->sets[0].quartets[1].parameters[2] = 0.01; // Error (m)
 
   profile->sets[0].quartets[1].dwell = 5; // ms
 
@@ -315,22 +315,22 @@ static MotionProfile *static_test_profile()
   // Create first quartet
   strcpy(profile->sets[1].quartets[0].name, "/sd/profiles/qrt3.qrt");
 
-  profile->sets[1].quartets[0].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[1].quartets[0].function = QUARTET_FUNC_LINE;
 
-  profile->sets[1].quartets[0].parameters[0] = 10;    // Distance
-  profile->sets[1].quartets[0].parameters[1] = 100;    // Strain rate
-  profile->sets[1].quartets[0].parameters[2] = 0.01; // Error
+  profile->sets[1].quartets[0].parameters[0] = 10;  // Distance
+  profile->sets[1].quartets[0].parameters[1] = 100; // Strain rate
+  // profile->sets[1].quartets[0].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[0].dwell = 5; // 500ms
 
   // Create second quartet
   strcpy(profile->sets[1].quartets[1].name, "/sd/profiles/qrt4.qrt");
 
-  profile->sets[1].quartets[1].function = QUARTET_FUNC_SIGMOIDAL;
+  profile->sets[1].quartets[1].function = QUARTET_FUNC_LINE;
 
-  profile->sets[1].quartets[1].parameters[0] = -10;   // Distance
-  profile->sets[1].quartets[1].parameters[1] = 50;    // Strain rate
-  profile->sets[1].quartets[1].parameters[2] = 0.01; // Error
+  profile->sets[1].quartets[1].parameters[0] = -10; // Distance
+  profile->sets[1].quartets[1].parameters[1] = 50;  // Strain rate
+  // profile->sets[1].quartets[1].parameters[2] = 0.01; // Error
 
   profile->sets[1].quartets[1].dwell = 5; // 500ms
 
@@ -358,11 +358,10 @@ static MotionProfile *static_test_profile()
 static bool start_display()
 {
   Error err;
-
   // turn on diplay
   if ((err = display_begin(&display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
   {
-    printf("Error starting display:%d\n", err);
+    serial_debug("Error starting display:%d\n", err);
     return false;
   }
 
@@ -377,55 +376,6 @@ static bool start_display()
   return true;
 }
 
-static void test_flash()
-{
-  printf("Flash init\n");
-  int status = BSP_W25Qx_Init(NULL);
-  printf("Sttus: %d\n", status);
-   /* if (!BSP_W25Qx_Lock()) {
-    printf("Failed to lock flash\n");
-    return;
-  }*/
-  printf("getting id\n");
-  uint8_t ID[4];
-  BSP_W25Qx_Read_ID(ID);
-  _waitms(1000);
-  printf(" W25Qxx ID is : ");
-	for(int i=0;i<2;i++)
-	{
-		printf("0x%02X ",ID[i]);
-	}
-	printf("\r\n");
-  printf("Erasing flash\n");
-  BSP_W25Qx_Erase_Chip();
-  printf("Writing to flash\n");
-  #define size sizeof(MonitorData)
-  
-  int currAddr = 0;
-  for (int i=0;i<1000;i++) {
-    MonitorData data;
-    data.forceRaw = i*2;
-    data.encoderRaw = i*2;
-    data.timems = i*4;
-  
-    BSP_W25Qx_Write(&data,size*i,size);
-  }
-
-  _waitms(1000);
-
-  for (int i=0;i<1000;i++) {
-    MonitorData data;
-    BSP_W25Qx_Read(&data,size*i,size);
-    printf("0x%04X %d %d %d\n",size*i, data.forceRaw, data.encoderRaw, data.timems);
-  }
-  BSP_W25Qx_Unlock();
-}
-
-static void test_dyn()
-{
-  dyn_init();
-}
-
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
@@ -433,11 +383,21 @@ static void test_dyn()
 
 void mad_begin()
 {
-  printf("Starting MAD P2\n");
+  if (serial_begin())
+  {
+    serial_debug("Serial port opened\n");
+  }
+  else
+  {
+    __builtin_printf("Serial port failed to open\n");
+    return false;
+  }
+
+  serial_debug("Starting MAD\n");
 
   if (!start_display())
   {
-    printf("Error starting display\n");
+    serial_debug("Error starting display\n");
     return;
   }
   loading_overlay_display(&display, "Display Initialized!", OVERLAY_TYPE_LOADING);
@@ -453,7 +413,7 @@ void mad_begin()
 
   machine_state_init(&machineState);
 
-  if (monitor_begin(&monitor, &machineState,&(machineProfile.configuration), 10))
+  if (monitor_begin(&monitor, &machineState, &(machineProfile.configuration), 10))
   {
     loading_overlay_display(&display, "Monitor Started", OVERLAY_TYPE_LOADING);
   }
@@ -477,14 +437,14 @@ void mad_begin()
   state_machine_set(&machineState, PARAM_SELF_CHARGE_PUMP, true);
 
   status_page_init(&statusPage, &display, &machineState, &machineProfile, &(monitor.data), &images);
-  //manual_page_init(&manualPage, &display, &machineState, &images);
-  automatic_page_init(&automaticPage, &display, &images, &machineState, &control,&(monitor.data)); //@TODO: remove structure pointer and pass data only
-  //calibrate_force_page_init(&calibrateForcePage, &display, &monitor, &machineProfile, &images); //@TODO: remove structure pointer and pass data only
-  //settings_page_init(&settingsPage, &display, &machineProfile, &images);
+  // manual_page_init(&manualPage, &display, &machineState, &images);
+  automatic_page_init(&automaticPage, &display, &images, &machineState, &control, &(monitor.data)); //@TODO: remove structure pointer and pass data only
+  // calibrate_force_page_init(&calibrateForcePage, &display, &monitor, &machineProfile, &images); //@TODO: remove structure pointer and pass data only
+  // settings_page_init(&settingsPage, &display, &machineProfile, &images);
   test_profile_page_init(&testProfilePage, &display, &images);
   navigation_page_init(&navigationPage, &display, &images);
 
-  printf("Machine propfile size:%d\n", (int)sizeof(machineProfile));
+  serial_debug("Machine propfile size:%d\n", (int)sizeof(machineProfile));
   // Begin main loop
   Page currentPage = PAGE_STATUS;
   while (1)
@@ -493,45 +453,45 @@ void mad_begin()
     {
     case PAGE_STATUS:
     {
-      printf("Loading status page\n");
+      serial_debug("Loading status page\n");
       status_page_run(&statusPage);
-      printf("Leaving status page\n");
+      serial_debug("Leaving status page\n");
       break;
     }
     case PAGE_MANUAL:
     {
-      printf("Loading manual page\n");
-//      manual_page_run(&manualPage);
-      printf("Leaving manual page\n");
+      serial_debug("Loading manual page\n");
+      //      manual_page_run(&manualPage);
+      serial_debug("Leaving manual page\n");
       break;
     }
     case PAGE_AUTOMATIC:
     {
-      printf("Loading automatic page...\n");
+      serial_debug("Loading automatic page...\n");
       automatic_page_run(&automaticPage);
-      printf("Leaving automatic page\n");
+      serial_debug("Leaving automatic page\n");
       break;
     }
     case PAGE_CALIBRATION:
     {
-      printf("Loading force calibration page...\n");
-      bool update = 0;//calibrate_force_page_run(&calibrateForcePage);
+      serial_debug("Loading force calibration page...\n");
+      bool update = 0; // calibrate_force_page_run(&calibrateForcePage);
       if (update)
       {
         write_machine_profile(&machineProfile);
       }
-      printf("Leaving force calibration page\n");
+      serial_debug("Leaving force calibration page\n");
       break;
     }
     case PAGE_SETTINGS:
     {
-      printf("Loading settings page...\n");
+      serial_debug("Loading settings page...\n");
       /*while (settings_page_run(&settingsPage)) // Keep running settings page until navigation icon selected
       {
-        printf("Updating force calibration page:%s\n", machineProfile.name);
+        serial_debug("Updating force calibration page:%s\n", machineProfile.name);
         write_machine_profile(&machineProfile);
       }*/
-      printf("Leaving settings page\n");
+      serial_debug("Leaving settings page\n");
       break;
     }
     case PAGE_TEST_PROFILE:
@@ -542,7 +502,7 @@ void mad_begin()
     default:
       break;
     }
-    printf("Selecting new page\n");
+    serial_debug("Selecting new page\n");
 
     currentPage = navigation_page_run(&navigationPage);
   }

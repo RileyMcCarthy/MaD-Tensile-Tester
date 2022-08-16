@@ -67,15 +67,15 @@ void selection_init(Selection *selection, Display *display)
     selection->display = display;
 }
 
-void selection_add_option(Selection *selection, char *option)
+void selection_add_option(Selection *selection, const char *option)
 {
-    printf("adding option\n");
+    serial_debug("adding option\n");
     Module *newOption = &(selection->options[selection->optionCount]);
     strncpy(selection->optionsBuffer[selection->optionCount], option, 20);
     module_set_visable(newOption, true);
     selection->optionCount++;
     selection->window.h = newOption->y + newOption->h + newOption->py;
-    printf("done adding option\n");
+    serial_debug("done adding option\n");
 }
 
 int selection_run(Selection *selection)
@@ -88,7 +88,7 @@ int selection_run(Selection *selection)
     {
         display_update_touch(selection->display);
     } while (module_touch_check(&(selection->root), selection->display, selection) == 0);
-    printf("selected: %d\n", selection->selected);
+    serial_debug("selected: %d\n", selection->selected);
 
     // Paste memory page to screen
     display_bte_memory_copy(selection->display, PAGE3_START_ADDR, SCREEN_WIDTH, 0, 0, PAGE1_START_ADDR, SCREEN_WIDTH, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

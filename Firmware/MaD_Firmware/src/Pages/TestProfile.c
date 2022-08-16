@@ -78,21 +78,21 @@ static void button_open(int id, void *arg)
     {
         char *ext = filepath;
         ext += strlen(filepath) - strlen(extension[i]);
-        printf("%s\n", ext);
+        serial_debug("%s\n", ext);
         if (strcmp(ext, extension[i]) == 0)
         {
-            printf("Found mode:%d\n", i);
+            serial_debug("Found mode:%d\n", i);
             page->mode = i;
             break;
         }
     }
-    printf("Mode:%d\n", page->mode);
+    serial_debug("Mode:%d\n", page->mode);
 
     switch (page->mode)
     {
     case PROFILE_QUARTET:
     {
-        printf("Quartet from json\n");
+        serial_debug("Quartet from json\n");
         json_to_motion_quartet(filepath, &(page->quartet));
         break;
     }
@@ -108,12 +108,12 @@ static void button_open(int id, void *arg)
     }
     case PROFILE_SAMPLE:
     {
-        json_to_sample_profile(filepath, &(page->sample));
+        //        json_to_sample_profile(filepath, &(page->sample));
         break;
     }
     case PROFILE_TEST:
     {
-//        json_to_test_profile(filepath, &(page->test));
+        //        json_to_test_profile(filepath, &(page->test));
         break;
     }
     }
@@ -134,7 +134,7 @@ static void button_new(int id, void *arg)
     Keyboard *keyboard = keyboard_create(page->display, page->images);
     if (keyboard == NULL)
     {
-        printf("TestProfile Button new Keyboard could not allocate memory\n");
+        serial_debug("TestProfile Button new Keyboard could not allocate memory\n");
         return;
     }
     char *filename = keyboard_get_input(keyboard, "Enter file name: ");
@@ -147,7 +147,7 @@ static void button_new(int id, void *arg)
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_DIRECTORY, "/sd");
     if (explorer == NULL)
     {
-        printf("Testprofile.c explorer could not allocate memory\n");
+        serial_debug("Testprofile.c explorer could not allocate memory\n");
         return;
     }
 
@@ -191,7 +191,7 @@ static void button_new(int id, void *arg)
 static void button_simulate(int id, void *arg)
 {
     TestProfilePage *page = (TestProfilePage *)arg;
-    printf("Simulate mode: %d\n", page->mode);
+    serial_debug("Simulate mode: %d\n", page->mode);
 
     RunMotionProfile *run = &(page->runProfile);
     bool *profileComplete = NULL;
@@ -243,9 +243,9 @@ static void button_simulate(int id, void *arg)
         }
         t += 0.001;
     }
-    printf("Max: %d Min: %d\n", max, min);
+    serial_debug("Max: %d Min: %d\n", max, min);
     int maxData = module_graph_get_max_data(&(page->graphPositionContainer));
-    printf("MaxData: %d\n", maxData);
+    serial_debug("MaxData: %d\n", maxData);
     double dt = t / (double)(maxData);
     module_graph_set_range(&(page->graphPositionContainer), max, -1 * max);
 
@@ -254,7 +254,7 @@ static void button_simulate(int id, void *arg)
     while (!(*profileComplete))
     {
         double position = getPosition(t, run, profile);
-        printf("Position, Time: %f,%f\n", position, t);
+        serial_debug("Position, Time: %f,%f\n", position, t);
         page->graphValue = position;
         module_redraw(page->display, &(page->graphPositionContainer), &position);
         t += dt;
@@ -268,25 +268,25 @@ static void button_save(int id, void *arg)
     {
     case PROFILE_QUARTET:
     {
-        printf("Saving quartet\n");
+        serial_debug("Saving quartet\n");
         motion_quartet_to_json(&(page->quartet), page->quartet.name);
         break;
     }
     case PROFILE_SET:
     {
-        printf("Saving set\n");
+        serial_debug("Saving set\n");
         motion_set_to_json(&(page->set), page->set.name);
         break;
     }
     case PROFILE_MOTION:
     {
-        printf("Saving motion\n");
+        serial_debug("Saving motion\n");
         motion_profile_to_json(&(page->profile), page->profile.name);
         break;
     }
     case PROFILE_TEST:
     {
-        printf("Saving test\n");
+        serial_debug("Saving test\n");
         test_profile_to_json(&(page->test), page->test.name);
         break;
     }
@@ -302,7 +302,7 @@ static void update_filename(char *filepath, const char *newName, const char *ext
 
 static void button_quartet(int id, void *arg)
 {
-    printf("BUTTON_QUARTET_id:%d\n", id);
+    serial_debug("BUTTON_QUARTET_id:%d\n", id);
     TestProfilePage *page = (TestProfilePage *)arg;
     switch (id)
     {
@@ -324,7 +324,7 @@ static void button_quartet(int id, void *arg)
         for (int i = 0; i < FUNCTION_COUNT; i++)
         {
             get_function_info(&(page->info), i);
-            printf("function:%d,name:%s\n", i, page->info.name);
+            serial_debug("function:%d,name:%s\n", i, page->info.name);
             selection_add_option(&(page->selection), page->info.name);
         }
         page->quartet.function = selection_run(&(page->selection));
@@ -698,12 +698,12 @@ void test_profile_page_init(TestProfilePage *page, Display *display, Images *ima
 void test_profile_page_run(TestProfilePage *page)
 {
     complete = false;
-    printf("Test profile page running\n");
+    serial_debug("Test profile page running\n");
     module_draw(page->display, &(page->root));
     int lastMode = -1;
     while (!complete)
     {
-        printf("Mode:%d\n", page->mode);
+        serial_debug("Mode:%d\n", page->mode);
         if (page->mode != lastMode)
         {
             for (int i = 0; i < 20; i++)
@@ -719,10 +719,10 @@ void test_profile_page_run(TestProfilePage *page)
             {
                 strcpy(page->editWindowTitleBuffer, "Quartet");
                 module_draw(page->display, &(page->root));
-                printf("Quartet name:%s\n", page->quartet.name);
+                serial_debug("Quartet name:%s\n", page->quartet.name);
             }
 
-            printf("Quartet\n");
+            serial_debug("Quartet\n");
 
             int paramIndex = 0;
 
@@ -730,7 +730,7 @@ void test_profile_page_run(TestProfilePage *page)
             sprintf(page->profileParametersBuffer[paramIndex], "Name: %s", page->quartet.name);
             module_touch_callback(nameModule, button_quartet, BUTTON_QUARTET_NAME);
             module_set_visable(nameModule, true);
-            printf("Name:%s\n", page->profileParametersBuffer[paramIndex]);
+            serial_debug("Name:%s\n", page->profileParametersBuffer[paramIndex]);
 
             paramIndex++;
             Module *funcModule = &(page->profileParameters[paramIndex]);
@@ -763,7 +763,7 @@ void test_profile_page_run(TestProfilePage *page)
                 module_draw(page->display, &(page->root));
                 // strcpy(page->set.name, page->filename);
             }
-            printf("Set\n");
+            serial_debug("Set\n");
             int paramIndex = 0;
 
             Module *nameModule = &(page->profileParameters[paramIndex]);
@@ -813,7 +813,7 @@ void test_profile_page_run(TestProfilePage *page)
                 module_draw(page->display, &(page->root));
                 // strcpy(page->set.name, page->filename);
             }
-            printf("Motion Profile\n");
+            serial_debug("Motion Profile\n");
             int paramIndex = 0;
 
             Module *nameModule = &(page->profileParameters[paramIndex]);
@@ -845,13 +845,13 @@ void test_profile_page_run(TestProfilePage *page)
         }
         case PROFILE_SAMPLE:
         {
-             if (lastMode != PROFILE_SAMPLE)
+            if (lastMode != PROFILE_SAMPLE)
             {
                 strcpy(page->editWindowTitleBuffer, "Sample Profile");
                 module_draw(page->display, &(page->root));
                 // strcpy(page->set.name, page->filename);
             }
-            printf("Sample Profile\n");
+            serial_debug("Sample Profile\n");
             int paramIndex = 0;
 
             Module *nameModule = &(page->profileParameters[paramIndex]);
@@ -870,7 +870,7 @@ void test_profile_page_run(TestProfilePage *page)
             sprintf(page->profileParametersBuffer[paramIndex], "Length: %f", page->sample.length);
             module_touch_callback(lengthModule, button_sample, BUTTON_SAMPLE_LENGTH);
             module_set_visable(lengthModule, true);
-            
+
             paramIndex++;
             Module *stretchModule = &(page->profileParameters[paramIndex]);
             sprintf(page->profileParametersBuffer[paramIndex], "Stretch: %f", page->sample.number);

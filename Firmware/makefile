@@ -2,8 +2,12 @@
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = C:\flexprop\bin\flexcc.exe
 LOAD = C:\flexprop\bin\loadp2.exe
-FLEXCCFLAGS=-2 -O1 -Wall #-D_DEBUG -g#D_DEBUG_FATFS=1#-DFF_USE_LFN
+FLEXCCFLAGS=-2 -O2 -Wall -include SerialController.h#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
 BIN = bin
+
+CATALINA="C:/Program Files (x86)/Catalina_5.1/bin/catalina.exe"
+CATALINAFLAGS= -O1 -p2 
+CAT = cat
 
 #GCC
 GCC = g++
@@ -23,6 +27,7 @@ $(info $$SOURCE is [${SOURCE}])
 $(info $$SPIN is [${SPIN}])
 
 OBJECTS := $(addprefix $(BIN)/,$(SOURCE:.c=.o))
+OBJECTSCAT := $(addprefix $(CAT)/,$(SOURCE:.c=.o))
 OBJECTSWIN := $(addprefix $(WIN)/,$(SOURCE:.c=.o))
 OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 $(info $$OBJECTSPIN is [${OBJECTSPIN}])
@@ -30,6 +35,7 @@ INC := $(addprefix -I ,$(INCLUDE))
 
 flexprop: clean clear $(BIN)/$(TARGET) run
 sim: clean clear $(WIN)/$(TARGET)
+catalina: $(CAT)/$(TARGET)
 
 # Make for FlexCC
 $(BIN)/$(TARGET): $(OBJECTS)
@@ -38,6 +44,14 @@ $(BIN)/$(TARGET): $(OBJECTS)
 $(BIN)/%.o: %.c
 	-mkdir -p $(subst /,\,$(@D))
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $<
+
+# Make for Catalina
+$(CAT)/$(TARGET): $(OBJECTSCAT)
+	$(CATALINA) $(CATALINAFLAGS) $(INC) $(OBJECTS) -o $@
+
+$(CAT)/%.o: %.c
+	-mkdir -p $(subst /,\,$(@D))
+	$(CATALINA) $(CATALINAFLAGS) $(INC) -c -o $@ $<
 
 #Make for windows
 $(WIN)/$(TARGET): $(OBJECTSWIN)
@@ -59,7 +73,7 @@ $(WIN)/%.c: %.c
 	-./a.exe $(subst /,\,$(<)) $(subst /,\,$(@))
 	
 run: 
-	$(LOAD) -b230400 -t -k -ZERO -v bin\$(TARGET)
+	$(LOAD) -p com4 -b230400 -t -k -ZERO -v bin\$(TARGET)
 .PHONY: clean
 .PHONY: clear
 clear:

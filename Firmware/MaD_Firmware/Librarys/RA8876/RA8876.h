@@ -17,7 +17,7 @@ Version   : v1.0
 #include <stdlib.h>
 
 #ifndef SIMULATION
-#include <simpletools.h>
+#include <propeller2.h>
 typedef struct __using("jm_i2c.spin2") I2CBus;
 typedef struct __using("jm_spi.spin2") SPI;
 #else

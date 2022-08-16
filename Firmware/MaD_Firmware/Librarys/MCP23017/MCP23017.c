@@ -60,7 +60,7 @@ bool mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl)
     ack &= write_register(mcp23017, DIRB, DIRBVALUE); // all inputs
     if (read_register(mcp23017, DIRA) != DIRAVALUE || read_register(mcp23017, DIRB) != DIRBVALUE)
     {
-        printf("Error setting up MCP23017: ACK:%d\n", ack);
+        serial_debug("Error setting up MCP23017: ACK:%d\n", ack);
         return false;
     }
     return true;

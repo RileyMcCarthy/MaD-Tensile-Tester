@@ -1,7 +1,6 @@
 #ifndef TestProfilePage_H
 #define TestProfilePage_H
 
-#include "simpletools.h"
 #include "RA8876.h"
 #include "Style.h"
 #include "Module.h"

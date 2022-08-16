@@ -20,6 +20,16 @@ void run_motion_profile_init(RunMotionProfile *run)
 
 double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 {
+    if (run == NULL || profile == NULL)
+    {
+        serial_debug("Null pointer passed to position_profile\n");
+        return 0;
+    }
+    if (run->currentSet > MAX_MOTION_PROFILE_SETS)
+    {
+        serial_debug("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
+        run->currentSet = 0;
+    }
     double position = position_set(t, run, &(profile->sets[run->currentSet]));
     if (run->setComplete)
     {
@@ -28,6 +38,7 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
     }
     if (run->currentSet >= profile->setCount)
     {
+        run->currentSet = 0;
         run->profileComplete = true;
     }
     return position;
@@ -35,22 +46,32 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 
 double position_set(double t, RunMotionProfile *run, MotionSet *set)
 {
+    if (run == NULL || set == NULL)
+    {
+        serial_debug("Null pointer passed to position_set\n");
+        return 0;
+    }
+    if (run->currentQuartet > MAX_MOTION_QUARTETS)
+    {
+        serial_debug("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
+        run->currentQuartet = 0;
+    }
     double position = position_quartet(t, run, &(set->quartets[run->currentQuartet]));
     if (run->quartetComplete)
     {
-        // printf("quartet complete:%d\n", run->currentQuartet);
+        // serial_debug("quartet complete:%d\n", run->currentQuartet);
         run->currentQuartet++;
         run->quartetComplete = false;
     }
     if (run->currentQuartet >= set->quartetCount)
     {
-        // printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
+        // serial_debug("Set %d execution %d done\n", run->currentSet, run->currentExecution);
         run->currentExecution++;
         run->currentQuartet = 0;
     }
     if (run->currentExecution >= set->executions)
     {
-        // printf("Set %d done\n", run->currentSet);
+        // serial_debug("Set %d done\n", run->currentSet);
         run->setComplete = true;
         run->currentExecution = 0;
     }
@@ -59,23 +80,33 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
 
 double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
 {
+    if (run == NULL || quartet == NULL)
+    {
+        serial_debug("Null pointer passed to position_set\n");
+        return 0;
+    }
     FunctionInfo info;
     get_function_info(&info, quartet->function);
-    // printf("Function:%s\n", info.name);
-    // printf("Args:%s\n", info.args[0]);
-    // printf("Args:%s\n", info.args[1]);
-    // printf("Args:%s\n", info.args[2]);
-    // printf("params:%f\n", quartet->parameters[0]);
+    // serial_debug("Function:%s\n", info.name);
+    // serial_debug("Args:%s\n", info.args[0]);
+    // serial_debug("Args:%s\n", info.args[1]);
+    // serial_debug("Args:%s\n", info.args[2]);
+    // serial_debug("params:%f\n", quartet->parameters[0]);
     if (info.func == NULL)
     {
-        // printf("no function for %s\n", info.name);
+        // serial_debug("no function for %s\n", info.name);
         run->lastQuartetTime = t;
         run->lastQuartetDistance += quartet->parameters[0];
         run->quartetComplete = true;
         return 0;
     }
-    double position = info.func(t - run->lastQuartetTime, quartet->parameters); // Quartet position
-    // printf("Position:%f\n", position);
+    // double position = info.func(t - run->lastQuartetTime, quartet->parameters); // Quartet position
+    double position = (t - run->lastQuartetTime) * quartet->parameters[1];
+    if (abs(position) > abs(quartet->parameters[0]))
+    {
+        position = quartet->parameters[0];
+    }
+    // serial_debug("Position:%f\n", position);
     double lastQuartetDistance = run->lastQuartetDistance;
 
     if (abs(position - quartet->parameters[0]) < 0.1) // Still need to add Dwell
@@ -113,6 +144,17 @@ double sigmoid(double t, double *args)
     return dir * position;
 }
 
+// args = [distance, strain rate]
+double line(double t, double *args)
+{
+    double position = t * args[1];
+    if (abs(position) > abs(args[0]))
+    {
+        return args[0];
+    }
+    return position;
+}
+
 void get_function_info(FunctionInfo *info, int id)
 {
     switch (id)
@@ -123,7 +165,7 @@ void get_function_info(FunctionInfo *info, int id)
 
         strncpy(info->name, "Line", FUNCTION_MAX_NAME_LENGTH);
 
-        info->func = NULL;
+        info->func = line;
 
         info->args_count = 2;
         strncpy(info->args[0], "distance", FUNCTION_MAX_ARG_LENGTH);
@@ -252,10 +294,20 @@ static void compute_setpoint(SetPoint *setpoint, double t, MotionPeriod *periods
 
 double steps_to_mm(int steps, MachineConfiguration *config)
 {
+    if (config == NULL)
+    {
+        serial_debug("steps_to_mm: config is NULL\n");
+        return 0;
+    }
     return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
 }
 
 int mm_to_steps(double mm, MachineConfiguration *config)
 {
+    if (config == NULL)
+    {
+        serial_debug("mm_to_steps: config is NULL\n");
+        return 0;
+    }
     return (int)round(mm * (double)config->positionEncoderStepsPerRev / (double)(config->gearDiameter * 3.14159));
 }

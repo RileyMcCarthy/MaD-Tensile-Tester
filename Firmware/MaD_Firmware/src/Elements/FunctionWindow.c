@@ -299,7 +299,7 @@ static void update_length(Display *display, Module *module, void *arg)
         innerColor = COLOR65K_BLACK;
         textColor = COLOR65K_WHITE;
     }
-     if (module->borderColor == outlineColor &&
+    if (module->borderColor == outlineColor &&
         module->backgroundColor == innerColor &&
         module->foregroundColor == textColor)
     {
@@ -361,7 +361,7 @@ void function_window_init(FunctionWindow *window, Module *container, MachineStat
 
     // Create edit window
     Module *functionWindow = &(window->functionWindow);
-    module_init(functionWindow,container);
+    module_init(functionWindow, container);
     module_set_rectangle_circle(functionWindow, 0, 0);
     module_add_border(functionWindow, COLOR65K_WHITE, 1);
     module_fit_height(functionWindow);

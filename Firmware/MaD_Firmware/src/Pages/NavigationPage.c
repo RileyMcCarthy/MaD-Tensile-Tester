@@ -169,11 +169,11 @@ void navigation_page_init(NavigationPage *page, Display *display, Images *images
  */
 Page navigation_page_run(NavigationPage *page)
 {
-    printf("Starting navigation page\n");
+    serial_debug("Starting navigation page\n");
     page->complete = false;
 
     module_draw(page->display, &(page->root));
-    printf("done drawing page\n");
+    serial_debug("done drawing page\n");
     while (!page->complete)
     {
         display_update_touch(page->display);

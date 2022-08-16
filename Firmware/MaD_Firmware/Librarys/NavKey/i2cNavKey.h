@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #ifndef SIMULATION
-#include <simpletools.h>
+#include <propeller2.h>
 typedef struct __using("jm_i2c.spin2") Bus;
 #else
 #include "SimI2C.h"

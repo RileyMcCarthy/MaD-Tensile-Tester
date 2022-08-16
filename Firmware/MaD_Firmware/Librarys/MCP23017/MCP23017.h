@@ -17,7 +17,7 @@
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
 #ifndef SIMULATION
-#include <simpletools.h>
+#include <propeller2.h>
 typedef struct __using("jm_i2c.spin2") I2CBus;
 #else
 #include "SimI2C.h"

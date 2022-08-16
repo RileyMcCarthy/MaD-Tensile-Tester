@@ -1,4 +1,3 @@
-#include <simpletools.h>
 #include "RA8876.h"
 #include "Style.h"
 typedef enum OverlayType_e

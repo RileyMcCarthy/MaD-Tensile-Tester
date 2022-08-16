@@ -1,6 +1,5 @@
 #ifndef CalibrateForcePage_H
 #define CalibrateForcePage_H
-#include "simpletools.h"
 #include "RA8876.h"
 #include "Error.h"
 #include "Style.h"

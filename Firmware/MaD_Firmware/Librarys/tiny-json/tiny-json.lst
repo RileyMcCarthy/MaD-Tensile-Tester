@@ -421,7 +421,7 @@
 00004                 |     char *ptr = goBlank(str);
 00004                 |     if (!ptr || (*ptr != '{' && *ptr != '['))
 00004                 |     {
-00004                 |         printf("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
+00004                 |         __builtin_printf("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
 00004                 |         return 0;
 00004                 |     }
 00004                 |     json_t *obj = pool->init(pool);
@@ -431,7 +431,7 @@
 00004                 |     ptr = objValue(ptr, obj, pool);
 00004                 |     if (!ptr)
 00004                 |     {
-00004                 |         printf("Error: json_createWithPool: invalid json string.\n");
+00004                 |         __builtin_printf("Error: json_createWithPool: invalid json string.\n");
 00004                 |         return 0;
 00004                 |     }
 00004                 |     return obj;
@@ -693,7 +693,7 @@
 0004d                 | 
 0004d                 |         if (!ptr)
 0004d                 |         {
-0004d                 |             printf("Error: Unexpected goblank error.\n");
+0004d                 |             __builtin_printf("Error: Unexpected goblank error.\n");
 0004d                 |             return 0;
 0004d                 |         }
 0004d                 |         if (*ptr == ',')
@@ -717,7 +717,7 @@
 0004d                 |         json_t *property = pool->alloc(pool);
 0004d                 |         if (!property)
 0004d                 |         {
-0004d                 |             printf("Error: Unexpected allocation error.\n");
+0004d                 |             __builtin_printf("Error: Unexpected allocation error.\n");
 0004d                 |             return 0;
 0004d                 |         }
 0004d                 |         if (obj->type != JSON_ARRAY)
@@ -725,13 +725,13 @@
 0004d                 | 
 0004d                 |             if (*ptr != '\"')
 0004d                 |             {
-0004d                 |                 printf("Error: Unexpected quote missing.\n");
+0004d                 |                 __builtin_printf("Error: Unexpected quote missing.\n");
 0004d                 |                 return 0;
 0004d                 |             }
 0004d                 |             ptr = propertyName(ptr, property);
 0004d                 |             if (!ptr)
 0004d                 |             {
-0004d                 |                 printf("Error: property name does not exist.\n");
+0004d                 |                 __builtin_printf("Error: property name does not exist.\n");
 0004d                 |                 return 0;
 0004d                 |             }
 0004d                 |         }
@@ -773,7 +773,7 @@
 0004d                 |         }
 0004d                 |         if (!ptr)
 0004d                 |         {
-0004d                 |             printf("Error: unable to parse value.\n");
+0004d                 |             __builtin_printf("Error: unable to parse value.\n");
 0004d                 |             return 0;
 0004d                 |         }
 0004d                 |     }

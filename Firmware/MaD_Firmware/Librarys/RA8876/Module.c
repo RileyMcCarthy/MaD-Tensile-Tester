@@ -110,7 +110,7 @@ void module_init(Module *module, Module *parent)
         }
         else
         {
-            printf("Error: Too many children\n");
+            serial_debug("Error: Too many children\n");
         }
     }
 }

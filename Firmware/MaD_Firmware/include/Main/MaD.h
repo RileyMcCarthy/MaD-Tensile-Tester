@@ -1,7 +1,6 @@
 #ifndef MaD_H
 #define MaD_H
 
-#include <simpletools.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

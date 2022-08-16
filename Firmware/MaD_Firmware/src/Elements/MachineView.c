@@ -29,7 +29,7 @@ void machine_view_init(MachineView *view, Module *container, MonitorData *data)
     int padding = 10;
     view->data = data;
 
-    module_set_window(container,view);
+    module_set_window(container, view);
 
     strcpy(view->forceValueBuffer, "0.0N");
     strcpy(view->positionValueBuffer, "0.0mm");
@@ -101,6 +101,6 @@ void machine_view_init(MachineView *view, Module *container, MonitorData *data)
     module_align_inner_left(forceGraphContainer);
     module_set_color(forceGraphContainer, forceGraphContainer->parent->foregroundColor, forceGraphContainer->parent->backgroundColor);
     module_fit_width(forceGraphContainer);
-    module_set_graph(forceGraphContainer, &(view->forceGraph), "Force", "N",&(view->data->force));
+    module_set_graph(forceGraphContainer, &(view->forceGraph), "Force", "N", &(view->data->force));
     module_graph_set_range(forceGraphContainer, 5.0, -5.0);
 }

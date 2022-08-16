@@ -1,6 +1,5 @@
 #ifndef MotionStateWindow_h
 #define MotionStateWindow_h
-#include "simpletools.h"
 #include "RA8876.h"
 #include "StateMachine.h"
 #include "Module.h"

@@ -16,7 +16,7 @@ static void button_run(int id, void *arg)
 {
     AutomaticPage *page = (AutomaticPage *)arg;
     state_machine_set(page->machineState, PARAM_MOTION_MODE, MODE_TEST_RUNNING);
-    // printf("New state: %d\n", page->state->motionParameters.mode);
+    // serial_debug("New state: %d\n", page->state->motionParameters.mode);
 }
 
 static void button_nav(int id, void *arg)
@@ -28,23 +28,24 @@ static void button_nav(int id, void *arg)
 static void button_save(int id, void *arg)
 {
     AutomaticPage *page = (AutomaticPage *)arg;
-    printf("Saving profile\n");
+    serial_debug("Saving profile\n");
 
-    FILE *file = fopen("/sd/raw.txt","w");
+    FILE *file = fopen("/sd/raw.txt", "w");
     if (file == NULL)
     {
-        printf("Error opening file:%s\n", page->profileNameBuffer);
+        serial_debug("Error opening file:%s\n", page->profileNameBuffer);
         return;
     }
-    
-    MonitorData* data=monitor_read_data(0); // Read flash from address 0
-    while(data->timems != -1)
+
+    MonitorData *data = monitor_read_data(0); // Read flash from address 0
+    while (data->timems != -1)
     {
-        fprintf(file,"%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw,data->force,data->position);
-        //printf("%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw,data->force,data->position);
+        fprintf(file, "%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw, data->force, data->position);
+        // serial_debug("%d,%d,%d,%f,%f\n", data->timems, data->forceRaw, data->encoderRaw, data->force, data->position);
         monitor_read_data(-1); // Read next address in flash
     }
     fclose(file);
+    serial_debug("File saved\n");
 }
 
 static void button_open(int id, void *arg)
@@ -52,12 +53,12 @@ static void button_open(int id, void *arg)
     AutomaticPage *page = (AutomaticPage *)arg;
     Explorer *explorer = explorer_create(page->display, 100, 100, EXPLORER_MODE_FILE, "/sd");
     explorer_run(explorer);
-    printf("Filepath: %s\n", explorer->pathBuffer);
+    serial_debug("Filepath: %s\n", explorer->pathBuffer);
     if (strcmp(explorer->pathBuffer, "") == 0)
     {
         return;
     }
-    printf("Filepath: %s\n", explorer->pathBuffer);
+    serial_debug("Filepath: %s\n", explorer->pathBuffer);
     json_to_motion_profile(explorer->pathBuffer, &(page->control->motionProfile));
     json_print_motion_profile(&(page->control->motionProfile));
 }
@@ -91,7 +92,7 @@ static void update_profileNumber(Display *dis, Module *module, void *arg)
 }
 
 // Public Functions
-void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData*data)
+void automatic_page_init(AutomaticPage *page, Display *display, Images *images, MachineState *state, ControlSystem *control, MonitorData *data)
 {
     page->display = display;
     page->images = images;

@@ -8,5 +8,5 @@ void loading_overlay_display(Display *display, const char *message, OverlayType 
     display_draw_circle_square_fill(display, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100, SCREEN_WIDTH / 2 + 250, SCREEN_HEIGHT / 2 + 100, 50, 50, MAINCOLOR);
     display_text_color(display, COLOR65K_BLACK, MAINCOLOR);
     display_draw_string(display, SCREEN_WIDTH / 2 - strlen(message) * 8, SCREEN_HEIGHT / 2 - 16, message);
-    printf("-----------------\nTEMP DISPLAY: %s\n-----------------\n", message);
+    serial_debug("-----------------\nTEMP DISPLAY: %s\n-----------------\n", message);
 }

@@ -1,6 +1,5 @@
 #ifndef FunctionWindow_h
 #define FunctionWindow_h
-#include "simpletools.h"
 #include "RA8876.h"
 #include "StateMachine.h"
 #include "Module.h"

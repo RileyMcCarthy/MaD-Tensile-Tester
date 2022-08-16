@@ -17,7 +17,7 @@ static void module_graph_redraw(Display *display, Module *module, void *arg)
 {
     ModuleGraph *graph = (ModuleGraph *)module->data.ptr;
     double newData = *(graph->dataPtr);
-    // printf("Redrawing graph with newData: %f\n", newData);
+    // serial_debug("Redrawing graph with newData: %f\n", newData);
     if (newData > graph->maxY || newData < graph->minY)
     {
         return;

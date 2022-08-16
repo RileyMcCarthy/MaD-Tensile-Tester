@@ -1,6 +1,5 @@
 #ifndef ManualPage_H
 #define ManualPage_H
-#include "simpletools.h"
 #include "RA8876.h"
 #include "Error.h"
 #include "Style.h"

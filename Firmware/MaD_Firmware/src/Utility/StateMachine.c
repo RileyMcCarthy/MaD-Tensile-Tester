@@ -71,14 +71,14 @@ static State state_machine_motion(MachineState *machineState)
              !machineState->machineCheckParameters.esdSwitch)) // Check for esd fault
         {
             // Motion exited due to esd fault
-            // printf("motion faulted\n");
+            // serial_debug("motion faulted\n");
             machineState->motionParameters.status = STATUS_FAULTED;
         }
         else
         {
             machineState->motionParameters.status = STATUS_DISABLED;
         }
-        // printf("machine check failed\n");
+        // serial_debug("machine check failed\n");
         machineState->motionParameters.mode = MODE_MANUAL;
         return newState;
     }
@@ -135,8 +135,8 @@ static State state_machine_motion(MachineState *machineState)
 
 static void state_machine_update(MachineState *machineState)
 {
-    while(!_locktry(machineState->lock)) 
-        printf("waiting for lock to release\n"); // waits for lock to be available then claims it
+    while (!_locktry(machineState->lock))
+        serial_debug("waiting for lock to release\n"); // waits for lock to be available then claims it
     machineState->state = state_machine_motion(machineState);
     _lockrel(machineState->lock);
 }
@@ -254,7 +254,7 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
         {
             if (machineState->motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
             { // Must be in test mode to run test
-                printf("Must be in test mode to run test\n");
+                serial_debug("Must be in test mode to run test\n");
                 break;
             }
 
@@ -291,8 +291,8 @@ void machine_state_init(MachineState *machineState)
     machineState->function = FUNC_MANUAL_OFF;
 
     machineState->lock = _locknew();
-    if (machineState->lock==-1)
+    if (machineState->lock == -1)
     {
-        printf("Error allocating new lock\n");
+        serial_debug("Error allocating new lock\n");
     }
 }

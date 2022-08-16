@@ -40,7 +40,7 @@ static void button_delete(int id, void *arg)
     int pathLength = strlen(explorer->pathBuffer);
     strcat(explorer->pathBuffer, "/");
     strcat(explorer->pathBuffer, explorer->files[explorer->selection]);
-    printf("Removing %s from %s\n", explorer->files[explorer->selection], explorer->pathBuffer);
+    serial_debug("Removing %s from %s\n", explorer->files[explorer->selection], explorer->pathBuffer);
     remove(explorer->pathBuffer);
     explorer->pathBuffer[pathLength] = '\0'; // Remove the file name from the path buffer
 }
@@ -111,7 +111,7 @@ static void button_files(int id, void *arg)
     strcat(explorer->pathBuffer, newpath);
     explorer->selection = -1;
     explorer->page = 0;
-    printf("%s\n", explorer->pathBuffer);
+    serial_debug("%s\n", explorer->pathBuffer);
 }
 
 // return static explorer
@@ -313,7 +313,7 @@ char *explorer_run(Explorer *explorer)
         DIR *dir = opendir(explorer->pathBuffer);
         if (dir == NULL)
         {
-            printf("Error: %d\n", _geterror());
+            serial_debug("Error: %d\n", _geterror());
             return NULL;
         }
 
@@ -333,7 +333,7 @@ char *explorer_run(Explorer *explorer)
             {
                 strcpy(explorer->files[i], dirent->d_name);
 
-                printf("File: %s\n", explorer->files[i]);
+                serial_debug("File: %s\n", explorer->files[i]);
                 // module_text_update(file->child[0], explorer->files[i]);
                 if (isFile(dirent->d_name))
                 {
@@ -347,7 +347,7 @@ char *explorer_run(Explorer *explorer)
                 module_set_visable(file, true);
                 if (explorer->selection == i)
                 {
-                    printf("selection: %d\n", explorer->selection);
+                    serial_debug("selection: %d\n", explorer->selection);
                     module_set_color(file->child[0], COLOR65K_GREEN, SECONDARYCOLOR);
                 }
                 else
@@ -364,7 +364,7 @@ char *explorer_run(Explorer *explorer)
         }
         closedir(dir);
         module_draw(explorer->display, root);
-        printf("done drawing\n");
+        serial_debug("done drawing\n");
         do
         {
             display_update_touch(explorer->display);
@@ -383,6 +383,6 @@ char *explorer_run(Explorer *explorer)
         strcat(explorer->pathBuffer, "/");
         strcat(explorer->pathBuffer, explorer->files[explorer->selection]);
     }
-    printf("Path:%s\n", explorer->pathBuffer);
+    serial_debug("Path:%s\n", explorer->pathBuffer);
     return explorer->pathBuffer;
 }

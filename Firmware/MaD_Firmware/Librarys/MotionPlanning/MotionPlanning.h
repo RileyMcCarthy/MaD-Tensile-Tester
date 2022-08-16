@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <JSON.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef struct motionPeriods_s
 {
@@ -41,7 +42,7 @@ typedef struct functioninfo_s
     char name[20];
     double (*func)(double, double *args);
     int args_count;
-    char args[FUNCTION_MAX_ARGS * 2][FUNCTION_MAX_ARG_LENGTH]; // max 10 args with 20 chars each
+    char args[FUNCTION_MAX_ARGS][FUNCTION_MAX_ARG_LENGTH]; // max 10 args with 20 chars each
 } FunctionInfo;
 
 typedef struct RunMotionProfile_s

@@ -175,7 +175,7 @@ json_t const *json_createWithPool(char *str, jsonPool_t *pool)
     char *ptr = goBlank(str);
     if (!ptr || (*ptr != '{' && *ptr != '['))
     {
-        printf("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
+        serial_debug("Error: json_createWithPool: invalid json string(missing opening {/[.\n");
         return 0;
     }
     json_t *obj = pool->init(pool);
@@ -185,7 +185,7 @@ json_t const *json_createWithPool(char *str, jsonPool_t *pool)
     ptr = objValue(ptr, obj, pool);
     if (!ptr)
     {
-        printf("Error: json_createWithPool: invalid json string.\n");
+        serial_debug("Error: json_createWithPool: invalid json string.\n");
         return 0;
     }
     return obj;
@@ -495,7 +495,7 @@ void add(json_t *obj, json_t *property)
  * @retval Null pointer if any error occur. */
 char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
 {
-    // printf("%c", *ptr);
+    // serial_debug("%c", *ptr);
 
     obj->type = *ptr == '{' ? JSON_OBJ : JSON_ARRAY;
     obj->u.c.child = 0;
@@ -504,11 +504,11 @@ char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
     for (;;)
     {
         ptr = goBlank(ptr);
-        // printf("after go blank:%c\n", *ptr);
+        // serial_debug("after go blank:%c\n", *ptr);
 
         if (!ptr)
         {
-            printf("Error: Unexpected goblank error.\n");
+            serial_debug("Error: Unexpected goblank error.\n");
             return 0;
         }
         if (*ptr == ',')
@@ -517,7 +517,7 @@ char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
             continue;
         }
         char endchar = (obj->type == JSON_OBJ) ? '}' : ']';
-        // printf("endchar:%c\n", endchar);
+        // serial_debug("endchar:%c\n", endchar);
         if (*ptr == endchar)
         {
             *ptr = '\0';
@@ -532,21 +532,21 @@ char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
         json_t *property = pool->alloc(pool);
         if (!property)
         {
-            printf("Error: Unexpected allocation error.\n");
+            serial_debug("Error: Unexpected allocation error.\n");
             return 0;
         }
         if (obj->type != JSON_ARRAY)
         {
-            // printf("befpore quite check:%c\n", *ptr);
+            // serial_debug("befpore quite check:%c\n", *ptr);
             if (*ptr != '\"')
             {
-                printf("Error: Unexpected quote missing.\n");
+                serial_debug("Error: Unexpected quote missing.\n");
                 return 0;
             }
             ptr = propertyName(ptr, property);
             if (!ptr)
             {
-                printf("Error: property name does not exist.\n");
+                serial_debug("Error: property name does not exist.\n");
                 return 0;
             }
         }
@@ -588,7 +588,7 @@ char *objValue(char *ptr, json_t *obj, jsonPool_t *pool)
         }
         if (!ptr)
         {
-            printf("Error: unable to parse value.\n");
+            serial_debug("Error: unable to parse value.\n");
             return 0;
         }
     }

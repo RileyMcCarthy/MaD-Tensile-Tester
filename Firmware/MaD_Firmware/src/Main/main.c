@@ -3,7 +3,7 @@
 #include "MaD.h"
 enum
 {
-    HEAPSIZE = 32768 * 2
+    HEAPSIZE = 32400 * 1
 };
 
 double atof(const char *str)
@@ -39,7 +39,7 @@ double atof(const char *str)
 }
 
 /**
- * @brief Main method that is called on program startup. 
+ * @brief Main method that is called on program startup.
  * Begins MaD Board instance
  *
  * @return int
@@ -47,16 +47,10 @@ double atof(const char *str)
 
 int main()
 {
-    //_clkset(_SETFREQ, _CLOCKFREQ);
-    //while(1)printf("Hello world\n");
-    _pinl(0);
-    _waitx(10);
-    _pinh(1);
-    printf("h");
-    return;
-    //mount("/sd", _vfs_open_sdcard());                // Mount SD card using default pins
-    //mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
-    //mount("/da", _vfs_open_sdcardx(6, 5, 4, 7)); // Mount data card using default pins
+    _clkset(_SETFREQ, _CLOCKFREQ);
+    mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
+    // mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
+    // mount("/da", _vfs_open_sdcardx(6, 5, 4, 7)); // Mount data card using default pins
     mad_begin();
     while (1)
         ;

@@ -60,7 +60,7 @@ void manual_page_init(ManualPage *page, Display *display, MachineState *machineS
 void manual_page_run(ManualPage *page)
 {
     complete = false;
-    printf("Manual page running\n");
+    serial_debug("Manual page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X2, RA8876_TEXT_HEIGHT_ENLARGEMENT_X2);
@@ -89,7 +89,7 @@ void manual_page_run(ManualPage *page)
     display_draw_string(page->display, titlex, titley, buf);
     display_draw_line(page->display, titlex, titley + 30, titlex + strlen(buf) * 16, titley + 30, MAINTEXTCOLOR);
 
-    printf("creating buttons\n");
+    serial_debug("creating buttons\n");
     Button *buttons = (Button *)malloc(sizeof(Button) * BUTTONCOUNT);
     page->buttons = buttons;
     buttons[0].name = BUTTON_MOTION_MODE;
@@ -121,7 +121,7 @@ void manual_page_run(ManualPage *page)
     Image navigationImg = page->images->navigationImage;
     display_bte_memory_copy_image(page->display, &navigationImg, SCREEN_WIDTH - navigationImg.width - 5, 5);
     bool initialRender = true;
-    printf("Manual page finished loading\n");
+    serial_debug("Manual page finished loading\n");
     MachineState previousState = *(page->machineState);
     while (!complete)
     {
