@@ -33,7 +33,8 @@ OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 $(info $$OBJECTSPIN is [${OBJECTSPIN}])
 INC := $(addprefix -I ,$(INCLUDE))
 
-flexprop: clean $(BIN)/$(TARGET) run
+flexpropc: clean clear $(BIN)/$(TARGET) run
+flexprop: $(BIN)/$(TARGET) run
 sim: clean clear $(WIN)/$(TARGET)
 catalina: $(CAT)/$(TARGET)
 
@@ -42,7 +43,7 @@ $(BIN)/$(TARGET): $(OBJECTS)
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) $(OBJECTS) -o $@
 
 $(BIN)/%.o: %.c
-	-mkdir -p $(subst /,/,$(@D))
+	-mkdir -p $(subst \,/,$(@D))
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $<
 
 # Make for Catalina
@@ -73,7 +74,7 @@ $(WIN)/%.c: %.c
 	-./a.exe $(subst /,\,$(<)) $(subst /,\,$(@))
 	
 run: 
-	$(LOAD) -p com4 -b230400 -t -k -ZERO -v bin\$(TARGET)
+	$(LOAD) -b230400 -t -k -ZERO -v $(subst \,/,bin\$(TARGET))
 .PHONY: clean
 .PHONY: clear
 clear:

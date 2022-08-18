@@ -375,16 +375,42 @@ static bool start_display()
   display_draw_square_fill(&display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
   return true;
 }
+typedef struct __using("jm_fullduplexserial.spin2") FDS;
 
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
  */
-
 void mad_begin()
 {
   printf("Starting MAD\n");
+  FDS serial;
+  serial.start(50, 49, 0, 115200);
+  MonitorData data;
+  data.forceRaw = 1202;
+  data.encoderRaw = 1104;
+  data.force = 4.2;
+  data.position = 105;
+  data.timems = 100;
+  data.timeus = 100000;
+  uint8_t *ptr = &data;
+  while (1)
+  {
+    for (int i = 0; i < sizeof(MonitorData); i++)
+    {
+      serial.tx(ptr[i]);
+    }
+    _waitms(1000);
+  }
 
+  while (1)
+  {
+    int message = serial.rx();
+    printf("Got serial message: %d\n", message);
+    serial.str("Hello world\n");
+    // serial.tx(50);
+    _waitms(100);
+  }
   if (!start_display())
   {
     printf("Error starting display\n");
