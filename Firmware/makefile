@@ -74,7 +74,7 @@ $(WIN)/%.c: %.c
 	-./a.exe $(subst /,\,$(<)) $(subst /,\,$(@))
 	
 run: 
-	$(LOAD) -b230400 -t -k -ZERO -v $(subst \,/,bin\$(TARGET))
+	$(LOAD) -p /dev/ttyUSB0 -b230400 -t -k -ZERO -v $(subst \,/,bin\$(TARGET))
 .PHONY: clean
 .PHONY: clear
 clear:

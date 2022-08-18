@@ -376,7 +376,9 @@ static bool start_display()
   return true;
 }
 typedef struct __using("jm_fullduplexserial.spin2") FDS;
-
+#define CMD_PING 0  // test communication
+#define CMD_DATA 1  // send monitor data
+#define CMD_STATE 2 // send machine state
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
@@ -396,11 +398,24 @@ void mad_begin()
   uint8_t *ptr = &data;
   while (1)
   {
-    for (int i = 0; i < sizeof(MonitorData); i++)
+    printf("Waiting for command\n");
+    int cmd = serial.rx();
+    switch (cmd)
     {
-      serial.tx(ptr[i]);
+    case CMD_PING:
+      printf("pinging device back\n");
+      serial.tx(1); // Send true
+      break;
+    case CMD_DATA:
+      printf("Sending monitor data\n");
+      for (int i = 0; i < sizeof(MonitorData); i++)
+      {
+        serial.tx(ptr[i]);
+      }
+      break;
+    default:
+      break;
     }
-    _waitms(1000);
   }
 
   while (1)
