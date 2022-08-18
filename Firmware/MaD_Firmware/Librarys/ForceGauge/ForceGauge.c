@@ -104,7 +104,7 @@ static void continuous_data(void *arg)
  */
 Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
-    serial_debug("opening force\n");
+    printf("opening force\n");
     forceGauge->rx = rx;
     forceGauge->tx = tx;
     forceGauge->serial.start(rx, tx, 3, BAUD);
@@ -149,10 +149,10 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
     _waitms(500);
     forceGauge->serial.stop();
     forceGauge->cogid = _cogstart_C(continuous_data, forceGauge, &force_stack[0], sizeof(long) * FORCE_MEMORY_SIZE);
-    serial_debug("COG ID: %d\n", forceGauge->cogid);
+    printf("COG ID: %d\n", forceGauge->cogid);
     if (forceGauge->cogid <= 0)
     {
-        serial_debug("COG FAIL\n");
+        printf("COG FAIL\n");
         return FORCEGAUGE_COG_FAIL;
     }
     return SUCCESS;
@@ -160,7 +160,7 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 
 void force_gauge_stop(ForceGauge *forceGauge)
 {
-    serial_debug("stopping cogid: %d\n", forceGauge->cogid);
+    printf("stopping cogid: %d\n", forceGauge->cogid);
     _waitms(1000);
     if (forceGauge->cogid > 0)
     {
@@ -190,7 +190,7 @@ int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
         return -1;
     }
 
-    serial_debug("%d\n", force);
+    printf("%d\n", force);
 
     int temp = forceGauge->serial.rxcheck();
     if (temp == -1)
@@ -200,7 +200,7 @@ int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
         return -1;
     }
     force |= temp << 8;
-    serial_debug("%d\n", temp);
+    printf("%d\n", temp);
     temp = forceGauge->serial.rxcheck();
     if (temp == -1)
     {

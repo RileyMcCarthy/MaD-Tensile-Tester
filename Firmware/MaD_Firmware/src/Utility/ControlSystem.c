@@ -38,7 +38,7 @@ static bool move_servo(ControlSystem *control, MoveType type, int value)
 {
     if (control == NULL)
     {
-        serial_debug("move_servo: control is null\n");
+        printf("move_servo: control is null\n");
         return false;
     }
     // move servo and check if move is allowed (conditions or machine limits)
@@ -81,7 +81,7 @@ static void control_cog(ControlSystem *control)
     /*Initialize mcp23017*/
     while (!mcp23017_begin(&mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL))
     {
-        serial_debug("MCP23017 not communicating, trying again\n");
+        printf("MCP23017 not communicating, trying again\n");
         _waitms(100);
     }
 
@@ -100,7 +100,7 @@ static void control_cog(ControlSystem *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
-    serial_debug("Control cog started\n");
+    printf("Control cog started\n");
 
     // For running test profiles;
     long startTime = 0;
@@ -363,12 +363,12 @@ static void control_cog(ControlSystem *control)
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
-                            serial_debug("up released\n");
+                            printf("up released\n");
                             move_servo(control, MOVE_RELATIVE, control->stateMachine->functionData);
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
-                            serial_debug("down released\n");
+                            printf("down released\n");
                             move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->functionData);
                         }
                         break;
@@ -520,7 +520,7 @@ static void control_cog(ControlSystem *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        serial_debug("running test\n");
+                        printf("running test\n");
                         run_motion_profile_init(&run); // Create new RunMotionProfile structure
                         startTime = _getus();
                         startPosition = control->monitorData->position;
@@ -544,7 +544,7 @@ static void control_cog(ControlSystem *control)
                     }
                     else
                     {
-                        serial_debug("test complete\n");
+                        printf("test complete\n");
                         monitorWriteData = false;
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }

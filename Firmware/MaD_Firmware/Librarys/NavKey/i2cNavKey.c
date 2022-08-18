@@ -195,10 +195,10 @@ static int32_t readNavKeyLong(NavKey *navkey, uint8_t reg)
   navkey->_tem_data.bval[2] = navkey->i2cBus.read(0);
   navkey->_tem_data.bval[1] = navkey->i2cBus.read(0);
   navkey->_tem_data.bval[0] = navkey->i2cBus.read(1);
-  serial_debug("read bval4: %d\n", navkey->_tem_data.bval[3]);
-  serial_debug("read bval4: %d\n", navkey->_tem_data.bval[2]);
-  serial_debug("read bval4: %d\n", navkey->_tem_data.bval[1]);
-  serial_debug("read bval4: %d\n", navkey->_tem_data.bval[0]);
+  printf("read bval4: %d\n", navkey->_tem_data.bval[3]);
+  printf("read bval4: %d\n", navkey->_tem_data.bval[2]);
+  printf("read bval4: %d\n", navkey->_tem_data.bval[1]);
+  printf("read bval4: %d\n", navkey->_tem_data.bval[0]);
   navkey->i2cBus.stop();
 
   return ((int32_t)(navkey->_tem_data.val));

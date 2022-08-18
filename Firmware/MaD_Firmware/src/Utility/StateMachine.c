@@ -136,7 +136,7 @@ static State state_machine_motion(MachineState *machineState)
 static void state_machine_update(MachineState *machineState)
 {
     while (!_locktry(machineState->lock))
-        serial_debug("waiting for lock to release\n"); // waits for lock to be available then claims it
+        printf("waiting for lock to release\n"); // waits for lock to be available then claims it
     machineState->state = state_machine_motion(machineState);
     _lockrel(machineState->lock);
 }
@@ -254,7 +254,7 @@ void state_machine_set(MachineState *machineState, Parameter param, int state)
         {
             if (machineState->motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
             { // Must be in test mode to run test
-                serial_debug("Must be in test mode to run test\n");
+                printf("Must be in test mode to run test\n");
                 break;
             }
 
@@ -293,6 +293,6 @@ void machine_state_init(MachineState *machineState)
     machineState->lock = _locknew();
     if (machineState->lock == -1)
     {
-        serial_debug("Error allocating new lock\n");
+        printf("Error allocating new lock\n");
     }
 }

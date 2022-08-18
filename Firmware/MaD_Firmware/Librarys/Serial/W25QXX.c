@@ -11,7 +11,7 @@ static void HAL_SPI_Receive(void *arg, uint8_t *pData, uint16_t size, uint32_t T
 	for (int i = 0; i < size; i++)
 	{
 		pData[i] = shift_in(_W25QXX_DI, _W25QXX_CLK, MSBPRE, 8);
-		// serial_debug("shift in: %d\n", pData[i]);
+		// printf("shift in: %d\n", pData[i]);
 		//  pData[i] = spi.shiftin(1, 8);
 	}
 }
@@ -54,12 +54,12 @@ uint8_t BSP_W25Qx_Init(Error *err)
 	// Allocate semaphore if it does not exist
 	if (ws25qxxSemaphore == -1)
 	{
-		serial_debug("Allocating semaphore\n");
+		printf("Allocating semaphore\n");
 		ws25qxxSemaphore = _locknew();
 		if (ws25qxxSemaphore == -1)
 		{
 			seterror(err, SEM_NOT_AVAILABLE);
-			serial_debug("Error allocating semaphore\n");
+			printf("Error allocating semaphore\n");
 			return 0;
 		}
 	}
@@ -71,7 +71,7 @@ uint8_t BSP_W25Qx_Init(Error *err)
 	if (ID[0] != 0xEF)
 	{
 		seterror(err, W25QXX_INVALID_ID);
-		serial_debug("Invalid ID\n");
+		printf("Invalid ID\n");
 		return 0;
 	}
 
@@ -137,7 +137,7 @@ uint8_t BSP_W25Qx_WriteEnable(void)
 		/* Check for the Timeout */
 		if ((HAL_GetTick() - tickstart) > W25Qx_TIMEOUT_VALUE)
 		{
-			serial_debug("W25Qx_WriteEnable: Timeout\n");
+			printf("W25Qx_WriteEnable: Timeout\n");
 			return W25Qx_TIMEOUT;
 		}
 	}
@@ -236,7 +236,7 @@ uint8_t BSP_W25Qx_Write(uint8_t *pData, uint32_t WriteAddr, uint32_t size)
 			/* Check for the Timeout */
 			if ((HAL_GetTick() - tickstart) > W25Qx_TIMEOUT_VALUE)
 			{
-				serial_debug("W25Qx_Write timeout\n");
+				printf("W25Qx_Write timeout\n");
 				return W25Qx_TIMEOUT;
 			}
 		}
@@ -279,7 +279,7 @@ uint8_t BSP_W25Qx_Erase_Block(uint32_t Address)
 		/* Check for the Timeout */
 		if ((HAL_GetTick() - tickstart) > W25Q128FV_SECTOR_ERASE_MAX_TIME)
 		{
-			serial_debug("W25Qx_Erase_Block timeout\n");
+			printf("W25Qx_Erase_Block timeout\n");
 			return W25Qx_TIMEOUT;
 		}
 	}
@@ -311,7 +311,7 @@ uint8_t BSP_W25Qx_Erase_Chip(void)
 		/* Check for the Timeout */
 		if ((HAL_GetTick() - tickstart) > W25Q128FV_BULK_ERASE_MAX_TIME)
 		{
-			serial_debug("timeout\n");
+			printf("timeout\n");
 			return W25Qx_TIMEOUT;
 		}
 	}

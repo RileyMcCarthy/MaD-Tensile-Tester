@@ -26,7 +26,7 @@ static const char *json_property_to_string(const json_t *parser, const char *nam
     json_t const *property = json_getProperty(parser, name);
     if (property == NULL)
     {
-        serial_debug("Error, the %s property is not found.\n", name);
+        printf("Error, the %s property is not found.\n", name);
     }
     return json_getValue(property);
 }
@@ -36,7 +36,7 @@ static int json_property_to_int(const json_t *parser, const char *name)
     json_t const *property = json_getProperty(parser, name);
     if (!property || JSON_INTEGER != json_getType(property))
     {
-        serial_debug("Error, the %s property is not found.\n", name);
+        printf("Error, the %s property is not found.\n", name);
     }
     return (int)json_getInteger(property);
 }
@@ -46,7 +46,7 @@ static double json_property_to_double(const json_t *json, const char *name)
     json_t const *property = json_getProperty(json, name);
     if (!property || JSON_REAL != json_getType(property))
     {
-        serial_debug("Error, the %s property is not found.", name);
+        printf("Error, the %s property is not found.", name);
     }
     return json_getReal(property);
 }
@@ -58,7 +58,7 @@ static int json_property_to_double_array(double *array, const json_t *json, cons
     for (const json_t *property = json_getChild(properties); property != 0; property = json_getSibling(property))
     {
         array[index] = json_getReal(property);
-        serial_debug("param:%f \n", array[index]);
+        printf("param:%f \n", array[index]);
         index++;
     }
 
@@ -282,12 +282,12 @@ Error machine_profile_to_json(MachineProfile *settings, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file:%s\n", filename);
+        printf("Error opening file:%s\n", filename);
         return JSON_FILE_ERROR;
     }
     fprintf(file, "{");
     string_to_json(file, "Name", settings->name);
-    serial_debug("writing name: %s\n", settings->name);
+    printf("writing name: %s\n", settings->name);
     fprintf(file, ",");
 
     int_to_json(file, "Number", settings->number);
@@ -307,7 +307,7 @@ Error motion_profile_to_json(MotionProfile *motion, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -322,7 +322,7 @@ Error motion_profile_to_json(MotionProfile *motion, const char *filename)
     fprintf(file, "\"Motion Sets\":[");
     for (int i = 0; i < motion->setCount; i++)
     {
-        serial_debug("writing motion set: %s\n", motion->sets[i].name);
+        printf("writing motion set: %s\n", motion->sets[i].name);
         fprintf(file, "\"%s\"", motion->sets[i].name);
         if (i < motion->setCount - 1)
         {
@@ -339,7 +339,7 @@ Error sample_profile_to_json(SampleProfile *sample, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -381,7 +381,7 @@ Error motion_set_to_json(MotionSet *set, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -419,7 +419,7 @@ Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
     fprintf(file, "{");
@@ -452,7 +452,7 @@ Error test_profile_to_json(TestProfile *test, const char *filename)
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
-        serial_debug("Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return JSON_FILE_ERROR;
     }
 
@@ -479,67 +479,67 @@ Error test_profile_to_json(TestProfile *test, const char *filename)
 
 static void json_print_machine_configuration(MachineConfiguration *configuration)
 {
-    serial_debug("Machine Configuration:\n");
-    serial_debug("    Motor Type: %s\n", configuration->motorType);
-    serial_debug("    maxMotorTorque: %f\n", configuration->maxMotorTorque);
-    serial_debug("    maxMotorRPM: %f\n", configuration->maxMotorRPM);
-    serial_debug("    gearPitch: %f\n", configuration->gearPitch);
-    serial_debug("    systemIntertia: %f\n", configuration->systemIntertia);
-    serial_debug("    staticTorque: %f\n", configuration->staticTorque);
-    serial_debug("    load: %f\n", configuration->load);
-    serial_debug("    positionEncoderType: %s\n", configuration->positionEncoderType);
-    serial_debug("    positionEncoderScaleFactor: %f\n", configuration->positionEncoderStepsPerRev);
-    serial_debug("    forceGauge: %s\n", configuration->forceGauge);
-    serial_debug("    forceGaugeScaleFactor: %f\n", configuration->forceGaugeScaleFactor);
-    serial_debug("    forceGaugeZeroFactor: %d\n", configuration->forceGaugeZeroFactor);
+    printf("Machine Configuration:\n");
+    printf("    Motor Type: %s\n", configuration->motorType);
+    printf("    maxMotorTorque: %f\n", configuration->maxMotorTorque);
+    printf("    maxMotorRPM: %f\n", configuration->maxMotorRPM);
+    printf("    gearPitch: %f\n", configuration->gearPitch);
+    printf("    systemIntertia: %f\n", configuration->systemIntertia);
+    printf("    staticTorque: %f\n", configuration->staticTorque);
+    printf("    load: %f\n", configuration->load);
+    printf("    positionEncoderType: %s\n", configuration->positionEncoderType);
+    printf("    positionEncoderScaleFactor: %f\n", configuration->positionEncoderStepsPerRev);
+    printf("    forceGauge: %s\n", configuration->forceGauge);
+    printf("    forceGaugeScaleFactor: %f\n", configuration->forceGaugeScaleFactor);
+    printf("    forceGaugeZeroFactor: %d\n", configuration->forceGaugeZeroFactor);
 }
 
 static void json_print_machine_performance(MachinePerformance *performance)
 {
-    serial_debug("Machine performance:\n");
-    serial_debug("    minPosition: %f\n", performance->minPosition);
-    serial_debug("    maxPosition: %f\n", performance->maxPosition);
-    serial_debug("    maxVelocity: %f\n", performance->maxVelocity);
-    serial_debug("    maxAcceleration: %f\n", performance->maxAcceleration);
-    serial_debug("    maxForceTensile: %f\n", performance->maxForceTensile);
-    serial_debug("    maxForceCompression: %f\n", performance->maxForceCompression);
-    serial_debug("    forceGaugeNeutralOffset: %f\n", performance->forceGaugeNeutralOffset);
+    printf("Machine performance:\n");
+    printf("    minPosition: %f\n", performance->minPosition);
+    printf("    maxPosition: %f\n", performance->maxPosition);
+    printf("    maxVelocity: %f\n", performance->maxVelocity);
+    printf("    maxAcceleration: %f\n", performance->maxAcceleration);
+    printf("    maxForceTensile: %f\n", performance->maxForceTensile);
+    printf("    maxForceCompression: %f\n", performance->maxForceCompression);
+    printf("    forceGaugeNeutralOffset: %f\n", performance->forceGaugeNeutralOffset);
 }
 
 void json_print_machine_profile(MachineProfile *profile)
 {
-    serial_debug("Name:%s\n", profile->name);
-    serial_debug("Number:%d\n", profile->number);
+    printf("Name:%s\n", profile->name);
+    printf("Number:%d\n", profile->number);
     json_print_machine_configuration(&(profile->configuration));
     json_print_machine_performance(&(profile->performance));
 }
 
 void json_print_quartet(MotionQuartet *quartet)
 {
-    serial_debug("        Name:%s\n", quartet->name);
-    serial_debug("        Function:%d\n", quartet->function);
-    serial_debug("        Dwell:%f\n", quartet->dwell);
+    printf("        Name:%s\n", quartet->name);
+    printf("        Function:%d\n", quartet->function);
+    printf("        Dwell:%f\n", quartet->dwell);
     FunctionInfo info;
     get_function_info(&info, quartet->function);
-    serial_debug("        Parameters:[");
+    printf("        Parameters:[");
     for (int i = 0; i < info.args_count; i++)
     {
-        serial_debug("%f", quartet->parameters[i]);
+        printf("%f", quartet->parameters[i]);
         if (i < info.args_count - 1)
         {
-            serial_debug(",");
+            printf(",");
         }
     }
-    serial_debug("\n");
+    printf("\n");
 }
 
 void json_print_motion_set(MotionSet *set)
 {
-    serial_debug("    Name:%s\n", set->name);
-    serial_debug("    Number:%d\n", set->number);
-    serial_debug("    Type:%s\n", set->type);
-    serial_debug("    Executions:%d\n", set->executions);
-    serial_debug("    Quartest:\n");
+    printf("    Name:%s\n", set->name);
+    printf("    Number:%d\n", set->number);
+    printf("    Type:%s\n", set->type);
+    printf("    Executions:%d\n", set->executions);
+    printf("    Quartest:\n");
     for (int i = 0; i < set->quartetCount; i++)
     {
         json_print_quartet(&(set->quartets[i]));
@@ -548,9 +548,9 @@ void json_print_motion_set(MotionSet *set)
 
 void json_print_motion_profile(MotionProfile *profile)
 {
-    serial_debug("Name:%s\n", profile->name);
-    serial_debug("Number:%d\n", profile->number);
-    serial_debug("Sets:\n");
+    printf("Name:%s\n", profile->name);
+    printf("Number:%d\n", profile->number);
+    printf("Sets:\n");
     for (int i = 0; i < profile->setCount; i++)
     {
         json_print_motion_set(&(profile->sets[i]));
@@ -563,7 +563,7 @@ static void read_file_to_buf(const char *filename)
 
     if (file == NULL)
     {
-        serial_debug("Error opening file:%s\n", filename);
+        printf("Error opening file:%s\n", filename);
         return;
     }
 
@@ -574,7 +574,7 @@ static void read_file_to_buf(const char *filename)
     if (fileSize > MAX_FILE_SIZE)
     {
         fclose(file);
-        serial_debug("File too large:%s\n", filename);
+        printf("File too large:%s\n", filename);
         return;
     }
 
@@ -582,7 +582,7 @@ static void read_file_to_buf(const char *filename)
     fclose(file);
 
     buffer[fileSize] = '\0';
-    serial_debug("%s\n", buffer);
+    printf("%s\n", buffer);
 }
 
 /**
@@ -599,7 +599,7 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
 
     if (!parser || JSON_OBJ != json_getType(parser))
     {
-        serial_debug("Error, the  JSON cannot be parsed.\n");
+        printf("Error, the  JSON cannot be parsed.\n");
         return;
     }
 
@@ -609,14 +609,14 @@ void json_to_machine_profile(MachineProfile *profile, const char *filename)
     const json_t *mcParser = json_getProperty(parser, "Configuration");
     if (!mcParser || JSON_OBJ != json_getType(mcParser))
     {
-        serial_debug("Error, the  Machine Configuration  property is not found.\n");
+        printf("Error, the  Machine Configuration  property is not found.\n");
     }
     json_to_machine_configuration(mcParser, &(profile->configuration));
 
     const json_t *mpParser = json_getProperty(parser, "Performance");
     if (!mpParser || JSON_OBJ != json_getType(mpParser))
     {
-        serial_debug("Error, the  Machine Profile  property is not found.\n");
+        printf("Error, the  Machine Profile  property is not found.\n");
     }
     json_to_machine_performance(mpParser, &(profile->performance));
     bufferSem = false; // Unlock buffer
@@ -705,7 +705,7 @@ void json_to_motion_profile(const char *filename, MotionProfile *profile)
 
     for (int i = 0; i < profile->setCount; i++)
     {
-        serial_debug("reading motion profile: %s\n", filenames[i]);
+        printf("reading motion profile: %s\n", filenames[i]);
         json_to_motion_set(filenames[i], &(profile->sets[i]));
     }
 
@@ -737,7 +737,7 @@ void json_to_motion_set(const char *filename, MotionSet *set)
 
     for (int i = 0; i < set->quartetCount; i++)
     {
-        serial_debug("reading motion set: %s\n", filenames[i]);
+        printf("reading motion set: %s\n", filenames[i]);
         json_to_motion_quartet(filenames[i], &(set->quartets[i]));
     }
 
@@ -750,16 +750,16 @@ void json_to_motion_quartet(const char *filename, MotionQuartet *quartet)
 
     // Use tiny-json to parse the string
     const json_t *parser = json_create(buffer, mem, MAX_TOKENS);
-    serial_debug("parsing name\n");
+    printf("parsing name\n");
     strncpy(quartet->name, json_property_to_string(parser, "Name"), MAX_MOTION_PROFILE_SET_NAME);
-    serial_debug("parsing Function\n");
+    printf("parsing Function\n");
     quartet->function = json_property_to_int(parser, "Function");
-    serial_debug("parsing Parameters\n");
+    printf("parsing Parameters\n");
     json_property_to_double_array(quartet->parameters, parser, "Parameters");
-    serial_debug("paramouter:%f \n", quartet->parameters[0]);
-    serial_debug("parsing Dwell\n");
+    printf("paramouter:%f \n", quartet->parameters[0]);
+    printf("parsing Dwell\n");
     quartet->dwell = json_property_to_double(parser, "Dwell");
-    serial_debug("done\n");
+    printf("done\n");
 
     bufferSem = false; // Unlock buffer
 }

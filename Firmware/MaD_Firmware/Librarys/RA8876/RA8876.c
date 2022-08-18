@@ -82,13 +82,13 @@ Error display_begin(Display *display, int reset, int xnscs, int spi_mosi, int sp
 
   if ((lcdRegDataRead(display, 0xff) != 0x76) && (lcdRegDataRead(display, 0xff) != 0x77))
   {
-    serial_debug("Display not found\n");
+    printf("Display not found\n");
     return DISPLAY_NOT_FOUND;
   }
   Error err;
   if ((err = display_initialize(display)) != SUCCESS)
   {
-    serial_debug("Error:%d\n", err);
+    printf("Error:%d\n", err);
     return err;
   }
   return SUCCESS;
@@ -99,12 +99,12 @@ Error display_initialize(Display *display)
 {
   if (!display_pll_initial(display))
   {
-    serial_debug("PLL initial fail!");
+    printf("PLL initial fail!");
     return DISPLAY_PLL_FAIL;
   }
   if (!display_sdram_initial(display))
   {
-    serial_debug("SDRAM initial fail!");
+    printf("SDRAM initial fail!");
     return DISPLAY_SDRAM_FAIL;
   }
   lcdRegWrite(display, RA8876_CCR); // 01h
@@ -1504,7 +1504,7 @@ use the image took from RA8876 to convert that jpg to bin. 8 characters max with
 */
 void display_load_image(Display *display, Image *image)
 {
-  serial_debug("Loading image %s\n", image->name);
+  printf("Loading image %s\n", image->name);
   if (image->page == 1)
   {
     display_canvas_image_start_address(display, PAGE1_START_ADDR);
@@ -1520,12 +1520,12 @@ void display_load_image(Display *display, Image *image)
 
   mkdir("/sd/img", 0);
   chdir("/sd/img");
-  serial_debug("Loading image %s\n", image->name);
+  printf("Loading image %s\n", image->name);
 
   FILE *fp = fopen(image->name, "r");
   if (fp == NULL)
   {
-    serial_debug("Error opening file(%s): %d\n", image->name, _geterror());
+    printf("Error opening file(%s): %d\n", image->name, _geterror());
     display_canvas_image_start_address(display, PAGE1_START_ADDR);
     display_active_window_xy(display, 0, 0);
     display_active_window_wh(display, SCREEN_WIDTH, SCREEN_HEIGHT);
