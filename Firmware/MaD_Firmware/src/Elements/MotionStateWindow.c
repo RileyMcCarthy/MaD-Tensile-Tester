@@ -1,5 +1,5 @@
 #include "MotionStateWindow.h"
-#include "style.h"
+#include "Style.h"
 #define BUTTONCOUNT 3
 
 #define BUTTON_STATUS 0
@@ -39,11 +39,11 @@ static void button_callback(int id, void *arg)
         switch (window->state->motionParameters.status)
         {
         case STATUS_DISABLED:
-            serial_debug("Status: Disabled");
+            printf("Status: Disabled");
             state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_ENABLED);
             break;
         case STATUS_ENABLED:
-            serial_debug("Status: enabled");
+            printf("Status: enabled");
             state_machine_set(window->state, PARAM_MOTION_STATUS, STATUS_DISABLED);
             break;
         }

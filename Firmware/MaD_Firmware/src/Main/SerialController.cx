@@ -30,7 +30,7 @@ static long serial_stack[SERIAL_MEMORY_SIZE];
 static Message queue[10];
 static int queue_head = 0;
 
-#define serial_debug(format, ...) serial_cmd(MESSAGE_TYPE_DEBUG, format, __VA_ARGS__)
+#define printf(format, ...) serial_cmd(MESSAGE_TYPE_DEBUG, format, __VA_ARGS__)
 #define serial_error(format, ...) serial_cmd(MESSAGE_TYPE_ERROR, format, __VA_ARGS__)
 #define serial_notify(format, ...) serial_cmd(MESSAGE_TYPE_NOTIFY, format, __VA_ARGS__)
 
@@ -101,7 +101,7 @@ static void serial_cog(void *arg)
 
 bool serial_begin(void)
 {
-    serial_debug("Serial begin\n");
+    printf("Serial begin\n");
     int cogid = _cogstart_C(serial_cog, NULL, &serial_stack[0], sizeof(long) * SERIAL_MEMORY_SIZE);
     if (cogid != -1)
     {

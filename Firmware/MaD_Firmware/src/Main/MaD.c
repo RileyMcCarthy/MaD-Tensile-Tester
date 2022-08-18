@@ -39,7 +39,7 @@ static void load_images()
   images.keyboardImage.backgroundColor = NULL;
   images.keyboardImage.colorToReplace = 0;
   images.keyboardImage.replacementColor = 0;
-  serial_debug("Name:%s\n", (images.keyboardImage.name));
+  printf("Name:%s\n", (images.keyboardImage.name));
 
   strcpy(images.manualPageImage.name, "manual.bin");
   images.manualPageImage.page = 2;
@@ -208,7 +208,7 @@ static void load_images()
 static void write_machine_profile(MachineProfile *profile)
 {
   mkdir("/sd/settings", 0);
-  serial_debug("Writing machine profile to settings file\n");
+  printf("Writing machine profile to settings file\n");
   machine_profile_to_json(profile, "/sd/settings/Default.mcp");
 }
 
@@ -222,13 +222,13 @@ static void load_machine_profile()
 {
   if (access("/sd/settings/Default.mcp", F_OK) == 0) // Check for machine profile in filesyste
   {
-    serial_debug("Opening existing profile\n");
+    printf("Opening existing profile\n");
     json_to_machine_profile(&machineProfile, "/sd/settings/Default.mcp"); // Load machine profile from file
     json_print_machine_profile(&machineProfile);                          // Print machine profile to console
     return;
   }
 
-  serial_debug("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
+  printf("No machine profile found, creating default\n"); // Default machine profile does not exist, make a new one
   // MachineSettings
 
   strcpy(machineProfile.name, "Tensile_Test_1");
@@ -361,7 +361,7 @@ static bool start_display()
   // turn on diplay
   if ((err = display_begin(&display, DISPLAY_XNRESET, DISPLAY_XNSCS, DISPLAY_MOSI, DISPLAY_MISO, DISPLAY_SCK, DISPLAY_CLK, DISPLAY_DATA)) != SUCCESS)
   {
-    serial_debug("Error starting display:%d\n", err);
+    printf("Error starting display:%d\n", err);
     return false;
   }
 
@@ -383,21 +383,11 @@ static bool start_display()
 
 void mad_begin()
 {
-  if (serial_begin())
-  {
-    serial_debug("Serial port opened\n");
-  }
-  else
-  {
-    __builtin_printf("Serial port failed to open\n");
-    return false;
-  }
-
-  serial_debug("Starting MAD\n");
+  printf("Starting MAD\n");
 
   if (!start_display())
   {
-    serial_debug("Error starting display\n");
+    printf("Error starting display\n");
     return;
   }
   loading_overlay_display(&display, "Display Initialized!", OVERLAY_TYPE_LOADING);
@@ -444,7 +434,7 @@ void mad_begin()
   test_profile_page_init(&testProfilePage, &display, &images);
   navigation_page_init(&navigationPage, &display, &images);
 
-  serial_debug("Machine propfile size:%d\n", (int)sizeof(machineProfile));
+  printf("Machine propfile size:%d\n", (int)sizeof(machineProfile));
   // Begin main loop
   Page currentPage = PAGE_STATUS;
   while (1)
@@ -453,45 +443,45 @@ void mad_begin()
     {
     case PAGE_STATUS:
     {
-      serial_debug("Loading status page\n");
+      printf("Loading status page\n");
       status_page_run(&statusPage);
-      serial_debug("Leaving status page\n");
+      printf("Leaving status page\n");
       break;
     }
     case PAGE_MANUAL:
     {
-      serial_debug("Loading manual page\n");
+      printf("Loading manual page\n");
       //      manual_page_run(&manualPage);
-      serial_debug("Leaving manual page\n");
+      printf("Leaving manual page\n");
       break;
     }
     case PAGE_AUTOMATIC:
     {
-      serial_debug("Loading automatic page...\n");
+      printf("Loading automatic page...\n");
       automatic_page_run(&automaticPage);
-      serial_debug("Leaving automatic page\n");
+      printf("Leaving automatic page\n");
       break;
     }
     case PAGE_CALIBRATION:
     {
-      serial_debug("Loading force calibration page...\n");
+      printf("Loading force calibration page...\n");
       bool update = 0; // calibrate_force_page_run(&calibrateForcePage);
       if (update)
       {
         write_machine_profile(&machineProfile);
       }
-      serial_debug("Leaving force calibration page\n");
+      printf("Leaving force calibration page\n");
       break;
     }
     case PAGE_SETTINGS:
     {
-      serial_debug("Loading settings page...\n");
+      printf("Loading settings page...\n");
       /*while (settings_page_run(&settingsPage)) // Keep running settings page until navigation icon selected
       {
-        serial_debug("Updating force calibration page:%s\n", machineProfile.name);
+        printf("Updating force calibration page:%s\n", machineProfile.name);
         write_machine_profile(&machineProfile);
       }*/
-      serial_debug("Leaving settings page\n");
+      printf("Leaving settings page\n");
       break;
     }
     case PAGE_TEST_PROFILE:
@@ -502,7 +492,7 @@ void mad_begin()
     default:
       break;
     }
-    serial_debug("Selecting new page\n");
+    printf("Selecting new page\n");
 
     currentPage = navigation_page_run(&navigationPage);
   }

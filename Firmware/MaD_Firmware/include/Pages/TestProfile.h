@@ -9,7 +9,7 @@
 #include "Selection.h"
 #include "JSON.h"
 #include "Graph.h"
-#include "motionPlanning.h"
+#include "MotionPlanning.h"
 
 typedef struct TestProfilePage_s
 {

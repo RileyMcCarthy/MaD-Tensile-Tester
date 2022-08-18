@@ -22,12 +22,12 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 {
     if (run == NULL || profile == NULL)
     {
-        serial_debug("Null pointer passed to position_profile\n");
+        printf("Null pointer passed to position_profile\n");
         return 0;
     }
     if (run->currentSet > MAX_MOTION_PROFILE_SETS)
     {
-        serial_debug("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
+        printf("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
         run->currentSet = 0;
     }
     double position = position_set(t, run, &(profile->sets[run->currentSet]));
@@ -48,30 +48,30 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
 {
     if (run == NULL || set == NULL)
     {
-        serial_debug("Null pointer passed to position_set\n");
+        printf("Null pointer passed to position_set\n");
         return 0;
     }
     if (run->currentQuartet > MAX_MOTION_QUARTETS)
     {
-        serial_debug("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
+        printf("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
         run->currentQuartet = 0;
     }
     double position = position_quartet(t, run, &(set->quartets[run->currentQuartet]));
     if (run->quartetComplete)
     {
-        // serial_debug("quartet complete:%d\n", run->currentQuartet);
+        // printf("quartet complete:%d\n", run->currentQuartet);
         run->currentQuartet++;
         run->quartetComplete = false;
     }
     if (run->currentQuartet >= set->quartetCount)
     {
-        // serial_debug("Set %d execution %d done\n", run->currentSet, run->currentExecution);
+        // printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
         run->currentExecution++;
         run->currentQuartet = 0;
     }
     if (run->currentExecution >= set->executions)
     {
-        // serial_debug("Set %d done\n", run->currentSet);
+        // printf("Set %d done\n", run->currentSet);
         run->setComplete = true;
         run->currentExecution = 0;
     }
@@ -82,19 +82,19 @@ double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
 {
     if (run == NULL || quartet == NULL)
     {
-        serial_debug("Null pointer passed to position_set\n");
+        printf("Null pointer passed to position_set\n");
         return 0;
     }
     FunctionInfo info;
     get_function_info(&info, quartet->function);
-    // serial_debug("Function:%s\n", info.name);
-    // serial_debug("Args:%s\n", info.args[0]);
-    // serial_debug("Args:%s\n", info.args[1]);
-    // serial_debug("Args:%s\n", info.args[2]);
-    // serial_debug("params:%f\n", quartet->parameters[0]);
+    // printf("Function:%s\n", info.name);
+    // printf("Args:%s\n", info.args[0]);
+    // printf("Args:%s\n", info.args[1]);
+    // printf("Args:%s\n", info.args[2]);
+    // printf("params:%f\n", quartet->parameters[0]);
     if (info.func == NULL)
     {
-        // serial_debug("no function for %s\n", info.name);
+        // printf("no function for %s\n", info.name);
         run->lastQuartetTime = t;
         run->lastQuartetDistance += quartet->parameters[0];
         run->quartetComplete = true;
@@ -106,7 +106,7 @@ double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
     {
         position = quartet->parameters[0];
     }
-    // serial_debug("Position:%f\n", position);
+    // printf("Position:%f\n", position);
     double lastQuartetDistance = run->lastQuartetDistance;
 
     if (abs(position - quartet->parameters[0]) < 0.1) // Still need to add Dwell
@@ -296,7 +296,7 @@ double steps_to_mm(int steps, MachineConfiguration *config)
 {
     if (config == NULL)
     {
-        serial_debug("steps_to_mm: config is NULL\n");
+        printf("steps_to_mm: config is NULL\n");
         return 0;
     }
     return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
@@ -306,7 +306,7 @@ int mm_to_steps(double mm, MachineConfiguration *config)
 {
     if (config == NULL)
     {
-        serial_debug("mm_to_steps: config is NULL\n");
+        printf("mm_to_steps: config is NULL\n");
         return 0;
     }
     return (int)round(mm * (double)config->positionEncoderStepsPerRev / (double)(config->gearDiameter * 3.14159));

@@ -172,7 +172,7 @@ bool calibrate_force_page_run(CalibratePage *page)
 {
     bool infoUpdated = false;
     complete = false;
-    serial_debug("Force Calibration page running\n");
+    printf("Force Calibration page running\n");
 
     module_draw(page->display, &(page->root));
 
@@ -259,7 +259,7 @@ bool calibrate_force_page_run(CalibratePage *page)
                 Keyboard *keyboard = keyboard_create(page->display, page->images);
                 char *forceValue = keyboard_get_input(keyboard, "Force:");
                 double forceReal = atof(forceValue);
-                serial_debug("force value:%s\n", forceValue);
+                printf("force value:%s\n", forceValue);
                 if (forceValue == NULL || forceReal > 5 || forceReal < -5)
                 {
                     page->state--;

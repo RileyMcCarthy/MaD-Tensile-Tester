@@ -1,8 +1,8 @@
 #FlexProp
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
-FLEXCC = C:\flexprop\bin\flexcc.exe
-LOAD = C:\flexprop\bin\loadp2.exe
-FLEXCCFLAGS=-2 -O2 -Wall -include SerialController.h#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
+FLEXCC = ~/flexprop/bin/flexcc
+LOAD = ~/flexprop/bin/loadp2
+FLEXCCFLAGS=-2 -O2 -Wall #-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
 BIN = bin
 
 CATALINA="C:/Program Files (x86)/Catalina_5.1/bin/catalina.exe"
@@ -14,7 +14,7 @@ GCC = g++
 GCCFLAGS = -Wall -DSIMULATION -include MaD_Firmware/Librarys/simulation/propellerSim.h
 WIN = win
 
-FIND := C:/cygwin64/bin/find.exe
+FIND := find #C:/cygwin64/bin/find.exe
 
 TARGET = MAD.binary
 SRC = MaD_Firmware #flexprop/include # Root folders for src code
@@ -33,7 +33,7 @@ OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 $(info $$OBJECTSPIN is [${OBJECTSPIN}])
 INC := $(addprefix -I ,$(INCLUDE))
 
-flexprop: clean clear $(BIN)/$(TARGET) run
+flexprop: clean $(BIN)/$(TARGET) run
 sim: clean clear $(WIN)/$(TARGET)
 catalina: $(CAT)/$(TARGET)
 
@@ -42,7 +42,7 @@ $(BIN)/$(TARGET): $(OBJECTS)
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) $(OBJECTS) -o $@
 
 $(BIN)/%.o: %.c
-	-mkdir -p $(subst /,\,$(@D))
+	-mkdir -p $(subst /,/,$(@D))
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $<
 
 # Make for Catalina
@@ -50,7 +50,7 @@ $(CAT)/$(TARGET): $(OBJECTSCAT)
 	$(CATALINA) $(CATALINAFLAGS) $(INC) $(OBJECTS) -o $@
 
 $(CAT)/%.o: %.c
-	-mkdir -p $(subst /,\,$(@D))
+	-mkdir -p $(subst /,/,$(@D))
 	$(CATALINA) $(CATALINAFLAGS) $(INC) -c -o $@ $<
 
 #Make for windows

@@ -38,7 +38,7 @@ static bool move_servo(ControlSystem *control, MoveType type, int value)
 {
     if (control == NULL)
     {
-        serial_debug("move_servo: control is null\n");
+        printf("move_servo: control is null\n");
         return false;
     }
     // move servo and check if move is allowed (conditions or machine limits)
@@ -50,10 +50,10 @@ static bool move_servo(ControlSystem *control, MoveType type, int value)
         break;
     case MOVE_RELATIVE:
     {
-        // serial_debug("moving relitive\n");
+        // printf("moving relitive\n");
 
         int positionSteps = mm_to_steps(value / 1000.0, &(control->machineProfile->configuration)) + control->monitorData->encoderRaw;
-        // serial_debug("positionSteps:%d,%d\n", positionSteps, control->monitorData->encoderRaw);
+        // printf("positionSteps:%d,%d\n", positionSteps, control->monitorData->encoderRaw);
         move_abs32(DYN1_ADDR, positionSteps);
         break;
     }
@@ -81,7 +81,7 @@ static void control_cog(ControlSystem *control)
     /*Initialize mcp23017*/
     while (!mcp23017_begin(&mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL))
     {
-        serial_debug("MCP23017 not communicating, trying again\n");
+        printf("MCP23017 not communicating, trying again\n");
         _waitms(100);
     }
 
@@ -100,7 +100,7 @@ static void control_cog(ControlSystem *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
-    serial_debug("Control cog started\n");
+    printf("Control cog started\n");
 
     // For running test profiles;
     long startTime = 0;
@@ -128,7 +128,7 @@ static void control_cog(ControlSystem *control)
         mcp_set_pin(&mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0);
 
 #if CONTROL_DEGUB
-        serial_debug("TIME1: %d\n", _getms() - testms);
+        printf("TIME1: %d\n", _getms() - testms);
         testms = _getms();
 #endif
 
@@ -189,7 +189,7 @@ static void control_cog(ControlSystem *control)
         }
 
 #if CONTROL_DEGUB
-        serial_debug("TIME2: %d\n", _getms() - testms);
+        printf("TIME2: %d\n", _getms() - testms);
         testms = _getms();
 #endif
         // DYN$
@@ -218,7 +218,7 @@ static void control_cog(ControlSystem *control)
         // RTC
 
 #if CONTROL_DEGUB
-        serial_debug("TIME3: %d\n", _getms() - testms);
+        printf("TIME3: %d\n", _getms() - testms);
         testms = _getms();
 #endif
 
@@ -266,7 +266,7 @@ static void control_cog(ControlSystem *control)
         }
 
 #if CONTROL_DEGUB
-        serial_debug("TIME4: %d\n", _getms() - testms);
+        printf("TIME4: %d\n", _getms() - testms);
         testms = _getms();
 #endif
 
@@ -299,11 +299,11 @@ static void control_cog(ControlSystem *control)
                     navkey_update_status(&navkey); // Update navkey status registers
                     if (navkey.status.CTRR > 0)    // Center button released
                     {
-                        // serial_debug("CTRR:%d\n", navkey.status.CTRR);
+                        // printf("CTRR:%d\n", navkey.status.CTRR);
 
                         if (currentMachineState.motionParameters.condition == MOTION_STOPPED)
                         {
-                            // serial_debug("stopped\n");
+                            // printf("stopped\n");
                             switch (currentMachineState.function)
                             {
                             case FUNC_MANUAL_OFF:
@@ -329,7 +329,7 @@ static void control_cog(ControlSystem *control)
                                 control->stateMachine->function = FUNC_MANUAL_OFF;
                                 break;
                             }
-                            // serial_debug("Function: %d\n", control->stateMachine->function);
+                            // printf("Function: %d\n", control->stateMachine->function);
                         }
                         else if (control->stateMachine->motionParameters.condition == MOTION_MOVING)
                         {
@@ -363,12 +363,12 @@ static void control_cog(ControlSystem *control)
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
-                            serial_debug("up released\n");
+                            printf("up released\n");
                             move_servo(control, MOVE_RELATIVE, control->stateMachine->functionData);
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
-                            serial_debug("down released\n");
+                            printf("down released\n");
                             move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->functionData);
                         }
                         break;
@@ -520,11 +520,11 @@ static void control_cog(ControlSystem *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        serial_debug("running test\n");
+                        printf("running test\n");
                         run_motion_profile_init(&run); // Create new RunMotionProfile structure
                         startTime = _getus();
                         startPosition = control->monitorData->position;
-                        // serial_debug("start time: %d\n", startTime);
+                        // printf("start time: %d\n", startTime);
                         //  json_print_motion_profile(&(control->motionProfile));
                         json_print_motion_profile(&(control->motionProfile));
                         monitorWriteData = true;
@@ -539,12 +539,12 @@ static void control_cog(ControlSystem *control)
                         }*/
                         double t = (_getus() - startTime) / 1000000.0;
                         double position = position_profile(t, &run, &(control->motionProfile));
-                        // serial_debug("%f,%f,%f\n", t, position, control->monitorData->position);
+                        // printf("%f,%f,%f\n", t, position, control->monitorData->position);
                         move_servo(control, MOVE_ABSOLUTE, startPosition + (int)(position * 1000));
                     }
                     else
                     {
-                        serial_debug("test complete\n");
+                        printf("test complete\n");
                         monitorWriteData = false;
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }

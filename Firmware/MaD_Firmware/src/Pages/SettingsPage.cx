@@ -341,7 +341,7 @@ void settings_page_init(SettingsPage *page, Display *display, MachineProfile *ma
 bool settings_page_run(SettingsPage *page)
 {
     complete = false;
-    serial_debug("Settings page running\n");
+    printf("Settings page running\n");
     display_draw_square_fill(page->display, 0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1, BACKCOLOR);
     display_set_text_parameter1(page->display, RA8876_SELECT_INTERNAL_CGROM, RA8876_CHAR_HEIGHT_32, RA8876_SELECT_8859_1);
     display_set_text_parameter2(page->display, RA8876_TEXT_FULL_ALIGN_DISABLE, RA8876_TEXT_CHROMA_KEY_DISABLE, RA8876_TEXT_WIDTH_ENLARGEMENT_X1, RA8876_TEXT_HEIGHT_ENLARGEMENT_X1);
@@ -707,11 +707,11 @@ bool settings_page_run(SettingsPage *page)
     {
         if (check_buttons(page) && !complete)
         {
-            serial_debug("reloading page\n");
+            printf("reloading page\n");
             return true; // reload page
         }
     }
-    serial_debug("exiting page\n");
+    printf("exiting page\n");
     free(page->buttons);
     return false; // exit page
 }

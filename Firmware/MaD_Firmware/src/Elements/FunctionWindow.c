@@ -1,6 +1,6 @@
 #include "FunctionWindow.h"
 #include "ControlSystem.h"
-#include "style.h"
+#include "Style.h"
 #define BUTTONCOUNT 7
 
 static char offBuffer[] = "Off";

@@ -51,7 +51,7 @@ static void monitor_cog(Monitor *monitor)
   BSP_W25Qx_Init(&flashError);
   while (flashError != SUCCESS)
   {
-    serial_debug("Error initializing flash:%d\n", flashError);
+    printf("Error initializing flash:%d\n", flashError);
     BSP_W25Qx_Init(&flashError);
     _waitms(100);
   }
@@ -70,7 +70,7 @@ static void monitor_cog(Monitor *monitor)
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
 
   int delayCycles = _clockfreq() / monitor->sampleRate;
-  // serial_debug("Monitor Cog Started at %dHz with delay of:%d\n", monitor->sampleRate, delayCycles);
+  // printf("Monitor Cog Started at %dHz with delay of:%d\n", monitor->sampleRate, delayCycles);
   FILE *file = NULL;
 
   monitorWriteData = false;
@@ -87,9 +87,9 @@ static void monitor_cog(Monitor *monitor)
     int forceStartMs = _getus();
     // int forceRawTemp = force_gauge_get_raw(&forceGauge, &err); // Get Force
     int forceRawTemp = forceGauge.forceRaw;
-    // serial_debug("Force Raw:%d\n", forceRawTemp);
+    // printf("Force Raw:%d\n", forceRawTemp);
     int forceEndMs = _getus();
-    // serial_debug("Force Gauge Time:%d\n", forceEndMs - forceStartMs);
+    // printf("Force Gauge Time:%d\n", forceEndMs - forceStartMs);
     if (forceGauge.responding)
     {
       monitor->data.forceRaw = forceRawTemp;
@@ -97,12 +97,12 @@ static void monitor_cog(Monitor *monitor)
     }
     else
     {
-      serial_debug("Force Gauge disconnected, attempting to reconnect\n");
+      printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       printf("Force Gauge stopped\n");
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
       {
-        serial_debug("Force Gauge reconnected\n");
+        printf("Force Gauge reconnected\n");
         state_machine_set(monitor->machineState, PARAM_MACHINE_FORCE_GAUGE_COM, true);
       }
       else
@@ -117,7 +117,7 @@ static void monitor_cog(Monitor *monitor)
     monitor->data.timems = _getms();
     monitor->data.timeus = _getus();
     monitor->data.force = raw_to_force(monitor->data.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
-    // serial_debug("Force:%f\n", monitor->data.force);
+    // printf("Force:%f\n", monitor->data.force);
     monitor->data.position = steps_to_mm(monitor->data.encoderRaw, monitor->configuration); // Convert steps to mm
     if (monitorWriteData)
     {
@@ -127,26 +127,26 @@ static void monitor_cog(Monitor *monitor)
 
         while (!BSP_W25Qx_Lock())
           ; // Wait for flash to be available, then lock it.
-        // serial_debug("flash claimed\n");
+        // printf("flash claimed\n");
       }
 
       if ((flashAddr + size * 2) / W25Q64FV_SUBSECTOR_SIZE >= eraseBlock)
       {
-        // serial_debug("Erasing flash:%d\n", eraseBlock);
+        // printf("Erasing flash:%d\n", eraseBlock);
         BSP_W25Qx_Erase_Block(eraseBlock * W25Q64FV_SUBSECTOR_SIZE);
         _waitms(100);
         eraseBlock++;
       }
       flashData.data = monitor->data;
       BSP_W25Qx_Write(flashData.byte, flashAddr, sizeof(MonitorData));
-      // serial_debug("wrote data to flash at address:%d\n",flashAddr); //not getting to this line
+      // printf("wrote data to flash at address:%d\n",flashAddr); //not getting to this line
       flashAddr += sizeof(MonitorData);
     }
     else
     {
       if (flashAddr != 0)
       {
-        serial_debug("Monitor done writing\n");
+        printf("Monitor done writing\n");
         MonitorData temp;
         temp.timems = -1; // Set to invalid value to indicate end of data
         temp.forceRaw = 0;
@@ -158,11 +158,11 @@ static void monitor_cog(Monitor *monitor)
         {
 
           BSP_W25Qx_Read(flashData.byte, addr, sizeof(MonitorData));
-          serial_debug("%d,%d,%d,%f,%f\n", flashData.data.timeus, flashData.data.forceRaw, flashData.data.encoderRaw, flashData.data.force, flashData.data.position);
+          printf("%d,%d,%d,%f,%f\n", flashData.data.timeus, flashData.data.forceRaw, flashData.data.encoderRaw, flashData.data.force, flashData.data.position);
           addr += sizeof(MonitorData);
         } while (flashData.data.timems > -1); // wait for invalid time
         BSP_W25Qx_Unlock();
-        serial_debug("Done writing data\n");
+        printf("Done writing data\n");
       }
       flashAddr = 0;
       eraseBlock = 0; //@TODO combine these into different method using flashAddr to det new page
@@ -180,7 +180,7 @@ static void monitor_cog(Monitor *monitor)
       }
     }
     /*if (waitcycles < (uint32_t)getcnt())
-        serial_debug("Error: Monitor COG is running too slow:%lu,%lu\n", ((uint32_t)getcnt() - waitcycles),delayCycles);
+        printf("Error: Monitor COG is running too slow:%lu,%lu\n", ((uint32_t)getcnt() - waitcycles),delayCycles);
     else
         waitcnt(waitcycles);*/
     //@TODO this delay shouldd only affect the writing of dfata

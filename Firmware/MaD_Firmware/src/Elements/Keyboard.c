@@ -1,4 +1,4 @@
-#include "keyboard.h"
+#include "Keyboard.h"
 #include "Module.h"
 
 #define KEY_UNIT_WIDTH 54
@@ -119,7 +119,7 @@ static char *key_name[] = {
 static void key_pressed(int id, void *arg)
 {
     Keyboard *keyboard = (Keyboard *)arg;
-    serial_debug("%s\n", keyboard->keyboard_buffer);
+    printf("%s\n", keyboard->keyboard_buffer);
     switch (id)
     {
     case key_del:
@@ -213,7 +213,7 @@ Keyboard *keyboard_create(Display *display, Images *images)
  */
 char *keyboard_get_input(Keyboard *keyboard, const char *prompt)
 {
-    serial_debug("keyboard running:%s\n", prompt);
+    printf("keyboard running:%s\n", prompt);
     keyboard->keyboard_complete = false;
     // Create Empty Buffer
     strcpy(keyboard->keyboard_buffer, "");
