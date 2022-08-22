@@ -1,16 +1,6 @@
 #ifndef JSON_H
 #define JSON_H
 
-#include <stddef.h>
-#include <stdbool.h>
-#include "string.h"
-#include "Error.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "tiny-json.h"
-#include <stdio.h>
-#include <stdlib.h>
-
 #define MAX_TOKENS 200
 #define MAX_MACHINE_PROFILE_NAME 20
 
@@ -134,41 +124,4 @@ typedef struct TestProfile_s
     MotionProfile motionProfile;            // Name of the motion profile
     char comment[MAX_TEST_PROFILE_COMMENT]; // Comment for the test
 } TestProfile;
-
-// Helper Functions
-
-void machine_configuration_init(MachineConfiguration *configuration);
-void machine_performance_init(MachinePerformance *performance);
-void machine_profile_init(MachineProfile *profile);
-void motion_quartet_init(MotionQuartet *quartet);
-void motion_set_init(MotionSet *set);
-void sample_profile_init(SampleProfile *sample);
-void motion_profile_init(MotionProfile *profile);
-void test_profile_init(TestProfile *profile);
-
-Error machine_profile_to_json(MachineProfile *settings, const char *filename); // U
-Error sample_profile_to_json(SampleProfile *sample, const char *filename);     // U
-Error test_profile_to_json(TestProfile *test, const char *filename);           // U
-Error motion_profile_to_json(MotionProfile *motion, const char *filename);     // U
-Error motion_set_to_json(MotionSet *set, char *filename);                      // U
-Error motion_quartet_to_json(MotionQuartet *quartet, const char *filename);    // U
-
-void json_to_machine_profile(MachineProfile *profile, const char *filename);
-void json_to_sample_profile(SampleProfile *sample, const char *filename);
-void json_to_test_profile(const char *filename, TestProfile *test);        // U
-void json_to_motion_profile(const char *filename, MotionProfile *profile); // U
-void json_to_motion_set(const char *filename, MotionSet *set);             // U
-void json_to_motion_quartet(const char *filename, MotionQuartet *quartet); // U
-
-void json_print_machine_profile(MachineProfile *profile);
-void json_print_motion_profile(MotionProfile *profile);
-
-void free_machine_profile(MachineProfile *settings);
-void free_machine_performance(MachinePerformance *performance);
-void free_machine_configuration(MachineConfiguration *configuration);
-void free_sample_profile(SampleProfile *sample);
-void free_test_profile(TestProfile *test);
-void free_motion_profile(MotionProfile *profile);
-void free_motion_set(MotionSet *set);
-void free_motion_quartet(MotionQuartet *quartet);
 #endif

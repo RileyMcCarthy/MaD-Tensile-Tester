@@ -104,7 +104,7 @@ static void continuous_data(void *arg)
  */
 Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
-    printf("opening force\n");
+    // printf("opening force\n");
     forceGauge->rx = rx;
     forceGauge->tx = tx;
     forceGauge->serial.start(rx, tx, 3, BAUD);
@@ -160,7 +160,7 @@ Error force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 
 void force_gauge_stop(ForceGauge *forceGauge)
 {
-    printf("stopping cogid: %d\n", forceGauge->cogid);
+    // printf("stopping cogid: %d\n", forceGauge->cogid);
     _waitms(1000);
     if (forceGauge->cogid > 0)
     {

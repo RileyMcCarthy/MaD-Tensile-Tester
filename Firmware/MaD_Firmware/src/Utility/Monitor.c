@@ -97,12 +97,12 @@ static void monitor_cog(Monitor *monitor)
     }
     else
     {
-      printf("Force Gauge disconnected, attempting to reconnect\n");
+      // printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
-      printf("Force Gauge stopped\n");
+      // printf("Force Gauge stopped\n");
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
       {
-        printf("Force Gauge reconnected\n");
+        // printf("Force Gauge reconnected\n");
         state_machine_set(monitor->machineState, PARAM_MACHINE_FORCE_GAUGE_COM, true);
       }
       else

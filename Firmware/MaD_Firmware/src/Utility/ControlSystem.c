@@ -526,7 +526,7 @@ static void control_cog(ControlSystem *control)
                         startPosition = control->monitorData->position;
                         // printf("start time: %d\n", startTime);
                         //  json_print_motion_profile(&(control->motionProfile));
-                        json_print_motion_profile(&(control->motionProfile));
+                        //                        json_print_motion_profile(&(control->motionProfile));
                         monitorWriteData = true;
                     }
                     // Run the loaded test profile

@@ -1,35 +1,6 @@
 #ifndef MaD_H
 #define MaD_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <dirent.h>
-
-#include "IOBoard.h"
-#include "MCP23017.h"
-#include "StateMachine.h"
-#include "Style.h"
-#include "RA8876.h"
-#include "ForceGauge.h"
-#include "Keyboard.h"
-#include "NavigationPage.h"
-#include "LoadingOverlay.h"
-#include "IOBoard.h"
-#include "Monitor.h"
-#include "ManualPage.h"
-#include "StatusPage.h"
-#include "NavigationPage.h"
-#include "AutomaticPage.h"
-#include "CalibrateForcePage.h"
-#include "JSON.h"
-#include "tiny-json.h"
-#include "ControlSystem.h"
-#include "SettingsPage.h"
-#include "Explorer.h"
-#include "TestProfile.h"
-#include "Encoder.h"
-
 #define DISPLAY_SCK 51     // SPI Clock Pin
 #define DISPLAY_MISO 53    // SPI Data Pin
 #define DISPLAY_MOSI 52    // SPI Clock Pin

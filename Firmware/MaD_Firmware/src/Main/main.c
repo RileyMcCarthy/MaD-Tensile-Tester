@@ -48,9 +48,6 @@ double atof(const char *str)
 int main()
 {
     _clkset(_SETFREQ, _CLOCKFREQ);
-    mount("/sd", _vfs_open_sdcard()); // Mount SD card using default pins
-    // mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
-    // mount("/da", _vfs_open_sdcardx(6, 5, 4, 7)); // Mount data card using default pins
     mad_begin();
     while (1)
         ;
