@@ -1,7 +1,7 @@
-r"""Wrapper for JSON.h
+r"""Wrapper for StateMachineDefinition.h
 
 Generated with:
-/home/riley/.local/bin/ctypesgen MaD_Firmware/Librarys/JSON/JSON.h -o MaD_Software/JSON.py
+/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Utility/StateMachineDefinition.h -o MaD_Software/StateMachineDefinition.py
 
 Do not modify this file.
 """
@@ -814,371 +814,213 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 48
-class struct_MachineConfiguration_s(Structure):
+enum_States_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 11
+
+STATE_SELFCHECK = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 11
+
+STATE_MACHINECHECK = (STATE_SELFCHECK + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 11
+
+STATE_MOTION = (STATE_MACHINECHECK + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 11
+
+State = enum_States_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 11
+
+enum_MotionStatus_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+STATUS_DISABLED = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+STATUS_ENABLED = (STATUS_DISABLED + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+STATUS_SAMPLE_LIMIT = (STATUS_ENABLED + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+STATUS_MACHINE_LIMIT = (STATUS_SAMPLE_LIMIT + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+STATUS_FAULTED = (STATUS_MACHINE_LIMIT + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+MotionStatus = enum_MotionStatus_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 20
+
+enum_MotionOverTravel_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 27
+
+MOTION_LIMIT_OK = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 27
+
+MOTION_LIMIT_UPPER = (MOTION_LIMIT_OK + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 27
+
+MOTION_LIMIT_LOWER = (MOTION_LIMIT_UPPER + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 27
+
+MotionOverTravel = enum_MotionOverTravel_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 27
+
+enum_MotionCondition_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_LENGTH = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_FORCE = (MOTION_LENGTH + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_TENSION = (MOTION_FORCE + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_COMPRESSION = (MOTION_TENSION + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_UPPER = (MOTION_COMPRESSION + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_LOWER = (MOTION_UPPER + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_DOOR = (MOTION_LOWER + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_STOPPED = (MOTION_DOOR + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MOTION_MOVING = (MOTION_STOPPED + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+MotionCondition = enum_MotionCondition_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 44
+
+enum_MotionMode_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 51
+
+MODE_MANUAL = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 51
+
+MODE_TEST = (MODE_MANUAL + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 51
+
+MODE_TEST_RUNNING = (MODE_TEST + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 51
+
+MotionMode = enum_MotionMode_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 51
+
+enum_ModeFunctions_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_OFF = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_INCREMENTAL_JOG = (FUNC_MANUAL_OFF + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_CONTINUOUS_JOG = (FUNC_MANUAL_INCREMENTAL_JOG + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_POSITIONAL_MOVE = (FUNC_MANUAL_CONTINUOUS_JOG + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_HOME = (FUNC_MANUAL_POSITIONAL_MOVE + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_MOVE_GAUGE_LENGTH = (FUNC_MANUAL_HOME + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_MANUAL_MOVE_FORCE = (FUNC_MANUAL_MOVE_GAUGE_LENGTH + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_TEST_LOAD = (FUNC_MANUAL_MOVE_FORCE + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_TEST_RUN = (FUNC_TEST_LOAD + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_TEST_STOP = (FUNC_TEST_RUN + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+FUNC_TEST_TOGGLE_HOLD_RESUME = (FUNC_TEST_STOP + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+ModeFunctions = enum_ModeFunctions_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 66
+
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 71
+class struct_SelfCheck_t(Structure):
     pass
 
-struct_MachineConfiguration_s.__slots__ = [
-    'motorType',
-    'maxMotorTorque',
-    'maxMotorRPM',
-    'gearDiameter',
-    'gearPitch',
-    'systemIntertia',
-    'staticTorque',
-    'load',
-    'positionEncoderType',
-    'positionEncoderStepsPerRev',
-    'forceGauge',
-    'forceGaugeScaleFactor',
-    'forceGaugeZeroFactor',
+struct_SelfCheck_t.__slots__ = [
+    'chargePump',
 ]
-struct_MachineConfiguration_s._fields_ = [
-    ('motorType', c_char * int(20)),
-    ('maxMotorTorque', c_float),
-    ('maxMotorRPM', c_float),
-    ('gearDiameter', c_float),
-    ('gearPitch', c_float),
-    ('systemIntertia', c_float),
-    ('staticTorque', c_float),
-    ('load', c_float),
-    ('positionEncoderType', c_char * int(20)),
-    ('positionEncoderStepsPerRev', c_float),
-    ('forceGauge', c_char * int(20)),
-    ('forceGaugeScaleFactor', c_float),
-    ('forceGaugeZeroFactor', c_int),
+struct_SelfCheck_t._fields_ = [
+    ('chargePump', c_bool),
 ]
 
-MachineConfiguration = struct_MachineConfiguration_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 48
+SelfCheckParameters = struct_SelfCheck_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 71
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 60
-class struct_MachinePerformance_s(Structure):
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 83
+class struct_MachineCheck_t(Structure):
     pass
 
-struct_MachinePerformance_s.__slots__ = [
-    'minPosition',
-    'maxPosition',
-    'maxVelocity',
-    'maxAcceleration',
-    'maxForceTensile',
-    'maxForceCompression',
-    'forceGaugeNeutralOffset',
+struct_MachineCheck_t.__slots__ = [
+    'switchedPower',
+    'esdTravelLimit',
+    'esdSwitch',
+    'servoOK',
+    'forceGaugeCom',
+    'servoCom',
+    'rtcCom',
 ]
-struct_MachinePerformance_s._fields_ = [
-    ('minPosition', c_float),
-    ('maxPosition', c_float),
-    ('maxVelocity', c_float),
-    ('maxAcceleration', c_float),
-    ('maxForceTensile', c_float),
-    ('maxForceCompression', c_float),
-    ('forceGaugeNeutralOffset', c_float),
+struct_MachineCheck_t._fields_ = [
+    ('switchedPower', c_bool),
+    ('esdTravelLimit', MotionOverTravel),
+    ('esdSwitch', c_bool),
+    ('servoOK', c_bool),
+    ('forceGaugeCom', c_bool),
+    ('servoCom', c_bool),
+    ('rtcCom', c_bool),
 ]
 
-MachinePerformance = struct_MachinePerformance_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 60
+MachineCheckParameters = struct_MachineCheck_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 83
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 69
-class struct_MachineProfile_s(Structure):
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 90
+class struct_Motion_t(Structure):
     pass
 
-struct_MachineProfile_s.__slots__ = [
-    'name',
-    'number',
-    'configuration',
-    'performance',
+struct_Motion_t.__slots__ = [
+    'status',
+    'condition',
+    'mode',
 ]
-struct_MachineProfile_s._fields_ = [
-    ('name', c_char * int(20)),
-    ('number', c_int),
-    ('configuration', MachineConfiguration),
-    ('performance', MachinePerformance),
+struct_Motion_t._fields_ = [
+    ('status', MotionStatus),
+    ('condition', MotionCondition),
+    ('mode', MotionMode),
 ]
 
-MachineProfile = struct_MachineProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 69
+MotionParameters = struct_Motion_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 90
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
-class struct_MotionQuartet_s(Structure):
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 103
+class struct_MachineState_t(Structure):
     pass
 
-struct_MotionQuartet_s.__slots__ = [
-    'name',
+struct_MachineState_t.__slots__ = [
+    'state',
+    'selfCheckParameters',
+    'machineCheckParameters',
+    'motionParameters',
     'function',
-    'parameters',
-    'dwell',
+    'functionData',
+    'lock',
 ]
-struct_MotionQuartet_s._fields_ = [
-    ('name', c_char * int(50)),
-    ('function', c_int),
-    ('parameters', c_float * int(10)),
-    ('dwell', c_float),
-]
-
-MotionQuartet = struct_MotionQuartet_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
-class struct_MotionSet_s(Structure):
-    pass
-
-struct_MotionSet_s.__slots__ = [
-    'name',
-    'number',
-    'type',
-    'executions',
-    'quartetCount',
-    'quartets',
-]
-struct_MotionSet_s._fields_ = [
-    ('name', c_char * int(50)),
-    ('number', c_int),
-    ('type', c_char * int(10)),
-    ('executions', c_int),
-    ('quartetCount', c_int),
-    ('quartets', MotionQuartet * int(6)),
+struct_MachineState_t._fields_ = [
+    ('state', State),
+    ('selfCheckParameters', SelfCheckParameters),
+    ('machineCheckParameters', MachineCheckParameters),
+    ('motionParameters', MotionParameters),
+    ('function', ModeFunctions),
+    ('functionData', c_int),
+    ('lock', c_int),
 ]
 
-MotionSet = struct_MotionSet_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
+MachineState = struct_MachineState_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 103
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
-class struct_MotionProfile_s(Structure):
-    pass
+enum_parameters_e = c_int# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-struct_MotionProfile_s.__slots__ = [
-    'name',
-    'number',
-    'setCount',
-    'sets',
-]
-struct_MotionProfile_s._fields_ = [
-    ('name', c_char * int(50)),
-    ('number', c_int),
-    ('setCount', c_int),
-    ('sets', MotionSet * int(6)),
-]
+PARAM_SELF_CHARGE_PUMP = 0# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-MotionProfile = struct_MotionProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
+PARAM_MACHINE_SWITCHED_POWER = (PARAM_SELF_CHARGE_PUMP + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
-class struct_SampleProfile_s(Structure):
-    pass
+PARAM_MACHINE_ESD_TRAVEL_LIMIT = (PARAM_MACHINE_SWITCHED_POWER + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-struct_SampleProfile_s.__slots__ = [
-    'name',
-    'number',
-    'length',
-    'stretchMax',
-    'maxVelocity',
-    'maxAcceleration',
-    'maxJerk',
-    'maxForceTensile',
-    'maxForceCompression',
-]
-struct_SampleProfile_s._fields_ = [
-    ('name', c_char * int(50)),
-    ('number', c_int),
-    ('length', c_float),
-    ('stretchMax', c_float),
-    ('maxVelocity', c_float),
-    ('maxAcceleration', c_float),
-    ('maxJerk', c_float),
-    ('maxForceTensile', c_float),
-    ('maxForceCompression', c_float),
-]
+PARAM_MACHINE_ESD_SWITCH = (PARAM_MACHINE_ESD_TRAVEL_LIMIT + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-SampleProfile = struct_SampleProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
+PARAM_MACHINE_SERVO_OK = (PARAM_MACHINE_ESD_SWITCH + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
-class struct_TestProfile_s(Structure):
-    pass
+PARAM_MACHINE_FORCE_GAUGE_COM = (PARAM_MACHINE_SERVO_OK + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-struct_TestProfile_s.__slots__ = [
-    'name',
-    'sampleSN',
-    'machineProfile',
-    'sampleProfile',
-    'motionProfile',
-    'comment',
-]
-struct_TestProfile_s._fields_ = [
-    ('name', c_char * int(50)),
-    ('sampleSN', c_int),
-    ('machineProfile', MachineProfile),
-    ('sampleProfile', SampleProfile),
-    ('motionProfile', MotionProfile),
-    ('comment', c_char * int(256)),
-]
+PARAM_MACHINE_SERVO_COM = (PARAM_MACHINE_FORCE_GAUGE_COM + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-TestProfile = struct_TestProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
+PARAM_MACHINE_RTC_COM = (PARAM_MACHINE_SERVO_COM + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 4
-try:
-    MAX_TOKENS = 200
-except:
-    pass
+PARAM_MOTION_STATUS = (PARAM_MACHINE_RTC_COM + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 5
-try:
-    MAX_MACHINE_PROFILE_NAME = 20
-except:
-    pass
+PARAM_MOTION_CONDITION = (PARAM_MOTION_STATUS + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 7
-try:
-    MAX_PATH_LENGTH = 50
-except:
-    pass
+PARAM_MOTION_MODE = (PARAM_MOTION_CONDITION + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 9
-try:
-    MAX_CONFIGURATION_MOTOR_TYPE = 20
-except:
-    pass
+PARAM_FUNCTION = (PARAM_MOTION_MODE + 1)# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 10
-try:
-    MAX_CONFIGURATION_ENCODER_TYPE = 20
-except:
-    pass
+Parameter = enum_parameters_e# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 119
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 11
-try:
-    MAX_CONFIGURATION_FORCE_GAUGE = 20
-except:
-    pass
+SelfCheck_t = struct_SelfCheck_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 71
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 13
-try:
-    MAX_MOTION_PROFILE_NAME = MAX_PATH_LENGTH
-except:
-    pass
+MachineCheck_t = struct_MachineCheck_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 83
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 14
-try:
-    MAX_MOTION_PROFILE_SETS = 6
-except:
-    pass
+Motion_t = struct_Motion_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 90
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 16
-try:
-    MAX_SAMPLE_PROFILE_NAME = MAX_PATH_LENGTH
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 18
-try:
-    MAX_TEST_PROFILE_NAME = MAX_PATH_LENGTH
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 19
-try:
-    MAX_TEST_PROFILE_MP_FILENAME = 20
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 20
-try:
-    MAX_TEST_PROFILE_COMMENT = 256
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 22
-try:
-    MAX_MOTION_PROFILE_SET_NAME = MAX_PATH_LENGTH
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 23
-try:
-    MAX_MOTION_PROFILE_SET_TYPE = 10
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 25
-try:
-    MAX_MOTION_QUARTET_NAME = MAX_PATH_LENGTH
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 26
-try:
-    MAX_MOTION_QUARTET_PARAMETERS = 10
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 27
-try:
-    MAX_MOTION_QUARTETS = 6
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 29
-try:
-    MACHINE_CONFIGURATION_FIELD_COUNT = 1
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 31
-try:
-    MAX_FILE_SIZE = 1000
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 50
-try:
-    MACHINE_PERFORMANCE_FIELD_COUNT = 7
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 62
-try:
-    MACHINE_PROFILE_FIELD_COUNT = ((MACHINE_PERFORMANCE_FIELD_COUNT + MACHINE_CONFIGURATION_FIELD_COUNT) + 2)
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 73
-try:
-    MOTION_QUARTET_FIELD_COUNT = (4 + 10)
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 82
-try:
-    MOTION_SET_FIELD_COUNT = (5 + 10)
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 93
-try:
-    MOTION_PROFILE_FIELD_COUNT = (4 + 20)
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 102
-try:
-    SAMPLE_PROFILE_FIELD_COUNT = 9
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 117
-try:
-    TEST_PROFILE_FIELD_COUNT = 6
-except:
-    pass
-
-MachineConfiguration_s = struct_MachineConfiguration_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 48
-
-MachinePerformance_s = struct_MachinePerformance_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 60
-
-MachineProfile_s = struct_MachineProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 69
-
-MotionQuartet_s = struct_MotionQuartet_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
-
-MotionSet_s = struct_MotionSet_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
-
-MotionProfile_s = struct_MotionProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
-
-SampleProfile_s = struct_SampleProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
-
-TestProfile_s = struct_TestProfile_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
+MachineState_t = struct_MachineState_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachineDefinition.h: 103
 
 # No inserted files
 

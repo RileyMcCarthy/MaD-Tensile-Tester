@@ -1,6 +1,8 @@
 #ifndef STATEMACHINEDEFINITION
 #define STATEMACHINEDEFINITION
 
+#include <stdbool.h>
+
 typedef enum States_e
 {
     STATE_SELFCHECK,

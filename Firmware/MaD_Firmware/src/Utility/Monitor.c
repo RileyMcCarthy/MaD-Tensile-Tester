@@ -71,7 +71,6 @@ static void monitor_cog(Monitor *monitor)
 
   int delayCycles = _clockfreq() / monitor->sampleRate;
   // printf("Monitor Cog Started at %dHz with delay of:%d\n", monitor->sampleRate, delayCycles);
-  FILE *file = NULL;
 
   monitorWriteData = false;
   bool firstTime = true;

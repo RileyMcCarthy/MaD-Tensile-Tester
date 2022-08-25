@@ -33,10 +33,18 @@ OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 $(info $$OBJECTSPIN is [${OBJECTSPIN}])
 INC := $(addprefix -I ,$(INCLUDE))
 
-flexpropc: clean clear $(BIN)/$(TARGET) run
-flexprop: $(BIN)/$(TARGET) run
+flexpropc: clean clear flexprop
+flexprop: $(BIN)/$(TARGET) exportStructures run
 sim: clean clear $(WIN)/$(TARGET)
 catalina: $(CAT)/$(TARGET)
+
+exportStructures:
+	ctypesgen MaD_Firmware/Librarys/JSON/JSON.h -o MaD_Software/JSON.py
+	sed -i -E "s/c_double/c_float/g" MaD_Software/JSON.py
+	ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/MonitorDefinition.py
+	sed -i -E "s/c_double/c_float/g" MaD_Software/MonitorDefinition.py
+	ctypesgen MaD_Firmware/include/Utility/StateMachineDefinition.h -o MaD_Software/StateMachineDefinition.py
+	sed -i -E "s/c_double/c_float/g" MaD_Software/StateMachineDefinition.py
 
 # Make for FlexCC
 $(BIN)/$(TARGET): $(OBJECTS)

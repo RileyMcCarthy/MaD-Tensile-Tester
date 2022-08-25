@@ -3,18 +3,7 @@
 
 #use Kivy for GUI
 from SerialHelpers import *
-
-def structEq(self, other):
-    for fld in self._fields_:
-        if getattr(self, fld[0]) != getattr(other, fld[0]):
-            return False
-    return True
-
-def structNe(self, other):
-    for fld in self._fields_:
-        if getattr(self, fld[0]) != getattr(other, fld[0]):
-            return True
-    return False
+from GUI import *
 
 def print_ctypes_obj(obj, level=0):
 
@@ -45,6 +34,21 @@ def print_ctypes_obj(obj, level=0):
         print('{}VALUE = {} (type={})'.format(indent, obj, type(obj)))
 
 def loadMotionProfile():
+    motionProfile = MotionProfile()
+    motionProfile.name = b'Test1.mp'
+    motionProfile.setCount = 1
+    motionProfile.sets[0].number=1
+    motionProfile.sets[0].executions =2
+    motionProfile.sets[0].quartetCount=1
+
+    motionProfile.sets[0].quartets[0].name = b'qrt1.qrt'
+    motionProfile.sets[0].quartets[0].function = 1
+    motionProfile.sets[0].quartets[0].parameters[0] = 50
+    motionProfile.sets[0].quartets[0].parameters[1] = 10
+    motionProfile.sets[0].quartets[0].dwell = 500
+    return motionProfile
+
+def loadMachineProfile():
     machineProfile = MachineProfile()
     machineProfile.name = b"Tensile_Test_1"
 
@@ -67,23 +71,21 @@ def loadMotionProfile():
 
     machineProfile.configuration.forceGauge = b"DS2-5N"
 
-    machineProfile.configuration.forceGaugeScaleFactor = 1.0
-    machineProfile.configuration.forceGaugeZeroFactor = 0
+    machineProfile.configuration.forceGaugeScaleFactor = -657.959
+    machineProfile.configuration.forceGaugeZeroFactor = 16119601
 
     # MachinePerformance
     machineProfile.performance.minPosition = 0.01
     machineProfile.performance.maxPosition = 50.5
     machineProfile.performance.maxVelocity = 200.5
     machineProfile.performance.maxAcceleration = 100.5
-    machineProfile.performance.maxForceTensile = 3.5
-    machineProfile.performance.maxForceCompression = 3.1
+    machineProfile.performance.maxForceTensile = 5.0
+    machineProfile.performance.maxForceCompression = 5.0
     machineProfile.performance.forceGaugeNeutralOffset = 0.9
 
     return machineProfile
 
-def initializeDevice():
-    profile = loadMotionProfile()
-
+def initializeDevice(ser):
     while True:
         # wait until device is communicating
         print("Pinging device")
@@ -92,29 +94,50 @@ def initializeDevice():
             time.sleep(2)
             continue
         print("Device responded")
-
         # Send machine profile
-        print("Sending motion profile")
-        profile = loadMotionProfile()
+        print("Sending machine profile")
+        profile = loadMachineProfile()
         setMachineProfile(ser, profile)
-
-        print("Confirmin motion profille is valid")
-        # Check machine profile has updated
+        print("Confirmin machine profille is valid")
+        # Check machine machine has updated
         deviceProfile = getMachineProfile(ser)
-        if (structEq(profile,deviceProfile)):
+        if (deviceProfile == None or structEq(profile,deviceProfile) == False):
             print("Profile did not update, trying again")
             time.sleep(2)
             continue
-        print("Motion profile successfully updated")
+        print("Machine profile successfully updated")
+        print_ctypes_obj(deviceProfile)
+
         break
-#MotionMode,ModeFunctions/functionData inside MachineState
+
 if __name__ == '__main__':
+    #MaD().run()
     ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)
     ser.reset_input_buffer()
-
-    initializeDevice()
-    
+    initializeDevice(ser)
+    sys.exit()
+    time.sleep(1)
     while True:
+        getMachineState(ser)
+        time.sleep(1)
+    getTestData(ser)
+    sys.exit()
+    setMotionMode(ser,1)
+    machineState = getMachineState(ser)
+    print_ctypes_obj(machineState)
+    monitorData = getMonitorData(ser)
+    print_ctypes_obj(monitorData)
+    motionProfile = loadMotionProfile()
+    setMotionProfile(ser,motionProfile)
+    setMotionMode(ser,2)
+    sys.exit()
+
+    motionProfile = loadMotionProfile()
+    setMotionProfile(ser,motionProfile)
+    protest=getMotionProfile(ser)
+    protest=getMotionProfile(ser)
+    print_ctypes_obj(protest)
+    #while True:
         #print("Pinging device")
         #if (getPing(ser)):
         #    print("Device responded")
@@ -125,11 +148,12 @@ if __name__ == '__main__':
         #    print_ctypes_obj(data)
         #except ValueError as error:
         #    print(error)
-        try:
-            data = getMachineProfile(ser)
-            print_ctypes_obj(data)
-            profile = MachineProfile()
-            #setMachineProfile(ser, profile)
-        except ValueError as error:
-            print(error)
-        time.sleep(3)
+        #try:
+        #    print("Main Liip")
+        #    data = getMachineProfile(ser)
+        #    print_ctypes_obj(data)
+        #    profile = MachineProfile()
+        #    #setMachineProfile(ser, profile)
+        #except ValueError as error:
+        #    print(error)
+        #time.sleep(3)

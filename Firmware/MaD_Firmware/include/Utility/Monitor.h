@@ -2,18 +2,8 @@
 #define Motion_H
 #include "ForceGauge.h"
 #include "StateMachine.h"
-#include "JSON.h"
 #include "Encoder.h"
-
-typedef struct monitor_data_t
-{
-    int forceRaw;    // Raw force value
-    int encoderRaw;  // Raw encoder value
-    double force;    // Force value in N
-    double position; // Position value in mm
-    int timems;      // time in ms
-    int timeus;      // time in us
-} MonitorData;
+#include "MonitorDefinition.h"
 
 typedef struct monitor_cog_t
 {
