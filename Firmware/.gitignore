@@ -1,3 +1,4 @@
 win/*
 bin/*
 *.o
+MaD_Software/__pycache__

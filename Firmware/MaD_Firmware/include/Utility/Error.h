@@ -1,5 +1,10 @@
 #ifndef Error_H
 #define Error_H
+#ifdef _DEBUG_WARNING
+#define DEBUG_WARNING printf
+#else
+#define DEBUG_WARNING(fmt, ...)
+#endif
 
 /**
  * @brief Error codes:

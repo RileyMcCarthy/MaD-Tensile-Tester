@@ -5,9 +5,10 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
+
 class MaD(App):
     def build(self):
         self.window = GridLayout()
-        #add widgets to window
-        
+        # add widgets to window
+
         return self.window

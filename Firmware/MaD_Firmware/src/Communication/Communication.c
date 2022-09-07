@@ -1,6 +1,7 @@
 #include "Communication.h"
 #include <stdlib.h>
 #include "StateMachine.h"
+#include "Error.h"
 /* Command structure
  * wxxxxxxx <data>.. <CRC>
  * ________ ________ ________
@@ -35,7 +36,7 @@ static bool receive(char *buf, unsigned int size)
         buf[i] = fds.rxtime(10);
         if (buf[i] == -1)
         {
-            printf("invalid data recieved\n");
+            DEBUG_WARNING("invalid data recieved\n");
             return false;
         }
     }
@@ -50,7 +51,7 @@ static bool receive(char *buf, unsigned int size)
     {
         if (buf == NULL)
         {
-            printf("Failed to send: buffer is empty\n");
+            DEBUG_WARNING("Failed to send: buffer is empty\n");
             return false;
         }
         for (unsigned int i = 0; i < size; i++)
@@ -69,9 +70,10 @@ static bool receive(char *buf, unsigned int size)
     return true;*/
 static bool send(char *buf, unsigned int size)
 {
+    DEBUG_WARNING("Sending data of size: %d\n", size);
     if (buf == NULL)
     {
-        printf("Failed to send: buffer is empty\n");
+        DEBUG_WARNING("Failed to send: buffer is empty\n");
         return false;
     }
     for (unsigned int i = 0; i < size; i++)
@@ -89,7 +91,7 @@ static int recieveCMD()
     {
         while (fds.rx() != 0x55)
             ;
-        int cmd = fds.rxtime(10);
+        int cmd = fds.rxtime(100);
         if (cmd != -1)
         {
             return cmd;
@@ -97,162 +99,156 @@ static int recieveCMD()
     }
 }
 
+static int flashAddress = 0;
+
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
     // Begin main loop
     fds.start(50, 49, 0, 115200);
     while (1)
     {
-        printf("Waiting for command\n");
+        DEBUG_WARNING("Waiting for command\n");
         int cmd = recieveCMD();
         char *ptr;
-        printf("cmd:%d,write:%d\n", cmd & ~CMD_WRITE, (cmd & CMD_WRITE) == CMD_WRITE);
+        DEBUG_WARNING("cmd:%d,write:%d\n", cmd & ~CMD_WRITE, (cmd & CMD_WRITE) == CMD_WRITE);
         if ((cmd & CMD_WRITE) != CMD_WRITE)
         {
-            printf("Sending data\n");
+            DEBUG_WARNING("Sending data\n");
             switch (cmd)
             {
             case CMD_PING:
             {
-                printf("pinging device back\n");
+                DEBUG_WARNING("pinging device back\n");
                 uint8_t res = 1;
                 send(&res, 1);
                 break;
             }
             case CMD_DATA:
             {
-                printf("Sending monitor data:%f\n", monitor->data.force);
+                DEBUG_WARNING("Sending monitor data:%f\n", monitor->data.force);
                 send(&(monitor->data), sizeof(MonitorData));
                 break;
             }
             case CMD_STATE:
             {
-                printf("Sending machine state\n");
+                DEBUG_WARNING("Sending machine state\n");
                 send(machineState, sizeof(MachineState));
                 break;
             }
             case CMD_MPROFILE:
             {
-                printf("Sending machine profile\n");
+                DEBUG_WARNING("Sending machine profile\n");
                 send(machineProfile, sizeof(MachineProfile));
                 break;
             }
             case CMD_MCONFIG:
             {
-                printf("Sending machine configuration\n");
+                DEBUG_WARNING("Sending machine configuration\n");
                 send(&(machineProfile->configuration), sizeof(MachineConfiguration));
                 break;
             }
             case CMD_MPERFORMANCE:
             {
-                printf("Sending machine performance\n");
+                DEBUG_WARNING("Sending machine performance\n");
                 send(&(machineProfile->performance), sizeof(MachinePerformance));
                 break;
             }
             case CMD_MOTIONPROFILE:
             {
-                printf("Sending motion profile\n");
+                DEBUG_WARNING("Sending motion profile\n");
                 send(&(control->motionProfile), sizeof(MotionProfile));
                 break;
             }
             case CMD_MOTIONMODE:
             {
-                printf("Sending motion mode\n");
+                DEBUG_WARNING("Sending motion mode\n");
                 send(&(machineState->motionParameters.mode), sizeof(MotionMode));
                 break;
             }
             case CMD_MOTIONFUNCTION:
             {
-                printf("Sending motion function and data\n");
+                DEBUG_WARNING("Sending motion function and data\n");
                 send(&(machineState->function), sizeof(int));
                 send(&(machineState->functionData), sizeof(int));
                 break;
             }
             case CMD_FLASHDATA:
             {
-                printf("Sending flash data\n");
-                MonitorData *data = monitor_read_data(0); // Read flash from address 0
-                while (1)
-                {
-                    send(data, sizeof(MonitorData));
-                    printf("Time:%d\n", data->timems);
-                    if (data->timems < 0)
-                    {
-                        break;
-                    }
-                    monitor_read_data(-1); // Read next address in flash
-                }
+                DEBUG_WARNING("Sending flash data\n");
+                int timebefore = _getms();
+                MonitorData *data = monitor_read_data(flashAddress); // Read flash from address 0
+                send(data, sizeof(MonitorData));
                 break;
             }
             default:
             {
-                printf("Command not found\n");
+                DEBUG_WARNING("Command not found\n");
                 break;
             }
             }
         }
         else
         {
-            printf("Recieving Data\n");
+            DEBUG_WARNING("Recieving Data\n");
             switch (cmd & ~CMD_WRITE)
             {
             case CMD_MPROFILE:
             {
-                printf("Getting machine profile: %d\n", sizeof(MachineProfile));
+                DEBUG_WARNING("Getting machine profile: %d\n", sizeof(MachineProfile));
                 MachineProfile temp;
                 if (receive(&temp, sizeof(MachineProfile)))
                 {
                     *machineProfile = temp;
-                    printf("test var:%d\n", machineProfile->number);
+                    DEBUG_WARNING("test var:%d\n", machineProfile->number);
                 }
                 else
                 {
-                    printf("failed to receive machine profile\n");
+                    DEBUG_WARNING("failed to receive machine profile\n");
                 }
                 break;
             }
             case CMD_MCONFIG:
             {
-                printf("Getting machine configuration\n");
+                DEBUG_WARNING("Getting machine configuration\n");
                 MachineConfiguration configuration;
                 if (receive(&configuration, sizeof(MachineConfiguration)))
                 {
                     machineProfile->configuration = configuration;
-                    printf("test var:%f\n", machineProfile->configuration.maxMotorTorque);
+                    DEBUG_WARNING("test var:%f\n", machineProfile->configuration.maxMotorTorque);
                 }
                 else
                 {
-                    printf("failed to receive machine configuration\n");
+                    DEBUG_WARNING("failed to receive machine configuration\n");
                 }
                 break;
             }
             case CMD_MPERFORMANCE:
             {
-                printf("Getting machine performance\n");
+                DEBUG_WARNING("Getting machine performance\n");
                 MachinePerformance performance;
                 if (receive(&performance, sizeof(MachinePerformance)))
                 {
                     machineProfile->performance = performance;
-                    printf("test var:%f\n", machineProfile->performance.maxVelocity);
+                    DEBUG_WARNING("test var:%f\n", machineProfile->performance.maxVelocity);
                 }
                 else
                 {
-                    printf("failed to receive machine performance\n");
+                    DEBUG_WARNING("failed to receive machine performance\n");
                 }
                 break;
             }
             case CMD_MOTIONPROFILE:
             {
-                printf("Getting motion profile\n");
+                DEBUG_WARNING("Getting motion profile\n");
                 MotionProfile profile;
                 if (receive(&profile, sizeof(MotionProfile)))
                 {
                     control->motionProfile = profile;
-                    printf("test var:%s\n", control->motionProfile.name);
+                    DEBUG_WARNING("test var:%s\n", control->motionProfile.name);
                 }
                 else
                 {
-                    printf("failed to receive motion profile\n");
+                    DEBUG_WARNING("failed to receive motion profile\n");
                 }
                 break;
             }
@@ -260,39 +256,54 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             {
                 //@TODO remove motion status hardcode
                 state_machine_set(machineState, PARAM_MOTION_STATUS, STATUS_ENABLED);
-                printf("Getting motion mode\n");
+                DEBUG_WARNING("Getting motion mode\n");
                 MotionMode mode;
                 if (receive(&mode, sizeof(int)))
                 {
                     state_machine_set(machineState, PARAM_MOTION_MODE, mode);
-                    printf("test var:%d\n", machineState->motionParameters.mode);
+                    DEBUG_WARNING("test var:%d\n", machineState->motionParameters.mode);
                 }
                 else
                 {
-                    printf("failed to receive motion mode\n");
+                    DEBUG_WARNING("failed to receive motion mode\n");
                 }
                 break;
             }
             case CMD_MOTIONFUNCTION:
             {
-                printf("Getting motion function,data\n");
+                DEBUG_WARNING("Getting motion function,data\n");
                 int function;
                 int data;
                 if (receive(&function, sizeof(int)) && receive(&data, sizeof(int)))
                 {
                     machineState->function = function;
                     machineState->functionData = data;
-                    printf("Function,data:%d,%d\n", machineState->function, machineState->functionData);
+                    DEBUG_WARNING("Function,data:%d,%d\n", machineState->function, machineState->functionData);
                 }
                 else
                 {
-                    printf("failed to receive function and data\n");
+                    DEBUG_WARNING("failed to receive function and data\n");
+                }
+                break;
+            }
+            case CMD_FLASHDATA:
+            {
+                DEBUG_WARNING("Getting new flash address\n");
+                int newAddr;
+                if (receive(&newAddr, sizeof(int)))
+                {
+                    flashAddress = newAddr;
+                    DEBUG_WARNING("New flash address: %d\n", newAddr);
+                }
+                else
+                {
+                    DEBUG_WARNING("failed to receive flash address\n");
                 }
                 break;
             }
             default:
             {
-                printf("unknown command\n");
+                DEBUG_WARNING("unknown command\n");
                 break;
             }
             }

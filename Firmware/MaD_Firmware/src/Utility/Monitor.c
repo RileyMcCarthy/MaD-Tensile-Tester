@@ -96,7 +96,7 @@ static void monitor_cog(Monitor *monitor)
     }
     else
     {
-      // printf("Force Gauge disconnected, attempting to reconnect\n");
+      printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       // printf("Force Gauge stopped\n");
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
@@ -155,7 +155,6 @@ static void monitor_cog(Monitor *monitor)
         int addr = 0;
         do
         {
-
           BSP_W25Qx_Read(flashData.byte, addr, sizeof(MonitorData));
           printf("%d,%d,%d,%f,%f\n", flashData.data.timeus, flashData.data.forceRaw, flashData.data.encoderRaw, flashData.data.force, flashData.data.position);
           addr += sizeof(MonitorData);
@@ -167,14 +166,10 @@ static void monitor_cog(Monitor *monitor)
       eraseBlock = 0; //@TODO combine these into different method using flashAddr to det new page
       if (!new_test_data)
       {
-        while (!BSP_W25Qx_Lock())
-          ; // Wait for flash to be available, then lock it.
-
         BSP_W25Qx_Read(flashData.byte, test_data_address, size);
         test_data = flashData.data;
         test_data_address += size;
 
-        BSP_W25Qx_Unlock();
         new_test_data = true;
       }
     }

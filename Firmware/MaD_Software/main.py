@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-#https://docs.python.org/3/library/struct.html
+# https://docs.python.org/3/library/struct.html
 
-#use Kivy for GUI
+# use Kivy for GUI
 from SerialHelpers import *
 from GUI import *
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 def print_ctypes_obj(obj, level=0):
 
-    delta_indent="    "
-    indent=delta_indent*level
+    delta_indent = "    "
+    indent = delta_indent*level
 
     # Assess wether the object is an array, a structure or an elementary type
-    if issubclass(type(obj), ctypes.Array) :
+    if issubclass(type(obj), ctypes.Array):
         print('{}ARRAY {}'.format(indent, obj))
         for obj2 in obj:
             print_ctypes_obj(obj2, level+1)
@@ -22,24 +25,26 @@ def print_ctypes_obj(obj, level=0):
             # Get the next field descriptor
             fname = fdesc[0]
             ftype = fdesc[1]
-            if len(fdesc)==3:
+            if len(fdesc) == 3:
                 fbitlen = fdesc[2]
             else:
                 fbitlen = 8*ctypes.sizeof(ftype)
             obj2 = getattr(obj, fname)
-            print('{}FIELD {} (type={}, bitlen={})'.format(indent+delta_indent, fname, ftype, fbitlen))
+            print('{}FIELD {} (type={}, bitlen={})'.format(
+                indent+delta_indent, fname, ftype, fbitlen))
             print_ctypes_obj(obj2, level+2)
 
     else:
         print('{}VALUE = {} (type={})'.format(indent, obj, type(obj)))
 
+
 def loadMotionProfile():
     motionProfile = MotionProfile()
     motionProfile.name = b'Test1.mp'
     motionProfile.setCount = 1
-    motionProfile.sets[0].number=1
-    motionProfile.sets[0].executions =2
-    motionProfile.sets[0].quartetCount=1
+    motionProfile.sets[0].number = 1
+    motionProfile.sets[0].executions = 2
+    motionProfile.sets[0].quartetCount = 1
 
     motionProfile.sets[0].quartets[0].name = b'qrt1.qrt'
     motionProfile.sets[0].quartets[0].function = 1
@@ -47,6 +52,7 @@ def loadMotionProfile():
     motionProfile.sets[0].quartets[0].parameters[1] = 10
     motionProfile.sets[0].quartets[0].dwell = 500
     return motionProfile
+
 
 def loadMachineProfile():
     machineProfile = MachineProfile()
@@ -85,6 +91,7 @@ def loadMachineProfile():
 
     return machineProfile
 
+
 def initializeDevice(ser):
     while True:
         # wait until device is communicating
@@ -101,7 +108,7 @@ def initializeDevice(ser):
         print("Confirmin machine profille is valid")
         # Check machine machine has updated
         deviceProfile = getMachineProfile(ser)
-        if (deviceProfile == None or structEq(profile,deviceProfile) == False):
+        if (deviceProfile == None or structEq(profile, deviceProfile) == False):
             print("Profile did not update, trying again")
             time.sleep(2)
             continue
@@ -110,50 +117,58 @@ def initializeDevice(ser):
 
         break
 
+
 if __name__ == '__main__':
-    #MaD().run()
-    ser = serial.Serial('/dev/ttyS0', 115200, timeout=1)
+    MaD().run()
+    ser = serial.Serial('/dev/ttyS0', 115200, timeout=3)
     ser.reset_input_buffer()
     initializeDevice(ser)
-    sys.exit()
     time.sleep(1)
-    while True:
-        getMachineState(ser)
-        time.sleep(1)
-    getTestData(ser)
+    # while True:
+    #    state = getMachineState(ser)
+    #    print_ctypes_obj(state)
+    #    time.sleep(1)
+    dataList = getTestData(ser)
+    x = []
+    y = []
+    for data in dataList:
+        x = data.timeus
+        y = data.force
+    plt.scatter(x, y, alpha=0.5)
+    plt.show()
     sys.exit()
-    setMotionMode(ser,1)
+    setMotionMode(ser, 1)
     machineState = getMachineState(ser)
     print_ctypes_obj(machineState)
     monitorData = getMonitorData(ser)
     print_ctypes_obj(monitorData)
     motionProfile = loadMotionProfile()
-    setMotionProfile(ser,motionProfile)
-    setMotionMode(ser,2)
+    setMotionProfile(ser, motionProfile)
+    setMotionMode(ser, 2)
     sys.exit()
 
     motionProfile = loadMotionProfile()
-    setMotionProfile(ser,motionProfile)
-    protest=getMotionProfile(ser)
-    protest=getMotionProfile(ser)
+    setMotionProfile(ser, motionProfile)
+    protest = getMotionProfile(ser)
+    protest = getMotionProfile(ser)
     print_ctypes_obj(protest)
-    #while True:
-        #print("Pinging device")
-        #if (getPing(ser)):
-        #    print("Device responded")
-        #else:
-        #    print("Device failed to respond")
-        #try:
-        #    data = getMonitorData(ser)
-        #    print_ctypes_obj(data)
-        #except ValueError as error:
-        #    print(error)
-        #try:
-        #    print("Main Liip")
-        #    data = getMachineProfile(ser)
-        #    print_ctypes_obj(data)
-        #    profile = MachineProfile()
-        #    #setMachineProfile(ser, profile)
-        #except ValueError as error:
-        #    print(error)
-        #time.sleep(3)
+    # while True:
+    #print("Pinging device")
+    # if (getPing(ser)):
+    #    print("Device responded")
+    # else:
+    #    print("Device failed to respond")
+    # try:
+    #    data = getMonitorData(ser)
+    #    print_ctypes_obj(data)
+    # except ValueError as error:
+    #    print(error)
+    # try:
+    #    print("Main Liip")
+    #    data = getMachineProfile(ser)
+    #    print_ctypes_obj(data)
+    #    profile = MachineProfile()
+    #    #setMachineProfile(ser, profile)
+    # except ValueError as error:
+    #    print(error)
+    # time.sleep(3)

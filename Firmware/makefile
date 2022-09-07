@@ -2,7 +2,7 @@
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = ~/flexprop/bin/flexcc
 LOAD = ~/flexprop/bin/loadp2
-FLEXCCFLAGS=-2 -O1 -Wall #-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
+FLEXCCFLAGS=-2 -O1 -Wall -D_DEBUG_INFO #-D_DEBUG_WARNING -D_DEBUG_ERROR#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
 BIN = bin
 
 CATALINA="C:/Program Files (x86)/Catalina_5.1/bin/catalina.exe"
@@ -33,6 +33,9 @@ OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 $(info $$OBJECTSPIN is [${OBJECTSPIN}])
 INC := $(addprefix -I ,$(INCLUDE))
 
+gui: 
+	pip install -r MaD_Software/requirements.txt
+	python3 MaD_Software/main.py
 flexpropc: clean clear flexprop
 flexprop: $(BIN)/$(TARGET) exportStructures run
 sim: clean clear $(WIN)/$(TARGET)
