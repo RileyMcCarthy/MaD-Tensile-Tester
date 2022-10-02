@@ -59,34 +59,6 @@ static void Send_Package(char ID, long Displacement);
 static void Make_CRC_Send(unsigned char Plength, unsigned char B[8]);
 /**/
 
-/*static void test_dyn4()
-{
-  printf("Testing dyn\n");
-
-  // move_rel32(DYN1_ADDR, 500); _waitms(5000);
-
-  ReadMotorPosition32(DYN1_ADDR);
-  while (!GetMotorPosition32())
-    ;
-  printf("Axis 1 Encoder Position: %ld\n", Motor_Pos32);
-
-  move_rel32(DYN1_ADDR, 500);
-  _waitms(5000);
-
-  ReadMotorPosition32(DYN1_ADDR);
-  while (!GetMotorPosition32())
-    ;
-  printf("Axis 1 Encoder Position: %ld\n", Motor_Pos32);
-
-  move_abs32(DYN1_ADDR, 0);
-  _waitms(5000);
-
-  ReadMotorPosition32(DYN1_ADDR);
-  while (!GetMotorPosition32())
-    ;
-  printf("Axis 1 Encoder Position: %ld\n", Motor_Pos32);
-}*/
-
 void dyn_init()
 {
 

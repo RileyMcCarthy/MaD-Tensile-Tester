@@ -22,12 +22,12 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
 {
     if (run == NULL || profile == NULL)
     {
-        printf("Null pointer passed to position_profile\n");
+        // printf("Null pointer passed to position_profile\n");
         return 0;
     }
     if (run->currentSet > MAX_MOTION_PROFILE_SETS)
     {
-        printf("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
+        // printf("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
         run->currentSet = 0;
     }
     double position = position_set(t, run, &(profile->sets[run->currentSet]));
@@ -48,12 +48,12 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
 {
     if (run == NULL || set == NULL)
     {
-        printf("Null pointer passed to position_set\n");
+        //("Null pointer passed to position_set\n");
         return 0;
     }
     if (run->currentQuartet > MAX_MOTION_QUARTETS)
     {
-        printf("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
+        // printf("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
         run->currentQuartet = 0;
     }
     double position = position_quartet(t, run, &(set->quartets[run->currentQuartet]));
@@ -82,7 +82,7 @@ double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
 {
     if (run == NULL || quartet == NULL)
     {
-        printf("Null pointer passed to position_set\n");
+        //("Null pointer passed to position_set\n");
         return 0;
     }
     FunctionInfo info;
@@ -296,7 +296,7 @@ double steps_to_mm(int steps, MachineConfiguration *config)
 {
     if (config == NULL)
     {
-        printf("steps_to_mm: config is NULL\n");
+        // printf("steps_to_mm: config is NULL\n");
         return 0;
     }
     return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
@@ -306,7 +306,7 @@ int mm_to_steps(double mm, MachineConfiguration *config)
 {
     if (config == NULL)
     {
-        printf("mm_to_steps: config is NULL\n");
+        // printf("mm_to_steps: config is NULL\n");
         return 0;
     }
     return (int)round(mm * (double)config->positionEncoderStepsPerRev / (double)(config->gearDiameter * 3.14159));

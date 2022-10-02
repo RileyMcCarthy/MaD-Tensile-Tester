@@ -12,11 +12,11 @@ typedef enum States_e
 
 typedef enum MotionStatus_e
 {
-    STATUS_DISABLED,      // Motion is disabled
-    STATUS_ENABLED,       // Motion is enabled
-    STATUS_SAMPLE_LIMIT,  // Motion is enabled but limited by condition (ie. length, force)
-    STATUS_MACHINE_LIMIT, // Motion is enabled but limited by condition (ie. tension, compression, travel upper/lower, door)
-    STATUS_FAULTED        // Motion is disabled due to fault (ie. ESD switch, ESD travel)
+    MOTIONSTATUS_DISABLED,      // Motion is disabled
+    MOTIONSTATUS_ENABLED,       // Motion is enabled
+    MOTIONSTATUS_SAMPLE_LIMIT,  // Motion is enabled but limited by condition (ie. length, force)
+    MOTIONSTATUS_MACHINE_LIMIT, // Motion is enabled but limited by condition (ie. tension, compression, travel upper/lower, door)
+    MOTIONSTATUS_FAULTED        // Motion is disabled due to fault (ie. ESD switch, ESD travel)
 } MotionStatus;
 
 typedef enum MotionOverTravel_e
@@ -32,15 +32,15 @@ typedef enum MotionOverTravel_e
  */
 typedef enum MotionCondition_e
 {
-    MOTION_LENGTH,      // Test sample maximum length exceeded
-    MOTION_FORCE,       // Test sample maximum force exceeded
-    MOTION_TENSION,     // Machine maximum tensile force exceeded
-    MOTION_COMPRESSION, // Machine maximum compression force exceeded
-    MOTION_UPPER,       // Machine upper travel limit exceeded
-    MOTION_LOWER,       // Machine lower travel limit exceeded
-    MOTION_DOOR,        // Door is open
-    MOTION_STOPPED,     // Motor is stationary
-    MOTION_MOVING,      // Motion is moving
+    CONDITION_LENGTH,      // Test sample maximum length exceeded
+    CONDITION_FORCE,       // Test sample maximum force exceeded
+    CONDITION_TENSION,     // Machine maximum tensile force exceeded
+    CONDITION_COMPRESSION, // Machine maximum compression force exceeded
+    CONDITION_UPPER,       // Machine upper travel limit exceeded
+    CONDITION_LOWER,       // Machine lower travel limit exceeded
+    CONDITION_DOOR,        // Door is open
+    CONDITION_STOPPED,     // Motor is stationary
+    CONDITION_MOVING,      // Motion is moving
 } MotionCondition;
 
 typedef enum MotionMode_e
@@ -96,10 +96,9 @@ typedef struct MachineState_t
     SelfCheckParameters selfCheckParameters;
     MachineCheckParameters machineCheckParameters;
     MotionParameters motionParameters;
-    ModeFunctions function;
-    int functionData; //@TODO use union for function data
-
-    int lock;
+    ModeFunctions _function;
+    int _functionData;
+    int _lock;
 } MachineState;
 
 typedef enum parameters_e

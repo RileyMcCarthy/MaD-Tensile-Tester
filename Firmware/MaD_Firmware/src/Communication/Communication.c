@@ -42,32 +42,7 @@ static bool receive(char *buf, unsigned int size)
     }
     return true;
 }
-/*static bool send(char *buf, unsigned int size)
-{
-    int attempts = 0;
-    unsigned crc;
-    unsigned crcRead;
-    do
-    {
-        if (buf == NULL)
-        {
-            DEBUG_WARNING("Failed to send: buffer is empty\n");
-            return false;
-        }
-        for (unsigned int i = 0; i < size; i++)
-        {
-            fds.tx(buf[i]);
-        }
-        crc = crc8(buf, size);
-        fds.tx(crc);
-        attempts++;
-        crcRead = fds.rxtime(100);
-        if (crcRead == 0)
-        {
-            return false;
-        }
-    } while (crc != crcRead || attempts > 5);
-    return true;*/
+
 static bool send(char *buf, unsigned int size)
 {
     DEBUG_WARNING("Sending data of size: %d\n", size);
@@ -104,12 +79,11 @@ static int flashAddress = 0;
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
     // Begin main loop
-    fds.start(50, 49, 0, 115200);
+    fds.start(50, 49, 0, 256000);
     while (1)
     {
         DEBUG_WARNING("Waiting for command\n");
         int cmd = recieveCMD();
-        char *ptr;
         DEBUG_WARNING("cmd:%d,write:%d\n", cmd & ~CMD_WRITE, (cmd & CMD_WRITE) == CMD_WRITE);
         if ((cmd & CMD_WRITE) != CMD_WRITE)
         {
@@ -168,15 +142,20 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             case CMD_MOTIONFUNCTION:
             {
                 DEBUG_WARNING("Sending motion function and data\n");
-                send(&(machineState->function), sizeof(int));
-                send(&(machineState->functionData), sizeof(int));
+                send(&(machineState->_function), sizeof(int));
+                send(&(machineState->_functionData), sizeof(int));
+                break;
+            }
+            case CMD_MOTIONSTATUS:
+            {
+                DEBUG_WARNING("Sending motion status\n");
+                send(&(machineState->motionParameters.status), sizeof(int));
                 break;
             }
             case CMD_FLASHDATA:
             {
                 DEBUG_WARNING("Sending flash data\n");
-                int timebefore = _getms();
-                MonitorData *data = monitor_read_data(flashAddress); // Read flash from address 0
+                MonitorData *data = monitor_read_data(); // Read flash from address 0
                 send(data, sizeof(MonitorData));
                 break;
             }
@@ -255,7 +234,7 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             case CMD_MOTIONMODE:
             {
                 //@TODO remove motion status hardcode
-                state_machine_set(machineState, PARAM_MOTION_STATUS, STATUS_ENABLED);
+                state_machine_set(machineState, PARAM_MOTION_STATUS, MOTIONSTATUS_ENABLED);
                 DEBUG_WARNING("Getting motion mode\n");
                 MotionMode mode;
                 if (receive(&mode, sizeof(int)))
@@ -276,13 +255,28 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
                 int data;
                 if (receive(&function, sizeof(int)) && receive(&data, sizeof(int)))
                 {
-                    machineState->function = function;
-                    machineState->functionData = data;
-                    DEBUG_WARNING("Function,data:%d,%d\n", machineState->function, machineState->functionData);
+                    machineState->_function = function;
+                    machineState->_functionData = data;
+                    DEBUG_WARNING("Function,data:%d,%d\n", machineState->_function, machineState->_functionData);
                 }
                 else
                 {
                     DEBUG_WARNING("failed to receive function and data\n");
+                }
+                break;
+            }
+            case CMD_MOTIONSTATUS:
+            {
+                DEBUG_WARNING("Getting motion status\n");
+                MotionStatus status;
+                if (receive(&status, sizeof(int)))
+                {
+                    state_machine_set(machineState, PARAM_MOTION_STATUS, status);
+                    DEBUG_WARNING("Motion Status:%d\n", machineState->motionParameters.status);
+                }
+                else
+                {
+                    DEBUG_WARNING("failed to receive motion status\n");
                 }
                 break;
             }
@@ -292,7 +286,7 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
                 int newAddr;
                 if (receive(&newAddr, sizeof(int)))
                 {
-                    flashAddress = newAddr;
+                    monitor_set_address(newAddr);
                     DEBUG_WARNING("New flash address: %d\n", newAddr);
                 }
                 else

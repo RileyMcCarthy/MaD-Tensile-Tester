@@ -27,12 +27,15 @@ union flashData_s
   uint8_t byte[size];
 } flashData;
 
-MonitorData *monitor_read_data(int addr)
+void monitor_set_address(int addr)
 {
   if (addr > 0)
     test_data_address = addr;
-
   new_test_data = false;
+}
+
+MonitorData *monitor_read_data()
+{
   while (!new_test_data)
   {
   }
@@ -51,7 +54,6 @@ static void monitor_cog(Monitor *monitor)
   BSP_W25Qx_Init(&flashError);
   while (flashError != SUCCESS)
   {
-    printf("Error initializing flash:%d\n", flashError);
     BSP_W25Qx_Init(&flashError);
     _waitms(100);
   }
@@ -96,7 +98,7 @@ static void monitor_cog(Monitor *monitor)
     }
     else
     {
-      printf("Force Gauge disconnected, attempting to reconnect\n");
+      // printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       // printf("Force Gauge stopped\n");
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
@@ -145,7 +147,7 @@ static void monitor_cog(Monitor *monitor)
     {
       if (flashAddr != 0)
       {
-        printf("Monitor done writing\n");
+        //("Monitor done writing\n");
         MonitorData temp;
         temp.timems = -1; // Set to invalid value to indicate end of data
         temp.forceRaw = 0;
@@ -156,11 +158,11 @@ static void monitor_cog(Monitor *monitor)
         do
         {
           BSP_W25Qx_Read(flashData.byte, addr, sizeof(MonitorData));
-          printf("%d,%d,%d,%f,%f\n", flashData.data.timeus, flashData.data.forceRaw, flashData.data.encoderRaw, flashData.data.force, flashData.data.position);
+          // printf("%d,%d,%d,%f,%f\n", flashData.data.timeus, flashData.data.forceRaw, flashData.data.encoderRaw, flashData.data.force, flashData.data.position);
           addr += sizeof(MonitorData);
         } while (flashData.data.timems > -1); // wait for invalid time
         BSP_W25Qx_Unlock();
-        printf("Done writing data\n");
+        // printf("Done writing data\n");
       }
       flashAddr = 0;
       eraseBlock = 0; //@TODO combine these into different method using flashAddr to det new page

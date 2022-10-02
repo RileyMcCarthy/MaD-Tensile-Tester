@@ -38,7 +38,7 @@ static bool move_servo(ControlSystem *control, MoveType type, int value)
 {
     if (control == NULL)
     {
-        printf("move_servo: control is null\n");
+        // printf("move_servo: control is null\n");
         return false;
     }
     // move servo and check if move is allowed (conditions or machine limits)
@@ -81,7 +81,7 @@ static void control_cog(ControlSystem *control)
     /*Initialize mcp23017*/
     while (!mcp23017_begin(&mcp, GPIO_ADDR, GPIO_SDA, GPIO_SCL))
     {
-        printf("MCP23017 not communicating, trying again\n");
+        // printf("MCP23017 not communicating, trying again\n");
         _waitms(100);
     }
 
@@ -100,7 +100,7 @@ static void control_cog(ControlSystem *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
-    printf("Control cog started\n");
+    // printf("Control cog started\n");
 
     // For running test profiles;
     long startTime = 0;
@@ -232,37 +232,37 @@ static void control_cog(ControlSystem *control)
         }
         else if (forcemN >= 0 && forcemN > machinePerformance.maxForceTensile * 1000) // Tension
         {
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_TENSION);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_TENSION);
         }
         else if (forcemN < 0 && forcemN < -machinePerformance.maxForceCompression * 1000) // Compression
         {
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_COMPRESSION);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_COMPRESSION);
         }
         else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1) // UPPER
         {
             // Error machine out of bounds (Upper Limit)
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_UPPER);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_UPPER);
         }
         else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1) // LOWER
         {
             // Error machine out of bounds
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_LOWER);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_LOWER);
         }
         else if (mcp_get_pin(&mcp, DOOR_SWITCH, DOOR_SWITCH_REGISTER) == 1) // Door
         {
             // Error machine door open
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_DOOR);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_DOOR);
         }
         else if (abs(lastEncoderRead - control->monitorData->encoderRaw) < 2) // STOPPED
         {
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_STOPPED);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_STOPPED);
         }
         else // MOVING
         {
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, MOTION_MOVING);
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_MOVING);
         }
 
 #if CONTROL_DEGUB
@@ -276,13 +276,13 @@ static void control_cog(ControlSystem *control)
             {
                 // dyn4_send_command(&dyn4, dyn4_)
             }
-            if (currentMachineState.motionParameters.status == STATUS_DISABLED)
+            if (currentMachineState.motionParameters.status == MOTIONSTATUS_DISABLED)
             {
                 move_servo(control, MOVE_STOP, 0);
             }
             else
             {
-                if (lastState.motionParameters.status != STATUS_ENABLED || initial) // Motion enabled initial
+                if (lastState.motionParameters.status != MOTIONSTATUS_ENABLED || initial) // Motion enabled initial
                 {
                     // dyn4_send_command(&dyn4, dyn4_go_rel_pos, -1000);
                     // _waitms(300);
@@ -301,98 +301,96 @@ static void control_cog(ControlSystem *control)
                     {
                         // printf("CTRR:%d\n", navkey.status.CTRR);
 
-                        if (currentMachineState.motionParameters.condition == MOTION_STOPPED)
+                        if (currentMachineState.motionParameters.condition == CONDITION_STOPPED)
                         {
                             // printf("stopped\n");
-                            switch (currentMachineState.function)
+                            switch (currentMachineState._function)
                             {
                             case FUNC_MANUAL_OFF:
-                                control->stateMachine->function = FUNC_MANUAL_INCREMENTAL_JOG;
+                                control->stateMachine->_function = FUNC_MANUAL_INCREMENTAL_JOG;
                                 break;
                             case FUNC_MANUAL_INCREMENTAL_JOG:
-                                control->stateMachine->function = FUNC_MANUAL_CONTINUOUS_JOG;
+                                control->stateMachine->_function = FUNC_MANUAL_CONTINUOUS_JOG;
                                 break;
                             case FUNC_MANUAL_CONTINUOUS_JOG:
-                                control->stateMachine->function = FUNC_MANUAL_POSITIONAL_MOVE;
+                                control->stateMachine->_function = FUNC_MANUAL_POSITIONAL_MOVE;
                                 break;
                             case FUNC_MANUAL_POSITIONAL_MOVE:
-                                control->stateMachine->function = FUNC_MANUAL_HOME;
+                                control->stateMachine->_function = FUNC_MANUAL_HOME;
                                 break;
                             case FUNC_MANUAL_HOME:
-                                control->stateMachine->function = FUNC_MANUAL_OFF;
+                                control->stateMachine->_function = FUNC_MANUAL_OFF;
                                 break;
                             case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
                                 break;
                             case FUNC_MANUAL_MOVE_FORCE:
                                 break;
                             default:
-                                control->stateMachine->function = FUNC_MANUAL_OFF;
+                                control->stateMachine->_function = FUNC_MANUAL_OFF;
                                 break;
                             }
                             // printf("Function: %d\n", control->stateMachine->function);
                         }
-                        else if (control->stateMachine->motionParameters.condition == MOTION_MOVING)
+                        else if (control->stateMachine->motionParameters.condition == CONDITION_MOVING)
                         {
-                            control->stateMachine->function = FUNC_MANUAL_OFF;
+                            control->stateMachine->_function = FUNC_MANUAL_OFF;
                         }
                     }
 
                     // Execute manual mode functions
-                    switch (currentMachineState.function)
+                    switch (currentMachineState._function)
                     {
                     case FUNC_MANUAL_OFF: // Stop current motion
                         move_servo(control, MOVE_STOP, 0);
                         break;
                     case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
-                        if (lastState.function != FUNC_MANUAL_INCREMENTAL_JOG || initial)
+                        if (lastState._function != FUNC_MANUAL_INCREMENTAL_JOG || initial)
                         {
                             move_servo(control, MOVE_STOP, 0);
-                            control->stateMachine->functionData = 1000; // Default step size in um = 1mm
+                            control->stateMachine->_functionData = 1000; // Default step size in um = 1mm
                         }
                         if (navkey.status.LTR > 0) // Left released
                         {
-                            if (control->stateMachine->functionData < 10000) // No step size above 10mm
-                                control->stateMachine->functionData /= 10;   // Increase step size by multiple of 10
+                            if (control->stateMachine->_functionData < 10000) // No step size above 10mm
+                                control->stateMachine->_functionData /= 10;   // Increase step size by multiple of 10
                         }
                         if (navkey.status.RTR > 0) // Right released
                         {
-                            if (control->stateMachine->functionData > 10) // No step size below 0.01mm
+                            if (control->stateMachine->_functionData > 10) // No step size below 0.01mm
                             {
-                                control->stateMachine->functionData *= 10; // Decrease step size by multiple of 10
+                                control->stateMachine->_functionData *= 10; // Decrease step size by multiple of 10
                             }
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
-                            printf("up released\n");
-                            move_servo(control, MOVE_RELATIVE, control->stateMachine->functionData);
+                            move_servo(control, MOVE_RELATIVE, control->stateMachine->_functionData);
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
-                            printf("down released\n");
-                            move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->functionData);
+                            move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->_functionData);
                         }
                         break;
                     case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
-                        if (lastState.function != FUNC_MANUAL_CONTINUOUS_JOG || initial)
+                        if (lastState._function != FUNC_MANUAL_CONTINUOUS_JOG || initial)
                         {
                             move_servo(control, MOVE_STOP, 0);
-                            control->stateMachine->functionData = 10000; // 10000um/s = 10mm/s
+                            control->stateMachine->_functionData = 10000; // 10000um/s = 10mm/s
                         }
                         if (navkey.status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData -= 1000; // Increase step size by 1mm
+                            control->stateMachine->_functionData -= 1000; // Increase step size by 1mm
                         }
                         if (navkey.status.RTR > 0) // Right released
                         {
-                            control->stateMachine->functionData += 1000; // Decrease step size by 1mm
+                            control->stateMachine->_functionData += 1000; // Decrease step size by 1mm
                         }
                         if (navkey.status.UPP > 0) // Up pressed
                         {
-                            move_servo(control, MOVE_SPEED, control->stateMachine->functionData);
+                            move_servo(control, MOVE_SPEED, control->stateMachine->_functionData);
                         }
                         if (navkey.status.DNP > 0) // Down pressed
                         {
-                            move_servo(control, MOVE_SPEED, -1 * control->stateMachine->functionData);
+                            move_servo(control, MOVE_SPEED, -1 * control->stateMachine->_functionData);
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
@@ -404,67 +402,67 @@ static void control_cog(ControlSystem *control)
                         }
                         break;
                     case FUNC_MANUAL_POSITIONAL_MOVE:
-                        if (lastState.function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
+                        if (lastState._function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
                         {
                             move_servo(control, MOVE_STOP, 0);
-                            control->stateMachine->functionData = 1000 * round(steps_to_mm(control->monitorData->encoderRaw, &(control->machineProfile->configuration)) / 1000.0); // Default position in um rounded to nearest mm
+                            control->stateMachine->_functionData = 1000 * round(steps_to_mm(control->monitorData->encoderRaw, &(control->machineProfile->configuration)) / 1000.0); // Default position in um rounded to nearest mm
                         }
                         if (navkey.status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData -= 1000; // Increase position by 1mm
+                            control->stateMachine->_functionData -= 1000; // Increase position by 1mm
                         }
                         if (navkey.status.RTR > 0) // Right released
                         {
-                            control->stateMachine->functionData += 1000; // Decrease position by 1mm
+                            control->stateMachine->_functionData += 1000; // Decrease position by 1mm
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
-                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->functionData);
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->_functionData);
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
-                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->functionData);
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->_functionData);
                         }
                         break;
                     case FUNC_MANUAL_HOME:
-                        if (lastState.function != FUNC_MANUAL_HOME || initial)
+                        if (lastState._function != FUNC_MANUAL_HOME || initial)
                         {
                             move_servo(control, MOVE_STOP, 0);
-                            control->stateMachine->functionData = HOMING_NONE; // Set to false, will be set to true when home is complete
+                            control->stateMachine->_functionData = HOMING_NONE; // Set to false, will be set to true when home is complete
                         }
 
-                        if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == HOMING_SEEKING) // Wait for limit switch trigger
+                        if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->_functionData == HOMING_SEEKING) // Wait for limit switch trigger
                         {
                             move_servo(control, MOVE_STOP, 0);
                             _waitms(100);
                             move_servo(control, MOVE_SPEED, -1500); // Turn CWW at homing speeds/10
 
-                            control->stateMachine->functionData = HOMING_BACKING_OFF; // Set to 2, will be set to 1 when home is complete
-                                                                                      // dyn4_send_command(&dyn4, dyn4_set_origin, 0);
+                            control->stateMachine->_functionData = HOMING_BACKING_OFF; // Set to 2, will be set to 1 when home is complete
+                                                                                       // dyn4_send_command(&dyn4, dyn4_set_origin, 0);
                         }
-                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && control->stateMachine->functionData == HOMING_BACKING_OFF)
+                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && control->stateMachine->_functionData == HOMING_BACKING_OFF)
                         {
                             move_servo(control, MOVE_STOP, 0);
                             _waitms(100);
                             move_servo(control, MOVE_SPEED, 1500); // Turn CCW at homing speeds/10
-                            control->stateMachine->functionData = HOMING_SEEKING_SLOW;
+                            control->stateMachine->_functionData = HOMING_SEEKING_SLOW;
                         }
-                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->functionData == HOMING_SEEKING_SLOW)
+                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && control->stateMachine->_functionData == HOMING_SEEKING_SLOW)
                         {
                             move_servo(control, MOVE_STOP, 0);
                             _waitms(1000);
                             // dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
                             //  move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
-                            control->stateMachine->functionData = HOMING_COMPLETE;
+                            control->stateMachine->_functionData = HOMING_COMPLETE;
                         }
                         if (navkey.status.UPR > 0) // Up released
                         {
-                            control->stateMachine->functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                            control->stateMachine->_functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
                             move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
-                            control->stateMachine->functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                            control->stateMachine->_functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
                             move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
                         }
                         break;
@@ -472,22 +470,22 @@ static void control_cog(ControlSystem *control)
                         move_servo(control, MOVE_STOP, 0);
                         break;
                     case FUNC_MANUAL_MOVE_FORCE:
-                        if (lastState.function != FUNC_MANUAL_MOVE_FORCE || initial)
+                        if (lastState._function != FUNC_MANUAL_MOVE_FORCE || initial)
                         {
-                            control->stateMachine->functionData = 0; // Set force to zero
+                            control->stateMachine->_functionData = 0; // Set force to zero
                         }
                         if (navkey.status.LTR > 0) // Left released
                         {
-                            control->stateMachine->functionData += 100; // Increase position by 10
+                            control->stateMachine->_functionData += 100; // Increase position by 10
                         }
                         if (navkey.status.RTR > 0) // Right released
                         {
-                            if (control->stateMachine->functionData > 100)
+                            if (control->stateMachine->_functionData > 100)
                             {
-                                control->stateMachine->functionData -= 100; // Decrease position by 10
+                                control->stateMachine->_functionData -= 100; // Decrease position by 10
                             }
                         }
-                        if (forcemN * 1000 < control->stateMachine->functionData)
+                        if (forcemN * 1000 < control->stateMachine->_functionData)
                         {
                             if (navkey.status.UPP > 0) // Up pressed
                             {
@@ -520,7 +518,6 @@ static void control_cog(ControlSystem *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        printf("running test\n");
                         run_motion_profile_init(&run); // Create new RunMotionProfile structure
                         startTime = _getus();
                         startPosition = control->monitorData->position;
@@ -544,7 +541,6 @@ static void control_cog(ControlSystem *control)
                     }
                     else
                     {
-                        printf("test complete\n");
                         monitorWriteData = false;
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }

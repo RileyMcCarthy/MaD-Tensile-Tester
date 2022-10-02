@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Status{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Motion Profile</h1>
+    <div id="testProfile"></div>
+</div>
+
+<script>
+    function getMotionProfile() {
+        console.log("Getting motion profile");
+        $.post("/motionProfile", {},
+            function (data) { // <- This is automatically called after the post completes successfully
+                console.log("returning:" + data)
+                $("#testProfile").html(data);
+            });
+    };
+
+    window.onload = getMotionProfile();
+</script>
+
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Status{% endblock %}
+{% block content %}
+<div class="row my-3">
+    <div class="col">
+        <div class="shadow p-3 mb-5 bg-white rounded">
+            <h1 class="text-center">Status</h1>
+            <div id="machineStatus"></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="shadow p-3 mb-5 bg-white rounded">
+                <h1 class="text-center">Machine</h1>
+                <div class="row text-center">
+                    <div class="col">
+                        <h3>Status</h3><button type="button" class="btn btn-success" id="status"
+                            onclick=toggleStatus()>status</button>
+                    </div>
+                    <div class="col">
+                        <h3>Condition</h3><button type="button" class="btn btn-info" id="condition"
+                            disabled>condition</button>
+                    </div>
+                    <div class="col">
+                        <h3>Mode</h3><button type="button" class="btn btn-success" id="mode"
+                            onclick=toggleMode()>mode</button>
+                    </div>
+                    <div class="col">
+                        <h3>Test MP</h3><button type="button" class="btn btn-success" id="mode"
+                            onclick=run()>Run</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="shadow p-3 mb-5 bg-white rounded">
+                <canvas id="chart-position" style="width:100%;">
+                </canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function run() {
+        $.ajax({
+            url: "/run",
+            type: "post",
+            success: function (data) {
+                console.log("Running default motion profile");
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function toggleStatus() {
+        $.ajax({
+            url: "/toggleStatus",
+            type: "post",
+            success: function (data) {
+                console.log("Toggling Status");
+                getStatus();
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function toggleMode() {
+        $.ajax({
+            url: "/toggleMode",
+            type: "post",
+            success: function (data) {
+                console.log("Toggling Mode");
+                getStatus();
+
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function getStatus() {
+        console.log("Getting device status");
+        $.ajax({
+            url: "/machineStatus",
+            type: "post",
+            success: function (data) {
+                if (data == "") {
+                    return;
+                }
+                $("#machineStatus").html(data);
+                $("#status").html($("#machineStatus").find(".status").find(".value").html())
+                $("#condition").html($("#machineStatus").find(".condition").find(".value").html())
+                $("#mode").html($("#machineStatus").find(".mode").find(".value").html())
+                state = $("#machineStatus").find(".state").find(".value").html()
+                $("#status").prop('disabled', "MOTION".localeCompare(state))
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function update() {
+        getStatus()
+        //setTimeout(update, 5000);
+    };
+
+    window.onload = update();
+
+    $(document).ready(function () {
+        const config = {
+            type: 'line',
+            responsive: true,
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Position",
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: [],
+                    fill: false,
+                }],
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Position vs. Time'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: '(mm)'
+                        }
+                    }]
+                }
+            }
+        };
+        const context = document.getElementById('chart-position').getContext('2d');
+
+        const lineChart = new Chart(context, config);
+
+        const source = new EventSource("/data");
+
+        source.onmessage = function (event) {
+            console.log("Data:" + event.data)
+            if (event.data == "") {
+                return;
+            }
+            const data = JSON.parse(event.data);
+            if (config.data.labels.length >= 20) {
+                config.data.labels.shift();
+                config.data.datasets[0].data.shift();
+            }
+            config.data.labels.push(data.time);
+            config.data.datasets[0].data.push(data.value);
+            lineChart.update();
+        }
+    });
+
+</script>
+
+{% endblock %}
