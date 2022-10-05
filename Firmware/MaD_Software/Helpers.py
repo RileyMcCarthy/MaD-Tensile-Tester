@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-from wtforms import Form, BooleanField, StringField, PasswordField, validators, SelectField
-from SerialHelpers import *
-import numpy as np
-import matplotlib.pyplot as plt
-import sys
-import glob
 import serial.tools.list_ports
 import re
+from SerialHelpers import *
+
 # This method of finding ports may break some serial ports
 
 
@@ -226,9 +222,3 @@ def machine_status_to_html(status):
         "condition": lambda sel, readonly: enum_to_html("CONDITION_", sel, readonly),
         "mode": lambda sel, readonly: enum_to_html("MODE_", sel, readonly),
     })
-
-
-class ConnectForm(Form):
-    port = SelectField('Serial Port')
-    baud = SelectField('Baud Rate', [
-                       9600, 14400, 19200, 38400, 57600, 115200, 256000])

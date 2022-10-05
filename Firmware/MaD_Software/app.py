@@ -1,5 +1,5 @@
 from traceback import format_exception
-from flask import Flask, render_template, request, g, session, Response, make_response, stream_with_context
+from flask import Flask, render_template, request, g, session, Response, make_response, stream_with_context, redirect, url_for
 from flask_session import Session
 from SerialHelpers import MaD_Serial
 from Helpers import *
@@ -10,124 +10,74 @@ import matplotlib.pyplot as plt
 import io
 import time
 import json
+from forms import ConnectForm
+#from flask_wtf.csrf import CSRFProtect
+
 # .g mutex lock, deadlock, peristance.
 app = Flask(__name__)
 # Check Configuration section for more details
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
+#csrf = CSRFProtect(app)
 
 mSerial = MaD_Serial()
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xef]/'
 
 
-@app.route('/formTest', methods=['GET', 'POST'])
-def register():
-    form = ConnectForm(request.form)
-    if request.method == 'POST' and form.validate():
-        print("Form submitted! Port:"+form.port+", Baud:"+form.baud)
-    return ""
-
 @app.route('/status')
 def status():
+    if mSerial.started == False:
+        print("serial has not been started, opening connect page")
+        return redirect(url_for('connect'))
     return render_template("status.html")
 
 
 @app.route('/test')
 def test():
+    if mSerial.started == False:
+        print("serial has not been started, opening connect page")
+        return redirect(url_for('connect'))
     return render_template("test.html")
 
 
 @app.route('/')
 def home():
-    ports = list_ports()
+    # Have homepage be a first run type of page that is only displayed when no device is connected
+    return redirect(url_for('status'))
+
+
+@app.route('/connect', methods=['GET', 'POST'])
+def connect():
     connectForm = ConnectForm()
-    print(ports)
+    connectForm.port.choices = list_ports()
+    print("ports:"+str(connectForm.port.choices))
+    if request.method == "POST":
+        if connectForm.validate():
+            print("Connecting to device " + str(connectForm.port.data) +
+                  " @ " + str(connectForm.baud.data))
+            if mSerial.start(connectForm.port.data, connectForm.baud.data) == False:
+                print("failed to connect to device")
+                connectForm.port.errors.append(
+                    "Failed to open specified port: " + str(connectForm.port.data))
+                return render_template("connect.html", connectForm=connectForm)
+            print("Initializing device")
+            if mSerial.initialize() == False:
+                connectForm.baud.errors.append(
+                    "Failed to initialize device on " + str(mSerial.port) + " @ " + str(mSerial.baud))
+                return render_template("connect.html", connectForm=connectForm)
+            return redirect(url_for('status'))
+        else:
+            print("fields not valid")
+            return render_template("connect.html", connectForm=connectForm)
+    connectForm.port.default = mSerial.port
+    connectForm.baud.default = mSerial.baud
+    connectForm.process()
+    print(connectForm.port.choices)
     print("selected port: " +
           mSerial.port + " @ " + str(mSerial.baud))
-    return render_template("home.html", ports=ports, selectedPort=mSerial.port, baud=mSerial.baud, connectForm=connectForm)
-
-
-@app.route('/connect', methods=['POST'])
-def connect():
-    print("Getting data")
-    port = request.form['port']
-    baud = request.form['baud']
-    if mSerial.start(port, baud) == False:
-        return "Failed to open specified port: " + str(port) + " @ " + str(baud)
-    if mSerial.initialize() == False:
-        return "Failed to initialize device on " + str(mSerial.port) + " @ " + str(mSerial.baud)
-    return "Connected"
-    #machineState = getMachineState(ser)
-    # print_ctypes_obj(machineState)
-    #monitorData = getMonitorData(ser)
-    # print_ctypes_obj(monitorData)
-    #motionProfile = loadMotionProfile()
-    #setMotionMode(ser, 1)
-    #machineState = getMachineState(ser)
-    # print_ctypes_obj(machineState)
-    #setMotionProfile(ser, motionProfile)
-    #setMotionMode(ser, 2)
-    #machineState = getMachineState(ser)
-    # time.sleep(15)
-    # print_ctypes_obj(machineState)
-
-    dataList = getTestData(ser)
-    timeY = []
-    force = []
-    position = []
-    startTime = dataList[0].timeus
-    for data in dataList:
-        if (data.timeus > 0):
-            timeY.append((data.timeus-startTime)/1000000.0)
-            force.append(data.force)
-            position.append(data.position)
-    print(timeY)
-    plt.plot(timeY, force)
-    plt.xlabel("Time (s)")
-    plt.ylabel("Force (N)")
-    plt.savefig('static/images/force.png')
-    plt.clf()
-
-    plt.plot(timeY, position)
-    plt.xlabel("Time (ms)")
-    plt.ylabel("position (N)")
-    plt.savefig('static/images/position.png')
-    plt.clf()
-
-    ser.close()
-    if (connected == True):
-        return "Connected"
-    else:
-        return "Disconnected"
-    machineState = getMachineState(ser)
-    print_ctypes_obj(machineState)
-    monitorData = getMonitorData(ser)
-    print_ctypes_obj(monitorData)
-    motionProfile = loadMotionProfile()
-    setMotionMode(ser, 1)
-    machineState = getMachineState(ser)
-    print_ctypes_obj(machineState)
-    setMotionProfile(ser, motionProfile)
-    setMotionMode(ser, 2)
-    machineState = getMachineState(ser)
-    time.sleep(15)
-    print_ctypes_obj(machineState)
-    return "Connected"
-    dataList = getTestData(ser)
-    x = []
-    y = []
-    for data in dataList:
-        x = data.timeus
-        y = data.force
-    session['x'] = x
-    session['y'] = y
-    print(dataList)
-    if (connected == True):
-        return "Connected"
-    else:
-        return "Disconnected"
+    return render_template("connect.html", connectForm=connectForm)
 
 
 @app.route('/data')

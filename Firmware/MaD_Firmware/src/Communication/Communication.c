@@ -11,18 +11,6 @@
 
 typedef struct __using("jm_fullduplexserial.spin2") FDS;
 static FDS fds;
-#define CMD_WRITE 128
-#define CMD_PING 0           // test communication
-#define CMD_DATA 1           // send monitor data
-#define CMD_STATE 2          // send machine state
-#define CMD_MPROFILE 3       // send/recieve machine profile
-#define CMD_MCONFIG 4        // send/recieve machine configuration
-#define CMD_MPERFORMANCE 5   // send/receive machine performance
-#define CMD_MOTIONPROFILE 6  // send/recieve motion profile
-#define CMD_MOTIONMODE 7     // send/recieve motion mode
-#define CMD_MOTIONFUNCTION 8 // send/recieve motion function and data
-#define CMD_MOTIONSTATUS 9   // send/recieve motion status
-#define CMD_FLASHDATA 10     // Send flash data
 
 // @TODO RETURN CHECKSUM FOR VALIDATION IT WAS RECIEVED CORRECTLY
 static bool receive(char *buf, unsigned int size)
@@ -93,7 +81,7 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             case CMD_PING:
             {
                 DEBUG_WARNING("pinging device back\n");
-                uint8_t res = 1;
+                uint8_t res = MAD_VERSION;
                 send(&res, 1);
                 break;
             }

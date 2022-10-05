@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Connect{% endblock %}
+{% block content %}
+<div class="container">
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+                            <h2 class="fw-bold mb-2 text-uppercase">Connect to MaD Device</h2>
+                            <div class="mb-md-5 mt-md-4 pb-5">
+                                <p class="text-white-50 mb-5">Please enter you device serial information</p>
+                                {% macro render_field(field) %}
+                                {{ field.label(class_="form-label")}}
+                                <div class="form-outline form-white mb-4">
+                                    {{ field(**kwargs) }}
+                                    {% if field.errors %}
+                                    <ul class=errors>
+                                        {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                                {% endmacro %}
+                                <form method=post id="connectForm">
+                                    <dl>
+                                        {{ render_field(connectForm.port, class="form-select form-select-lg
+                                        mb-3") }}
+                                        {{ render_field(connectForm.baud) }}
+                                    </dl>
+                                    <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    $(document).ready(function () {
+        /*$('#connectForm').submit(function (e) {
+            var url = "{{ url_for('connect') }}"; // send the form data here.
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $('#connectForm').serialize(), // serializes the form's elements.
+                success: function (data) {
+                    document.write(data);
+                }
+            });
+            e.preventDefault(); // block the traditional submission of the form.
+        });*/
+
+
+        /* $.ajaxSetup({
+             beforeSend: function (xhr, settings) {
+                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                     xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                 }
+             }
+         });*/
+    }); 
+</script>
+
+{% endblock %}

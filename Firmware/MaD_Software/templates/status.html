@@ -94,6 +94,7 @@
                 if (data == "") {
                     return;
                 }
+                console.log("Got machine profile")
                 $("#machineStatus").html(data);
                 $("#status").html($("#machineStatus").find(".status").find(".value").html())
                 $("#condition").html($("#machineStatus").find(".condition").find(".value").html())
@@ -102,7 +103,7 @@
                 $("#status").prop('disabled', "MOTION".localeCompare(state))
             },
             error: function (xhr) {
-                //Handel error
+                console.log(xhr)
             }
         });
     };
@@ -164,7 +165,7 @@
 
         const lineChart = new Chart(context, config);
 
-        const source = new EventSource("/data");
+        const source = new EventSource("/data1");
 
         source.onmessage = function (event) {
             console.log("Data:" + event.data)

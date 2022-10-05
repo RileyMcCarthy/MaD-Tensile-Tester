@@ -10,6 +10,7 @@ from MonitorDefinition import *
 from StateMachineDefinition import *
 from Helpers import *
 import threading
+from CommuncationDefinition import *
 
 CMD_SYNC = bytearray([0x55])
 CMD_WRITE = bytearray([128])
@@ -79,6 +80,7 @@ class MaD_Serial:
         buf = self.serial.read(n)
         if (len(buf) != n):
             print('Bytes dont match:'+str(buf))
+            self.lock.release()
             return None
         crcBuf = self.serial.read(1)
         self.lock.release()
@@ -122,15 +124,22 @@ class MaD_Serial:
         self.lock.release()
 
     def start(self, port, baud):
+        if self.serial is not None and self.serial.isOpen() == True:
+            print("Disconnecting previous serial")
+            self.serial.close()
         self.port = port
         self.baud = baud
         try:
+            print("trying to get lock")
             self.lock.acquire()
-            self.serial = serial.Serial(self.port, self.baud, timeout=3)
+            print("starig serial")
+            self.serial = serial.Serial(self.port, self.baud, timeout=1, write_timeout=0)
+            print("done")
             self.started = True
             self.serial.reset_input_buffer()
             self.lock.release()
         except serial.SerialException as error:
+            self.lock.release()
             print(error)
             self.started = False
         return self.started
@@ -138,13 +147,12 @@ class MaD_Serial:
     def initialize(self):
         # wait until device is communicating
         print("Pinging device")
-        tries = 3
-        if (self.getPing() == False):
-            if tries == 0:
-                print("Device failed to respond")
-                self.started = False
-                return False
-            tries -= 1
+        version = self.getVersion()
+        print(version)
+        if (version != MAD_VERSION):
+            print("Device failed to respond")
+            self.started = False
+            return False
         print("Device responded")
 
         # Send machine profile
@@ -166,13 +174,13 @@ class MaD_Serial:
 
     # Returns true if ping is successful
 
-    def getPing(self):
+    def getVersion(self):
         self.__readCmd(CMD_PING)
         buf = self.__read(1)
-        try:
-            return self.getBoolean(buf)
-        except ValueError as error:
-            return False
+        if buf is not None:
+            return int.from_bytes(buf, "big", signed=False)
+        else:
+            return -1
 
     def readStructure(self, structType):
         print("Reading structure of size: "+str(ctypes.sizeof(structType)))

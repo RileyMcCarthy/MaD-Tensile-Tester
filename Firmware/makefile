@@ -48,18 +48,19 @@ exportStructures:
 	ctypesgen MaD_Firmware/Librarys/JSON/JSON.h -o MaD_Software/JSON.py --no-embed-preamble
 	sed -i -E "s/c_double/c_float/g" MaD_Software/JSON.py
 	sed -i -E "s/from ./from /g" MaD_Software/JSON.py
-	#sed -i '1,31d' MaD_Software/JSON.py
-	#sed -i '1s/^/from ctypes import *\n/' MaD_Software/JSON.py
+
 	ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/MonitorDefinition.py --no-embed-preamble
 	sed -i -E "s/c_double/c_float/g" MaD_Software/MonitorDefinition.py
 	sed -i -E "s/from ./from /g" MaD_Software/MonitorDefinition.py
-	#sed -i '1,31d' MaD_Software/MonitorDefinition.py
-	#sed -i '1s/^/from ctypes import *\n/' MaD_Software/MonitorDefinition.py
+
 	ctypesgen MaD_Firmware/include/Utility/StateMachineDefinition.h -o MaD_Software/StateMachineDefinition.py --no-embed-preamble
 	sed -i -E "s/c_double/c_float/g" MaD_Software/StateMachineDefinition.py
 	sed -i -E "s/from ./from /g" MaD_Software/StateMachineDefinition.py
-	#sed -i '1,31d' MaD_Software/StateMachineDefinition.py
-	#sed -i '1s/^/from ctypes import *\n/' MaD_Software/StateMachineDefinition.py
+
+	ctypesgen MaD_Firmware/include/Main/Communication/CommunicationDefinition.h -o MaD_Software/CommuncationDefinition.py --no-embed-preamble
+	sed -i -E "s/c_double/c_float/g" MaD_Software/CommuncationDefinition.py
+	sed -i -E "s/from ./from /g" MaD_Software/CommuncationDefinition.py
+
 exportStructuresNew:
 	clang2py MaD_Firmware/Librarys/JSON/JSON.h -o MaD_Software/JSON.py
 	sed -i -E "s/c_double/c_float/g" MaD_Software/JSON.py
