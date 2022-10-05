@@ -11,7 +11,7 @@ import io
 import time
 import json
 from forms import ConnectForm
-#from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect
 
 # .g mutex lock, deadlock, peristance.
 app = Flask(__name__)
@@ -19,7 +19,8 @@ app = Flask(__name__)
 SESSION_TYPE = 'filesystem'
 app.config.from_object(__name__)
 Session(app)
-#csrf = CSRFProtect(app)
+
+csrf = CSRFProtect(app)
 
 mSerial = MaD_Serial()
 

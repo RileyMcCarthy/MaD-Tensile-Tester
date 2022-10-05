@@ -25,12 +25,16 @@
                                 </div>
                                 {% endmacro %}
                                 <form method=post id="connectForm">
+                                    {{ connectForm.csrf_token }}
                                     <dl>
                                         {{ render_field(connectForm.port, class="form-select form-select-lg
                                         mb-3") }}
                                         {{ render_field(connectForm.baud) }}
+                                        {% if connectForm.errors %}
+                                        {{connectForm.errors}}
+                                        {% endif %}
                                     </dl>
-                                    <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                                    <button class="btn btn-outline-light btn-lg px-5" type="submit">Connect</button>
                                 </form>
                             </div>
                         </div>
@@ -40,31 +44,5 @@
         </div>
     </section>
 </div>
-
-<script>
-    $(document).ready(function () {
-        /*$('#connectForm').submit(function (e) {
-            var url = "{{ url_for('connect') }}"; // send the form data here.
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: $('#connectForm').serialize(), // serializes the form's elements.
-                success: function (data) {
-                    document.write(data);
-                }
-            });
-            e.preventDefault(); // block the traditional submission of the form.
-        });*/
-
-
-        /* $.ajaxSetup({
-             beforeSend: function (xhr, settings) {
-                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                     xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                 }
-             }
-         });*/
-    }); 
-</script>
 
 {% endblock %}
