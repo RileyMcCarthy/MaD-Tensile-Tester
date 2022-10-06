@@ -69,9 +69,9 @@ void destroy_run_motion_profile(RunMotionProfile *run);
 
 void get_function_info(FunctionInfo *info, int id);
 
-double position_profile(double t, RunMotionProfile *run, MotionProfile *profile);
-double position_set(double t, RunMotionProfile *run, MotionSet *set);
-double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet);
+double position_profile(double t, double position, RunMotionProfile *run, MotionProfile *profile);
+double position_set(double t, double position, RunMotionProfile *run, MotionSet *set);
+double position_quartet(double t, double position, RunMotionProfile *run, MotionQuartet *quartet);
 
 double sigmoid(double t, double *args);
 // void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);

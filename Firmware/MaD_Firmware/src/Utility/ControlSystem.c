@@ -535,7 +535,7 @@ static void control_cog(ControlSystem *control)
                             run.profileComplete = true;
                         }*/
                         double t = (_getus() - startTime) / 1000000.0;
-                        double position = position_profile(t, &run, &(control->motionProfile));
+                        double position = position_profile(t, control->monitorData->position - startPosition, &run, &(control->motionProfile));
                         // printf("%f,%f,%f\n", t, position, control->monitorData->position);
                         move_servo(control, MOVE_ABSOLUTE, startPosition + (int)(position * 1000));
                     }

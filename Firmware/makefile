@@ -110,7 +110,7 @@ $(WIN)/%.c: %.c
 	-./a.exe $(subst /,\,$(<)) $(subst /,\,$(@))
 	
 run: 
-	$(LOAD) -p $(PORT) -t -b230400 -ZERO -v $(subst \,/,bin\$(TARGET))
+	$(LOAD) -p $(PORT) -t -b230400 -ZERO -v $(subst \,/,bin\$(TARGET)) 
 .PHONY: clean
 .PHONY: clear
 clear:

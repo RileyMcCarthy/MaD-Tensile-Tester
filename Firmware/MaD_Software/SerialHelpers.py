@@ -90,7 +90,7 @@ class MaD_Serial:
         crc = unpack('B', crcBuf)[0]
         crccalc = self.crc8(buf)
         if (crc != crccalc):
-            print("Invalid CRC:"+str(crc)+"Should be:"+str(crccalc))
+            print("Invalid CRC:"+str(crc)+"Should be:"+str(crccalc) + " Recieved message: "+str(buf))
             return None
         return buf
 

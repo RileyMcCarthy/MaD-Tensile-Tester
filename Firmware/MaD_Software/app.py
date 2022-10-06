@@ -12,6 +12,7 @@ import time
 import json
 from forms import ConnectForm
 from flask_wtf.csrf import CSRFProtect
+import cv2
 
 # .g mutex lock, deadlock, peristance.
 app = Flask(__name__)
@@ -21,11 +22,33 @@ app.config.from_object(__name__)
 Session(app)
 
 csrf = CSRFProtect(app)
-
+camera = cv2.VideoCapture(-1)
 mSerial = MaD_Serial()
 
 app.secret_key = b'_5#y2L"F4Q8z\n\xef]/'
 
+
+def gen_frames():
+    while True:
+        if not camera.isOpened():
+            print("Cannot open camera, trying again")
+            camera.open(-1)
+            exit()
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            print("failed to read camera info")
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
+
+@app.route('/video_feed')
+def video_feed():
+    print("getting video feed")
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/status')
 def status():

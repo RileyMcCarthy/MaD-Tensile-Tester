@@ -18,7 +18,7 @@ void run_motion_profile_init(RunMotionProfile *run)
     run->lastSetDistance = 0;
 }
 
-double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
+double position_profile(double t, double position, RunMotionProfile *run, MotionProfile *profile)
 {
     if (run == NULL || profile == NULL)
     {
@@ -30,7 +30,7 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
         // printf("Error: currentSet > MAX_MOTION_PROFILE_SETS\n");
         run->currentSet = 0;
     }
-    double position = position_set(t, run, &(profile->sets[run->currentSet]));
+    double position = position_set(t, position, run, &(profile->sets[run->currentSet]));
     if (run->setComplete)
     {
         run->currentSet++;
@@ -44,7 +44,7 @@ double position_profile(double t, RunMotionProfile *run, MotionProfile *profile)
     return position;
 }
 
-double position_set(double t, RunMotionProfile *run, MotionSet *set)
+double position_set(double t, double position, RunMotionProfile *run, MotionSet *set)
 {
     if (run == NULL || set == NULL)
     {
@@ -56,7 +56,7 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
         // printf("Error: currentQuartet > MAX_MOTION_QUARTETS\n");
         run->currentQuartet = 0;
     }
-    double position = position_quartet(t, run, &(set->quartets[run->currentQuartet]));
+    double position = position_quartet(t, position, run, &(set->quartets[run->currentQuartet]));
     if (run->quartetComplete)
     {
         // printf("quartet complete:%d\n", run->currentQuartet);
@@ -78,20 +78,17 @@ double position_set(double t, RunMotionProfile *run, MotionSet *set)
     return position;
 }
 
-double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
+double position_quartet(double t, double position, RunMotionProfile *run, MotionQuartet *quartet)
 {
     if (run == NULL || quartet == NULL)
     {
         //("Null pointer passed to position_set\n");
         return 0;
     }
+
     FunctionInfo info;
     get_function_info(&info, quartet->function);
-    // printf("Function:%s\n", info.name);
-    // printf("Args:%s\n", info.args[0]);
-    // printf("Args:%s\n", info.args[1]);
-    // printf("Args:%s\n", info.args[2]);
-    // printf("params:%f\n", quartet->parameters[0]);
+
     if (info.func == NULL)
     {
         // printf("no function for %s\n", info.name);
@@ -100,22 +97,27 @@ double position_quartet(double t, RunMotionProfile *run, MotionQuartet *quartet)
         run->quartetComplete = true;
         return 0;
     }
-    // double position = info.func(t - run->lastQuartetTime, quartet->parameters); // Quartet position
-    double position = (t - run->lastQuartetTime) * quartet->parameters[1];
-    if (abs(position) > abs(quartet->parameters[0]))
+    double positionSetpoint = info.func(t - run->lastQuartetTime, quartet->parameters); // Get setpoint
+    if (abs(positionSetpoint) > abs(quartet->parameters[0]))
     {
-        position = quartet->parameters[0];
+        positionSetpoint = quartet->parameters[0];
     }
-    // printf("Position:%f\n", position);
-    double lastQuartetDistance = run->lastQuartetDistance;
 
-    if (abs(position - quartet->parameters[0]) < 0.1) // Still need to add Dwell
+    if (abs(position - quartet->parameters[0]) < 0.1) // Actual position has reached final position
     {
-        run->lastQuartetTime = t;
-        run->lastQuartetDistance += quartet->parameters[0];
-        run->quartetComplete = true;
+        if (run->dwellTime == 0) // Dwell has not started
+        {
+            run->dwellTime = t;
+        }
+        if (t - run->dwellTime > quartet->dwell) // Dwell period is done, quartet has completed
+        {
+            run->dwellTime = 0;
+            run->lastQuartetTime = t;
+            run->lastQuartetDistance += quartet->parameters[0];
+            run->quartetComplete = true;
+        }
     }
-    return lastQuartetDistance + position;
+    return run->lastQuartetDistance + positionSetpoint;
 }
 
 // args = [distance, strain rate, error]
