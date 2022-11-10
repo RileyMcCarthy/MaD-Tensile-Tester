@@ -7,6 +7,7 @@ typedef struct monitor_data_t
     int encoderRaw;  // Raw encoder value
     double force;    // Force value in N
     double position; // Position value in mm
+    int setpoint; // Setpoint in um
     int timems;      // time in ms
     int timeus;      // time in us
 } MonitorData;

@@ -16,7 +16,8 @@ typedef struct monitor_cog_t
     MonitorData cache; // Cached data
     int cacheLock;
 } Monitor;
-
-MonitorData *monitor_read_data(int addr);
+void monitor_sync_setpoint();
+void monitor_set_address(int addr);
+MonitorData *monitor_read_data();
 bool monitor_begin(Monitor *monitor, MachineState *machineState, MachineConfiguration *configuration, int sampleRate);
 #endif

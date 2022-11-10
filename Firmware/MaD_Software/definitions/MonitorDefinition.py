@@ -1,7 +1,7 @@
 r"""Wrapper for MonitorDefinition.h
 
 Generated with:
-/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/MonitorDefinition.py --no-embed-preamble
+/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/definitions/MonitorDefinition.py --no-embed-preamble
 
 Do not modify this file.
 """
@@ -10,8 +10,8 @@ __docformat__ = "restructuredtext"
 
 # Begin preamble for Python
 
-from ctypes_preamble import *
-from ctypes_preamble import _variadic_function
+from .ctypes_preamble import *
+from .ctypes_preamble import _variadic_function
 
 # End preamble
 
@@ -20,7 +20,7 @@ _libdirs = []
 
 # Begin loader
 
-from ctypes_loader import *
+from .ctypes_loader import *
 
 # End loader
 
@@ -30,7 +30,7 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 12
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
 class struct_monitor_data_t(Structure):
     pass
 
@@ -39,6 +39,7 @@ struct_monitor_data_t.__slots__ = [
     'encoderRaw',
     'force',
     'position',
+    'setpoint',
     'timems',
     'timeus',
 ]
@@ -47,13 +48,14 @@ struct_monitor_data_t._fields_ = [
     ('encoderRaw', c_int),
     ('force', c_float),
     ('position', c_float),
+    ('setpoint', c_int),
     ('timems', c_int),
     ('timeus', c_int),
 ]
 
-MonitorData = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 12
+MonitorData = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
 
-monitor_data_t = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 12
+monitor_data_t = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
 
 # No inserted files
 

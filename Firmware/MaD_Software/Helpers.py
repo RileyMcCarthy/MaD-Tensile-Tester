@@ -53,16 +53,16 @@ def loadMotionProfile():
     motionProfile.sets[0].quartetCount = 2
 
     motionProfile.sets[0].quartets[0].name = b'qrt1.qrt'
-    motionProfile.sets[0].quartets[0].function = 1
+    motionProfile.sets[0].quartets[0].function = 0
     motionProfile.sets[0].quartets[0].parameters[0] = 20
     motionProfile.sets[0].quartets[0].parameters[1] = 20
     motionProfile.sets[0].quartets[0].dwell = 500
 
-    motionProfile.sets[0].quartets[0].name = b'qrt2.qrt'
-    motionProfile.sets[0].quartets[0].function = 1
-    motionProfile.sets[0].quartets[0].parameters[0] = -20
-    motionProfile.sets[0].quartets[0].parameters[1] = 10
-    motionProfile.sets[0].quartets[0].dwell = 500
+    motionProfile.sets[0].quartets[1].name = b'qrt2.qrt'
+    motionProfile.sets[0].quartets[1].function = 0
+    motionProfile.sets[0].quartets[1].parameters[0] = -20
+    motionProfile.sets[0].quartets[1].parameters[1] = 10
+    motionProfile.sets[0].quartets[1].dwell = 500
     return motionProfile
 
 
@@ -120,7 +120,7 @@ inputHTMLPre = """
     </div>"""
 
 inputHTMLTitlePre = """
-<div class="mb-3 row border rounded {}">
+<div class="mb-3 row rounded {}">
     <div class="col-auto">
         <h5 class="text-center">{}</h5>
     </div>"""
@@ -129,8 +129,7 @@ inputHTMLPost = """</div>"""
 
 
 def formatTitle(title):
-    ret = re.sub('([A-Z])', r' \1', title)
-    return ret.title()
+    return re.sub('([A-Z])', r' \1', title).title()
 
 
 def formatField(field, readonly):
@@ -186,6 +185,10 @@ def enum_to_html(prefix, selected, readonly):
     for var in globals():
         if prefix in var:
             options.append(var.replace(prefix, ""))
+    if selected > len(options):
+        print("selected value not valid:"+str(selected))
+        selected = 0
+
     if readonly == True:
         str = '<span type="text" class="col value">{}</span>'.format(
             options[selected])

@@ -33,11 +33,13 @@ double position_profile(double t, double position, RunMotionProfile *run, Motion
     double position = position_set(t, position, run, &(profile->sets[run->currentSet]));
     if (run->setComplete)
     {
+        printf("set complete\n");
         run->currentSet++;
         run->setComplete = false;
     }
     if (run->currentSet >= profile->setCount)
     {
+        printf("profile complete\n");
         run->currentSet = 0;
         run->profileComplete = true;
     }
@@ -59,19 +61,19 @@ double position_set(double t, double position, RunMotionProfile *run, MotionSet 
     double position = position_quartet(t, position, run, &(set->quartets[run->currentQuartet]));
     if (run->quartetComplete)
     {
-        // printf("quartet complete:%d\n", run->currentQuartet);
+         printf("quartet complete:%d\n", run->currentQuartet);
         run->currentQuartet++;
         run->quartetComplete = false;
     }
     if (run->currentQuartet >= set->quartetCount)
     {
-        // printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
+         printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
         run->currentExecution++;
         run->currentQuartet = 0;
     }
     if (run->currentExecution >= set->executions)
     {
-        // printf("Set %d done\n", run->currentSet);
+         printf("Set %d done\n", run->currentSet);
         run->setComplete = true;
         run->currentExecution = 0;
     }
@@ -98,23 +100,29 @@ double position_quartet(double t, double position, RunMotionProfile *run, Motion
         return 0;
     }
     double positionSetpoint = info.func(t - run->lastQuartetTime, quartet->parameters); // Get setpoint
+    //printf("posSetpoint:%f\n",positionSetpoint);
     if (abs(positionSetpoint) > abs(quartet->parameters[0]))
     {
         positionSetpoint = quartet->parameters[0];
     }
-
-    if (abs(position - quartet->parameters[0]) < 0.1) // Actual position has reached final position
+    double quartetPosition = run->lastQuartetDistance + position;
+    //printf("Delta:%f,%f,%f\n",quartetPosition, quartet->parameters[0], abs(abs(quartetPosition) - abs(quartet->parameters[0])));
+    if (abs(abs(quartetPosition) - abs(quartet->parameters[0])) < 0.1) // Actual position has reached final position
     {
+        //printf("reached setpoint\n");
         if (run->dwellTime == 0) // Dwell has not started
         {
-            run->dwellTime = t;
+            printf("starting dwell:%f\n",t);
+            run->dwellTime = t*1000;
         }
-        if (t - run->dwellTime > quartet->dwell) // Dwell period is done, quartet has completed
+        if ((t*1000 - run->dwellTime) > quartet->dwell) // Dwell period is done, quartet has completed
         {
+            printf("Dwell complete:%f\n",t);
             run->dwellTime = 0;
             run->lastQuartetTime = t;
             run->lastQuartetDistance += quartet->parameters[0];
             run->quartetComplete = true;
+            return run->lastQuartetDistance;
         }
     }
     return run->lastQuartetDistance + positionSetpoint;
@@ -148,8 +156,9 @@ double sigmoid(double t, double *args)
 
 // args = [distance, strain rate]
 double line(double t, double *args)
-{
-    double position = t * args[1];
+{   
+    int dir = args[0] > 0 ? 1 : -1;
+    double position = t * args[1] * dir;
     if (abs(position) > abs(args[0]))
     {
         return args[0];
@@ -157,14 +166,17 @@ double line(double t, double *args)
     return position;
 }
 
+/*FunctionInfo functions[] = {
+    [QUARTET_FUNC_LINE] = {.name = "Line", .func = line, .args_count = 2, .args = {"distance", "strain rate"}},
+    [QUARTET_FUNC_SIGMOIDAL] = {.name = "Sigmoid", .func = sigmoid, .args_count = 3, .args = {"distance", "strain rate", "error"}},
+};*/
+
 void get_function_info(FunctionInfo *info, int id)
 {
     switch (id)
     {
     case QUARTET_FUNC_LINE:
     {
-        info->id = QUARTET_FUNC_LINE;
-
         strncpy(info->name, "Line", FUNCTION_MAX_NAME_LENGTH);
 
         info->func = line;
@@ -176,8 +188,6 @@ void get_function_info(FunctionInfo *info, int id)
     }
     case QUARTET_FUNC_SIGMOIDAL:
     {
-        info->id = QUARTET_FUNC_SIGMOIDAL;
-
         strncpy(info->name, "Sigmoid", FUNCTION_MAX_NAME_LENGTH);
 
         info->func = sigmoid;
@@ -189,8 +199,6 @@ void get_function_info(FunctionInfo *info, int id)
         break;
     }
     default:
-        info->id = QUARTET_FUNC_SIGMOIDAL;
-
         strcpy(info->name, "");
 
         info->func = NULL;

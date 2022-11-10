@@ -34,16 +34,18 @@ static bool receive(char *buf, unsigned int size)
 static bool send(char *buf, unsigned int size)
 {
     DEBUG_WARNING("Sending data of size: %d\n", size);
-    if (buf == NULL)
+    char *bufCopy = (char*)__builtin_alloca(size);
+    memcpy(bufCopy,buf,size);
+    if (bufCopy == NULL)
     {
         DEBUG_WARNING("Failed to send: buffer is empty\n");
         return false;
     }
     for (unsigned int i = 0; i < size; i++)
     {
-        fds.tx(buf[i]);
+        fds.tx(bufCopy[i]);
     }
-    unsigned crc = crc8(buf, size);
+    unsigned crc = crc8(bufCopy, size);
     fds.tx(crc);
     return true;
 }
@@ -66,9 +68,8 @@ static int flashAddress = 0;
 
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
-    _rxraw(0);
     // Begin main loop
-    fds.start(50, 49, 0, 256000); // tx,rx,46, 47, 50,59
+    fds.start(57, 56, 0, 256000); // tx, rx, 46, 47, 50, 49
     while (1)
     {
         DEBUG_WARNING("Waiting for command\n");
@@ -144,8 +145,7 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             case CMD_FLASHDATA:
             {
                 DEBUG_WARNING("Sending flash data\n");
-                MonitorData *data = monitor_read_data(); // Read flash from address 0
-                send(data, sizeof(MonitorData));
+                send(monitor_read_data(), sizeof(MonitorData));
                 break;
             }
             default:

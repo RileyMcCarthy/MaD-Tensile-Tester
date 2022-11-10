@@ -1,31 +1,80 @@
+from definitions.StateMachineDefinition import *
 from traceback import format_exception
-from flask import Flask, render_template, request, g, session, Response, make_response, stream_with_context, redirect, url_for
-from flask_session import Session
+from flask import Flask, render_template, request, g, session, Response, make_response, stream_with_context, redirect, url_for, flash, copy_current_request_context
 from SerialHelpers import MaD_Serial
 from Helpers import *
-from StateMachineDefinition import *
-import random
-import matplotlib
-import matplotlib.pyplot as plt
-import io
 import time
 import json
-from forms import ConnectForm
+from forms import ConnectForm, structure_to_form, MotionProfileForm, FunctionForm
 from flask_wtf.csrf import CSRFProtect
 import cv2
+from flask_socketio import SocketIO
+from threading import Lock
 
-# .g mutex lock, deadlock, peristance.
+import csv
 app = Flask(__name__)
-# Check Configuration section for more details
-SESSION_TYPE = 'filesystem'
-app.config.from_object(__name__)
-Session(app)
-
+app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xef]/'
+# app.config.from_object(__name__)
+socketio = SocketIO(app, async_mode=None)
 csrf = CSRFProtect(app)
 camera = cv2.VideoCapture(-1)
 mSerial = MaD_Serial()
 
-app.secret_key = b'_5#y2L"F4Q8z\n\xef]/'
+thread = None
+thread_lock = Lock()
+
+
+def write_flash_data():
+    try:
+        addr = 0
+        print("writing test data")
+        with open("data.csv", "w") as file:
+            file.write("time,position,force,setpoint\n")
+            while True:
+                res = mSerial.getTestData(addr)
+                if res is None:
+                    continue
+                data, addr = res
+                print(data)
+                if data.timems < 0:
+                    break
+                line = "{},{},{},{}\n".format(
+                    data.timems/1000.0, data.position, data.force, data.setpoint/1000.0)
+                print(line)
+                file.write(line)
+    finally:
+        print("done writing flash data")
+
+
+@app.route('/run', methods=['POST'])
+def run():
+    @copy_current_request_context
+    def wait_for_test_end():
+        print("waiting for test to end")
+        while mSerial.getMotionMode() == 2:
+            socketio.sleep(2)
+        flash('Saving test data')
+        write_flash_data()
+        flash('Test data is now ready!')
+    if request.method == "POST":
+        flash('Running Motion Profile')
+        print("Running default motion profile")
+        if mSerial.started == False:
+            print("serial has not been started")
+            return "Status not available"
+        motionProfile = loadMotionProfile()
+        mSerial.setMotionProfile(motionProfile)
+        mSerial.setMotionMode(2)
+        mode = mSerial.getMotionMode()
+        if mode != 2:
+            print("unable to run test: "+str(mode))
+            return "Unable to run test"
+        global thread
+        with thread_lock:
+            if thread is None:
+                thread = socketio.start_background_task(
+                    wait_for_test_end)
+    return "Cannot GET /run"
 
 
 def gen_frames():
@@ -33,7 +82,7 @@ def gen_frames():
         if not camera.isOpened():
             print("Cannot open camera, trying again")
             camera.open(-1)
-            exit()
+            continue
         success, frame = camera.read()  # read the camera frame
         if not success:
             print("failed to read camera info")
@@ -50,6 +99,7 @@ def video_feed():
     print("getting video feed")
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 @app.route('/status')
 def status():
     if mSerial.started == False:
@@ -60,10 +110,22 @@ def status():
 
 @app.route('/test')
 def test():
+    # if mSerial.started == False:
+    #    print("serial has not been started, opening connect page")
+    #    return redirect(url_for('connect'))
+    profile = loadMotionProfile()
+    form = structure_to_form(profile)()
+    form2 = MotionProfileForm(profile)()
+    print(form)
+    return render_template("test.html", form=form, form2=form2)
+
+
+@app.route('/dataPage')
+def dataPage():
     if mSerial.started == False:
         print("serial has not been started, opening connect page")
         return redirect(url_for('connect'))
-    return render_template("test.html")
+    return render_template("data.html")
 
 
 @app.route('/')
@@ -104,28 +166,55 @@ def connect():
     return render_template("connect.html", connectForm=connectForm)
 
 
-@app.route('/data')
-def data():
+@app.route('/flashData')
+def flashData():
+    with open("data.csv", "r") as fp:
+        csv = fp.read()
+    return Response(
+        csv,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=myplot.csv"})
+    return output
+
     def getData():
-        while True:
-            if mSerial.started == False:
-                print("serial has not been started")
-                return ""
-            print("getting data")
-            data = mSerial.getMonitorData()
-            if data is not None:
-                jsonData = json.dumps(
-                    {"time": data.timems/1000.0, "position": data.position})
-                time.sleep(1)
-                yield f"data:{jsonData}\n\n"
-            else:
-                time.sleep(1)
-                yield f"data:\n\n"
-    response = Response(stream_with_context(getData()),
+        try:
+            with open("data.csv", "r") as file:
+                print(file.readline())  # time,position,force,setpoint
+                csvFile = csv.reader(file, delimiter=',')
+                for data in csvFile:
+                    jsonData = json.dumps({"time": float(data[0]), "position": float(data[1]),
+                                           "force": float(data[2]), "setpoint": float(data[3])})
+                    print(jsonData)
+                    yield f"data:{jsonData}\n\n"
+        finally:
+            yield f""
+            print("Completed flash data stream")
+    response = Response(getData(),
                         mimetype="text/event-stream")
     response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Accel-Buffering"] = "no"
     return response
+
+
+@app.route('/functionManual', methods=['GET', 'POST'])
+def functionManual():
+    # this is crashing serial, nothing happens currently
+    return ""
+    if request.method == "POST":
+        if mSerial.started == False:
+            print("serial has not been started")
+        else:
+            print("Running function " + request.data.function)
+            mSerial.setMotionFunction(request.data.function, 100)
+    print("Getting current function and data")
+    info = mSerial.getMotionFunction()
+    if info is None:
+        return ""
+    func, data = info
+    print(func)
+    print(data)
+    return FunctionForm(func, data)
 
 
 @app.route('/ping', methods=['POST'])
@@ -151,6 +240,26 @@ def machineProfile():
     return machine_profile_to_html(deviceProfile)
 
 
+@app.route('/machineStatusStream')
+def machineStatusStream():
+    def getStatusStream():
+        try:
+            while True:
+                status = mSerial.getMachineState()
+                if status is not None:
+                    html = machine_status_to_html(status)
+                    print("sending status")
+                    yield json.dumps({"Status": html})
+                time.sleep(1)
+        finally:
+            print("status stream closed")
+    response = Response(stream_with_context(getStatusStream()),
+                        mimetype="text/event-stream")
+    # response.headers["Cache-Control"] = "no-cache"
+    # response.headers["X-Accel-Buffering"] = "no"
+    return response
+
+
 @app.route('/machineStatus', methods=['POST'])
 def machineStatus():
     if request.method == "POST":
@@ -162,23 +271,7 @@ def machineStatus():
         if status is None:
             return ""
         return machine_status_to_html(status)
-    return "Cannot GET /motionProfile"
-
-
-@app.route('/run', methods=['POST'])
-def run():
-    if request.method == "POST":
-        print("Running default motion profile")
-        if mSerial.started == False:
-            print("serial has not been started")
-            return "Status not available"
-        motionProfile = loadMotionProfile()
-        mSerial.setMotionMode(1)
-        machineState = mSerial.getMachineState()
-        mSerial.setMotionProfile(motionProfile)
-        mSerial.setMotionMode(2)
-        machineState = mSerial.getMachineState()
-    return "Cannot GET /run"
+    return "Cannot GET /machineStatus"
 
 
 @app.route('/toggleStatus', methods=['POST'])
@@ -189,11 +282,10 @@ def toggleStatus():
             print("serial has not been started")
             return "Status not available"
         status = mSerial.getMotionStatus()
-        print(str(status.value)+" "+str(MOTIONSTATUS_DISABLED))
-        if status.value == MOTIONSTATUS_DISABLED:
+        if status == MOTIONSTATUS_DISABLED:
             print("Enabling status")
             mSerial.setMotionStatus(MOTIONSTATUS_ENABLED)
-        elif status.value == MOTIONSTATUS_ENABLED:
+        elif status == MOTIONSTATUS_ENABLED:
             print("Disabling status")
             mSerial.setMotionStatus(MOTIONSTATUS_DISABLED)
     return "Cannot GET /toggleStatus"
@@ -207,11 +299,10 @@ def toggleMode():
             print("serial has not been started")
             return "Status not available"
         mode = mSerial.getMotionMode()
-        print(str(mode.value)+" "+str(MODE_MANUAL))
-        if mode.value == MODE_MANUAL:
+        if mode == MODE_MANUAL:
             print("Changing mode to test")
             mSerial.setMotionMode(MODE_TEST)
-        elif mode.value == MODE_TEST:
+        elif mode == MODE_TEST:
             print("Changing mode to manual")
             mSerial.setMotionMode(MODE_MANUAL)
     return "Cannot GET /toggleMode"
@@ -221,9 +312,10 @@ def toggleMode():
 def motionProfile():
     if request.method == "POST":
         print("Getting motionProfile")
-        if mSerial.started == False:
-            print("serial has not been started")
-            return "Status not available"
-        profile = mSerial.getMotionProfile()
+        # if mSerial.started == False:
+        # print("serial has not been started")
+        #   return "Status not available"
+        # profile = mSerial.getMotionProfile()
+        profile = loadMotionProfile()
         return structure_to_html(profile)
     return "Cannot GET /motionProfile"

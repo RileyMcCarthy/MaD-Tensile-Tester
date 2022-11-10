@@ -1,7 +1,7 @@
 r"""Wrapper for CommunicationDefinition.h
 
 Generated with:
-/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Main/Communication/CommunicationDefinition.h -o MaD_Software/CommuncationDefinition.py --no-embed-preamble
+/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Main/Communication/CommunicationDefinition.h -o MaD_Software/definitions/CommuncationDefinition.py --no-embed-preamble
 
 Do not modify this file.
 """
@@ -10,8 +10,8 @@ __docformat__ = "restructuredtext"
 
 # Begin preamble for Python
 
-from ctypes_preamble import *
-from ctypes_preamble import _variadic_function
+from .ctypes_preamble import *
+from .ctypes_preamble import _variadic_function
 
 # End preamble
 
@@ -20,7 +20,7 @@ _libdirs = []
 
 # Begin loader
 
-from ctypes_loader import *
+from .ctypes_loader import *
 
 # End loader
 

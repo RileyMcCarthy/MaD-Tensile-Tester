@@ -4,6 +4,7 @@
 #include <JSON.h>
 #include <math.h>
 #include <stdbool.h>
+#include "MotionPlanningDefinition.h"
 
 typedef struct motionPeriods_s
 {
@@ -27,23 +28,6 @@ typedef struct setPoint_s
     double v;
     double a;
 } SetPoint;
-
-#define FUNCTION_COUNT 2
-#define QUARTET_FUNC_LINE 0
-#define QUARTET_FUNC_SIGMOIDAL 1
-
-#define FUNCTION_MAX_NAME_LENGTH 10
-#define FUNCTION_MAX_ARGS 10
-#define FUNCTION_MAX_ARG_LENGTH 20
-
-typedef struct functioninfo_s
-{
-    int id;
-    char name[20];
-    double (*func)(double, double *args);
-    int args_count;
-    char args[FUNCTION_MAX_ARGS][FUNCTION_MAX_ARG_LENGTH]; // max 10 args with 20 chars each
-} FunctionInfo;
 
 typedef struct RunMotionProfile_s
 {

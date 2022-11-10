@@ -18,6 +18,7 @@ static struct __using("jm_fullduplexserial.spin2") serial;
 static SimSerial serial;
 #endif
 
+#define Set_Origin 0x00
 #define Go_Absolute_Pos 0x01
 #define Go_Relative_Pos 0x03
 #define Is_AbsPos32 0x1b
@@ -68,6 +69,13 @@ void dyn_init()
 
 /////////////////////////// SAMPLE COMMAND FUNCTIONS  ////////////////////////////////////
 
+void set_origin(char ID)
+{
+  char Axis_Num = ID;
+  Global_Func = (char)Set_Origin;
+  Send_Package(Axis_Num, 0);
+}
+
 void move_rel32(char ID, long pos)
 {
   char Axis_Num = ID;
@@ -94,10 +102,15 @@ void ReadMotorPosition32(char ID)
   MotorPosition32Ready_Flag = 0xff;
 }
 
-bool GetMotorPosition32()
+bool GetMotorPosition32Ready()
 {
   ReadPackage();
   return MotorPosition32Ready_Flag == 0x00;
+}
+
+bool GetMotorPosition32()
+{
+  return Motor_Pos32;
 }
 
 void move_abs32(char MotorID, long Pos32)

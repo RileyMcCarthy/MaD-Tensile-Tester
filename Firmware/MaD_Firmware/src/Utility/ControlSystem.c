@@ -34,42 +34,60 @@ typedef enum movetype_e
     MOVE_STOP
 } MoveType;
 
-static bool move_servo(ControlSystem *control, MoveType type, int value)
+static void move_setpoint(ControlSystem *control)
 {
-    if (control == NULL)
-    {
-        // printf("move_servo: control is null\n");
-        return false;
-    }
-    // move servo and check if move is allowed (conditions or machine limits)
-    bool moveAllowed = true;
+    int setpoint = control->monitorData->setpoint; // Setpoint in um
+    int setpointSteps = mm_to_steps((setpoint) / 1000.0, &(control->machineProfile->configuration));
+    move_abs32(DYN1_ADDR, setpointSteps);
+}
+
+static bool move_servo(ControlSystem *control, MoveType type, int moveum)
+{
     switch (type)
     {
     case MOVE_STOP:
-        move_rel32(DYN1_ADDR, 0); // stop servo
+    {
+        // move_rel32(DYN1_ADDR, 0); // stop servo
+
+        // Read dyn position and make that the current setpoint
+        int start = _getms();
+        ReadMotorPosition32(0);
+        while (!GetMotorPosition32Ready())
+        {
+            if ((_getms() - start) > 100)
+            {
+                printf("failed to recieve dyn position to update setpoint\n");
+                state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)false);
+                return false;
+            }
+            // printf("waitinf for position\n");
+        }
+        state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)true);
+        int setpointsteps = GetMotorPosition32();
+        control->monitorData->setpoint = steps_to_mm(setpointsteps, &(control->machineProfile->configuration)) / 1000.0;
+        monitor_sync_setpoint();
+        // printf("got position:%d\n",control->monitorData->setpoint);
+
         break;
+    }
     case MOVE_RELATIVE:
     {
-        // printf("moving relitive\n");
-
-        int positionSteps = mm_to_steps(value / 1000.0, &(control->machineProfile->configuration)) + control->monitorData->encoderRaw;
-        // printf("positionSteps:%d,%d\n", positionSteps, control->monitorData->encoderRaw);
-        move_abs32(DYN1_ADDR, positionSteps);
+        control->monitorData->setpoint += moveum;
+        move_setpoint(control);
         break;
     }
     case MOVE_ABSOLUTE:
     {
-        int deltaSteps = mm_to_steps((value) / 1000.0, &(control->machineProfile->configuration));
-        move_abs32(DYN1_ADDR, deltaSteps);
+        control->monitorData->setpoint = moveum;
+        move_setpoint(control);
         break;
     }
     case MOVE_SPEED:
     {
-        int rpm = ((double)value / 1000.0) * (60.0 / 80.0); // um/s to rpm (mm/s)*((sec/min)/(mm/rev))
-        Turn_const_speed(DYN1_ADDR, rpm);                   // Stop motion (mm/r)*(r/min)/(sec/min)        break;
+        //    int rpm = ((double)moveum / 1000.0) * (60.0 / 80.0); // um/s to rpm (mm/s)*((sec/min)/(mm/rev))
+        //    Turn_const_speed(DYN1_ADDR, rpm);                   // Stop motion (mm/r)*(r/min)/(sec/min)        break;
     }
     }
-
     return true;
 }
 
@@ -100,7 +118,8 @@ static void control_cog(ControlSystem *control)
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
 
-    // printf("Control cog started\n");
+    // Sync setpoint and dyn
+    bool hasSync = false;
 
     // For running test profiles;
     long startTime = 0;
@@ -112,14 +131,8 @@ static void control_cog(ControlSystem *control)
     bool initial = true;
     int servoCheckCount = 0; // count number of times servo has not communicated properly
     MonitorData lastData = *control->monitorData;
-#if CONTROL_DEGUB
-    int testms = 0;
-#endif
     while (1)
     {
-#if CONTROL_DEGUB
-        testms = _getms();
-#endif
         MachineState currentMachineState = *(control->stateMachine);
         MonitorData data = *(control->monitorData); // Get latest monitor data
         int forcemN = raw_to_force(control->monitorData->forceRaw, &(control->machineProfile->configuration));
@@ -127,10 +140,17 @@ static void control_cog(ControlSystem *control)
         mcp_update_register(&mcp);
         mcp_set_pin(&mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0);
 
-#if CONTROL_DEGUB
-        printf("TIME1: %d\n", _getms() - testms);
-        testms = _getms();
-#endif
+        // Sync dyn and setpoint to zero
+        if (!hasSync)
+        {
+            // printf("syncing dyn\n");
+            hasSync = move_servo(control, MOVE_STOP, 0); // Moves to rel pos of 0 then syncs setpoint to dyn position
+            if (hasSync)
+            {
+                set_origin(0);
+            }
+            _waitms(1000);
+        }
 
         /*Check self check state*/
         // Charge Pump
@@ -188,40 +208,6 @@ static void control_cog(ControlSystem *control)
             state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int)false);
         }
 
-#if CONTROL_DEGUB
-        printf("TIME2: %d\n", _getms() - testms);
-        testms = _getms();
-#endif
-        // DYN$
-        if (servoCheckCount == 0)
-        {
-            // ReadMotorPosition32(DYN1_ADDR);
-            servoCheckCount++;
-        }
-        else
-        {
-            if (1 && !GetMotorPosition32())
-            {
-                servoCheckCount++;
-            }
-            else
-            {
-                state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)true);
-                servoCheckCount = 0;
-            }
-            if (servoCheckCount > 1000)
-            {
-                servoCheckCount = 0;
-                state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)false);
-            }
-        }
-        // RTC
-
-#if CONTROL_DEGUB
-        printf("TIME3: %d\n", _getms() - testms);
-        testms = _getms();
-#endif
-
         /*Update Motion State parameters*/
         // Check conditions for motion
         if (false) // LEGNTH
@@ -265,16 +251,10 @@ static void control_cog(ControlSystem *control)
             state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_MOVING);
         }
 
-#if CONTROL_DEGUB
-        printf("TIME4: %d\n", _getms() - testms);
-        testms = _getms();
-#endif
-
         if (currentMachineState.state == STATE_MOTION) // Motion Enabled
         {
             if (lastState.state != STATE_MOTION || initial)
             {
-                // dyn4_send_command(&dyn4, dyn4_)
             }
             if (currentMachineState.motionParameters.status == MOTIONSTATUS_DISABLED)
             {
@@ -458,12 +438,12 @@ static void control_cog(ControlSystem *control)
                         if (navkey.status.UPR > 0) // Up released
                         {
                             control->stateMachine->_functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
-                            move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
+                            move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
                         }
                         if (navkey.status.DNR > 0) // Down released
                         {
                             control->stateMachine->_functionData = HOMING_SEEKING; // Set to false, will be set to true when home is complete
-                            move_servo(control, MOVE_SPEED, 10000);               // Turn CW at homing speeds
+                            move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
                         }
                         break;
                     case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
@@ -535,8 +515,15 @@ static void control_cog(ControlSystem *control)
                             run.profileComplete = true;
                         }*/
                         double t = (_getus() - startTime) / 1000000.0;
-                        double position = position_profile(t, control->monitorData->position - startPosition, &run, &(control->motionProfile));
-                        // printf("%f,%f,%f\n", t, position, control->monitorData->position);
+
+                        // Position relative to start of motion profile (um)
+                        double relativePosition = control->monitorData->position - startPosition;
+                        // printf("monitorPos,start, relPos:%f,%f,%f\n",control->monitorData->position,startPosition,relativePosition);
+
+                        // Position is the setpoint based of the time since profile has begun (m)
+                        double position = position_profile(t, relativePosition, &run, &(control->motionProfile));
+                        // printf("t,start,setpoint,mm:%f,%f,%f,%f\n", t, startPosition, position, control->monitorData->position);
+
                         move_servo(control, MOVE_ABSOLUTE, startPosition + (int)(position * 1000));
                     }
                     else

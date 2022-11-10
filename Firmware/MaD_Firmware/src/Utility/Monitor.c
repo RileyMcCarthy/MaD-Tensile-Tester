@@ -13,6 +13,8 @@ bool monitorWriteData;
 static ForceGauge forceGauge;
 static Encoder encoder;
 
+static bool sync_setpoint;
+
 static bool new_test_data;
 static MonitorData test_data;
 static int test_data_address;
@@ -26,6 +28,11 @@ union flashData_s
   MonitorData data;
   uint8_t byte[size];
 } flashData;
+
+void monitor_sync_setpoint()
+{
+  sync_setpoint = true;
+}
 
 void monitor_set_address(int addr)
 {
@@ -47,17 +54,16 @@ MonitorData *monitor_read_data()
 static void monitor_cog(Monitor *monitor)
 {
   new_test_data = false;
+  sync_setpoint = true;
   test_data_address = 0;
-  // mount("/da", _vfs_open_sdcardx(40, 42, 41, 39)); // Mount data card using default pins
-
   Error flashError;
   BSP_W25Qx_Init(&flashError);
   while (flashError != SUCCESS)
   {
+    printf("Failed to start flash, trying again");
     BSP_W25Qx_Init(&flashError);
     _waitms(100);
   }
-  _waitms(1000);
   // Connect Force Gauge
   if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
   {
@@ -67,7 +73,6 @@ static void monitor_cog(Monitor *monitor)
   {
     state_machine_set(monitor->machineState, PARAM_MACHINE_FORCE_GAUGE_COM, false);
   }
-
   // Set up encoder
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
 
@@ -120,6 +125,11 @@ static void monitor_cog(Monitor *monitor)
     monitor->data.force = raw_to_force(monitor->data.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
     // printf("Force:%f\n", monitor->data.force);
     monitor->data.position = steps_to_mm(monitor->data.encoderRaw, monitor->configuration); // Convert steps to mm
+    if (sync_setpoint)
+    {
+      encoder.Set(monitor->data.setpoint);
+      sync_setpoint = false;
+    }
     if (monitorWriteData)
     {
 
@@ -135,7 +145,6 @@ static void monitor_cog(Monitor *monitor)
       {
         // printf("Erasing flash:%d\n", eraseBlock);
         BSP_W25Qx_Erase_Block(eraseBlock * W25Q64FV_SUBSECTOR_SIZE);
-        _waitms(100);
         eraseBlock++;
       }
       flashData.data = monitor->data;

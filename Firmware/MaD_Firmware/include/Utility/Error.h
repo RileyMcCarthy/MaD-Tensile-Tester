@@ -3,7 +3,7 @@
 #ifdef _DEBUG_WARNING
 #define DEBUG_WARNING printf
 #else
-#define DEBUG_WARNING(fmt, ...)
+#define DEBUG_WARNING(...)
 #endif
 
 /**

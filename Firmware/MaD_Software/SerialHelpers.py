@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
 import serial
-import time
 import ctypes
-from ctypes import Structure
 from struct import *
-from JSON import *
-from MonitorDefinition import *
-from StateMachineDefinition import *
+from definitions.JSON import *
+from definitions.MonitorDefinition import *
+from definitions.StateMachineDefinition import *
+from definitions.CommuncationDefinition import *
 from Helpers import *
 import threading
-from CommuncationDefinition import *
 
 CMD_SYNC = bytearray([0x55])
 CMD_WRITE = bytearray([128])
@@ -35,7 +33,8 @@ class MaD_Serial:
         self.port = "/dev/ttyS0"
         self.baud = 256000
         self.serial = None
-        self.lock = threading.Lock()
+        # Rlock is used as it can be acuired by the same thread multiple times
+        self.lock = threading.RLock()
 
     @staticmethod
     def convert_to_bytes(st):
@@ -72,210 +71,232 @@ class MaD_Serial:
             raise ValueError('packet parameter is empty')
 
     def __read(self, n):
-        if (self.serial == None):
-            raise ValueError('serial communication object is not initialized')
-        if (n <= 0):
-            raise ValueError('Invalid number of bytes to read: '+str(n))
-        self.lock.acquire()
-        buf = self.serial.read(n)
-        if (len(buf) != n):
-            print('Bytes dont match:'+str(buf))
-            self.lock.release()
-            return None
-        crcBuf = self.serial.read(1)
-        self.lock.release()
-        if (len(crcBuf) == 0):
-            print("No CRC sent")
-            return None
-        crc = unpack('B', crcBuf)[0]
-        crccalc = self.crc8(buf)
-        if (crc != crccalc):
-            print("Invalid CRC:"+str(crc)+"Should be:"+str(crccalc) + " Recieved message: "+str(buf))
-            return None
-        return buf
+        with self.lock:
+            if (self.serial == None):
+                return None
+            if (n <= 0):
+                return None
+
+            buf = self.serial.read(n)
+
+            if (len(buf) != n):
+                print('Bytes dont match:'+str(buf))
+                self.serial.reset_input_buffer()
+                return None
+
+            crcBuf = self.serial.read(1)
+
+            if (len(crcBuf) == 0):
+                print("No CRC sent")
+                self.serial.reset_input_buffer()
+                return None
+
+            crc = unpack('B', crcBuf)[0]
+            crccalc = self.crc8(buf)
+
+            if (crc != crccalc):
+                print("Invalid CRC:"+str(crc)+"Should be:" +
+                      str(crccalc) + " Recieved message: "+str(buf))
+                self.serial.reset_input_buffer()
+                return None
+            return buf
 
     def __write(self, data, n=-1):
-        if (n == -1):
-            n = ctypes.sizeof(data)
-        if (self.serial == None):
-            raise ValueError('serial communication object is not initialized')
-        self.lock.acquire()
-        sent = self.serial.write(data)
-        self.lock.release()
-        if (sent != n):
-            print("Bytes sent to not match specified bytes. Sent:" +
-                  str(sent)+",Spec:"+str(n))
+        with self.lock:
+            if (n == -1):
+                n = ctypes.sizeof(data)
+            if (self.serial == None):
+                raise ValueError(
+                    'serial communication object is not initialized')
+            sent = self.serial.write(data)
+            if (sent != n):
+                print("Bytes sent to not match specified bytes. Sent:" +
+                      str(sent)+",Spec:"+str(n))
 
     def __writeCmd(self, cmd):
-        if (self.serial == None):
-            raise ValueError('serial communication object is not initialized')
-        CMD = bytearray([cmd[0] | CMD_WRITE[0]])
-        self.lock.acquire()
-        self.serial.write(CMD_SYNC)
-        self.serial.write(CMD)
-        self.lock.release()
+        with self.lock:
+            if (self.serial == None):
+                raise ValueError(
+                    'serial communication object is not initialized')
+            CMD = bytearray([cmd[0] | CMD_WRITE[0]])
+            self.serial.write(CMD_SYNC)
+            self.serial.write(CMD)
 
     def __readCmd(self, cmd):
-        if (self.serial == None):
-            raise ValueError('serial communication object is not initialized')
-        self.lock.acquire()
-        self.serial.write(CMD_SYNC)
-        self.serial.write(cmd)
-        self.lock.release()
+        with self.lock:
+            if (self.serial == None):
+                raise ValueError(
+                    'serial communication object is not initialized')
+            self.serial.write(CMD_SYNC)
+            self.serial.write(cmd)
 
     def start(self, port, baud):
-        if self.serial is not None and self.serial.isOpen() == True:
-            print("Disconnecting previous serial")
-            self.serial.close()
-        self.port = port
-        self.baud = baud
-        try:
-            print("trying to get lock")
-            self.lock.acquire()
-            print("starig serial")
-            self.serial = serial.Serial(self.port, self.baud, timeout=1, write_timeout=0)
-            print("done")
-            self.started = True
-            self.serial.reset_input_buffer()
-            self.lock.release()
-        except serial.SerialException as error:
-            self.lock.release()
-            print(error)
-            self.started = False
-        return self.started
+        with self.lock:
+            if self.serial is not None and self.serial.isOpen() == True:
+                print("Disconnecting previous serial")
+                self.serial.close()
+            self.port = port
+            self.baud = baud
+            try:
+                print("starig serial")
+                self.serial = serial.Serial(
+                    self.port, self.baud, timeout=1, write_timeout=1)
+                self.started = True
+                self.serial.reset_input_buffer()
+            except serial.SerialException as error:
+                print(error)
+                self.started = False
+            return self.started
 
     def initialize(self):
-        # wait until device is communicating
-        print("Pinging device")
-        version = self.getVersion()
-        print(version)
-        if (version != MAD_VERSION):
-            print("Device failed to respond")
-            self.started = False
-            return False
-        print("Device responded")
+        with self.lock:
+            # wait until device is communicating
+            print("Pinging device")
+            version = self.getVersion()
+            print(version)
+            if (version != MAD_VERSION):
+                print("Device failed to respond")
+                self.started = False
+                return False
+            print("Device responded")
 
-        # Send machine profile
-        print("Sending machine profile")
-        profile = loadMachineProfile()
-        self.setMachineProfile(profile)
+            # Send machine profile
+            print("Sending machine profile")
+            profile = loadMachineProfile()
+            self.setMachineProfile(profile)
 
-        # Check machine machine has updated
-        print("Confirmin machine profille is valid")
-        deviceProfile = self.getMachineProfile()
-        if (deviceProfile == None or self.structEq(profile, deviceProfile) == False):
-            print("Profile did not update, trying again")
-            self.started = False
-            return False
-        print("Machine profile successfully updated")
-        # print(structure_to_html(deviceProfile))
-        self.started = True
-        return True
+            # Check machine machine has updated
+            print("Confirmin machine profille is valid")
+            deviceProfile = self.getMachineProfile()
+            if (deviceProfile == None or self.structEq(profile, deviceProfile) == False):
+                print("Profile did not update, trying again")
+                self.started = False
+                return False
+            print("Machine profile successfully updated")
+            # print(structure_to_html(deviceProfile))
+            self.started = True
+            return True
 
     # Returns true if ping is successful
 
     def getVersion(self):
-        self.__readCmd(CMD_PING)
-        buf = self.__read(1)
-        if buf is not None:
-            return int.from_bytes(buf, "big", signed=False)
-        else:
-            return -1
+        with self.lock:
+            self.__readCmd(CMD_PING)
+            buf = self.__read(1)
+            if buf is not None:
+                return int.from_bytes(buf, "big", signed=False)
+            else:
+                return -1
 
     def readStructure(self, structType):
-        print("Reading structure of size: "+str(ctypes.sizeof(structType)))
-        buf = self.__read(ctypes.sizeof(structType))
-        if (buf == None):
-            raise ValueError('invalid serial data')
-        structure = structType.from_buffer_copy(buf)
-        return structure
+        with self.lock:
+            buf = self.__read(ctypes.sizeof(structType))
+            if (buf == None):
+                raise ValueError('invalid serial data')
+            structure = structType.from_buffer_copy(buf)
+            return structure
 
     def getMonitorData(self):
-        self.__readCmd(CMD_DATA)
-        try:
-            return self.readStructure(MonitorData)
-        except ValueError as error:
-            print("Failed to get monitor data: "+str(error))
+        with self.lock:
+            self.__readCmd(CMD_DATA)
+            try:
+                return self.readStructure(MonitorData)
+            except ValueError as error:
+                print("Failed to get monitor data: "+str(error))
 
     def getMachineState(self):
-        self.__readCmd(CMD_STATE)
-        try:
-            return self.readStructure(MachineState)
-        except ValueError as error:
-            print("Failed to get machine state: "+str(error))
-            return None
+        with self.lock:
+            try:
+                self.__readCmd(CMD_STATE)
+                return self.readStructure(MachineState)
+            except ValueError as error:
+                print("Failed to get machine state: "+str(error))
+                return None
 
     def getMachineProfile(self):
-        self.__readCmd(CMD_MPROFILE)
-        try:
-            return self.readStructure(MachineProfile)
-        except ValueError as error:
-            print("Failed to get data: " + str(error))
+        with self.lock:
+            self.__readCmd(CMD_MPROFILE)
+            try:
+                return self.readStructure(MachineProfile)
+            except ValueError as error:
+                print("Failed to get data: " + str(error))
 
     def getMachineConfiguration(self):
-        self.__readCmd(CMD_MCONFIG)
-        try:
-            return self.readStructure(MachineConfiguration)
-        except ValueError as error:
-            print("Failed to get data: "+str(error))
+        with self.lock:
+            self.__readCmd(CMD_MCONFIG)
+            try:
+                return self.readStructure(MachineConfiguration)
+            except ValueError as error:
+                print("Failed to get data: "+str(error))
 
     def getMachinePerformance(self):
-        self.__readCmd(CMD_MPERFORMANCE)
-        try:
-            return self.readStructure(MachinePerformance)
-        except ValueError as error:
-            print("Failed to get data: "+str(error))
+        with self.lock:
+            self.__readCmd(CMD_MPERFORMANCE)
+            try:
+                return self.readStructure(MachinePerformance)
+            except ValueError as error:
+                print("Failed to get data: "+str(error))
 
     def getMachinePerformance(self):
-        self.__readCmd(CMD_MPERFORMANCE)
-        try:
-            return self.readStructure(MachinePerformance)
-        except ValueError as error:
-            print("Failed to get data: "+str(error))
-            return None
+        with self.lock:
+            self.__readCmd(CMD_MPERFORMANCE)
+            try:
+                return self.readStructure(MachinePerformance)
+            except ValueError as error:
+                print("Failed to get data: "+str(error))
+                return None
+
+    def getMotionFunction(self):
+        with self.lock:
+            self.__readCmd(CMD_MOTIONFUNCTION)
+            try:
+                func = self.readStructure(c_int32).value
+                data = self.readStructure(c_int32).value
+                return func, data
+            except ValueError as error:
+                print("Failed to get data: "+str(error))
+                return None
 
     def getMotionProfile(self):
-        self.__readCmd(CMD_MOTIONPROFILE)
-        try:
-            return self.readStructure(MotionProfile)
-        except ValueError as error:
-            print("Failed to get motion profile: "+str(error))
-            return None
+        with self.lock:
+            self.__readCmd(CMD_MOTIONPROFILE)
+            try:
+                return self.readStructure(MotionProfile)
+            except ValueError as error:
+                print("Failed to get motion profile: "+str(error))
+                return None
 
     def setFlashAddr(self, addr):
-        self.__writeCmd(CMD_FLASHDATA)
-        self.__write(self.convert_to_bytes(ctypes.c_int32(addr)),
-                     ctypes.sizeof(ctypes.c_int32()))
+        with self.lock:
+            self.__writeCmd(CMD_FLASHDATA)
+            self.__write(self.convert_to_bytes(ctypes.c_int32(addr)),
+                         ctypes.sizeof(ctypes.c_int32()))
 
-    def getTestData(self):
-        addr = 0
-        dataList = []
-        while True:
+    def getTestData(self, addr=0):
+        with self.lock:
             try:
+                print("getting addr"+str(addr))
                 self.setFlashAddr(addr)
                 self.__readCmd(CMD_FLASHDATA)
                 data = self.readStructure(MonitorData)
                 print("Time:"+str(data.timems))
-                if (data.timems < 0):
-                    break
-                dataList.append(data)
                 addr += ctypes.sizeof(MonitorData)
+                return data, addr
             except ValueError as error:
-                print("Failed to get data: "+str(error)+", trying again...")
-                continue
-        return dataList
+                print("Failed to get data: "+str(error))
+                return None
 
     def getMotionStatus(self):
-        self.__readCmd(CMD_MOTIONSTATUS)
         try:
-            return self.readStructure(ctypes.c_int)
+            self.__readCmd(CMD_MOTIONSTATUS)
+            return self.readStructure(ctypes.c_int).value
         except ValueError as error:
             print("Failed to get motion status: "+str(error))
 
     def getMotionMode(self):
-        self.__readCmd(CMD_MOTIONMODE)
         try:
-            return self.readStructure(ctypes.c_int)
+            self.__readCmd(CMD_MOTIONMODE)
+            return self.readStructure(ctypes.c_int).value
         except ValueError as error:
             print("Failed to get motion mode: "+str(error))
 
