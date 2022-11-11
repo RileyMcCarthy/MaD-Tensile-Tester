@@ -135,7 +135,7 @@ static void ReadPackage(void)
 
   while (serial.available() > 0)
   {
-    InputBuffer[InBfTopPointer] = serial.rxtime(100); // Load InputBuffer with received packets
+    InputBuffer[InBfTopPointer] = serial.rxtime(10); // Load InputBuffer with received packets
     InBfTopPointer++;
   }
   while (InBfBtmPointer != InBfTopPointer)

@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "ControlSystem.h"
-#include "W25QXX.h"
 #include "Error.h"
+#include "DataSlave.h"
 
 static Monitor monitor;
 static ControlSystem control;
@@ -28,6 +28,13 @@ void mad_begin()
   {
     // printf("Monitor failed to start\n");
     return;
+  }
+
+  if (data_begin(&(monitor.data)))
+  {
+  }
+  else
+  {
   }
 
   if (control_begin(&control, &machineProfile, &machineState, &(monitor.data)))

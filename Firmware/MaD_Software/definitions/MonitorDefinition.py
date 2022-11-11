@@ -30,7 +30,7 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 class struct_monitor_data_t(Structure):
     pass
 
@@ -42,6 +42,7 @@ struct_monitor_data_t.__slots__ = [
     'setpoint',
     'timems',
     'timeus',
+    'log',
 ]
 struct_monitor_data_t._fields_ = [
     ('forceRaw', c_int),
@@ -51,11 +52,12 @@ struct_monitor_data_t._fields_ = [
     ('setpoint', c_int),
     ('timems', c_int),
     ('timeus', c_int),
+    ('log', c_int),
 ]
 
-MonitorData = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
+MonitorData = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 
-monitor_data_t = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 13
+monitor_data_t = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 
 # No inserted files
 

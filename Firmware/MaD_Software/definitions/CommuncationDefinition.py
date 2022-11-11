@@ -96,13 +96,7 @@ try:
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/Communication/CommunicationDefinition.h: 15
-try:
-    CMD_FLASHDATA = 10
-except:
-    pass
-
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/Communication/CommunicationDefinition.h: 17
+# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/Communication/CommunicationDefinition.h: 16
 try:
     MAD_VERSION = 1.0
 except:

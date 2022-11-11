@@ -34,8 +34,8 @@ static bool receive(char *buf, unsigned int size)
 static bool send(char *buf, unsigned int size)
 {
     DEBUG_WARNING("Sending data of size: %d\n", size);
-    char *bufCopy = (char*)__builtin_alloca(size);
-    memcpy(bufCopy,buf,size);
+    char *bufCopy = (char *)__builtin_alloca(size);
+    memcpy(bufCopy, buf, size);
     if (bufCopy == NULL)
     {
         DEBUG_WARNING("Failed to send: buffer is empty\n");
@@ -56,7 +56,7 @@ static int recieveCMD()
     {
         while (fds.rx() != 0x55)
             ;
-        int cmd = fds.rxtime(100);
+        int cmd = fds.rxtime(10);
         if (cmd != -1)
         {
             return cmd;
@@ -140,12 +140,6 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             {
                 DEBUG_WARNING("Sending motion status\n");
                 send(&(machineState->motionParameters.status), sizeof(int));
-                break;
-            }
-            case CMD_FLASHDATA:
-            {
-                DEBUG_WARNING("Sending flash data\n");
-                send(monitor_read_data(), sizeof(MonitorData));
                 break;
             }
             default:
@@ -266,21 +260,6 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
                 else
                 {
                     DEBUG_WARNING("failed to receive motion status\n");
-                }
-                break;
-            }
-            case CMD_FLASHDATA:
-            {
-                DEBUG_WARNING("Getting new flash address\n");
-                int newAddr;
-                if (receive(&newAddr, sizeof(int)))
-                {
-                    monitor_set_address(newAddr);
-                    DEBUG_WARNING("New flash address: %d\n", newAddr);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive flash address\n");
                 }
                 break;
             }

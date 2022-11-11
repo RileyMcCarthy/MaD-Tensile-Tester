@@ -46,7 +46,7 @@ static uint8_t read_register(ForceGauge *forceGauge, uint8_t reg)
     // uart_read(&(forceGauge->serial), 1, &temp);
     forceGauge->serial.tx(0x55);
     forceGauge->serial.tx(0x20 + (reg << 1));
-    temp = forceGauge->serial.rxtime(100);
+    temp = forceGauge->serial.rxtime(10);
     return temp;
 }
 
@@ -178,7 +178,7 @@ int raw_to_force(int raw, MachineConfiguration *configuration)
 int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
 {
     seterror(err, SUCCESS);
-    int force = forceGauge->serial.rxtime(2);
+    int force = forceGauge->serial.rxtime(10);
     if (force == -1)
     {
         forceGauge->serial.rxflush();
@@ -218,9 +218,9 @@ int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
 
     forceGauge->serial.tx(0x55);
     forceGauge->serial.tx(0x10); // Send RData command
-    int counter = forceGauge->serial.rxtime(100);
-    int forceRaw = forceGauge->serial.rxtime(100);
-    forceRaw |= forceGauge->serial.rxtime(100) << 8;
-    forceRaw |= forceGauge->serial.rxtime(100) << 16;
+    int counter = forceGauge->serial.rxtime(10);
+    int forceRaw = forceGauge->serial.rxtime(10);
+    forceRaw |= forceGauge->serial.rxtime(10) << 8;
+    forceRaw |= forceGauge->serial.rxtime(10) << 16;
     return forceRaw;
 }

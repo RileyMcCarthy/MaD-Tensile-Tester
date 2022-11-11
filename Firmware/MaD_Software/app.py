@@ -24,28 +24,6 @@ thread = None
 thread_lock = Lock()
 
 
-def write_flash_data():
-    try:
-        addr = 0
-        print("writing test data")
-        with open("data.csv", "w") as file:
-            file.write("time,position,force,setpoint\n")
-            while True:
-                res = mSerial.getTestData(addr)
-                if res is None:
-                    continue
-                data, addr = res
-                print(data)
-                if data.timems < 0:
-                    break
-                line = "{},{},{},{}\n".format(
-                    data.timems/1000.0, data.position, data.force, data.setpoint/1000.0)
-                print(line)
-                file.write(line)
-    finally:
-        print("done writing flash data")
-
-
 @app.route('/run', methods=['POST'])
 def run():
     @copy_current_request_context

@@ -35,6 +35,9 @@ class MaD_Serial:
         self.serial = None
         # Rlock is used as it can be acuired by the same thread multiple times
         self.lock = threading.RLock()
+        # Default settings
+        if self.start("/dev/ttyS0", 256000):
+            self.initialize()
 
     @staticmethod
     def convert_to_bytes(st):

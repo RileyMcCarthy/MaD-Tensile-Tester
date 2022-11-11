@@ -12,7 +12,7 @@ static long control_stack[CONTROL_MEMORY_SIZE];
 
 #define SERVO_CHECK_COUNT_MAX 3
 
-extern bool monitorWriteData;
+extern bool monitorLogData;
 
 static NavKey navkey;
 static MCP23017 mcp;
@@ -56,7 +56,7 @@ static bool move_servo(ControlSystem *control, MoveType type, int moveum)
         {
             if ((_getms() - start) > 100)
             {
-                printf("failed to recieve dyn position to update setpoint\n");
+                // printf("failed to recieve dyn position to update setpoint\n");
                 state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)false);
                 return false;
             }
@@ -504,7 +504,7 @@ static void control_cog(ControlSystem *control)
                         // printf("start time: %d\n", startTime);
                         //  json_print_motion_profile(&(control->motionProfile));
                         //                        json_print_motion_profile(&(control->motionProfile));
-                        monitorWriteData = true;
+                        monitorLogData = true;
                     }
                     // Run the loaded test profile
 
@@ -528,7 +528,7 @@ static void control_cog(ControlSystem *control)
                     }
                     else
                     {
-                        monitorWriteData = false;
+                        monitorLogData = false;
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }
                 }
