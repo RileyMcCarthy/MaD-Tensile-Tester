@@ -1,5 +1,5 @@
 #FlexProp
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = ~/flexprop/bin/flexcc
 LOAD = ~/flexprop/bin/loadp2

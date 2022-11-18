@@ -423,6 +423,7 @@
 
         var socketMonitor = io('/monitor');
         socketMonitor.on('data', function (data) {
+            console.log("getting data")
             if (!data) {
                 return;
             }

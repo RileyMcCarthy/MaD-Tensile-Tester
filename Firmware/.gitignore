@@ -1,4 +1,7 @@
-win/*
-bin/*
+win
+bin
 *.o
 MaD_Software/__pycache__
+MaD_Software/__pycache__/*
+MaD_Software/flask_session
+ctypes_*

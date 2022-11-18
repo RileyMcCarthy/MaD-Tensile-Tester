@@ -1,24 +1,44 @@
 from Helpers import machine_status_to_html
 from threading import RLock, Event, Lock
-from app import socketio, mSerial
-
+from app import app, socketio
+from Helpers import print_ctypes_obj
+from definitions.MonitorDefinition import MonitorData
+import spidev
+import RPi.GPIO as GPIO
+import ctypes
 thread = None
 thread_lock = RLock()
 thread_event = Event()
 clients = 0
+monitorData = None
 
-
-def task_thread():
+# too much processing for a thread, need to use multiprocessing
+def data_thread(queue):
+    print("CStarting monitor thread")
+    GPIO.setmode(GPIO.BCM)
+    # GPIO 10 set up as input. It is pulled up to stop false signals
+    GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    # We only have SPI bus 0 available to us on the Pi
+    bus = 0
+    # Device is the chip select pin. Set to 0 or 1, depending on the connections
+    device = 0
+    # Enable SPI
+    spi = spidev.SpiDev()
+    spi.close()
+    # Open a connection to a specific bus and device (chip select pin)
+    spi.open(bus, device)
+    # Set SPI speed and mode
+    spi.max_speed_hz = 100000
+    spi.mode = 0
     try:
-        while thread_event.is_set():
-            socketio.sleep(0.2)
-            if mSerial.started == False:
-                print("serial has not been started")
-                continue
-            data = mSerial.getMonitorData()
-            if data is not None:
-                socketio.emit('data', {"time": data.timems/1000.0, "position": data.position,
-                              "force": data.force, "setpoint": data.setpoint/1000.0}, namespace='/monitor')
+        while True:
+            if GPIO.wait_for_edge(22, GPIO.FALLING):
+                socketio.sleep(1)
+                monitorData = MonitorData.from_buffer_copy(
+                    bytearray(spi.readbytes(ctypes.sizeof(MonitorData))))
+                print_ctypes_obj(monitorData)
+                #socketio.emit('data', {"time": monitorData.timems/1000.0, "position": monitorData.position,
+                #                       "force": monitorData.force, "setpoint": monitorData.setpoint/1000.0}, namespace='/monitor')
     finally:
         pass
 
@@ -26,25 +46,14 @@ def task_thread():
 @socketio.on('connect', namespace='/monitor')
 def connect():
     socketio.sleep(1)
-    global clients
-    clients += 1
-    print("Device connected to monitor socket: "+str(clients))
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread_event.set()
-            thread = socketio.start_background_task(
-                task_thread)
+    print("Connected to /monitor")
+    #global thread
+    #with thread_lock:
+    #    if thread is None:
+    #        thread = socketio.start_background_task(
+    #            task_thread, app)
 
 
 @socketio.on('disconnect', namespace='/monitor')
 def disconnect():
-    global clients
-    clients -= 1
-    print("Device disconnected from monitor socket: "+str(clients))
-    if clients <= 0:
-        global thread
-        with thread_lock:
-            thread_event.clear()
-            thread.join()
-            thread = None
+    pass

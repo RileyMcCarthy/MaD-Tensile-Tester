@@ -31,12 +31,18 @@ static void data_cog(MonitorData *data)
     START:
         hasData = false;
         while (_pinr(_DATA_CS) == 0) // wait for cs high
-        {
-            _pinw(_DATA_RDY, !hasData);
-        }
+            ;
         while (_pinr(_DATA_CS) != 0) // wait for cs low
         {
-            _pinw(_DATA_RDY, !hasData);
+            if (hasData)
+            {
+                _pinh(_DATA_RDY);
+                _pinl(_DATA_RDY);
+            }
+            else
+            {
+                _pinl(_DATA_RDY);
+            }
         }
         packet.data = *data;
         for (int i = 0; i < sizeof(MonitorData) * 8; i++)

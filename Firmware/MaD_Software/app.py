@@ -10,12 +10,12 @@ from flask_wtf.csrf import CSRFProtect
 import cv2
 from flask_socketio import SocketIO
 from threading import Lock
-
 import csv
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xef]/'
 # app.config.from_object(__name__)
-socketio = SocketIO(app, async_mode=None)
+socketio = SocketIO(app)
 csrf = CSRFProtect(app)
 camera = cv2.VideoCapture(-1)
 mSerial = MaD_Serial()
