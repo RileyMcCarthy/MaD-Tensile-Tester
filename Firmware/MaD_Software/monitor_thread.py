@@ -31,16 +31,19 @@ def data_thread(queue):
     spi.max_speed_hz = 100000
     spi.mode = 0
     try:
+        f = open("data_cache.csv", "w")
+        f.write("time,position,force,setpoint")
         while True:
             if GPIO.wait_for_edge(22, GPIO.FALLING):
                 socketio.sleep(1)
                 monitorData = MonitorData.from_buffer_copy(
                     bytearray(spi.readbytes(ctypes.sizeof(MonitorData))))
-                print_ctypes_obj(monitorData)
+                #print_ctypes_obj(monitorData)
+                f.write("time:{},position:{},force{},setpoint{}".format(monitorData.time,monitorData.position,monitorData.force,monitorData.setpoint))
                 #socketio.emit('data', {"time": monitorData.timems/1000.0, "position": monitorData.position,
                 #                       "force": monitorData.force, "setpoint": monitorData.setpoint/1000.0}, namespace='/monitor')
     finally:
-        pass
+        f.close()
 
 
 @socketio.on('connect', namespace='/monitor')
