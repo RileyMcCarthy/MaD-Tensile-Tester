@@ -13,6 +13,6 @@
 #define CMD_MOTIONFUNCTION 8 // send/recieve motion function and data
 #define CMD_MOTIONSTATUS 9   // send/recieve motion status
 
-#define MAD_VERSION 1.0
+#define MAD_VERSION 1
 
 #endif

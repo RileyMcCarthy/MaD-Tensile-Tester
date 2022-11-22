@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # p.start()
     app.debug = True
     try:
-        socketio.run(app, port=5001, host="0.0.0.0",
+        socketio.run(app, port=5000, host="0.0.0.0",
                      debug=True, use_reloader=True)
     except KeyboardInterrupt:
         # p.join()

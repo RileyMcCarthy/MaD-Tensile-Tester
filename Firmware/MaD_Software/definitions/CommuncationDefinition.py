@@ -98,7 +98,7 @@ except:
 
 # /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/Communication/CommunicationDefinition.h: 16
 try:
-    MAD_VERSION = 1.0
+    MAD_VERSION = 1
 except:
     pass
 
