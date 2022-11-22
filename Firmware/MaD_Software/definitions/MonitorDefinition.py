@@ -1,7 +1,7 @@
 r"""Wrapper for MonitorDefinition.h
 
 Generated with:
-/home/riley/.local/bin/ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/definitions/MonitorDefinition.py --no-embed-preamble
+/home/mad/.local/bin/ctypesgen MaD_Firmware/include/Utility/MonitorDefinition.h -o MaD_Software/definitions/MonitorDefinition.py --no-embed-preamble
 
 Do not modify this file.
 """
@@ -30,7 +30,7 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 class struct_monitor_data_t(Structure):
     pass
 
@@ -55,9 +55,9 @@ struct_monitor_data_t._fields_ = [
     ('log', c_int),
 ]
 
-MonitorData = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+MonitorData = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 
-monitor_data_t = struct_monitor_data_t# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+monitor_data_t = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
 
 # No inserted files
 

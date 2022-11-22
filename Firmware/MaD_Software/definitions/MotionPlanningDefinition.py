@@ -1,7 +1,7 @@
 r"""Wrapper for MotionPlanningDefinition.h
 
 Generated with:
-/home/riley/.local/bin/ctypesgen MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h -o MaD_Software/definitions/MotionPlanningDefinition.py --no-embed-preamble
+/home/mad/.local/bin/ctypesgen MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h -o MaD_Software/definitions/MotionPlanningDefinition.py --no-embed-preamble
 
 Do not modify this file.
 """
@@ -30,7 +30,7 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 9
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 9
 for _lib in _libs.values():
     if not _lib.has("line", "cdecl"):
         continue
@@ -39,7 +39,7 @@ for _lib in _libs.values():
     line.restype = c_float
     break
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 10
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 10
 for _lib in _libs.values():
     if not _lib.has("sigmoid", "cdecl"):
         continue
@@ -48,7 +48,7 @@ for _lib in _libs.values():
     sigmoid.restype = c_float
     break
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
 class struct_functioninfo_s(Structure):
     pass
 
@@ -65,9 +65,9 @@ struct_functioninfo_s._fields_ = [
     ('args', (c_char * int(20)) * int(10)),
 ]
 
-FunctionInfo = struct_functioninfo_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
+FunctionInfo = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 21
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 21
 for _lib in _libs.values():
     try:
         functions = (POINTER(FunctionInfo)).in_dll(_lib, "functions")
@@ -75,43 +75,43 @@ for _lib in _libs.values():
     except:
         pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 1
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 1
 try:
     FUNCTION_COUNT = 2
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 2
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 2
 try:
     QUARTET_FUNC_LINE = 0
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 3
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 3
 try:
     QUARTET_FUNC_SIGMOIDAL = 1
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 5
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 5
 try:
     FUNCTION_MAX_NAME_LENGTH = 10
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 6
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 6
 try:
     FUNCTION_MAX_ARGS = 10
 except:
     pass
 
-# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 7
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 7
 try:
     FUNCTION_MAX_ARG_LENGTH = 20
 except:
     pass
 
-functioninfo_s = struct_functioninfo_s# /home/riley/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
+functioninfo_s = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
 
 # No inserted files
 

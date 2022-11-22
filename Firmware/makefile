@@ -25,14 +25,21 @@ SPIN = $(sort $(foreach dir,$(SRC),$(shell $(FIND) $(dir) -name "*.spin2")))
 
 OBJECTS := $(addprefix $(BIN)/,$(SOURCE:.c=.o))
 OBJECTSCAT := $(addprefix $(CAT)/,$(SOURCE:.c=.o))
-OBJECTSWIN := $(addprefix $(WIN)/,$(SOURCE:.c=.o))
+OBJECTSWIN := $(addprefix $(WIN)/,$(SOURCE:.c=.o))WWWD
 OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 INC := $(addprefix -I ,$(INCLUDE))
-
 gui:
-	cd MaD_Software && python3 main.py
-guideps: 
-	pipreqs MaD_Software --force
+	cd MaD_Software && sudo ./venv/bin/python3 main.py
+# pre install on pi:
+# sudo apt-get update
+# sudo apt-get upgrade
+# sudo apt-get install -y libhdf5-dev libhdf5-serial-dev python3-pyqt5 libatlas-base-dev libjasper-dev
+# pip install python3-rpi.gpio
+
+guideps:
+	rm -Rf MaD_Software/venv
+	python3 -m venv MaD_Software/venv && \
+	. MaD_Software/venv/bin/activate && \
 	pip install -r MaD_Software/requirements.txt
 flexpropc: clean clear exportStructures flexprop
 flexprop: $(BIN)/$(TARGET) run
@@ -104,7 +111,7 @@ $(WIN)/%.c: %.c
 	-./a.exe $(subst /,\,$(<)) $(subst /,\,$(@))
 	
 run: 
-	$(LOAD) -p $(PORT) -b230400 -t -ZERO -v $(subst \,/,bin\$(TARGET)) 
+	$(LOAD) -p $(PORT) -b230400 -ZERO -v $(subst \,/,bin\$(TARGET)) -t
 .PHONY: clean
 .PHONY: clear
 clear:

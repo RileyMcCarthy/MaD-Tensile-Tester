@@ -1,6 +1,10 @@
-Flask==1.1.2
-Flask_Session==0.4.0
-GUI==0.0.1
-matplotlib==3.5.3
-numpy==1.19.5
-pyserial==3.5
+flask_socketio
+flask_socketio
+flask_wtf
+opencv_python
+pyserial
+spidev
+WTForms
+ctypesgen
+RPi.GPIO
+simple_websocket

@@ -30,13 +30,13 @@ class MaD_Serial:
 
     def __init__(self):
         self.started = False
-        self.port = "/dev/ttyS0"
+        self.port = "/dev/serial0"
         self.baud = 256000
         self.serial = None
         # Rlock is used as it can be acuired by the same thread multiple times
         self.lock = threading.RLock()
         # Default settings
-        if self.start("/dev/ttyS0", 256000):
+        if self.start("/dev/serial0", 256000):
             self.initialize()
 
     @staticmethod
@@ -79,15 +79,23 @@ class MaD_Serial:
                 return None
             if (n <= 0):
                 return None
-
-            buf = self.serial.read(n)
+            try:
+                buf = self.serial.read(n)
+            except Exception as err:
+                print("serial read exception: " + str(err))
+                self.serial.reset_input_buffer()
+                return None
 
             if (len(buf) != n):
                 print('Bytes dont match:'+str(buf))
                 self.serial.reset_input_buffer()
                 return None
-
-            crcBuf = self.serial.read(1)
+            try:
+                crcBuf = self.serial.read(1)
+            except Exception as err:
+                print("serial read exception: " + str(err))
+                self.serial.reset_input_buffer()
+                return None
 
             if (len(crcBuf) == 0):
                 print("No CRC sent")

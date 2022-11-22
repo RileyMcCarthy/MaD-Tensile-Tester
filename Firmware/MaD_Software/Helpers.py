@@ -8,7 +8,7 @@ from SerialHelpers import *
 
 def list_ports():
     ports = serial.tools.list_ports.comports()
-    result = ["/dev/ttyS0"]
+    result = ["/dev/ttyS0", "/dev/serial0"]
     for port in ports:
         result.append("/dev/"+port.name)
     return result

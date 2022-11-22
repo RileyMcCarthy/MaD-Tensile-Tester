@@ -13,6 +13,8 @@ clients = 0
 monitorData = None
 
 # too much processing for a thread, need to use multiprocessing
+
+
 def data_thread(queue):
     print("CStarting monitor thread")
     GPIO.setmode(GPIO.BCM)
@@ -32,15 +34,16 @@ def data_thread(queue):
     spi.mode = 0
     try:
         f = open("data_cache.csv", "w")
-        f.write("time,position,force,setpoint")
+        f.write("time,position,force,setpoint\n")
         while True:
             if GPIO.wait_for_edge(22, GPIO.FALLING):
                 socketio.sleep(1)
                 monitorData = MonitorData.from_buffer_copy(
                     bytearray(spi.readbytes(ctypes.sizeof(MonitorData))))
-                #print_ctypes_obj(monitorData)
-                f.write("time:{},position:{},force{},setpoint{}".format(monitorData.time,monitorData.position,monitorData.force,monitorData.setpoint))
-                #socketio.emit('data', {"time": monitorData.timems/1000.0, "position": monitorData.position,
+                # print_ctypes_obj(monitorData)
+                f.write("time:{},position:{},force{},setpoint{}\n".format(
+                    monitorData.timems/1000.0, monitorData.position, monitorData.force, monitorData.setpoint))
+                # socketio.emit('data', {"time": monitorData.timems/1000.0, "position": monitorData.position,
                 #                       "force": monitorData.force, "setpoint": monitorData.setpoint/1000.0}, namespace='/monitor')
     finally:
         f.close()
@@ -51,7 +54,7 @@ def connect():
     socketio.sleep(1)
     print("Connected to /monitor")
     #global thread
-    #with thread_lock:
+    # with thread_lock:
     #    if thread is None:
     #        thread = socketio.start_background_task(
     #            task_thread, app)
