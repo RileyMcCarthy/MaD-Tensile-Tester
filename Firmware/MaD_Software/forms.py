@@ -1,5 +1,6 @@
 from wtforms import Form, BooleanField, StringField, PasswordField, validators, SelectField, SubmitField, FormField, FieldList
 from flask_wtf import FlaskForm
+from Helpers import print_ctypes_obj
 import re
 import ctypes
 from definitions.MotionPlanningDefinition import *
@@ -74,12 +75,29 @@ def MotionProfileForm(profile):
     # callbacks should replace getField()
 
     def getParameters(function, parameters):
-        fields = FieldList(StringField)
-        print(functions)
-        functionInfo = functions[function]
-        for parameter in parameters[:functionInfo.args_count]:
-            fields.append_entry(parameter)
-            fields.entries[-1].label.text = functioninfo.name
+        # Get params over serial on setup!!!
+
+        lineInfo = FunctionInfo()
+        lineInfo.name = b'Line'
+        lineInfo.args[0] = ctypes.create_string_buffer(
+            b'distance',  ctypes.sizeof(lineInfo.args[0]))
+        lineInfo.args[1] = ctypes.create_string_buffer(
+            b'strain rate', ctypes.sizeof(lineInfo.args[0]))
+
+        sigmoidInfo = FunctionInfo()
+        sigmoidInfo.name = b'Sigmoid'
+        sigmoidInfo.args[0] = ctypes.create_string_buffer(
+            b'distance', ctypes.sizeof(sigmoidInfo.args[0]))
+        sigmoidInfo.args[1] = ctypes.create_string_buffer(
+            b'strain rate', ctypes.sizeof(sigmoidInfo.args[1]))
+        sigmoidInfo.args[2] = ctypes.create_string_buffer(
+            b'error', ctypes.sizeof(sigmoidInfo.args[2]))
+        functions = [lineInfo, sigmoidInfo]
+
+        #fields = FieldList(FunctionInfo, default=functions)
+        # print_ctypes_obj(functions[function])
+        return StringField("Parameters", default="hi")
+        return FieldList(StringField(), default=["arg1, 'arg2"])
 
     return structure_to_form(profile, {
         "sets": lambda name, profile, sets: FieldList(FormField(
@@ -87,7 +105,7 @@ def MotionProfileForm(profile):
                 "quartets": lambda name, set, quartets: FieldList(FormField(
                     structure_to_form(quartets[0], {
                         "function": lambda name, quartet, quartets: SelectField('Function', choices=getEnum("QUARTET_FUNC_")),
-                        "parameters": lambda name, quartet, parameters: getParameters(quartet.function, parameters)
+                        # "parameters": lambda name, quartet, parameters: StringField("Parameters", default="hi")
                     })
                 ), default=quartets)
             })

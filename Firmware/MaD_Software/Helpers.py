@@ -13,27 +13,28 @@ def list_ports():
         result.append("/dev/"+port.name)
     return result
 
+
 def crc8(data):
-        if (data == None):
-            raise ValueError('Data is not valid: '+str(data))
-        crc = 0
-        for i in range(len(data)):
-            byte = data[i]
-            for b in range(8):
-                fb_bit = (crc ^ byte) & 0x01
-                if fb_bit == 0x01:
-                    crc = crc ^ 0x18
-                crc = (crc >> 1) & 0x7f
-                if fb_bit == 0x01:
-                    crc = crc | 0x80
-                byte = byte >> 1
-        return crc
+    if (data == None):
+        raise ValueError('Data is not valid: '+str(data))
+    crc = 0
+    for i in range(len(data)):
+        byte = data[i]
+        for b in range(8):
+            fb_bit = (crc ^ byte) & 0x01
+            if fb_bit == 0x01:
+                crc = crc ^ 0x18
+            crc = (crc >> 1) & 0x7f
+            if fb_bit == 0x01:
+                crc = crc | 0x80
+            byte = byte >> 1
+    return crc
+
 
 def print_ctypes_obj(obj, level=0):
 
     delta_indent = "    "
     indent = delta_indent*level
-
 
     # Assess wether the object is an array, a structure or an elementary type
     if issubclass(type(obj), ctypes.Array):
@@ -63,7 +64,9 @@ def print_ctypes_obj(obj, level=0):
 def loadMotionProfile():
     motionProfile = MotionProfile()
     motionProfile.name = b'Test1.mp'
+    motionProfile.number = 5
     motionProfile.setCount = 1
+    motionProfile.sets[0].name = b'Test set 1'
     motionProfile.sets[0].number = 1
     motionProfile.sets[0].executions = 2
     motionProfile.sets[0].quartetCount = 2

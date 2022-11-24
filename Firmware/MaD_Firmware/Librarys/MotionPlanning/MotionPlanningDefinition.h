@@ -18,7 +18,7 @@ typedef struct functioninfo_s
 } FunctionInfo;
 
 // Name, function*, # params, param names
-FunctionInfo functions[] = {
+const FunctionInfo functions[] = {
     {"Line", line, 2, {"distance", "strain rate"}},
     {"Sigmoid", sigmoid, 3, {"distance", "strain rate", "error"}},
 };
