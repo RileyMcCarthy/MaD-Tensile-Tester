@@ -46,23 +46,6 @@ class MaD_Serial:
         return buffer.raw
 
     @staticmethod
-    def crc8(data):
-        if (data == None):
-            raise ValueError('Data is not valid: '+str(data))
-        crc = 0
-        for i in range(len(data)):
-            byte = data[i]
-            for b in range(8):
-                fb_bit = (crc ^ byte) & 0x01
-                if fb_bit == 0x01:
-                    crc = crc ^ 0x18
-                crc = (crc >> 1) & 0x7f
-                if fb_bit == 0x01:
-                    crc = crc | 0x80
-                byte = byte >> 1
-        return crc
-
-    @staticmethod
     def structEq(comp, other):
         return MaD_Serial.convert_to_bytes(comp) == MaD_Serial.convert_to_bytes(other)
 
@@ -103,7 +86,7 @@ class MaD_Serial:
                 return None
 
             crc = unpack('B', crcBuf)[0]
-            crccalc = self.crc8(buf)
+            crccalc = crc8(buf)
 
             if (crc != crccalc):
                 print("Invalid CRC:"+str(crc)+"Should be:" +

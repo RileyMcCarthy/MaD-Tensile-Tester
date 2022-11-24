@@ -172,7 +172,7 @@ int force_gauge_raw_to_force(int zero, double slope, int raw)
 // returns force in milliNewtons
 int raw_to_force(int raw, MachineConfiguration *configuration)
 {
-    return round(raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor);
+    return round((raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor));
 }
 
 int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)

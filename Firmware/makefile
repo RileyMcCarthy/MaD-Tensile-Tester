@@ -1,5 +1,5 @@
 #FlexProp
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyUSB1
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = ~/flexprop/bin/flexcc
 LOAD = ~/flexprop/bin/loadp2
@@ -29,13 +29,9 @@ OBJECTSWIN := $(addprefix $(WIN)/,$(SOURCE:.c=.o))WWWD
 OBJECTSPIN := $(addprefix $(WIN)/,$(SPIN:.spin2=.h))
 INC := $(addprefix -I ,$(INCLUDE))
 gui:
+	sudo killall pigpiod || true
+	sudo pigpiod
 	cd MaD_Software && sudo ./venv/bin/python3 main.py
-# pre install on pi:
-# sudo apt-get update
-# sudo apt-get upgrade
-# sudo apt-get install -y libhdf5-dev libhdf5-serial-dev python3-pyqt5 libatlas-base-dev libjasper-dev
-# pip install python3-rpi.gpio
-
 guideps:
 	rm -Rf MaD_Software/venv
 	python3 -m venv MaD_Software/venv && \

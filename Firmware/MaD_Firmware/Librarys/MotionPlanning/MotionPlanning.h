@@ -61,5 +61,6 @@ double sigmoid(double t, double *args);
 // void simulate_profile(SetPoint *setpoint, double t, double v_max, double a_max, double (*f)(double t, va_list args), ...);
 
 double steps_to_mm(int steps, MachineConfiguration *config);
+int steps_to_um(int steps, MachineConfiguration *config);
 int mm_to_steps(double mm, MachineConfiguration *config);
 #endif

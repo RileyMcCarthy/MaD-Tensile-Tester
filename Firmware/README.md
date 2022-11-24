@@ -27,7 +27,7 @@ Go to Interface Options and enable SPI and Serial
 ```
 sudo apt-get update
 sudo apt-get upgradesudo apt-get install -y libhdf5-dev libhdf5-serial-dev python3-pyqt5 libatlas-base-dev libjasper-dev
-pip install RPi.GPIO
+sudo apt-get install libmemcached-dev zlib1g-dev
 ```
 
 ## Create pyhon venv

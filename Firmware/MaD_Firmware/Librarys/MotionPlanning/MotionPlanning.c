@@ -61,19 +61,19 @@ double position_set(double t, double position, RunMotionProfile *run, MotionSet 
     double position = position_quartet(t, position, run, &(set->quartets[run->currentQuartet]));
     if (run->quartetComplete)
     {
-         printf("quartet complete:%d\n", run->currentQuartet);
+        printf("quartet complete:%d\n", run->currentQuartet);
         run->currentQuartet++;
         run->quartetComplete = false;
     }
     if (run->currentQuartet >= set->quartetCount)
     {
-         printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
+        printf("Set %d execution %d done\n", run->currentSet, run->currentExecution);
         run->currentExecution++;
         run->currentQuartet = 0;
     }
     if (run->currentExecution >= set->executions)
     {
-         printf("Set %d done\n", run->currentSet);
+        printf("Set %d done\n", run->currentSet);
         run->setComplete = true;
         run->currentExecution = 0;
     }
@@ -100,24 +100,24 @@ double position_quartet(double t, double position, RunMotionProfile *run, Motion
         return 0;
     }
     double positionSetpoint = info.func(t - run->lastQuartetTime, quartet->parameters); // Get setpoint
-    //printf("posSetpoint:%f\n",positionSetpoint);
+    // printf("posSetpoint:%f\n",positionSetpoint);
     if (abs(positionSetpoint) > abs(quartet->parameters[0]))
     {
         positionSetpoint = quartet->parameters[0];
     }
     double quartetPosition = run->lastQuartetDistance + position;
-    //printf("Delta:%f,%f,%f\n",quartetPosition, quartet->parameters[0], abs(abs(quartetPosition) - abs(quartet->parameters[0])));
+    // printf("Delta:%f,%f,%f\n",quartetPosition, quartet->parameters[0], abs(abs(quartetPosition) - abs(quartet->parameters[0])));
     if (abs(abs(quartetPosition) - abs(quartet->parameters[0])) < 0.1) // Actual position has reached final position
     {
-        //printf("reached setpoint\n");
+        // printf("reached setpoint\n");
         if (run->dwellTime == 0) // Dwell has not started
         {
-            printf("starting dwell:%f\n",t);
-            run->dwellTime = t*1000;
+            printf("starting dwell:%f\n", t);
+            run->dwellTime = t * 1000;
         }
-        if ((t*1000 - run->dwellTime) > quartet->dwell) // Dwell period is done, quartet has completed
+        if ((t * 1000 - run->dwellTime) > quartet->dwell) // Dwell period is done, quartet has completed
         {
-            printf("Dwell complete:%f\n",t);
+            printf("Dwell complete:%f\n", t);
             run->dwellTime = 0;
             run->lastQuartetTime = t;
             run->lastQuartetDistance += quartet->parameters[0];
@@ -156,7 +156,7 @@ double sigmoid(double t, double *args)
 
 // args = [distance, strain rate]
 double line(double t, double *args)
-{   
+{
     int dir = args[0] > 0 ? 1 : -1;
     double position = t * args[1] * dir;
     if (abs(position) > abs(args[0]))
@@ -310,6 +310,16 @@ double steps_to_mm(int steps, MachineConfiguration *config)
         return 0;
     }
     return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
+}
+
+int steps_to_um(int steps, MachineConfiguration *config)
+{
+    if (config == NULL)
+    {
+        // printf("steps_to_mm: config is NULL\n");
+        return 0;
+    }
+    return (int)round(steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev * 1000);
 }
 
 int mm_to_steps(double mm, MachineConfiguration *config)

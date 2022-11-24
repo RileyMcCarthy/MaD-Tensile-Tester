@@ -30,13 +30,19 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+__uint8_t = c_ubyte# /usr/include/arm-linux-gnueabihf/bits/types.h: 38
+
+uint8_t = __uint8_t# /usr/include/arm-linux-gnueabihf/bits/stdint-uintn.h: 24
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
 class struct_monitor_data_t(Structure):
     pass
 
 struct_monitor_data_t.__slots__ = [
     'forceRaw',
     'encoderRaw',
+    'forcemN',
+    'encoderum',
     'force',
     'position',
     'setpoint',
@@ -47,17 +53,36 @@ struct_monitor_data_t.__slots__ = [
 struct_monitor_data_t._fields_ = [
     ('forceRaw', c_int),
     ('encoderRaw', c_int),
+    ('forcemN', c_int),
+    ('encoderum', c_int),
     ('force', c_float),
     ('position', c_float),
     ('setpoint', c_int),
-    ('timems', c_int),
-    ('timeus', c_int),
+    ('timems', c_uint),
+    ('timeus', c_uint),
     ('log', c_int),
 ]
 
-MonitorData = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+MonitorData = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
 
-monitor_data_t = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 14
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
+class struct_DataPacket_s(Structure):
+    pass
+
+struct_DataPacket_s.__slots__ = [
+    'data',
+    'crc',
+]
+struct_DataPacket_s._fields_ = [
+    ('data', MonitorData),
+    ('crc', uint8_t),
+]
+
+DataPacket = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
+
+monitor_data_t = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
+
+DataPacket_s = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
 
 # No inserted files
 

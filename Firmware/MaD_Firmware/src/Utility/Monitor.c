@@ -52,7 +52,7 @@ static void monitor_cog(Monitor *monitor)
     }
     else
     {
-      // printf("Force Gauge disconnected, attempting to reconnect\n");
+      printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
       {
@@ -68,12 +68,16 @@ static void monitor_cog(Monitor *monitor)
     temp.encoderRaw = encoder.value();
     temp.timems = _getms();
     temp.timeus = _getus();
+    temp.forcemN = raw_to_force(temp.forceRaw, monitor->configuration);
+    temp.encoderum = steps_to_um(temp.encoderRaw, monitor->configuration);
+    // these are convinience variables for the user, can be removed later
     temp.force = raw_to_force(temp.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
     temp.position = steps_to_mm(temp.encoderRaw, monitor->configuration);      // Convert steps to mm
     temp.log = monitorLogData;
 
     monitor->data = temp;
     data_update();
+    //_waitms(1);
   }
 }
 

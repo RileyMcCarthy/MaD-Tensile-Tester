@@ -3,8 +3,8 @@ flask_socketio
 flask_wtf
 opencv_python
 pyserial
-spidev
+pigpio
 WTForms
 ctypesgen
-RPi.GPIO
 simple_websocket
+pylibmc

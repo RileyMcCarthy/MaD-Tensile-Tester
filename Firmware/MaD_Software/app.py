@@ -32,7 +32,7 @@ def run():
         while mSerial.getMotionMode() == 2:
             socketio.sleep(2)
         flash('Saving test data')
-        write_flash_data()
+        #write_flash_data()
         flash('Test data is now ready!')
     if request.method == "POST":
         flash('Running Motion Profile')

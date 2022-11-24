@@ -215,7 +215,7 @@
                 },
                 scales: {
                     x: {
-                        display: true,
+                        display: false,
                         scaleLabel: {
                             display: true,
                             labelString: 'Time'
@@ -233,9 +233,11 @@
                             display: true,
                             labelString: '(mm)'
                         },
+                        min: -50,
+                        max: 50,
                         ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 100
+                            // forces step size to be 1N
+                            stepSize: 10
                         }
                     }
                 }
@@ -271,7 +273,7 @@
                 },
                 scales: {
                     x: {
-                        display: true,
+                        display: false,
                         scaleLabel: {
                             display: true,
                             labelString: 'Time'
@@ -289,9 +291,11 @@
                             display: true,
                             labelString: '(N)'
                         },
+                        min: -5,
+                        max: 5,
                         ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 5
+                            // forces step size to be 1N
+                            stepSize: 1
                         }
                     }
                 }
@@ -327,17 +331,18 @@
                 },
                 scales: {
                     x: {
-                        display: true,
+                        display: false,
                         scaleLabel: {
                             display: true,
                             labelString: '(mm)'
                         },
                         ticks: {
                             suggestedMin: -20,
-                            suggestedMax: 20
+                            suggestedMax: 20,
                         },
                         gridLines: {
-                            color: "rgba(0, 0, 0, 0)",
+                            display: false,
+                            drawBorder: false
                         }
                     },
                     y: {
@@ -346,9 +351,11 @@
                             display: true,
                             labelString: '(N)'
                         },
+                        min: -5,
+                        max: 5,
                         ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 5
+                            // forces step size to be 1N
+                            stepSize: 1
                         }
                     }
                 }
@@ -413,6 +420,7 @@
 
         var socketStatus = io('/status');
         socketStatus.on('data', function (data) {
+            console.log("getting status")
             $("#machineStatus").html(data.html);
             $("#status").html($("#machineStatus").find(".status").find(".value").html())
             $("#condition").html($("#machineStatus").find(".condition").find(".value").html())
@@ -423,10 +431,10 @@
 
         var socketMonitor = io('/monitor');
         socketMonitor.on('data', function (data) {
-            console.log("getting data")
             if (!data) {
                 return;
             }
+            data = data
             if (configPosition.data.labels.length >= 100) {
                 configPosition.data.labels.shift();
                 configPosition.data.datasets[0].data.shift();
