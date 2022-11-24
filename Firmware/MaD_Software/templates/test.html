@@ -61,11 +61,9 @@
                 {% for quartet in set.form.quartets %}
                 {% if set.form.quartetCount.data >= loop.index %}
                 {{ render_field(quartet.form.name) }}
-                {{ render_field(quartet.form.function) }}
-                {% for quartet in set.form.quartets %}
-                {% if quartet.quartetCount.data >= loop.index %}
-                {{ render_field(quartet.form.parameters) }}
-                {% endif %}
+                {{ render_field(quartet.form.function.form.id) }}
+                {% for parameter in quartet.form.function.form.parameters %}
+                {{ render_field(parameter) }}
                 {% endfor %}
                 {{ render_field(quartet.form.dwell) }}
                 {% endif %}

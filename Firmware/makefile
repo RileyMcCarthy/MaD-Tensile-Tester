@@ -32,6 +32,10 @@ gui:
 	sudo killall pigpiod || true
 	sudo pigpiod
 	cd MaD_Software && sudo ./venv/bin/python3 main.py
+i2c:
+	sudo killall pigpiod || true
+	sudo pigpiod
+	cd MaD_Software && sudo ./venv/bin/python3 i2c_test.py
 guideps:
 	rm -Rf MaD_Software/venv
 	python3 -m venv MaD_Software/venv && \

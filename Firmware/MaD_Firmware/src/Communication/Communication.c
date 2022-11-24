@@ -69,7 +69,7 @@ static int flashAddress = 0;
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
     // Begin main loop
-    fds.start(57, 56, 0, 256000);
+    fds.start(57, 56, 0, 1152000);
     while (1)
     {
         DEBUG_WARNING("Waiting for command\n");

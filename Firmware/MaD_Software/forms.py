@@ -5,6 +5,7 @@ import re
 import ctypes
 from definitions.MotionPlanningDefinition import *
 from definitions.StateMachineDefinition import *
+from definitions.JSON import *
 
 
 def title(title):
@@ -32,7 +33,7 @@ def FunctionForm(func, data):
         """.format(data)
     functions = getEnum('FUNC_MANUAL_')
     print(func)
-    #print("seelected: "+str(func)+", data:",+str(data))
+    # print("seelected: "+str(func)+", data:",+str(data))
     for index, function in enumerate(functions):
         str += '<button type="button" class="btn m-2 {}" id="{}" onclick=func_manual()>{}</button>'.format("btn-success" if index !=
                                                                                                            func else "btn-primary", index, function)
@@ -76,36 +77,38 @@ def MotionProfileForm(profile):
 
     def getParameters(function, parameters):
         # Get params over serial on setup!!!
-
-        lineInfo = FunctionInfo()
-        lineInfo.name = b'Line'
-        lineInfo.args[0] = ctypes.create_string_buffer(
-            b'distance',  ctypes.sizeof(lineInfo.args[0]))
-        lineInfo.args[1] = ctypes.create_string_buffer(
-            b'strain rate', ctypes.sizeof(lineInfo.args[0]))
-
-        sigmoidInfo = FunctionInfo()
-        sigmoidInfo.name = b'Sigmoid'
-        sigmoidInfo.args[0] = ctypes.create_string_buffer(
-            b'distance', ctypes.sizeof(sigmoidInfo.args[0]))
-        sigmoidInfo.args[1] = ctypes.create_string_buffer(
-            b'strain rate', ctypes.sizeof(sigmoidInfo.args[1]))
-        sigmoidInfo.args[2] = ctypes.create_string_buffer(
-            b'error', ctypes.sizeof(sigmoidInfo.args[2]))
-        functions = [lineInfo, sigmoidInfo]
-
-        #fields = FieldList(FunctionInfo, default=functions)
-        # print_ctypes_obj(functions[function])
-        return StringField("Parameters", default="hi")
-        return FieldList(StringField(), default=["arg1, 'arg2"])
+        # print("function: "+str(function))
+        func_options = getEnum("QUARTET_FUNC_")
+        desc_enum_name = "FUNCTION_PARAM_DESCRIPTION_" + \
+            func_options[function]+"_"
+        descriptions = getEnum(desc_enum_name)
+        print(desc_enum_name+" descriptions: "+str(descriptions))
+        fields = []
+        i = 0
+        for parameter in parameters:
+            description = str(i)
+            if (i < len(descriptions)):
+                print("description: "+str(description) +
+                      " p[arams: "+str(parameters))
+                description = descriptions[i]
+            fields.append(StringField(description, default=parameters[i]))
+            i += 1
+            print(fields)
+        # return StringField(title(description), default=parameters[description])
+        #
+        return FieldList(StringField(), default=fields)
 
     return structure_to_form(profile, {
         "sets": lambda name, profile, sets: FieldList(FormField(
             structure_to_form(sets[0], {
                 "quartets": lambda name, set, quartets: FieldList(FormField(
                     structure_to_form(quartets[0], {
-                        "function": lambda name, quartet, quartets: SelectField('Function', choices=getEnum("QUARTET_FUNC_")),
-                        # "parameters": lambda name, quartet, parameters: StringField("Parameters", default="hi")
+                        "function": lambda name, quartets, function: FormField(
+                            structure_to_form(function, {
+                                "id": lambda name, function, id: SelectField('Function', choices=getEnum("QUARTET_FUNC_")),
+                                "parameters": lambda name, function, parameters: getParameters(function.id, parameters)
+                            }), default=function
+                        ),
                     })
                 ), default=quartets)
             })

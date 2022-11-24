@@ -111,26 +111,47 @@ struct_MachineProfile_s._fields_ = [
 
 MachineProfile = struct_MachineProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 69
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
+enum_Function_e = c_int# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 75
+
+QUARTET_FUNC_LINE = 0# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 75
+
+QUARTET_FUNC_SIGMOID = (QUARTET_FUNC_LINE + 1)# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 75
+
+Function = enum_Function_e# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 75
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 85
+class struct_functioninfo_s(Structure):
+    pass
+
+struct_functioninfo_s.__slots__ = [
+    'id',
+    'parameters',
+]
+struct_functioninfo_s._fields_ = [
+    ('id', Function),
+    ('parameters', c_float * int(10)),
+]
+
+FunctionInfo = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 85
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 93
 class struct_MotionQuartet_s(Structure):
     pass
 
 struct_MotionQuartet_s.__slots__ = [
     'name',
     'function',
-    'parameters',
     'dwell',
 ]
 struct_MotionQuartet_s._fields_ = [
     ('name', c_char * int(50)),
-    ('function', c_int),
-    ('parameters', c_float * int(10)),
+    ('function', FunctionInfo),
     ('dwell', c_float),
 ]
 
-MotionQuartet = struct_MotionQuartet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
+MotionQuartet = struct_MotionQuartet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 93
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 104
 class struct_MotionSet_s(Structure):
     pass
 
@@ -151,9 +172,9 @@ struct_MotionSet_s._fields_ = [
     ('quartets', MotionQuartet * int(6)),
 ]
 
-MotionSet = struct_MotionSet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
+MotionSet = struct_MotionSet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 104
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 113
 class struct_MotionProfile_s(Structure):
     pass
 
@@ -170,9 +191,9 @@ struct_MotionProfile_s._fields_ = [
     ('sets', MotionSet * int(6)),
 ]
 
-MotionProfile = struct_MotionProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
+MotionProfile = struct_MotionProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 113
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 128
 class struct_SampleProfile_s(Structure):
     pass
 
@@ -199,9 +220,9 @@ struct_SampleProfile_s._fields_ = [
     ('maxForceCompression', c_float),
 ]
 
-SampleProfile = struct_SampleProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
+SampleProfile = struct_SampleProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 128
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 139
 class struct_TestProfile_s(Structure):
     pass
 
@@ -222,7 +243,7 @@ struct_TestProfile_s._fields_ = [
     ('comment', c_char * int(256)),
 ]
 
-TestProfile = struct_TestProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
+TestProfile = struct_TestProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 139
 
 # /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 4
 try:
@@ -350,31 +371,49 @@ try:
 except:
     pass
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 73
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 77
+try:
+    FUNCTION_PARAMETERS_LINE = 2
+except:
+    pass
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 78
+try:
+    FUNCTION_PARAM_DESCRIPTION_LINE_DIASTANCE = 0
+except:
+    pass
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 79
+try:
+    FUNCTION_PARAM_DESCRIPTION_LINE_VELCOTIY = 1
+except:
+    pass
+
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 87
 try:
     MOTION_QUARTET_FIELD_COUNT = (4 + 10)
 except:
     pass
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 82
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 95
 try:
     MOTION_SET_FIELD_COUNT = (5 + 10)
 except:
     pass
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 93
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 106
 try:
     MOTION_PROFILE_FIELD_COUNT = (4 + 20)
 except:
     pass
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 102
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
 try:
     SAMPLE_PROFILE_FIELD_COUNT = 9
 except:
     pass
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 117
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 130
 try:
     TEST_PROFILE_FIELD_COUNT = 6
 except:
@@ -386,15 +425,17 @@ MachinePerformance_s = struct_MachinePerformance_s# /home/mad/Tensile-Testing-Ma
 
 MachineProfile_s = struct_MachineProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 69
 
-MotionQuartet_s = struct_MotionQuartet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 80
+functioninfo_s = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 85
 
-MotionSet_s = struct_MotionSet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 91
+MotionQuartet_s = struct_MotionQuartet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 93
 
-MotionProfile_s = struct_MotionProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 100
+MotionSet_s = struct_MotionSet_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 104
 
-SampleProfile_s = struct_SampleProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 115
+MotionProfile_s = struct_MotionProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 113
 
-TestProfile_s = struct_TestProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 126
+SampleProfile_s = struct_SampleProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 128
+
+TestProfile_s = struct_TestProfile_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/JSON/JSON.h: 139
 
 # No inserted files
 

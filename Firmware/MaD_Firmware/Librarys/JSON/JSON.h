@@ -68,15 +68,28 @@ typedef struct MachineProfile_s
     MachinePerformance performance;
 } MachineProfile;
 
-// make function enum to string method
+typedef enum Function_e
+{
+    QUARTET_FUNC_LINE,
+    QUARTET_FUNC_SIGMOID,
+} Function;
+
+#define FUNCTION_PARAMETERS_LINE 2
+#define FUNCTION_PARAM_DESCRIPTION_LINE_DIASTANCE 0
+#define FUNCTION_PARAM_DESCRIPTION_LINE_VELCOTIY 1
+// Modify this to have distance variable instead of param[0]=distance
+typedef struct functioninfo_s
+{
+    Function id;
+    double parameters[MAX_MOTION_QUARTET_PARAMETERS]; // Parameters of the motion quartet (max 10)
+} FunctionInfo;
 
 #define MOTION_QUARTET_FIELD_COUNT 4 + 10
 typedef struct MotionQuartet_s
 {
-    char name[MAX_MOTION_QUARTET_NAME];               // Filename of the motion quartet
-    int function;                                     // Motion function type
-    double parameters[MAX_MOTION_QUARTET_PARAMETERS]; // Parameters of the motion quartet (max 10)
-    double dwell;                                     // Dwell of the motion quartet (us)
+    char name[MAX_MOTION_QUARTET_NAME]; // Filename of the motion quartet
+    FunctionInfo function;
+    double dwell; // Dwell of the motion quartet (us)
 } MotionQuartet;
 
 #define MOTION_SET_FIELD_COUNT 5 + 10

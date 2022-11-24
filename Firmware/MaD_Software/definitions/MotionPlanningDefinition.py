@@ -30,7 +30,7 @@ add_library_search_dirs([])
 
 # No modules
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 9
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 5
 for _lib in _libs.values():
     if not _lib.has("line", "cdecl"):
         continue
@@ -39,7 +39,7 @@ for _lib in _libs.values():
     line.restype = c_float
     break
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 10
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 6
 for _lib in _libs.values():
     if not _lib.has("sigmoid", "cdecl"):
         continue
@@ -47,33 +47,6 @@ for _lib in _libs.values():
     sigmoid.argtypes = [c_float, POINTER(c_float)]
     sigmoid.restype = c_float
     break
-
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
-class struct_functioninfo_s(Structure):
-    pass
-
-struct_functioninfo_s.__slots__ = [
-    'name',
-    'func',
-    'args_count',
-    'args',
-]
-struct_functioninfo_s._fields_ = [
-    ('name', c_char * int(20)),
-    ('func', CFUNCTYPE(UNCHECKED(c_float), c_float, POINTER(c_float))),
-    ('args_count', c_int),
-    ('args', (c_char * int(20)) * int(10)),
-]
-
-FunctionInfo = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
-
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 21
-for _lib in _libs.values():
-    try:
-        functions = (POINTER(FunctionInfo)).in_dll(_lib, "functions")
-        break
-    except:
-        pass
 
 # /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 1
 try:
@@ -92,26 +65,6 @@ try:
     QUARTET_FUNC_SIGMOIDAL = 1
 except:
     pass
-
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 5
-try:
-    FUNCTION_MAX_NAME_LENGTH = 10
-except:
-    pass
-
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 6
-try:
-    FUNCTION_MAX_ARGS = 10
-except:
-    pass
-
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 7
-try:
-    FUNCTION_MAX_ARG_LENGTH = 20
-except:
-    pass
-
-functioninfo_s = struct_functioninfo_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/Librarys/MotionPlanning/MotionPlanningDefinition.h: 18
 
 # No inserted files
 

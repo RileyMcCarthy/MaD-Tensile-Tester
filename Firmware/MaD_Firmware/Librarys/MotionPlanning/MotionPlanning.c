@@ -80,6 +80,20 @@ double position_set(double t, double position, RunMotionProfile *run, MotionSet 
     return position;
 }
 
+double call_function(int id, double t, double *args)
+{
+    switch (id)
+    {
+    case 0:
+        printf("time: %f, args: %f, %f\n", t, args[0], args[1]);
+        return line(t, args);
+    case 1:
+        return sigmoid(t, args);
+    default:
+        return line(t, args);
+    }
+}
+
 double position_quartet(double t, double position, RunMotionProfile *run, MotionQuartet *quartet)
 {
     if (run == NULL || quartet == NULL)
@@ -88,26 +102,15 @@ double position_quartet(double t, double position, RunMotionProfile *run, Motion
         return 0;
     }
 
-    FunctionInfo info;
-    get_function_info(&info, quartet->function);
-
-    if (info.func == NULL)
+    double positionSetpoint = call_function(quartet->function.id, t - run->lastQuartetTime, quartet->function.parameters); // Get setpoint
+    printf("posSetpoint:%f\n", positionSetpoint);
+    if (abs(positionSetpoint) > abs(quartet->function.parameters[0]))
     {
-        // printf("no function for %s\n", info.name);
-        run->lastQuartetTime = t;
-        run->lastQuartetDistance += quartet->parameters[0];
-        run->quartetComplete = true;
-        return 0;
-    }
-    double positionSetpoint = info.func(t - run->lastQuartetTime, quartet->parameters); // Get setpoint
-    // printf("posSetpoint:%f\n",positionSetpoint);
-    if (abs(positionSetpoint) > abs(quartet->parameters[0]))
-    {
-        positionSetpoint = quartet->parameters[0];
+        positionSetpoint = quartet->function.parameters[0];
     }
     double quartetPosition = run->lastQuartetDistance + position;
     // printf("Delta:%f,%f,%f\n",quartetPosition, quartet->parameters[0], abs(abs(quartetPosition) - abs(quartet->parameters[0])));
-    if (abs(abs(quartetPosition) - abs(quartet->parameters[0])) < 0.1) // Actual position has reached final position
+    if (abs(abs(quartetPosition) - abs(quartet->function.parameters[0])) < 0.1) // Actual position has reached final position
     {
         // printf("reached setpoint\n");
         if (run->dwellTime == 0) // Dwell has not started
@@ -120,7 +123,7 @@ double position_quartet(double t, double position, RunMotionProfile *run, Motion
             printf("Dwell complete:%f\n", t);
             run->dwellTime = 0;
             run->lastQuartetTime = t;
-            run->lastQuartetDistance += quartet->parameters[0];
+            run->lastQuartetDistance += quartet->function.parameters[0];
             run->quartetComplete = true;
             return run->lastQuartetDistance;
         }
@@ -164,48 +167,6 @@ double line(double t, double *args)
         return args[0];
     }
     return position;
-}
-
-/*FunctionInfo functions[] = {
-    [QUARTET_FUNC_LINE] = {.name = "Line", .func = line, .args_count = 2, .args = {"distance", "strain rate"}},
-    [QUARTET_FUNC_SIGMOIDAL] = {.name = "Sigmoid", .func = sigmoid, .args_count = 3, .args = {"distance", "strain rate", "error"}},
-};*/
-
-void get_function_info(FunctionInfo *info, int id)
-{
-    switch (id)
-    {
-    case QUARTET_FUNC_LINE:
-    {
-        strncpy(info->name, "Line", FUNCTION_MAX_NAME_LENGTH);
-
-        info->func = line;
-
-        info->args_count = 2;
-        strncpy(info->args[0], "distance", FUNCTION_MAX_ARG_LENGTH);
-        strncpy(info->args[1], "strain rate", FUNCTION_MAX_ARG_LENGTH);
-        break;
-    }
-    case QUARTET_FUNC_SIGMOIDAL:
-    {
-        strncpy(info->name, "Sigmoid", FUNCTION_MAX_NAME_LENGTH);
-
-        info->func = sigmoid;
-
-        info->args_count = 3;
-        strncpy(info->args[0], "distance", FUNCTION_MAX_ARG_LENGTH);
-        strncpy(info->args[1], "strain rate", FUNCTION_MAX_ARG_LENGTH);
-        strncpy(info->args[2], "error", FUNCTION_MAX_ARG_LENGTH);
-        break;
-    }
-    default:
-        strcpy(info->name, "");
-
-        info->func = NULL;
-
-        info->args_count = 0;
-        break;
-    }
 }
 
 // Equation to determine position

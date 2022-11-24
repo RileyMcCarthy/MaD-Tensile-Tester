@@ -76,8 +76,9 @@ static void monitor_cog(Monitor *monitor)
     temp.log = monitorLogData;
 
     monitor->data = temp;
-    data_update();
-    //_waitms(1);
+    _pinh(39);
+    _waitus(10);
+    _pinl(39);
   }
 }
 

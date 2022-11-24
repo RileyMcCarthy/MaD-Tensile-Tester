@@ -8,6 +8,7 @@ import pigpio
 import json
 import multiprocessing
 from Helpers import crc8
+from app import mSerial
 
 manager = multiprocessing.Manager()
 data_dict = manager.dict()
@@ -15,8 +16,39 @@ data_dict = manager.dict()
 thread = None
 thread_lock = RLock()
 
+data_ready = 3
+
 
 def data_thread(data):
+    print("CStarting monitor thread")
+    pi = pigpio.pi()
+    if not pi.connected:
+        print("Can't connected to pigpio daemon")
+        exit()
+    # GPIO 22 set up as input. It is pulled up to stop false signals
+    pi.set_mode(data_ready, pigpio.INPUT)
+    pi.set_pull_up_down(data_ready, pigpio.PUD_OFF)
+
+    def read_data(gpio, level, tick):
+        monitorData = mSerial.getMonitorData()
+        if monitorData is None:
+            print("Error reading monitor data")
+            return
+        data['time'] = monitorData.timems/1000.0
+        data['position'] = monitorData.encoderum/1000000.0
+        data['force'] = monitorData.forcemN/1000.0
+        data['setpoint'] = monitorData.setpoint
+        # print({'time': data['time'], 'position': data['position'],
+        #       'force': data['force'], 'setpoint': data['setpoint']})
+    pi.callback(data_ready, pigpio.FALLING_EDGE, read_data)
+    try:
+        while True:
+            socketio.sleep(1)
+    finally:
+        pass
+
+
+def data_thread_old(data):
     print("CStarting monitor thread")
     pi = pigpio.pi()
     if not pi.connected:
@@ -44,8 +76,8 @@ def data_thread(data):
         data['position'] = monitorData.encoderum/1000000.0
         data['force'] = monitorData.forcemN/1000.0
         data['setpoint'] = monitorData.setpoint
-        print({'time': data['time'], 'position': data['position'],
-               'force': data['force'], 'setpoint': data['setpoint']})
+        # print({'time': data['time'], 'position': data['position'],
+        #       'force': data['force'], 'setpoint': data['setpoint']})
     pi.callback(22, pigpio.FALLING_EDGE, read_spi)
     try:
         while True:
@@ -56,15 +88,31 @@ def data_thread(data):
 
 def data_transmit_thread(data):
     print("CStarting monitor thread")
+    pi = pigpio.pi()
+    if not pi.connected:
+        print("Can't connected to pigpio daemon")
+        exit()
+    # GPIO 22 set up as input. It is pulled up to stop false signals
+    pi.set_mode(data_ready, pigpio.INPUT)
+    pi.set_pull_up_down(data_ready, pigpio.PUD_OFF)
+
+    def read_data(gpio, level, tick):
+        monitorData = mSerial.getMonitorData()
+        if monitorData is None:
+            print("Error reading monitor data")
+            return
+        time = monitorData.timems/1000.0
+        position = monitorData.encoderum/1000000.0
+        force = monitorData.forcemN/1000.0
+        setpoint = monitorData.setpoint
+        print({'time': time, 'position': position,
+               'force': force, 'setpoint': setpoint})
+        # socketio.emit('data', {'time': data['time'], 'position': data['position'],
+        #                      'force': data['force'], 'setpoint': data['setpoint']}, namespace='/monitor')
+    pi.callback(data_ready, pigpio.FALLING_EDGE, read_data)
     try:
         while True:
-            socketio.sleep(0.1)
-            if data['time'] is not None:
-                socketio.emit('data', {'time': data['time'], 'position': data['position'],
-                              'force': data['force'], 'setpoint': data['setpoint']}, namespace='/monitor')
-                data['time'] = None
-            else:
-                print("No data")
+            socketio.sleep(1)
     finally:
         pass
 

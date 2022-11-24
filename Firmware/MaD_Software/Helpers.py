@@ -72,15 +72,16 @@ def loadMotionProfile():
     motionProfile.sets[0].quartetCount = 2
 
     motionProfile.sets[0].quartets[0].name = b'qrt1.qrt'
-    motionProfile.sets[0].quartets[0].function = 0
-    motionProfile.sets[0].quartets[0].parameters[0] = 20
-    motionProfile.sets[0].quartets[0].parameters[1] = 20
+    motionProfile.sets[0].quartets[1].function.id = 0
+    motionProfile.sets[0].quartets[1].function.parameters[0] = -20
+    motionProfile.sets[0].quartets[1].function.parameters[1] = 10
     motionProfile.sets[0].quartets[0].dwell = 500
+    print_ctypes_obj(motionProfile.sets[0].quartets[1].function)
 
     motionProfile.sets[0].quartets[1].name = b'qrt2.qrt'
-    motionProfile.sets[0].quartets[1].function = 0
-    motionProfile.sets[0].quartets[1].parameters[0] = -20
-    motionProfile.sets[0].quartets[1].parameters[1] = 10
+    motionProfile.sets[0].quartets[1].function.id = 0
+    motionProfile.sets[0].quartets[1].function.parameters[0] = 20
+    motionProfile.sets[0].quartets[1].function.parameters[1] = -10
     motionProfile.sets[0].quartets[1].dwell = 500
     return motionProfile
 

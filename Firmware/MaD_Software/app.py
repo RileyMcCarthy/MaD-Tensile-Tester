@@ -11,6 +11,7 @@ import cv2
 from flask_socketio import SocketIO
 from threading import Lock
 import csv
+import socket
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xef]/'
@@ -32,7 +33,7 @@ def run():
         while mSerial.getMotionMode() == 2:
             socketio.sleep(2)
         flash('Saving test data')
-        #write_flash_data()
+        # write_flash_data()
         flash('Test data is now ready!')
     if request.method == "POST":
         flash('Running Motion Profile')
@@ -42,6 +43,7 @@ def run():
             return "Status not available"
         motionProfile = loadMotionProfile()
         mSerial.setMotionProfile(motionProfile)
+        # print_ctypes_obj(motionProfile)
         mSerial.setMotionMode(2)
         mode = mSerial.getMotionMode()
         if mode != 2:
@@ -114,6 +116,8 @@ def home():
 
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
+    hostname = socket.gethostbyname(socket.gethostname())
+    print(hostname)
     connectForm = ConnectForm()
     connectForm.port.choices = list_ports()
     print("ports:"+str(connectForm.port.choices))
@@ -125,23 +129,23 @@ def connect():
                 print("failed to connect to device")
                 connectForm.port.errors.append(
                     "Failed to open specified port: " + str(connectForm.port.data))
-                return render_template("connect.html", connectForm=connectForm)
+                return render_template("connect.html", connectForm=connectForm, ip=hostname)
             print("Initializing device")
             if mSerial.initialize() == False:
                 connectForm.baud.errors.append(
                     "Failed to initialize device on " + str(mSerial.port) + " @ " + str(mSerial.baud))
-                return render_template("connect.html", connectForm=connectForm)
+                return render_template("connect.html", connectForm=connectForm, ip=hostname)
             return redirect(url_for('status'))
         else:
             print("fields not valid")
-            return render_template("connect.html", connectForm=connectForm)
+            return render_template("connect.html", connectForm=connectForm, ip=hostname)
     connectForm.port.default = mSerial.port
     connectForm.baud.default = mSerial.baud
     connectForm.process()
     print(connectForm.port.choices)
     print("selected port: " +
           mSerial.port + " @ " + str(mSerial.baud))
-    return render_template("connect.html", connectForm=connectForm)
+    return render_template("connect.html", connectForm=connectForm, ip=hostname)
 
 
 @app.route('/flashData')
