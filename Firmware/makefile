@@ -1,9 +1,9 @@
 #FlexProp
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = ~/flexprop/bin/flexcc
 LOAD = ~/flexprop/bin/loadp2
-FLEXCCFLAGS=-2 -O1 -Wall -D_DEBUG_INFO -D_DEBUG_WARNING -D_DEBUG_ERROR#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
+FLEXCCFLAGS=-2 -O1 -Wall #-D_DEBUG_INFO -D_DEBUG_WARNING -D_DEBUG_ERROR#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
 BIN = bin
 
 CATALINA="C:/Program Files (x86)/Catalina_5.1/bin/catalina.exe"

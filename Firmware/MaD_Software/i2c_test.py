@@ -1,30 +1,45 @@
 import time
+from SerialHelpers import MaD_Serial
 import pigpio
-I2C_ADDR = 0x13
-SDA = 18
-SCL = 19
+
+mSerial = MaD_Serial()
+
+data_ready = 22
 
 
-def i2c(id, tick):
-    global pi
-    print("i2c callback")
-    status, n, bytes = pi.bsc_i2c(I2C_ADDR)
-    print("got bytres:"+str(bytes))
+def data_transmit_thread():
+    print("CStarting monitor thread")
+    pi = pigpio.pi()
+    if not pi.connected:
+        print("Can't connected to pigpio daemon")
+        exit()
+    # GPIO 22 set up as input. It is pulled up to stop false signals
+    #pi.set_mode(data_ready, pigpio.INPUT)
+    #pi.set_pull_up_down(data_ready, pigpio.PUD_OFF)
+
+    # def read_data(gpio, level, tick):
+    def read_data():
+        # print("callback")
+        monitorData = mSerial.getMonitorData()
+        if monitorData is None:
+            print("Error reading monitor data")
+            return
+        time = monitorData.timems/1000.0
+        position = monitorData.encoderum/1000000.0
+        force = monitorData.forcemN/1000.0
+        setpoint = monitorData.setpoint
+        print(monitorData.log)
+        # print({'time': time, 'position': position,
+        #       'force': force, 'setpoint': setpoint, 'log': monitorData.log})
+        # socketio.emit('data', {'time': data['time'], 'position': data['position'],
+        #                      'force': data['force'], 'setpoint': data['setpoint']}, namespace='/monitor')
+    #pi.callback(data_ready, pigpio.FALLING_EDGE, read_data)
+    try:
+        while True:
+            read_data()
+            # time.sleep(1)
+    finally:
+        pass
 
 
-pi = pigpio.pi()
-if not pi.connected:
-    exit()
-pi.set_pull_up_down(SDA, pigpio.PUD_UP)
-pi.set_pull_up_down(SCL, pigpio.PUD_UP)
-# Respond to BSC slave activity
-e = pi.event_callback(pigpio.EVENT_BSC, i2c)
-pi.bsc_i2c(I2C_ADDR)  # Configure BSC as I2C slave
-
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    e.cancel()
-    pi.bsc_i2c(0)  # Disable BSC peripheral
-    pi.stop()
+data_transmit_thread()

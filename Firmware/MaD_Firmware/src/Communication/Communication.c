@@ -31,7 +31,7 @@ static bool receive(char *buf, unsigned int size)
     return true;
 }
 
-static bool send(char *buf, unsigned int size)
+static bool _send(char *buf, unsigned int size)
 {
     DEBUG_WARNING("Sending data of size: %d\n", size);
     char *bufCopy = (char *)__builtin_alloca(size);
@@ -69,7 +69,7 @@ static int flashAddress = 0;
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
     // Begin main loop
-    fds.start(57, 56, 0, 1152000);
+    fds.start(57, 56, 0, 2000000);
     while (1)
     {
         DEBUG_WARNING("Waiting for command\n");
@@ -84,13 +84,15 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             {
                 DEBUG_WARNING("pinging device back\n");
                 uint8_t res = MAD_VERSION;
-                send(&res, 1);
+                send(cmd, &res, sizeof());
                 break;
             }
             case CMD_DATA:
             {
-                DEBUG_WARNING("Sending monitor data:%f\n", monitor->data.force);
-                send(&(monitor->data), sizeof(MonitorData));
+                DEBUG_WARNING("%d,%d\n", monitor->data.timeus, monitor->data.log);
+                while (1)
+                    send(&(monitor->data), sizeof(MonitorData));
+
                 break;
             }
             case CMD_STATE:

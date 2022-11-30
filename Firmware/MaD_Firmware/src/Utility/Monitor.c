@@ -24,7 +24,7 @@ void monitor_sync_setpoint()
 static void monitor_cog(Monitor *monitor)
 {
   sync_setpoint = true;
-
+  monitor->data.log = 0;
   // Connect Force Gauge
   if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
   {
@@ -36,7 +36,7 @@ static void monitor_cog(Monitor *monitor)
   }
   // Set up encoder
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
-
+  int lastForceCount = -1;
   while (1)
   {
     MonitorData temp;
@@ -48,10 +48,20 @@ static void monitor_cog(Monitor *monitor)
 
     if (forceGauge.responding)
     {
-      temp.forceRaw = forceGauge.forceRaw;
+      if (forceGauge.counter != lastForceCount)
+      {
+        temp.forceRaw = forceGauge.forceRaw;
+        lastForceCount = forceGauge.counter;
+        temp.log = monitor->data.log + 1; // Increment when new data is added to buffer, used for checking if data is new.
+      }
+      else
+      {
+        temp.forceRaw = 0;
+      }
     }
     else
     {
+      temp.forceRaw = 0;
       printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
@@ -73,12 +83,12 @@ static void monitor_cog(Monitor *monitor)
     // these are convinience variables for the user, can be removed later
     temp.force = raw_to_force(temp.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
     temp.position = steps_to_mm(temp.encoderRaw, monitor->configuration);      // Convert steps to mm
-    temp.log = monitorLogData;
 
     monitor->data = temp;
     _pinh(39);
-    _waitus(10);
+    _waitus(30);
     _pinl(39);
+    // printf("%d\n", temp.log);
   }
 }
 

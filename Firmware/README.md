@@ -17,10 +17,29 @@ cd flexprop
 make install INSTALL=~/flexprop
 ```
 
-## Enable Serial and SPI
+## Enable Serial
 
 `sudo raspi-config`
 Go to Interface Options and enable SPI and Serial
+
+sudo nano /boot/config.txt
+add: dtoverlay = disable-bt
+sudo reboot
+
+If worked then:
+ls -l /dev/serial\*
+lrwxrwxrwx 1 root root 7 Nov 24 21:17 /dev/serial0 -> ttyAMA0
+lrwxrwxrwx 1 root root 5 Nov 24 21:17 /dev/serial1 -> ttyS0
+
+sudo nano /boot/cmdline.txt
+Remove: console=serial0,115200
+sudo reboot
+
+Disable bluetooth:
+sudo systemctl disable hciuart.service
+sudo systemctl disable bluealsa.service
+sudo systemctl disable bluetooth.service
+sudo reboot
 
 ## Install and update packages
 

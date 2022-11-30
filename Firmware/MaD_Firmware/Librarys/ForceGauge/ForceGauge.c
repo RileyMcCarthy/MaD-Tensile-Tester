@@ -87,6 +87,7 @@ static void continuous_data(void *arg)
         {
             forceGauge->responding = true;
             forceGauge->forceRaw = data;
+            forceGauge->counter++;
             data = 0;
             index = 0;
         }

@@ -30,8 +30,8 @@ class MaD_Serial:
 
     def __init__(self):
         self.started = False
-        self.port = "/dev/ttyUSB0"
-        self.baud = 1152000
+        self.port = "/dev/serial0"
+        self.baud = 2000000
         self.serial = None
         # Rlock is used as it can be acuired by the same thread multiple times
         self.lock = threading.RLock()
