@@ -47,7 +47,7 @@ double atof(const char *str)
 
 int main()
 {
-    _clkset(_SETFREQ, _CLOCKFREQ);
+    //_clkset(_SETFREQ, _CLOCKFREQ);
     mad_begin();
     while (1)
         ;

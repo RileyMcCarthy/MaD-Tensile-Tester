@@ -20,19 +20,12 @@ def getEnum(prefix):
     return options
 
 
-class ConnectForm(FlaskForm):
-    port = SelectField('Serial Port', choices=[''], validate_choice=False)
-    baud = SelectField('Baud Rate', choices=[
-                       9600, 14400, 19200, 38400, 57600, 115200, 230400, 256000], validate_choice=False)
-
-
 def FunctionForm(func, data):
     str = """
         <div class="row-xl">
             <div class="col">
         """.format(data)
     functions = getEnum('FUNC_MANUAL_')
-    print(func)
     # print("seelected: "+str(func)+", data:",+str(data))
     for index, function in enumerate(functions):
         str += '<button type="button" class="btn m-2 {}" id="{}" onclick=func_manual()>{}</button>'.format("btn-success" if index !=

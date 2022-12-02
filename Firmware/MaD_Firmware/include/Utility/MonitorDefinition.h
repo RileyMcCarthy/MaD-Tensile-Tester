@@ -15,10 +15,14 @@ typedef struct monitor_data_t
     int log;
 } MonitorData;
 
+// only important info to send to rpi
 typedef struct DataPacket_s
 {
-    MonitorData data;
-    uint8_t crc;
-} DataPacket;
+    int forcemN;         // Force in mN
+    int encoderum;       // Encoder in um
+    int setpointum;      // Setpoint in um
+    unsigned int timeus; // time in us
+    int log;
+} MonitorDataPacket;
 
 #endif

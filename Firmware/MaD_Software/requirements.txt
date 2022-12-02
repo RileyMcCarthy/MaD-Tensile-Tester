@@ -7,4 +7,4 @@ pigpio
 WTForms
 ctypesgen
 simple_websocket
-pylibmc
+eventlet

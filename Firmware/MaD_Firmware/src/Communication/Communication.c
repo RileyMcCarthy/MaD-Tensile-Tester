@@ -31,7 +31,7 @@ static bool receive(char *buf, unsigned int size)
     return true;
 }
 
-static bool _send(char *buf, unsigned int size)
+static bool send(int cmd, char *buf, unsigned int size)
 {
     DEBUG_WARNING("Sending data of size: %d\n", size);
     char *bufCopy = (char *)__builtin_alloca(size);
@@ -41,6 +41,9 @@ static bool _send(char *buf, unsigned int size)
         DEBUG_WARNING("Failed to send: buffer is empty\n");
         return false;
     }
+    fds.tx(0x55);
+    fds.tx(cmd);
+    fds.tx(size);
     for (unsigned int i = 0; i < size; i++)
     {
         fds.tx(bufCopy[i]);
@@ -50,12 +53,19 @@ static bool _send(char *buf, unsigned int size)
     return true;
 }
 
+bool hasNewData;
 static int recieveCMD()
 {
     while (1)
     {
-        while (fds.rx() != 0x55)
-            ;
+        while (fds.rxcheck() != 0x55)
+        {
+            if (hasNewData)
+            {
+                // hasNewData = false;
+                // return CMD_DATA;
+            }
+        }
         int cmd = fds.rxtime(10);
         if (cmd != -1)
         {
@@ -69,7 +79,7 @@ static int flashAddress = 0;
 void beginCommunication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
 {
     // Begin main loop
-    fds.start(57, 56, 0, 2000000);
+    fds.start(57, 56, 0, 1000000);
     while (1)
     {
         DEBUG_WARNING("Waiting for command\n");
@@ -84,64 +94,70 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             {
                 DEBUG_WARNING("pinging device back\n");
                 uint8_t res = MAD_VERSION;
-                send(cmd, &res, sizeof());
+                send(CMD_PING, &res, 1);
                 break;
             }
             case CMD_DATA:
             {
                 DEBUG_WARNING("%d,%d\n", monitor->data.timeus, monitor->data.log);
-                while (1)
-                    send(&(monitor->data), sizeof(MonitorData));
+                MonitorDataPacket packet;
+                packet.forcemN = monitor->data.forcemN;
+                packet.encoderum = monitor->data.encoderum;
+                packet.setpointum = monitor->data.setpoint;
+                packet.timeus = monitor->data.timeus;
+                packet.log = monitor->data.log;
+                // printf("%d\n", packet.timeus);
+                send(CMD_DATA, &packet, sizeof(MonitorDataPacket));
 
                 break;
             }
             case CMD_STATE:
             {
                 DEBUG_WARNING("Sending machine state\n");
-                send(machineState, sizeof(MachineState));
+                send(CMD_STATE, machineState, sizeof(MachineState));
                 break;
             }
             case CMD_MPROFILE:
             {
                 DEBUG_WARNING("Sending machine profile\n");
-                send(machineProfile, sizeof(MachineProfile));
+                send(CMD_MPROFILE, machineProfile, sizeof(MachineProfile));
                 break;
             }
             case CMD_MCONFIG:
             {
                 DEBUG_WARNING("Sending machine configuration\n");
-                send(&(machineProfile->configuration), sizeof(MachineConfiguration));
+                send(CMD_MCONFIG, &(machineProfile->configuration), sizeof(MachineConfiguration));
                 break;
             }
             case CMD_MPERFORMANCE:
             {
                 DEBUG_WARNING("Sending machine performance\n");
-                send(&(machineProfile->performance), sizeof(MachinePerformance));
+                send(CMD_MPERFORMANCE, &(machineProfile->performance), sizeof(MachinePerformance));
                 break;
             }
             case CMD_MOTIONPROFILE:
             {
                 DEBUG_WARNING("Sending motion profile\n");
-                send(&(control->motionProfile), sizeof(MotionProfile));
+                send(CMD_MOTIONPROFILE, &(control->motionProfile), sizeof(MotionProfile));
                 break;
             }
             case CMD_MOTIONMODE:
             {
                 DEBUG_WARNING("Sending motion mode\n");
-                send(&(machineState->motionParameters.mode), sizeof(MotionMode));
+                send(CMD_MOTIONMODE, &(machineState->motionParameters.mode), sizeof(MotionMode));
                 break;
             }
             case CMD_MOTIONFUNCTION:
             {
                 DEBUG_WARNING("Sending motion function and data\n");
-                send(&(machineState->_function), sizeof(int));
-                send(&(machineState->_functionData), sizeof(int));
+                send(CMD_MOTIONFUNCTION, &(machineState->_function), sizeof(int));
+                send(CMD_MOTIONFUNCTION, &(machineState->_functionData), sizeof(int));
                 break;
             }
             case CMD_MOTIONSTATUS:
             {
                 DEBUG_WARNING("Sending motion status\n");
-                send(&(machineState->motionParameters.status), sizeof(int));
+                send(CMD_MOTIONSTATUS, &(machineState->motionParameters.status), sizeof(int));
                 break;
             }
             default:

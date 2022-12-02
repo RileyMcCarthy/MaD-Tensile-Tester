@@ -30,10 +30,6 @@ add_library_search_dirs([])
 
 # No modules
 
-__uint8_t = c_ubyte# /usr/include/arm-linux-gnueabihf/bits/types.h: 38
-
-uint8_t = __uint8_t# /usr/include/arm-linux-gnueabihf/bits/stdint-uintn.h: 24
-
 # /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
 class struct_monitor_data_t(Structure):
     pass
@@ -65,24 +61,30 @@ struct_monitor_data_t._fields_ = [
 
 MonitorData = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
 
-# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
+# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 26
 class struct_DataPacket_s(Structure):
     pass
 
 struct_DataPacket_s.__slots__ = [
-    'data',
-    'crc',
+    'forcemN',
+    'encoderum',
+    'setpointum',
+    'timeus',
+    'log',
 ]
 struct_DataPacket_s._fields_ = [
-    ('data', MonitorData),
-    ('crc', uint8_t),
+    ('forcemN', c_int),
+    ('encoderum', c_int),
+    ('setpointum', c_int),
+    ('timeus', c_uint),
+    ('log', c_int),
 ]
 
-DataPacket = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
+MonitorDataPacket = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 26
 
 monitor_data_t = struct_monitor_data_t# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 16
 
-DataPacket_s = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 22
+DataPacket_s = struct_DataPacket_s# /home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/MonitorDefinition.h: 26
 
 # No inserted files
 

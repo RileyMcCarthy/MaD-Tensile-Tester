@@ -5,8 +5,9 @@ from SerialHelpers import MaD_Serial
 from Helpers import *
 import time
 import json
-from forms import ConnectForm, structure_to_form, MotionProfileForm, FunctionForm
+from forms import structure_to_form, MotionProfileForm, FunctionForm
 from flask_wtf.csrf import CSRFProtect
+from flask_wtf import FlaskForm
 import cv2
 from flask_socketio import SocketIO
 from threading import Lock
@@ -76,13 +77,15 @@ def status():
 
 @app.route('/test')
 def test():
-    # if mSerial.started == False:
-    #    app.logger.info("serial has not been started, opening connect page")
-    #    return redirect(url_for('connect'))
     profile = loadMotionProfile()
     form = structure_to_form(profile)()
     form2 = MotionProfileForm(profile)()
     return render_template("test.html", form=form, form2=form2)
+
+
+@app.route('/settings')
+def settings():
+    return render_template("settings.html")
 
 
 @app.route('/dataPage')
@@ -101,99 +104,15 @@ def home():
 
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
-    connectForm = ConnectForm()
-    connectForm.port.choices = list_ports()
-    app.logger.info("ports:"+str(connectForm.port.choices))
+    form = FlaskForm()
     if request.method == "POST":
-        if connectForm.validate():
-            app.logger.info("Connecting to device " + str(connectForm.port.data) +
-                            " @ " + str(connectForm.baud.data))
-            if mSerial.start(connectForm.port.data, connectForm.baud.data) == False:
-                app.logger.info("failed to connect to device")
-                connectForm.port.errors.append(
-                    "Failed to open specified port: " + str(connectForm.port.data))
-                return render_template("connect.html", connectForm=connectForm)
-            app.logger.info("Initializing device")
-            if mSerial.initialize() == False:
-                connectForm.baud.errors.append(
-                    "Failed to initialize device on " + str(mSerial.port) + " @ " + str(mSerial.baud))
-                return render_template("connect.html", connectForm=connectForm)
-            return redirect(url_for('status'))
-        else:
-            app.logger.info("fields not valid")
-            return render_template("connect.html", connectForm=connectForm)
-    connectForm.port.default = mSerial.port
-    connectForm.baud.default = mSerial.baud
-    connectForm.process()
-    app.logger.info(connectForm.port.choices)
-    app.logger.info("selected port: " +
-                    mSerial.port + " @ " + str(mSerial.baud))
-    return render_template("connect.html", connectForm=connectForm)
-
-
-@app.route('/flashData')
-def flashData():
-    with open("data.csv", "r") as fp:
-        csv = fp.read()
-    return Response(
-        csv,
-        mimetype="text/csv",
-        headers={"Content-disposition":
-                 "attachment; filename=myplot.csv"})
-    return output
-
-    def getData():
-        try:
-            with open("data.csv", "r") as file:
-                # time,position,force,setpoint
-                app.logger.info(file.readline())
-                csvFile = csv.reader(file, delimiter=',')
-                for data in csvFile:
-                    jsonData = json.dumps({"time": float(data[0]), "position": float(data[1]),
-                                           "force": float(data[2]), "setpoint": float(data[3])})
-                    app.logger.info(jsonData)
-                    yield f"data:{jsonData}\n\n"
-        finally:
-            yield f""
-            app.logger.info("Completed flash data stream")
-    response = Response(getData(),
-                        mimetype="text/event-stream")
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["X-Accel-Buffering"] = "no"
-    return response
-
-
-@app.route('/functionManual', methods=['GET', 'POST'])
-def functionManual():
-    # this is crashing serial, nothing happens currently
-    return ""
-    if request.method == "POST":
-        if mSerial.started == False:
-            app.logger.info("serial has not been started")
-        else:
-            app.logger.info("Running function " + request.data.function)
-            mSerial.setMotionFunction(request.data.function, 100)
-    app.logger.info("Getting current function and data")
-    info = mSerial.getMotionFunction()
-    if info is None:
-        return ""
-    func, data = info
-    app.logger.info(func)
-    app.logger.info(data)
-    return FunctionForm(func, data)
-
-
-@app.route('/ping', methods=['POST'])
-def ping():
-    if mSerial.started == False:
-        app.logger.info("serial has not been started")
-        return "Disconnected"
-    app.logger.info("Pinging Device on port " +
-                    str(mSerial.port) + " @ " + str(mSerial.baud))
-    if mSerial.getPing():
-        return "Connected"
-    else:
-        return "Disconnected"
+        app.logger.info("Attempting to connect to device")
+        if not mSerial.initialize():
+            app.logger.info("Failed to connect to device")
+            return render_template("connect.html", form=form, error="Failed to connect to device. "+"Ensure device is on and connected to "+mSerial.port+" @"+str(mSerial.baud))
+        app.logger.info("Success to connect to device")
+        return redirect(url_for('status'))
+    return render_template("connect.html", form=form, error="Ensure device is on and connected to "+mSerial.port+" @"+str(mSerial.baud))
 
 
 @app.route('/machineProfile', methods=['POST'])
@@ -206,28 +125,9 @@ def machineProfile():
     return machine_profile_to_html(deviceProfile)
 
 
-@app.route('/machineStatusStream')
-def machineStatusStream():
-    def getStatusStream():
-        try:
-            while True:
-                status = mSerial.getMachineState()
-                if status is not None:
-                    html = machine_status_to_html(status)
-                    app.logger.info("sending status")
-                    yield json.dumps({"Status": html})
-                time.sleep(1)
-        finally:
-            app.logger.info("status stream closed")
-    response = Response(stream_with_context(getStatusStream()),
-                        mimetype="text/event-stream")
-    # response.headers["Cache-Control"] = "no-cache"
-    # response.headers["X-Accel-Buffering"] = "no"
-    return response
-
-
 @app.route('/machineStatus', methods=['POST'])
 def machineStatus():
+    # @TODO should trigger a status update using status thread
     if request.method == "POST":
         app.logger.info("Getting machineStatus")
         if mSerial.started == False:
@@ -278,10 +178,6 @@ def toggleMode():
 def motionProfile():
     if request.method == "POST":
         app.logger.info("Getting motionProfile")
-        # if mSerial.started == False:
-        # app.logger.info("serial has not been started")
-        #   return "Status not available"
-        # profile = mSerial.getMotionProfile()
         profile = loadMotionProfile()
         return structure_to_html(profile)
     return "Cannot GET /motionProfile"

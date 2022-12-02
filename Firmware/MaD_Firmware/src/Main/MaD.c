@@ -30,13 +30,6 @@ void mad_begin()
     return;
   }
 
-  if (data_begin(&(monitor.data)))
-  {
-  }
-  else
-  {
-  }
-
   if (control_begin(&control, &machineProfile, &machineState, &(monitor.data)))
   {
     // printf("Control started\n");
