@@ -1,4 +1,4 @@
-from ctypes import *
+from ctypes import Structure, c_int, c_float, c_char, c_bool
 MAX_TOKENS = 200
 MAX_MACHINE_PROFILE_NAME = 20
 MAX_PATH_LENGTH = 50

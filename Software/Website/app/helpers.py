@@ -1,5 +1,6 @@
 import re
 import ctypes
+from .definitions.JSON import MachineProfile
 def print_ctypes_obj(obj, level=0):
 
     delta_indent = "    "
@@ -108,8 +109,48 @@ def ctypes_to_dict(ctypes_obj):
         elif isinstance(obj, ctypes.Array):
             return [convert(elem) for elem in obj]
         elif isinstance(obj, ctypes.c_int) and hasattr(obj, 'enum'):
-            return obj.enum[obj.value]
+            return {"enum": {"type":"{}".format(obj.__class__.__name__),"value": obj.enum[obj.value], "options": [obj.enum[e] for e in obj.enum]}}
         else:
             return obj
 
     return {field[0]: convert(getattr(ctypes_obj, field[0])) for field in ctypes_obj._fields_}
+
+
+def dict_to_ctypes(data, ctypes_struct):
+    def convert(obj, ctypes_type):
+    if hasattr(ctypes_type, "_fields_"):
+        # Structure
+        return dict_to_ctypes(obj, ctypes_type)
+    elif hasattr(ctypes_type, "_length_") and hasattr(ctypes_type, "_type_"):
+        # Array
+        # Convert string to bytes object
+        value = bytes(obj, "utf-8")
+        # Create character array from bytes object
+        return ctypes_type.from_bytes(value)
+    elif isinstance(ctypes_type, ctypes.c_int) and hasattr(ctypes_type, 'enum'):
+        return ctypes_type(ctypes_type.enum[obj["enum"]["value"]])
+    else:
+        return ctypes_type(obj)
+
+
+    if not isinstance(data, dict):
+        raise TypeError("data must be a dictionary")
+
+    #if not isinstance(ctypes_struct, ctypes.Structure):
+    #    raise TypeError("ctypes_struct must be a ctypes Structure")
+#
+    obj = ctypes_struct()
+    for field in obj._fields_:
+        setattr(obj, field[0], convert(data[field[0]], field[1]))
+    return obj
+
+    if not isinstance(data, dict):
+        raise TypeError("data must be a dictionary")
+
+    #if not isinstance(ctypes_struct, ctypes.Structure):
+    #    raise TypeError("ctypes_struct must be a ctypes Structure")
+#
+    obj = ctypes_struct()
+    for field in obj._fields_:
+        setattr(obj, field[0], convert(data[field[0]], field[1]))
+    return obj

@@ -9,7 +9,7 @@ FIRMWARE = ../../Firmware/MaD_Firmware
 
 HEADERS = $(FIRMWARE)/Librarys/JSON/JSON.h $(FIRMWARE)/include/Utility/MonitorDefinition.h $(FIRMWARE)/include/Utility/StateMachineDefinition.h $(FIRMWARE)/include/Main/Communication/CommunicationDefinition.h $(FIRMWARE)/Librarys/MotionPlanning/MotionPlanningDefinition.h
 
-MODELS := $(addprefix $(MODELBIN)/,$(HEADERS:.h=.py))
+DEFINITIONS := $(addprefix $(DEFINITIONBIN)/,$(HEADERS:.h=.py))
 
 $(VENV)/bin/activate: requirements.txt
 	python3 -m venv $(VENV)
@@ -55,7 +55,7 @@ $(MODELBIN)/%.py: $(DEFINITIONBIN)/%.py $(MODELBIN)/__init__.py
 $(DEFINITIONBIN)/%.py: %.h $(DEFINITIONBIN)/__init__.py
 	$(PYTHON) c2py.py $< -o $(DEFINITIONBIN)/$(@F)
 
-convert: $(MODELS)
+convert: $(DEFINITIONS)
 
 venv: $(VENV)/bin/activate
 

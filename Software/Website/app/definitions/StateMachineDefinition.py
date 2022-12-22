@@ -1,4 +1,4 @@
-from ctypes import *
+from ctypes import Structure, c_int, c_float, c_char, c_bool
 class State(c_int):
 	enum = {
 		0: "SELFCHECK",

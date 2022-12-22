@@ -15,8 +15,9 @@ def serial_thread():
     while True:
         data = communication.process_recieved()
         if data is not None:
-            print(f'got data: {data}')
+            #print(f'got data: {data}')
             if type(data) == MachineState:
+                #print(ctypes_to_dict(data))
                 socketio.emit('state', {'json': json.dumps(ctypes_to_dict(data))}, namespace = '/serial')
             elif type(data) == MonitorDataPacket:
                 socketio.emit('data', {'json': json.dumps(ctypes_to_dict(data))}, namespace = '/serial')
@@ -25,7 +26,7 @@ def serial_thread():
 def data_thread():
     print('starting data task')
     while True:
-        print('Sending data command')
+        #print('Sending data command')
         communication.get_data()
         socketio.sleep(0.5)
 
@@ -33,7 +34,7 @@ def state_thread():
     print('starting status task')
     number = 0
     while True:
-        print(f'Sending status command: {number}')
+        #print(f'Sending status command: {number}')
         number += 1
         communication.get_state()
         socketio.sleep(1)

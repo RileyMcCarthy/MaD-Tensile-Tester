@@ -39,6 +39,9 @@ def get_data():
 def get_state():
     serial_read(CMD_STATE)
 
+def set_machine_profile(profile):
+    serial_write(CMD_MPROFILE, profile)
+
 def process_recieved():
     # read data from serial
     res = serial_recieve()
@@ -49,5 +52,5 @@ def process_recieved():
     cmd, data = res
     packet = CMD_TYPE[cmd].from_buffer_copy(data)
 
-    print("Recieved(" + str(cmd)+"): " + str(packet))
+    #print("Recieved(" + str(cmd)+"): " + str(packet))
     return packet 

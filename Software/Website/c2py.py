@@ -208,7 +208,7 @@ args = parser.parse_args()
 with open(args.header, 'r') as f:
     data = f.read()
 
-filestr = 'from ctypes import *\n'
+filestr = 'from ctypes import Structure, c_int, c_float, c_char, c_bool\n'
 filestr += parse_defines(data)
 filestr += parse_enums(data)
 filestr += parse_structs(data)

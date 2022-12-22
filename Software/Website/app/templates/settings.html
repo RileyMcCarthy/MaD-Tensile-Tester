@@ -5,33 +5,29 @@
     <div class="container rounded">
         <h1>Motion Profile</h1>
         <div id="machineProfile"></div>
-        {% macro display_dict(dict) %}
-        <ul>
-        {% for key, value in dict.items() %}
-            {% if key[0] != "_" %}
-            <li>{{ key }}: {% if value is mapping %}{{ display_dict(value) }}{% else %}{{ value }}{% endif %}</li>
+        {% macro display_dict(dict, path) %}
+            {% for key, value in dict.items() %}
+            {% if key[0] != '_' %}
+                <div>
+                {{ key }}:
+                {% if value is mapping %}
+                    {{ display_dict(value, path + [key]) }}
+                {% else %}
+                <input type="text" name="{{ path|join('.') }}.{{ key }}" value="{{ value }}">
+                {% endif %}
+                </div>
             {% endif %}
-        {% endfor %}
-        </ul>
+            {% endfor %}
         {% endmacro %}
-        {{ display_dict(machineProfile) }}
-    </div>
-    <div class="container-border">
-        <a href="javascript: window.close()">Close</a>
+        <form method="post" action="/settings">
+            {{ display_dict(machineProfile, []) }}
+        <button type="submit">Submit</button>
+    </form>
     </div>
 </div>
 
 <script>
-    function getMachineProfile() {
-        console.log("Getting machine profile");
-        $.post("/machineProfile", {},
-            function (data) { // <- This is automatically called after the post completes successfully
-                console.log("returning:" + data)
-                $("#machineProfile").html(data);
-            });
-    };
-
-    window.onload = getMachineProfile();
+    
 </script>
 
 {% endblock %}
