@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Status{% endblock %}
+{% block content %}
+<div class="container shadow my-5 bg-white rounded">
+    <h1>Motion Profile</h1>
+    <div id="testProfile"></div>
+    <fieldset>
+        {{ form2.csrf_token }}
+        <dl>
+            {{ render_field(form2.name) }}
+            {{ render_field(form2.number) }}
+            {% for set in form2.sets %}
+            {% if form2.setCount.data >= loop.index %}
+            <div class="container form-group {% if set.form.errors %}error{% endif %}">
+                {{ render_field(set.form.name) }}
+                {{ render_field(set.form.number) }}
+                {{ render_field(set.form.type) }}
+                {{ render_field(set.form.executions) }}
+                {% for quartet in set.form.quartets %}
+                {% if set.form.quartetCount.data >= loop.index %}
+                {{ render_field(quartet.form.name) }}
+                {{ render_field(quartet.form.function.form.id) }}
+                {% for parameter in quartet.form.function.form.parameters %}
+                {{ render_field(parameter) }}
+                {% endfor %}
+                {{ render_field(quartet.form.dwell) }}
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% if form2.errors %}
+            {{form2.errors}}
+            {% endif %}
+        </dl>
+        <button class="btn btn-outline-light btn-lg px-5" type="submit">Connect</button>
+    </fieldset>
+    {{ render(form2) }}
+
+</div>
+
+<script>
+    /*function getMotionProfile() {
+        console.log("Getting motion profile");
+        $.post("/motionProfile", {},
+            function (data) { // <- This is automatically called after the post completes successfully
+                console.log("returning:" + data)
+                $("#testProfile").html(data);
+            });
+    };
+
+    window.onload = getMotionProfile();*/
+</script>
+
+{% endblock %}
