@@ -102,7 +102,7 @@ double position_quartet(double t, double position, RunMotionProfile *run, Motion
         return 0;
     }
 
-    double positionSetpoint = call_function(quartet->function.id, t - run->lastQuartetTime, quartet->function.parameters); // Get setpoint
+    double positionSetpoint = call_function(quartet->function.function, t - run->lastQuartetTime, quartet->function.parameters); // Get setpoint
     printf("posSetpoint:%f\n", positionSetpoint);
     if (abs(positionSetpoint) > abs(quartet->function.parameters[0]))
     {

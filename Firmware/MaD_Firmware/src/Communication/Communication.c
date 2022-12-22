@@ -62,8 +62,8 @@ static int recieveCMD()
         {
             if (hasNewData)
             {
-                // hasNewData = false;
-                // return CMD_DATA;
+            //      hasNewData = false;
+             //       return CMD_DATA;
             }
         }
         int cmd = fds.rxtime(10);
@@ -99,7 +99,7 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
             }
             case CMD_DATA:
             {
-                DEBUG_WARNING("%d,%d\n", monitor->data.timeus, monitor->data.log);
+                printf("%d,%d\n", monitor->data.forcemN, monitor->data.log);
                 MonitorDataPacket packet;
                 packet.forcemN = monitor->data.forcemN;
                 packet.encoderum = monitor->data.encoderum;
@@ -179,7 +179,6 @@ void beginCommunication(MachineProfile *machineProfile, MachineState *machineSta
                 if (receive(&temp, sizeof(MachineProfile)))
                 {
                     *machineProfile = temp;
-                    DEBUG_WARNING("test var:%d\n", machineProfile->number);
                 }
                 else
                 {

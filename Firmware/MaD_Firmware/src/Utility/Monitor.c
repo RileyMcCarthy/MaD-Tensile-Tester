@@ -41,7 +41,6 @@ static void monitor_cog(Monitor *monitor)
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
   while (1)
   {
-    MonitorData temp;
     bool update = false;
     if (sync_setpoint)
     {
@@ -53,14 +52,14 @@ static void monitor_cog(Monitor *monitor)
     {
       if (forceGauge.counter != monitor->data.log)
       {
-        temp.log = forceGauge.counter; // Increment when new data is added to buffer, used for checking if data is new.
+        monitor->data.log = forceGauge.counter; // Increment when new data is added to buffer, used for checking if data is new.
         update = true;
       }
-      temp.forceRaw = forceGauge.forceRaw;
+      monitor->data.forceRaw = forceGauge.forceRaw;
     }
     else
     {
-      temp.forceRaw = 0;
+      monitor->data.forceRaw = 0;
       printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
@@ -74,16 +73,15 @@ static void monitor_cog(Monitor *monitor)
       }
     }
 
-    temp.encoderRaw = encoder.value();
-    temp.timems = _getms();
-    temp.timeus = _getus();
-    temp.forcemN = raw_to_force(temp.forceRaw, monitor->configuration);
-    temp.encoderum = steps_to_um(temp.encoderRaw, monitor->configuration);
+    monitor->data.encoderRaw = encoder.value();
+    monitor->data.timems = _getms();
+    monitor->data.timeus = _getus();
+    monitor->data.forcemN = raw_to_force(monitor->data.forceRaw, monitor->configuration);
+    monitor->data.encoderum = steps_to_um(monitor->data.encoderRaw, monitor->configuration);
     // these are convinience variables for the user, can be removed later
-    temp.force = raw_to_force(temp.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
-    temp.position = steps_to_mm(temp.encoderRaw, monitor->configuration);      // Convert steps to mm
+    monitor->data.force = raw_to_force(monitor->data.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
+    monitor->data.position = steps_to_mm(monitor->data.encoderRaw, monitor->configuration);      // Convert steps to mm
 
-    monitor->data = temp;
     if (update)
     {
       hasNewData = true;

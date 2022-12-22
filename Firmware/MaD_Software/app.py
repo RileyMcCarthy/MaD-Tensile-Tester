@@ -10,29 +10,22 @@ from flask_wtf.csrf import CSRFProtect
 from flask_wtf import FlaskForm
 import cv2
 from flask_socketio import SocketIO
-from threading import Lock
-import csv
-import socket
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xef]/'
-# app.config.from_object(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+
+db = SQLAlchemy(app)
+
 socketio = SocketIO(app)
 csrf = CSRFProtect(app)
 camera = cv2.VideoCapture(-1)
-mSerial = MaD_Serial()
-
-thread = None
-thread_lock = Lock()
-
 
 @app.route('/run', methods=['POST'])
 def run():
     if request.method == "POST":
         app.logger.info("Running device motion profile")
-        if mSerial.started == False:
-            app.logger.warning("serial has not been started")
-            return "Status not available"
         # TODO: Remove this for loading from file
         motionProfile = loadMotionProfile()
         mSerial.setMotionProfile(motionProfile)
@@ -104,15 +97,7 @@ def home():
 
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
-    form = FlaskForm()
-    if request.method == "POST":
-        app.logger.info("Attempting to connect to device")
-        if not mSerial.initialize():
-            app.logger.info("Failed to connect to device")
-            return render_template("connect.html", form=form, error="Failed to connect to device. "+"Ensure device is on and connected to "+mSerial.port+" @"+str(mSerial.baud))
-        app.logger.info("Success to connect to device")
-        return redirect(url_for('status'))
-    return render_template("connect.html", form=form, error="Ensure device is on and connected to "+mSerial.port+" @"+str(mSerial.baud))
+    return render_template("connect.html")
 
 
 @app.route('/machineProfile', methods=['POST'])

@@ -1,5 +1,4 @@
 flask_socketio
-flask_socketio
 flask_wtf
 opencv_python
 pyserial
@@ -7,4 +6,6 @@ pigpio
 WTForms
 ctypesgen
 simple_websocket
+pylibmc
 eventlet
+flask_sqlalchemy

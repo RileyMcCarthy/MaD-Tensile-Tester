@@ -1,6 +1,3 @@
-#ifndef COMMDEF_H
-#define COMMDEF_H
-
 #define CMD_WRITE 128
 #define CMD_PING 0           // test communication
 #define CMD_DATA 1           // send monitor data
@@ -14,5 +11,3 @@
 #define CMD_MOTIONSTATUS 9   // send/recieve motion status
 
 #define MAD_VERSION 1
-
-#endif

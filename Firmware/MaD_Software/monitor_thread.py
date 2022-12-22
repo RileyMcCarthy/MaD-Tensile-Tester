@@ -7,7 +7,8 @@ import pigpio
 import json
 import multiprocessing
 from Helpers import crc8
-from app import mSerial
+import SerialHelpers
+import time
 
 manager = multiprocessing.Manager()
 data_dict = manager.dict()
@@ -18,35 +19,17 @@ thread_lock = RLock()
 data_ready = 22
 
 
-def data_transmit_thread():
-    print("CStarting monitor thread")
-    pi = pigpio.pi()
-    if not pi.connected:
-        print("Can't connected to pigpio daemon")
-        exit()
-
-    pi.set_mode(data_ready, pigpio.INPUT)
-    pi.set_pull_up_down(data_ready, pigpio.PUD_OFF)
-
-    def read_data(gpio, level, tick):
-        monitorData = mSerial.getMonitorData()
-        if monitorData is None:
-            print("Error reading monitor data")
-            return
-        time = monitorData.timeus/1000000.0
-        position = monitorData.encoderum/1000000.0
-        force = monitorData.forcemN/1000.0
-        setpoint = monitorData.setpointum/1000000.0
-        # print({'time': time, 'position': position,
-        #       'force': force, 'setpoint': setpoint, 'log': monitorData.log})
-        # socketio.emit('data', {'time': time, 'position': position,
-        #                       'force': force, 'setpoint': setpoint}, namespace='/monitor')
-    pi.callback(data_ready, pigpio.FALLING_EDGE, read_data)
-    try:
-        while True:
-            socketio.sleep(1)
-    finally:
-        pass
+def data_thread(serial, quit):
+    # Thread to manage the serial port
+    while not quit.is_set():
+        try:
+            serial.parse_packet()
+            monitorData = serial.rx.pop(serial.CMD_DATA, None)
+            if monitorData is not None:
+                pass
+                # print(str(monitorData.timeus)+" "+str(monitorData.log))
+        except Exception as error:
+            print("Exception in serial thread: " + str(error))
 
 
 @socketio.on('connect', namespace='/monitor')
@@ -57,7 +40,7 @@ def connect():
     # with thread_lock:
     #    if thread is None:
     #        thread = socketio.start_background_task(
-    #            data_transmit_thread)
+    #            manage_serial, mSerial)
 
 
 @socketio.on('disconnect', namespace='/monitor')

@@ -1,5 +1,3 @@
-#ifndef MONITORDEFINITION_H
-#define MONITORDEFINITION_H
 #include "stdint.h"
 typedef struct monitor_data_t
 {
@@ -16,7 +14,7 @@ typedef struct monitor_data_t
 } MonitorData;
 
 // only important info to send to rpi
-typedef struct DataPacket_s
+typedef struct MonitorDataPacket
 {
     int forcemN;         // Force in mN
     int encoderum;       // Encoder in um
@@ -24,5 +22,3 @@ typedef struct DataPacket_s
     unsigned int timeus; // time in us
     int log;
 } MonitorDataPacket;
-
-#endif

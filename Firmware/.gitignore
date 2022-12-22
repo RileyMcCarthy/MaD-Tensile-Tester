@@ -1,7 +1,11 @@
 win
 bin
 *.o
-MaD_Software/__pycache__
-MaD_Software/__pycache__/*
-MaD_Software/flask_session
+*.pyc
+*.code-workspace
+**/__pycache__/
+**/venv/
+MaD_Software/definitions/__pycache__/
+MaD_Software/flask_session/
+MaD_Software/data_cache.csv
 ctypes_*

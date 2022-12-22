@@ -84,4 +84,4 @@ nano ~/.config/lxsession/LXDE-pi/autostart
 ```
 
 in nano add:
-`chromium-browser --noerrdialogs --disable-infobars --incognito --kiosk http://localhost:8080/`
+`chromium-browser --noerrdialogs --disable-infobars --incognito --kiosk http://localhost:5000/`

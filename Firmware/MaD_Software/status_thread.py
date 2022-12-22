@@ -1,6 +1,6 @@
 from Helpers import machine_status_to_html
 from threading import RLock, Event, Lock
-from app import socketio, mSerial
+from app import socketio
 
 thread = None
 thread_lock = RLock()
@@ -8,23 +8,22 @@ thread_event = Event()
 clients = 0
 
 
-def task_thread():
-    try:
-        while thread_event.is_set():
-            try:
-                status = mSerial.getMachineState()
-                if status is not None:
-                    html = machine_status_to_html(status)
-                    socketio.emit('data', {'html': html}, namespace='/status')
-            except:
-                pass
-            socketio.sleep(1)
-    finally:
-        pass
-
-
 @socketio.on('connect', namespace='/status')
 def connect():
+    def task_thread():
+        try:
+            while thread_event.is_set():
+                try:
+                    status = mSerial.getMachineState()
+                    if status is not None:
+                        html = machine_status_to_html(status)
+                        socketio.emit(
+                            'data', {'html': html}, namespace='/status')
+                except:
+                    pass
+                socketio.sleep(1)
+        finally:
+            pass
     socketio.sleep(1)
     global clients
     clients += 1

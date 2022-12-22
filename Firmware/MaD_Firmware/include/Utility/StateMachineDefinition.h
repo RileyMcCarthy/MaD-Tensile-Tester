@@ -1,25 +1,22 @@
-#ifndef STATEMACHINEDEFINITION
-#define STATEMACHINEDEFINITION
-
 #include <stdbool.h>
 
-typedef enum States_e
+typedef enum State
 {
     STATE_SELFCHECK,
     STATE_MACHINECHECK,
     STATE_MOTION
 } State;
 
-typedef enum MotionStatus_e
+typedef enum MotionStatus
 {
-    MOTIONSTATUS_DISABLED,      // Motion is disabled
+    MOTIONSTATUS_DISABLED,
     MOTIONSTATUS_ENABLED,       // Motion is enabled
     MOTIONSTATUS_SAMPLE_LIMIT,  // Motion is enabled but limited by condition (ie. length, force)
     MOTIONSTATUS_MACHINE_LIMIT, // Motion is enabled but limited by condition (ie. tension, compression, travel upper/lower, door)
     MOTIONSTATUS_FAULTED        // Motion is disabled due to fault (ie. ESD switch, ESD travel)
 } MotionStatus;
 
-typedef enum MotionOverTravel_e
+typedef enum MotionOverTravel
 {
     MOTION_LIMIT_OK,    // No limit
     MOTION_LIMIT_UPPER, // Upper limit
@@ -30,7 +27,7 @@ typedef enum MotionOverTravel_e
  * @brief Motion conditions ordered from most to least critical.
  *
  */
-typedef enum MotionCondition_e
+typedef enum MotionCondition
 {
     CONDITION_LENGTH,      // Test sample maximum length exceeded
     CONDITION_FORCE,       // Test sample maximum force exceeded
@@ -43,14 +40,14 @@ typedef enum MotionCondition_e
     CONDITION_MOVING,      // Motion is moving
 } MotionCondition;
 
-typedef enum MotionMode_e
+typedef enum MotionMode
 {
     MODE_MANUAL, // Manual mode
     MODE_TEST,   // Test mode
     MODE_TEST_RUNNING
 } MotionMode;
 
-typedef enum ModeFunctions_e
+typedef enum ModeFunctions
 {
     FUNC_MANUAL_OFF,               // Terminates current motion
     FUNC_MANUAL_INCREMENTAL_JOG,   // Jog by incremental amount
@@ -65,12 +62,12 @@ typedef enum ModeFunctions_e
     FUNC_TEST_TOGGLE_HOLD_RESUME   // Toggle hold/resume
 } ModeFunctions;
 
-typedef struct SelfCheck_t
+typedef struct SelfCheckParameters
 {
     bool chargePump; // Charge pump signal is activated, self check is satisfied. StateMachine, working
 } SelfCheckParameters;
 
-typedef struct MachineCheck_t
+typedef struct MachineCheckParameters
 {
     bool switchedPower;              // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. implemented, changed to GPI12
     MotionOverTravel esdTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
@@ -82,7 +79,7 @@ typedef struct MachineCheck_t
 
 } MachineCheckParameters;
 
-typedef struct Motion_t
+typedef struct MotionParameters
 {
     MotionStatus status;       // internal and external
     MotionCondition condition; // internal and external
@@ -90,7 +87,7 @@ typedef struct Motion_t
 } MotionParameters;
 
 //@TODO use lock for this struct (built into flexprop)
-typedef struct MachineState_t
+typedef struct MachineState
 {
     State state;
     SelfCheckParameters selfCheckParameters;
@@ -101,7 +98,7 @@ typedef struct MachineState_t
     int _lock;
 } MachineState;
 
-typedef enum parameters_e
+typedef enum Parameter
 {
     PARAM_SELF_CHARGE_PUMP,
     PARAM_MACHINE_SWITCHED_POWER,
@@ -116,5 +113,3 @@ typedef enum parameters_e
     PARAM_MOTION_MODE,
     PARAM_FUNCTION
 } Parameter;
-
-#endif
