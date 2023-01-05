@@ -105,9 +105,6 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <!--<img src="{{ url_for('video_feed') }}" width="100%" class="img-fluid">-->
-    </div>
 </div>
 
 
@@ -447,20 +444,20 @@
             machineCheck = json.machineCheckParameters;
             update_header("machineCheckParameters", json.state!="SELFCHECK"&&json.state!="MACHINECHECK");
             update_boolean("switchedPower", machineCheck.switchedPower);
-            update_value("esdTravelLimit", machineCheck.esdTravelLimit.enum.value);
+            update_value("esdTravelLimit", machineCheck.esdTravelLimit);
             update_boolean("esdSwitch", machineCheck.esdSwitch);
             update_boolean("servoOK", machineCheck.servoOK);
             update_boolean("forceGaugeCom", machineCheck.forceGaugeCom);
             update_boolean("servoCom", machineCheck.servoCom);
 
             motionParameters = json.motionParameters;
-            update_value("status", motionParameters.status.enum.value);
-            update_value("condition", motionParameters.condition.enum.value);
-            update_value("mode", motionParameters.mode.enum.value);
+            update_value("status", motionParameters.status);
+            update_value("condition", motionParameters.condition);
+            update_value("mode", motionParameters.mode);
 
-            $("#status").html(motionParameters.status.enum.value);
-            $("#condition").html(motionParameters.condition.enum.value);
-            $("#mode").html(motionParameters.mode.enum.value);
+            $("#status").html(motionParameters.status);
+            $("#condition").html(motionParameters.condition);
+            $("#mode").html(motionParameters.mode);
             $("#status").prop('disabled', "MOTION".localeCompare(json.state));
         });
 

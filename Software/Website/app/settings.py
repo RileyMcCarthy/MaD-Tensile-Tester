@@ -1,21 +1,36 @@
-from flask import render_template, request
-from .definitions.JSON import MachineProfile
+from flask import render_template, request, jsonify, Response
+from .definitions.JSON import MachineProfile, MachinePerformance, MachineProfileForm
 from .helpers import ctypes_to_dict,dict_to_ctypes, loadMachineProfile
-
+from werkzeug.datastructures import MultiDict
 from app import app, socketio
 import app.communication as communication
+from .helpers import flatten_dict, unflatten_dict
 
-@app.route('/settings', methods=['GET', 'POST'])
+@app.route('/settings', methods=['GET'])
 def settings():
-    my_dict = ctypes_to_dict(loadMachineProfile())
-    if request.method == 'POST':
-        for key, value in request.form.items():
-            parts = key.split('.')
-            d = my_dict
-            for p in parts[:-1]:
-                if p in d:
-                    d = d[p]
-            d[parts[-1]] = value
-    communication.set_machine_profile(dict_to_ctypes(my_dict, MachineProfile))
-    print(my_dict)
-    return render_template('settings.html', machineProfile=my_dict)
+    form = MachineProfileForm()
+    return render_template('settings.html',form=form, editable=False)
+
+@app.route('/settings', methods=['POST'])
+def settings_save():
+    form = MachineProfileForm()
+    if form.validate_on_submit():
+        result = unflatten_dict(request.form.to_dict())
+        mp = MachineProfile()
+        mp.setdict(result)
+        communication.set_machine_profile(mp)
+    else:
+        return Response(jsonify(flatten_dict(form.errors)), status=400)
+    return Response('success')
+
+@app.route('/settings/edit', methods=['GET'])
+def settings_edit():
+    form = MachineProfileForm()
+    return render_template('settings.html', form=form, editable=True)
+
+@app.route('/settings/defaults', methods=['GET', 'POST'])
+def settings_default():
+    mp = loadMachineProfile().getdict()
+    form = MachineProfileForm()
+    form.process(data=mp)
+    return render_template('settings.html', form=form, editable=True)

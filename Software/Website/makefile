@@ -25,38 +25,20 @@ clean:
 	rm -rf $(VENV)
 	find -iname "*.pyc" -delete
 	rm -rf __pycache__
-
-venv: clean $(VENV)/bin/activate
-
-dbinit:
-	. $(ACTIVATE); export FLASK_APP=MaD.py; flask db init
-	. $(ACTIVATE); export FLASK_APP=MaD.py; flask db migrate
-	. $(ACTIVATE); export FLASK_APP=MaD.py; flask db upgrade
-
-dbmigrate:
-	. $(ACTIVATE); export FLASK_APP=MaD.py; flask db migrate
-	. $(ACTIVATE); export FLASK_APP=MaD.py; flask db upgrade
 	
 $(DEFINITIONBIN):
 	mkdir -p $@
 
-$(MODELBIN):
-	mkdir -p $@
-
 $(DEFINITIONBIN)/__init__.py: $(DEFINITIONBIN)
 	touch $@
-
-$(MODELBIN)/__init__.py: $(MODELBIN)
-	touch $@
-
-$(MODELBIN)/%.py: $(DEFINITIONBIN)/%.py $(MODELBIN)/__init__.py
-	$(PYTHON) struct2model.py $(addprefix app.definitions.,$(@F:.py=)) -o $(MODELBIN)/$(@F)
 
 $(DEFINITIONBIN)/%.py: %.h $(DEFINITIONBIN)/__init__.py
 	$(PYTHON) c2py.py $< -o $(DEFINITIONBIN)/$(@F)
 
 convert: $(DEFINITIONS)
 
+venvc: clean $(VENV)/bin/activate
 venv: $(VENV)/bin/activate
+	$(PIP) install -r requirements.txt
 
 generate: clean venv convert dbmigrate

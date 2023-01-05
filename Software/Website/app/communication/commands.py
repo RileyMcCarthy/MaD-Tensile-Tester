@@ -28,7 +28,7 @@ CMD_TYPE = {
 }
 
 def start():
-    return serial_init(CMD_TYPE)
+    return serial_init()
 
 def get_ping():
     serial_read(CMD_PING)
@@ -41,6 +41,9 @@ def get_state():
 
 def set_machine_profile(profile):
     serial_write(CMD_MPROFILE, profile)
+
+def get_machine_profile():
+    serial_read(CMD_MPROFILE)
 
 def process_recieved():
     # read data from serial

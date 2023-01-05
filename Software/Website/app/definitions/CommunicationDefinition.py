@@ -1,4 +1,6 @@
 from ctypes import Structure, c_int, c_float, c_char, c_bool
+from wtforms import BooleanField,IntegerField, StringField,FloatField, PasswordField, validators, SelectField, SubmitField, FormField, FieldList
+from flask_wtf import FlaskForm
 CMD_WRITE = 128
 CMD_PING = 0           # test communication
 CMD_DATA = 1           # send monitor data

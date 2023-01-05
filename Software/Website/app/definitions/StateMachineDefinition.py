@@ -1,4 +1,6 @@
 from ctypes import Structure, c_int, c_float, c_char, c_bool
+from wtforms import BooleanField,IntegerField, StringField,FloatField, PasswordField, validators, SelectField, SubmitField, FormField, FieldList
+from flask_wtf import FlaskForm
 class State(c_int):
 	enum = {
 		0: "SELFCHECK",
@@ -71,10 +73,22 @@ class SelfCheckParameters(Structure):
         ("chargePump", c_bool),
     ]
 
+    def setdict(self, d):
+        self.chargePump = bool(d["chargePump"])
+        
+
+    def getdict(self):
+        return {
+            "chargePump": self.chargePump,
+        }
+
+class SelfCheckParametersForm(FlaskForm):
+    chargePump = BooleanField("chargePump",validators=[validators.DataRequired()])
+
 class MachineCheckParameters(Structure):
     _fields_ = [
         ("switchedPower", c_bool),
-        ("esdTravelLimit", MotionOverTravel),
+        ("esdTravelLimit", c_int),
         ("esdSwitch", c_bool),
         ("servoOK", c_bool),
         ("forceGaugeCom", c_bool),
@@ -82,21 +96,99 @@ class MachineCheckParameters(Structure):
         ("rtcCom", c_bool),
     ]
 
+    def setdict(self, d):
+        self.switchedPower = bool(d["switchedPower"])
+        self.esdTravelLimit = int(d["esdTravelLimit"])
+        self.esdSwitch = bool(d["esdSwitch"])
+        self.servoOK = bool(d["servoOK"])
+        self.forceGaugeCom = bool(d["forceGaugeCom"])
+        self.servoCom = bool(d["servoCom"])
+        self.rtcCom = bool(d["rtcCom"])
+        
+
+    def getdict(self):
+        return {
+            "switchedPower": self.switchedPower,
+            "esdTravelLimit": self.esdTravelLimit,
+            "esdSwitch": self.esdSwitch,
+            "servoOK": self.servoOK,
+            "forceGaugeCom": self.forceGaugeCom,
+            "servoCom": self.servoCom,
+            "rtcCom": self.rtcCom,
+        }
+
+class MachineCheckParametersForm(FlaskForm):
+    switchedPower = BooleanField("switchedPower",validators=[validators.DataRequired()])
+    esdTravelLimit = IntegerField("esdTravelLimit",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    esdSwitch = BooleanField("esdSwitch",validators=[validators.DataRequired()])
+    servoOK = BooleanField("servoOK",validators=[validators.DataRequired()])
+    forceGaugeCom = BooleanField("forceGaugeCom",validators=[validators.DataRequired()])
+    servoCom = BooleanField("servoCom",validators=[validators.DataRequired()])
+    rtcCom = BooleanField("rtcCom",validators=[validators.DataRequired()])
+
 class MotionParameters(Structure):
     _fields_ = [
-        ("status", MotionStatus),
-        ("condition", MotionCondition),
-        ("mode", MotionMode),
+        ("status", c_int),
+        ("condition", c_int),
+        ("mode", c_int),
     ]
+
+    def setdict(self, d):
+        self.status = int(d["status"])
+        self.condition = int(d["condition"])
+        self.mode = int(d["mode"])
+        
+
+    def getdict(self):
+        return {
+            "status": self.status,
+            "condition": self.condition,
+            "mode": self.mode,
+        }
+
+class MotionParametersForm(FlaskForm):
+    status = IntegerField("status",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    condition = IntegerField("condition",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    mode = IntegerField("mode",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MachineState(Structure):
     _fields_ = [
-        ("state", State),
+        ("state", c_int),
         ("selfCheckParameters", SelfCheckParameters),
         ("machineCheckParameters", MachineCheckParameters),
         ("motionParameters", MotionParameters),
-        ("_function", ModeFunctions),
+        ("_function", c_int),
         ("_functionData", c_int),
         ("_lock", c_int),
     ]
+
+    def setdict(self, d):
+        self.state = int(d["state"])
+        self.selfCheckParameters.setdict(d["selfCheckParameters"])
+        self.machineCheckParameters.setdict(d["machineCheckParameters"])
+        self.motionParameters.setdict(d["motionParameters"])
+        self._function = int(d["_function"])
+        self._functionData = int(d["_functionData"])
+        self._lock = int(d["_lock"])
+        
+
+    def getdict(self):
+        return {
+            "state": self.state,
+            "selfCheckParameters": self.selfCheckParameters.getdict(),
+            "machineCheckParameters": self.machineCheckParameters.getdict(),
+            "motionParameters": self.motionParameters.getdict(),
+            "_function": self._function,
+            "_functionData": self._functionData,
+            "_lock": self._lock,
+        }
+
+class MachineStateForm(FlaskForm):
+    state = IntegerField("state",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    selfCheckParameters = FormField(SelfCheckParametersForm)
+    machineCheckParameters = FormField(MachineCheckParametersForm)
+    motionParameters = FormField(MotionParametersForm)
+    _function = IntegerField("_function",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    _functionData = IntegerField("_functionData",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    _lock = IntegerField("_lock",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
 

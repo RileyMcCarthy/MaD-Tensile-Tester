@@ -6,14 +6,11 @@ SYNC_BYTE = 0x55
 WRITE_BYTE = 128
 READ_BYTE = 0x00
 
-commands = None
 serial = None
 lock = RLock()
 
-def serial_init(cmds, port = "/dev/serial0", baud = 1000000):
-    global commands
+def serial_init(port = "/dev/serial0", baud = 1000000):
     global serial
-    commands = cmds
     try:
         if serial is not None and serial.isOpen():
             serial.close()
@@ -63,11 +60,6 @@ def serial_recieve():
         print("Exception reading command byte: " + str(err))
         return None
 
-    # check if the command is valid
-    if cmd not in commands:
-        print("Invalid command byte: " + str(cmd))
-        return None
-
     # read the data length
     length = None
     try:
@@ -114,9 +106,6 @@ def send(cmd, data):
     with lock:
         if (serial == None):
             print("Serial is not initialized")
-            return
-        if cmd not in commands:
-            print("Invalid command: " + str(cmd))
             return
         try:
             serial.write(bytearray([SYNC_BYTE, cmd]))

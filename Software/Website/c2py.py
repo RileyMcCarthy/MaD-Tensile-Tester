@@ -19,6 +19,58 @@ ctype_map = {
     'bool': 'c_bool',
 }
 
+# a mapping of ctypes to python data types
+python_map = {
+    'c_char': 'str',
+    'c_short': 'int',
+    'c_int': 'int',
+    'c_long': 'int',
+    'c_longlong': 'int',
+    'c_ubyte': 'int',
+    'c_ushort': 'int',
+    'c_uint': 'int',
+    'c_ulong': 'int',
+    'c_ulonglong': 'int',
+    'c_float': 'float',
+    'c_void_p': 'str',
+    'c_bool': 'bool',
+}
+
+# a mapping of ctypes data types to wtforms data types
+wtform_map = {
+    'c_char': 'StringField',
+    'c_short': 'IntegerField',
+    'c_int': 'IntegerField',
+    'c_long': 'IntegerField',
+    'c_longlong': 'IntegerField',
+    'c_ubyte': 'IntegerField',
+    'c_ushort': 'IntegerField',
+    'c_uint': 'IntegerField',
+    'c_ulong': 'IntegerField',
+    'c_ulonglong': 'IntegerField',
+    'c_float': 'FloatField',
+    'c_void_p': 'StringField',
+    'c_bool': 'BooleanField',
+}
+
+# map of ctype data types to validators, limiting the range of values to 32 bit and arrays to a placeholder
+validator_map = {
+    'c_char': ',validators=[validators.DataRequired(), validators.Length(min=0, max=32)]',
+    'c_short': ',validators=[validators.DataRequired(), validators.NumberRange(min=-32768, max=32767)]',
+    'c_int': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_long': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_longlong': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_ubyte': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=255)]',
+    'c_ushort': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=65535)]',
+    'c_uint': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
+    'c_ulong': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
+    'c_ulonglong': 'v,alidators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
+    'c_float': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_void_p': ',validators=[validators.DataRequired(), validators.Length(min=0, max=32)]',
+    'c_bool': ',validators=[validators.DataRequired()]',
+}
+    
+
 
 def parse_defines(data):
     # the regular expression to match #define statements with a non-empty value
@@ -151,10 +203,24 @@ def parse_structs(data):
         # skip this structure if it has already been defined
         if struct_name in defined_structs:
             continue
+        
+        # add the structure to the set of defined structures
+        defined_structs.add(struct_name)
+        print(defined_structs)
 
         # generate the class definition for the structure
         output_string += f'class {struct_name}(Structure):\n'
         output_string += '    _fields_ = [\n'
+
+        # Generate setdict() function
+        setdict_string = '    def setdict(self, d):\n'
+
+        # Generate getdict() function
+        getdict_string = '    def getdict(self):\n'
+        getdict_string += '        return {\n'
+
+        # Generate a class of type FlaskForm that has all the fields
+        form_string = f'class {struct_name}Form(FlaskForm):\n'
 
         # find all fields in the structure definition
         fields = field_regex.finditer(struct_def)
@@ -170,12 +236,8 @@ def parse_structs(data):
             # the default value of the field
             field_default = field.group(4)
 
-            # map the C type to a ctypes data type
-            ctype = ctype_map.get(field_type, field_type)
-
-            # if the field type is a structure, add the structure to the set of defined structures
-            if ctype in struct_regex.findall(data):
-                defined_structs.add(ctype)
+            # map the C type to a ctypes data type, if not found might be an enum. Default c_int
+            ctype = ctype_map.get(field_type, 'c_int')
 
             # add the array dimensions to the ctype
             if field_dims:
@@ -184,11 +246,54 @@ def parse_structs(data):
             # add the field definition to the output string
             if field_default:
                 output_string += f'        ("{field_name}", {ctype}, {field_default}),\n'
+            elif field_type in defined_structs:
+                output_string += f'        ("{field_name}", {field_type}),\n'
             else:
                 output_string += f'        ("{field_name}", {ctype}),\n'
 
+            # add the field definition to the setdict() function
+            python_type = python_map.get(ctype, 'int')
+            if "c_char *" in ctype:
+                setdict_string += '        self.' + field_name + ' = str(d["' + field_name + '"]).encode("utf-8")\n'
+            elif field_type in defined_structs:
+                setdict_string += '        self.' + field_name + '.setdict(d["' + field_name + '"])\n'
+            else:
+                setdict_string += '        self.' + field_name + ' = ' + python_type + '(d["' + field_name + '"])\n'
+
+            # add the field definition to the getdict() function
+            if "c_char *" in ctype:
+                getdict_string += '            "' + field_name + '": self.' + field_name + '.decode("utf-8"),\n'
+            elif field_type in defined_structs:
+                getdict_string += '            "' + field_name + '": self.' + field_name + '.getdict(),\n'
+            else:
+                getdict_string += '            "' + field_name + '": self.' + field_name + ',\n'
+            
+            # create the validator type if needed validators=[Length(max=' + field_dims + ')]
+            if "c_char *" in ctype:
+                validator = ', validators=[validators.Length(max=' + field_dims + ')]'
+            else:
+                validator = validator_map.get(ctype, '')
+
+            # add the field definition to the form class
+            if field_type in defined_structs:
+                form_string += f'    {field_name} = FormField({field_type}Form)\n'
+            else:
+                wtformtype = wtform_map.get(ctype, 'StringField')
+                form_string += f'    {field_name} = {wtformtype}("{field_name}"{validator})\n'
+
+
+        # add the closing bracket and newline to the getdict string
+        setdict_string += '        \n\n'
+        getdict_string += '        }\n\n'
+        form_string += '\n'
+
         # add the closing bracket and newline to the output string
         output_string += '    ]\n\n'
+        output_string += setdict_string
+        output_string += getdict_string
+        output_string += form_string
+
+
     return output_string
 
 
@@ -209,6 +314,8 @@ with open(args.header, 'r') as f:
     data = f.read()
 
 filestr = 'from ctypes import Structure, c_int, c_float, c_char, c_bool\n'
+filestr += 'from wtforms import BooleanField,IntegerField, StringField,FloatField, PasswordField, validators, SelectField, SubmitField, FormField, FieldList\n'
+filestr += 'from flask_wtf import FlaskForm\n'
 filestr += parse_defines(data)
 filestr += parse_enums(data)
 filestr += parse_structs(data)

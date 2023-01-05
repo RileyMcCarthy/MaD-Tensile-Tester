@@ -1,5 +1,5 @@
 # sql/types_api.py
-# Copyright (C) 2005-2022 the SQLAlchemy authors and contributors
+# Copyright (C) 2005-2023 the SQLAlchemy authors and contributors
 # <see AUTHORS file>
 #
 # This module is part of SQLAlchemy and is released under
@@ -542,6 +542,11 @@ class TypeEngine(Traversible):
          of the given name is in use.
         :param dialect_name: base name of the dialect which uses
          this type. (i.e. ``'postgresql'``, ``'mysql'``, etc.)
+
+        .. seealso::
+
+            :ref:`types_with_variant` - illustrates the use of
+            :meth:`_types.TypeEngine.with_variant`.
 
         """
         return Variant(self, {dialect_name: to_instance(type_)})

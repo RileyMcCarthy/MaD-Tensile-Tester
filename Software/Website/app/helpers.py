@@ -1,6 +1,8 @@
 import re
 import ctypes
 from .definitions.JSON import MachineProfile
+from collections.abc import MutableMapping
+
 def print_ctypes_obj(obj, level=0):
 
     delta_indent = "    "
@@ -102,55 +104,67 @@ def loadMachineProfile():
 
     return machineProfile
 
-def ctypes_to_dict(ctypes_obj):
-    def convert(obj):
-        if isinstance(obj, ctypes.Structure):
-            return ctypes_to_dict(obj)
-        elif isinstance(obj, ctypes.Array):
-            return [convert(elem) for elem in obj]
-        elif isinstance(obj, ctypes.c_int) and hasattr(obj, 'enum'):
-            return {"enum": {"type":"{}".format(obj.__class__.__name__),"value": obj.enum[obj.value], "options": [obj.enum[e] for e in obj.enum]}}
+#def ctypes_to_dict(ctypes_obj):
+##    def convert(obj):
+#        if issubclass(obj, ctypes.Structure):
+#            return ctypes_to_dict(obj)
+#        elif issubclass(obj, ctypes.Array):
+#            return [convert(elem) for elem in obj]
+#        elif issubclass(obj, ctypes.c_int) and hasattr(obj, 'enum'):
+#            return {"enum": {"type":"{}".format(obj.__class__.__name__),"value": obj.enum[obj.value], "options": [obj.enum[e] for e in obj.enum]}}
+#        else:
+#            print(obj)
+#            print(type(obj))
+#            return obj.value
+
+#    return {field_name: convert(getattr(ctypes_obj, field_name)) for field_name, field_type in ctypes_obj._fields_}
+
+def ctypes_to_dict(ctypes_structure):
+    result = {}
+    for field_name, field_type in ctypes_structure._fields_:
+        value = getattr(ctypes_structure, field_name)
+        print(field_name+"("+str(field_type)+")"+" = "+str(value)+"("+str(type(value))+")")
+        if issubclass(field_type, ctypes.Structure):
+            result[field_name] = ctypes_to_dict(value)
+        elif issubclass(field_type, ctypes.Array):
+            result[field_name] = list(value)
         else:
-            return obj
+            result[field_name] = value
+    return result
 
-    return {field[0]: convert(getattr(ctypes_obj, field[0])) for field in ctypes_obj._fields_}
-
-
-def dict_to_ctypes(data, ctypes_struct):
-    def convert(obj, ctypes_type):
-    if hasattr(ctypes_type, "_fields_"):
-        # Structure
-        return dict_to_ctypes(obj, ctypes_type)
-    elif hasattr(ctypes_type, "_length_") and hasattr(ctypes_type, "_type_"):
-        # Array
-        # Convert string to bytes object
-        value = bytes(obj, "utf-8")
-        # Create character array from bytes object
-        return ctypes_type.from_bytes(value)
-    elif isinstance(ctypes_type, ctypes.c_int) and hasattr(ctypes_type, 'enum'):
-        return ctypes_type(ctypes_type.enum[obj["enum"]["value"]])
-    else:
-        return ctypes_type(obj)
-
-
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
-
-    #if not isinstance(ctypes_struct, ctypes.Structure):
-    #    raise TypeError("ctypes_struct must be a ctypes Structure")
-#
-    obj = ctypes_struct()
-    for field in obj._fields_:
-        setattr(obj, field[0], convert(data[field[0]], field[1]))
+def dict_to_ctypes(ctypes_struct_class, data):
+    obj = ctypes_struct_class()
+    for field_name, field_type in obj._fields_:
+        value = data[field_name]
+        print(field_name+"("+str(field_type)+")"+" = "+str(value)+"("+str(type(value))+")")
+        if issubclass(field_type, ctypes.Array):
+            setattr(obj, field_name, field_type(*value))
+        elif issubclass(field_type, ctypes.Structure):
+            setattr(obj, field_name, dict_to_ctypes(field_type, value))
+        elif hasattr(obj, 'enum'):
+            setattr(obj, field_name, field_type(field_type.enum[value["enum"]["value"]]))
+        else:
+            setattr(obj, field_name, field_type(value))
     return obj
 
-    if not isinstance(data, dict):
-        raise TypeError("data must be a dictionary")
+def unflatten_dict(d):
+    result = {}
+    for key, value in d.items():
+        parts = key.split('-')
+        d = result
+        for part in parts[:-1]:
+            if part not in d:
+                d[part] = {}
+            d = d[part]
+        d[parts[-1]] = value
+    return result
 
-    #if not isinstance(ctypes_struct, ctypes.Structure):
-    #    raise TypeError("ctypes_struct must be a ctypes Structure")
-#
-    obj = ctypes_struct()
-    for field in obj._fields_:
-        setattr(obj, field[0], convert(data[field[0]], field[1]))
-    return obj
+def flatten_dict(d, parent_key='', sep='-'):
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, MutableMapping):
+            items.extend(flatten_dict(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)

@@ -1,6 +1,5 @@
 flask_socketio
 flask_wtf
-opencv_python
 pyserial
 pigpio
 WTForms
@@ -10,3 +9,4 @@ pylibmc
 eventlet
 flask_sqlalchemy
 flask_migrate
+Werkzeug
