@@ -18,6 +18,18 @@ static MachineState machineState;
  */
 void mad_begin()
 {
+  int delay = 1;
+  // printf("Starting MaD\n");
+  //_pinl(PIN_SERVO_ENA); // does nothing... yet
+  //_pinl(PIN_SERVO_DIR); // pinh is cw, pinl is ccw
+  //while(1)
+  //{
+  //  _pinl(PIN_SERVO_PUL);
+  //  _waitms(delay);
+  //  _pinh(PIN_SERVO_PUL);
+  //  _waitms(delay);
+  //}
+
   machine_state_init(&machineState);
 
   if (monitor_begin(&monitor, &machineState, &(machineProfile.configuration), 10))

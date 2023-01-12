@@ -55,18 +55,18 @@ wtform_map = {
 
 # map of ctype data types to validators, limiting the range of values to 32 bit and arrays to a placeholder
 validator_map = {
-    'c_char': ',validators=[validators.DataRequired(), validators.Length(min=0, max=32)]',
-    'c_short': ',validators=[validators.DataRequired(), validators.NumberRange(min=-32768, max=32767)]',
-    'c_int': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
-    'c_long': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
-    'c_longlong': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
-    'c_ubyte': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=255)]',
-    'c_ushort': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=65535)]',
-    'c_uint': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
-    'c_ulong': ',validators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
-    'c_ulonglong': 'v,alidators=[validators.DataRequired(), validators.NumberRange(min=0, max=4294967295)]',
-    'c_float': ',validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)]',
-    'c_void_p': ',validators=[validators.DataRequired(), validators.Length(min=0, max=32)]',
+    'c_char': ',validators=[ validators.Length(min=0, max=32)]',
+    'c_short': ',validators=[ validators.NumberRange(min=-32768, max=32767)]',
+    'c_int': ',validators=[ validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_long': ',validators=[ validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_longlong': ',validators=[ validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_ubyte': ',validators=[ validators.NumberRange(min=0, max=255)]',
+    'c_ushort': ',validators=[ validators.NumberRange(min=0, max=65535)]',
+    'c_uint': ',validators=[ validators.NumberRange(min=0, max=4294967295)]',
+    'c_ulong': ',validators=[ validators.NumberRange(min=0, max=4294967295)]',
+    'c_ulonglong': 'v,alidators=[ validators.NumberRange(min=0, max=4294967295)]',
+    'c_float': ',validators=[ validators.NumberRange(min=-2147483648, max=2147483647)]',
+    'c_void_p': ',validators=[ validators.Length(min=0, max=32)]',
     'c_bool': ',validators=[validators.DataRequired()]',
 }
     

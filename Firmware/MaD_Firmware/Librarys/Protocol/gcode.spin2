@@ -1,0 +1,181 @@
+' These return position values from gcode parameters
+
+PRI G01G91G09(x,y,z,a,feed)
+
+    CNC(x,y,z,a,0,0,0,0,feed,0,1)
+    'CNC(X,Y,Z,A,P,DegStart,DegMove,Radius,Feed,plane,pause)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI G01G91(x,y,z,a,feed,xs)
+    CNC(x,y,z,a,0,0,0,0,feed,0,xs)
+    'CNC(X,Y,Z,A,P,DegStart,DegMove,Radius,Feed,plane,pause)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI G02(x,y,i,j,r,f,xs)| bigstartangle,bigendangle,startangle,endangle,moveangle  'CW Arc
+
+ r,bigstartangle := xypol(-i,-j)
+ r,bigendangle   := xypol(x-i,y-j)
+
+ startangle := muldiv64(bigstartangle,360_000,$ffff_ffff)
+ endangle   := muldiv64(bigendangle,360_000,$ffff_ffff)
+
+    if startangle > endangle
+      moveangle := endangle - startangle
+    else
+      moveangle := (endangle-startangle)-360_000
+
+    CNC(0,0,0,0,0,startangle,moveangle,r,f,0,xs)
+    'CNC(X,Y,Z,A,P,DegStart,DegMove,Radius,Feed,plane,pause)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI G03(x,y,i,j,r,f,xs)| bigstartangle,bigendangle,startangle,endangle,moveangle  'CCW Arc
+
+ r,bigstartangle := xypol(-i,-j)
+ r,bigendangle   := xypol(x-i,y-j)
+
+ startangle := muldiv64(bigstartangle,360_000,$ffff_ffff)
+ endangle   := muldiv64(bigendangle,360_000,$ffff_ffff)
+
+    if startangle < endangle
+      moveangle := endangle - startangle
+    else
+      moveangle := (endangle + 360_000)-startangle
+
+    CNC(0,0,0,0,0,startangle,moveangle,r,f,0,xs)
+    'CNC(X,Y,Z,A,P,DegStart,DegMove,Radius,Feed,plane,pause)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI G04(p)| anyfeed      'G4 Delay
+    anyfeed := 1000 'just so we don't get a divide by zero?
+    CNC(0,0,0,0,p,0,0,0,anyfeed,0,0)
+    'CNC(X,Y,Z,A,P,DegStart,DegMove,Radius,Feed,plane,pause)
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI G92(x,y,z,a,input)'set new coordinates to whatever you put in Xmove,Ymove,Zmove,Amove
+    repeat while ((Ack_out & ACTmov)==ACTmov) or ((Ack_out & ACTdec)==ACTdec)  'wait till stopped movein
+    if ((input & Xin) == Xin)
+        Xmove := x
+        Ack_in := Ack_in | Zero_X    'set "Preset_X" bit
+        repeat while (Xpos <>x)
+        AbsX := Xpos
+        Ack_in := Ack_in & !Zero_X   'reset "Preset_X" bit
+    if ((input & Yin) == Yin)
+        Ymove := y
+        Ack_in := Ack_in | Zero_Y    'set "Preset_Y" bit
+        repeat while (Ypos <>y)
+        AbsY := Ypos
+        Ack_in := Ack_in & !Zero_Y   'reset "Preset_Y" bit
+    if ((input & Zin) == Zin)
+        Zmove := z
+        Ack_in := Ack_in | Zero_Z    'set "Preset_Z" bit
+        repeat while (Zpos <>z)
+        AbsZ := Zpos
+        Ack_in := Ack_in & !Zero_Z   'reset "Preset_Z" bit
+    if ((input & Ain) == Ain)
+        Amove := a
+        Ack_in := Ack_in | Zero_A    'set "Preset_A" bit
+        repeat while (Apos <>a)
+        AbsA := Apos
+        Ack_in := Ack_in & !Zero_A   'reset "Preset_A" bit
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+PRI CNC(X,Y,Z,A,P,StartAng,MoveAng,Radius,Feed,Plane,Pause) | t1,t2,t3,EndAng,tmovelen,sAxis,PinS,transition,zeroaxis
+
+       line++
+       repeat while ((Ack_out&1) == 1)  'bitwise AND -> wait untill PASM has finished reading the prior move
+
+       Xmove,Ymove,Zmove,Amove := 0,0,0,0
+       AccDisX,AccDisY,AccDisZ,AccDisA,AccDisT := 0,0,0,0,0
+
+       StT,EndT,DisT,OffsetX,OffsetY,Rad := 0,0,0,0,0,0
+
+       Sign := %1_1111
+
+       if MoveAng < 0                           ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+          -= MoveAng                            'If MoveAng is negative, it is a G02 CW move           '
+          -=StartAng                            'If MoveAng is positive, it is a G03 CCW move          '
+          StartAng := startang + 180_000        '                                                      '
+          if StartAng < 0                       ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+              StartAng := StartAng + 360_000
+          Sign := %0_1111  'clear bit 4
+
+       EndAng := StartAng + MoveAng
+       StT      := MULDIV64(StartAng,$0FFF_FFFF,360_000)
+       EndT     := MULDIV64(EndAng,$0FFF_FFFF,360_000)
+       DisT     := MULDIV64(MoveAng,$0FFF_FFFF,360_000)
+       t1       := MULDIV64(MoveAng,1000,57297) 'degrees to radians
+       Tmovelen := MULDIV64(Radius,t1,1000) 'length = radius x radians
+       t1 := StT
+       t1<<=4
+       OffsetX,OffsetY := ROTXY(Radius,0,t1)
+
+       if ((sign & %1_0000) == 0)                        'this is for G02 CW rotation vs G03 CCW
+          -= offsetX                                     'this is for G02 CW rotation vs G03 CCW
+
+       Rad := Radius
+
+      'movelength := sqrt((x*x)+(y*y)+(z*z)+(a*a)+(AngDis*AngDis))
+       movelength := vectorlength(x,y)
+       movelength := vectorlength(movelength,z)
+       movelength := vectorlength(movelength,a)
+       movelength := vectorlength(movelength,TmoveLen)
+
+       t1 := 60_000   '1000 * 60 seconds per minute
+       blocktime :=  MULDIV64(t1,movelength,feed)     '((1000*movelength)*60)/feed
+
+       If blocktime <= AccTC                          'I don't like this and the next line, but...
+          blocktime := AccTC + 1                      'blocktime shouldn't be less than AccTC
+
+       t1 := blocktime << 1                           'this is the (1/2) term 8 lines down
+
+       if (p<>0)                                      'if G4 Dwell do this
+          blocktime := p*100 + AccTC                  '100_000 = 1 sec, 1000= 1 sec, so
+
+       Xmove := x                 'feed is in mm/min
+       Ymove := y                 '1000 pulses per mm
+       Zmove := z                 'If move is 10mm, X= 10_000, feed is 1mm/min, this takes 10min
+       Amove := A                 'blocktime = 60_000 x 10_000 / 1
+       ABS=x                      'blocktime = 600_000_000 units of 10uSec (interp looptime)
+       ABS=y                      '600_000_000/100_000 = 600 seconds, or 10 minutes.
+       ABS=z
+       ABS=a
+       ExStop := pause
+       AccDisX := MULDIV64(x,AccTC,t1)               'AccDisX = Xmove * (AccTC/Blocktime) * (1/2)
+       AccDisY := MULDIV64(y,AccTC,t1)
+       AccDisZ := MULDIV64(z,AccTC,t1)
+       AccDisA := MULDIV64(a,AccTC,t1)
+       AccDisT := MULDIV64(DisT,AccTC,t1)
+       'Xv := MULDIV64(x,100_000,Blocktime)         'Xvelocity = (Xmove * 100_000)/Blocktime
+       'Yv := MULDIV64(y,100_000,Blocktime)
+       'Zv := MULDIV64(z,100_000,Blocktime)
+       'Av := MULDIV64(a,100_000,Blocktime)
+
+
+
+       if (Xmove<0)
+          Sign := Sign & %1_1110            'X is a negative move
+          -= AccDisX
+       if (Ymove<0)
+          Sign := Sign & %1_1101
+          -= AccDisY
+       if (Zmove<0)
+          Sign := Sign & %1_1011
+          -= AccDisZ
+       if (Amove<0)
+          Sign := Sign & %1_0111
+          -= AccDisA
+
+       Ack_in := Ack_in | movRDY                                 'Ack_into pasm that spin has a new move to be read!!!
+       repeat until((Ack_out&1) == 1) or ((Ack_in & Bit2)==4) or ((Ack_in & SkipM)==SkipM)  'wait for pasm to read move or soft reset or skip
+       Ack_in := Ack_in & !movRDY                                'Ack into pasm that spin sees the move was read
+
+       if ((skips[buff_tail] & SkipBit) <> 0)      'skipbit = 100_0000_0000_0000_0000
+             sAxis := skips[buff_tail] & $ff
+             PinS := (skips[buff_tail] ror 8) & $ff
+             Transition := (skips[buff_tail]ror 16) & 1  'Transition =  1_0000_0000_0000_0000   "low to high" or "high to low"><><
+             ZeroAxis   := (skips[buff_tail]ror 17) & 1  'ZeroAxis   = 10_0000_0000_0000_0000
+             'sAxis := 0
+             'PinS := 16
+             'Transition := 0 '0 means when pin goes low, 1 means skip when pin goes high
+             ZeroAxis := 1   'not sure I want to zero axis in all cases??
+             SkipMove(sAxis,PinS,Transition,ZeroAxis)

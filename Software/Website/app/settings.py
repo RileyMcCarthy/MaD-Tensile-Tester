@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, Response
 from .definitions.JSON import MachineProfile, MachinePerformance, MachineProfileForm
-from .helpers import ctypes_to_dict,dict_to_ctypes, loadMachineProfile
+from .helpers import ctypes_to_dict,dict_to_ctypes, loadMachineProfile, loadMotionProfile
 from werkzeug.datastructures import MultiDict
 from app import app, socketio
 import app.communication as communication
@@ -20,6 +20,7 @@ def settings_save():
         mp.setdict(result)
         communication.set_machine_profile(mp)
     else:
+        print(form.errors)
         return Response(jsonify(flatten_dict(form.errors)), status=400)
     return Response('success')
 

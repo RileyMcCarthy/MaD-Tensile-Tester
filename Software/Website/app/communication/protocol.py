@@ -1,16 +1,20 @@
 from serial import Serial
 from .helpers import crc8
 from threading import RLock
-
+import ctypes
 SYNC_BYTE = 0x55
 WRITE_BYTE = 128
 READ_BYTE = 0x00
 
+commands = {}
+
 serial = None
 lock = RLock()
 
-def serial_init(port = "/dev/serial0", baud = 1000000):
+def serial_init(cmds, port = "/dev/serial0", baud = 1000000):
     global serial
+    global commands
+    commands = cmds
     try:
         if serial is not None and serial.isOpen():
             serial.close()
@@ -56,6 +60,9 @@ def serial_recieve():
         if cmd is None:
             print("No command byte found")
             return None
+        if cmd not in commands:
+            print("Invalid command byte: " + str(cmd))
+            return None
     except Exception as err:
         print("Exception reading command byte: " + str(err))
         return None
@@ -66,6 +73,9 @@ def serial_recieve():
         length = serial.read(1)[0]
         if length is None:
             print("No length byte found")
+            return False
+        if length != ctypes.sizeof(commands[cmd]):
+            print("Invalid length byte: " + str(length))
             return False
     except Exception as err:
         print("Exception reading length byte: " + str(err))
@@ -101,8 +111,17 @@ def serial_recieve():
     return cmd, data
 
 
-def send(cmd, data):
+def send(cmd, dataRaw):
     global serial
+    global lock
+    cmd_raw = (cmd & ~WRITE_BYTE)
+    if cmd_raw not in commands:
+        print("Invalid command byte: " + str(cmd_raw))
+        return
+    if dataRaw != None:
+        data = commands[cmd_raw](dataRaw)
+    else:
+        data = None
     with lock:
         if (serial == None):
             print("Serial is not initialized")

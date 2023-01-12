@@ -109,6 +109,31 @@
 
 
 <script type="text/javascript">
+
+    function update_boolean(id, value) {
+        if (value) {
+            $(`[json-id="${id}"]`).attr("class", "bi-check-square-fill");
+        } else {
+            $(`[json-id="${id}"]`).attr("class", "bi-x-square");
+        }
+    };
+
+    function update_value(id, value) {
+        $(`[json-id="${id}"]`).html(value);
+    };
+
+    function get_value(id) {
+        return $(`[json-id="${id}"]`).html();
+    };
+
+    function update_header(id, value) {
+        if (value) {
+            $(`[json-id="${id}"]`).attr("class", "text-success");
+        } else {
+            $(`[json-id="${id}"]`).attr("class", "text-danger");
+        }
+    };
+
     function run() {
         $.ajax({
             url: "/run",
@@ -122,41 +147,14 @@
         });
     };
 
-    function func_manual() {
-        $.ajax({
-            url: "/functionManual",
-            type: "post",
-            data: { function: this.id },
-            success: function (data) {
-                console.log("Running function:" + this.id);
-            },
-            error: function (xhr) {
-                //Handel error
-            }
-        });
-    };
-
-    function load_functions() {
-        $.ajax({
-            url: "/functionManual",
-            type: "get",
-            success: function (data) {
-                console.log("Getting functions:" + data);
-                $("#functions").html(data);
-            },
-            error: function (xhr) {
-                //Handel error
-            }
-        });
-    };
-
     function toggleStatus() {
         $.ajax({
             url: "/toggleStatus",
             type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({status: get_value("status")}),
             success: function (data) {
                 console.log("Toggling Status");
-                getStatus();
             },
             error: function (xhr) {
                 //Handel error
@@ -168,51 +166,16 @@
         $.ajax({
             url: "/toggleMode",
             type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({mode: $("#mode").html()}),
             success: function (data) {
                 console.log("Toggling Mode");
-                getStatus();
-
             },
             error: function (xhr) {
                 //Handel error
             }
         });
     };
-
-    function getStatus() {
-        console.log("Getting device status");
-        $.ajax({
-            url: "/machineStatus",
-            type: "post",
-            success: function (data) {
-                if (data == "") {
-                    return;
-                }
-                console.log("Got machine profile")
-                $("#machineStatus").html(data);
-                $("#status").html($("#machineStatus").find(".status").find(".value").html())
-                $("#condition").html($("#machineStatus").find(".condition").find(".value").html())
-                $("#mode").html($("#machineStatus").find(".mode").find(".value").html())
-                state = $("#machineStatus").find(".state").find(".value").html()
-                $("#status").prop('disabled', "MOTION".localeCompare(state))
-            },
-            error: function (xhr) {
-                console.log(xhr)
-            }
-        });
-    };
-
-    function update() {
-        //getStatus();
-        setTimeout(update, 1000);
-    };
-
-    function page_load() {
-        update();
-        load_functions();
-    };
-
-    window.onload = page_load();
 
     $(document).ready(function () {
 
@@ -414,35 +377,15 @@
             if (!data && !data.json) {
                 return;
             } 
-            
-            function update_boolean(id, value) {
-                if (value) {
-                    $(`[json-id="${id}"]`).attr("class", "bi-check-square-fill");
-                } else {
-                    $(`[json-id="${id}"]`).attr("class", "bi-x-square");
-                }
-            }
-    
-            function update_value(id, value) {
-                $(`[json-id="${id}"]`).html(value);
-            }
-    
-            function update_header(id, value) {
-                if (value) {
-                    $(`[json-id="${id}"]`).attr("class", "text-success");
-                } else {
-                    $(`[json-id="${id}"]`).attr("class", "text-danger");
-                }
-            }
 
             json = JSON.parse(data.json);
             console.log(json);
             selfCheck = json.selfCheckParameters;
-            update_header("selfCheckParameters", json.state!="SELFCHECK");
+            update_header("selfCheckParameters", json.state!=0);
             update_boolean("chargePump", selfCheck.chargePump);
         
             machineCheck = json.machineCheckParameters;
-            update_header("machineCheckParameters", json.state!="SELFCHECK"&&json.state!="MACHINECHECK");
+            update_header("machineCheckParameters", json.state!=0&&json.state!=1);
             update_boolean("switchedPower", machineCheck.switchedPower);
             update_value("esdTravelLimit", machineCheck.esdTravelLimit);
             update_boolean("esdSwitch", machineCheck.esdSwitch);
@@ -458,14 +401,13 @@
             $("#status").html(motionParameters.status);
             $("#condition").html(motionParameters.condition);
             $("#mode").html(motionParameters.mode);
-            $("#status").prop('disabled', "MOTION".localeCompare(json.state));
+            $("#status").prop('disabled', "2".localeCompare(json.state));
         });
 
         socket.on('data', function (data) {
             if (!data) {
                 return;
             }
-            console.log('getting data'+ data.json);
             
             var monitor = JSON.parse(data.json);
             var time = monitor.timeus/1000000.0;

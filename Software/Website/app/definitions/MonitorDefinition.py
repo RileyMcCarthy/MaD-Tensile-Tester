@@ -43,16 +43,16 @@ class monitor_data_t(Structure):
         }
 
 class monitor_data_tForm(FlaskForm):
-    forceRaw = IntegerField("forceRaw",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    encoderRaw = IntegerField("encoderRaw",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    forcemN = IntegerField("forcemN",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    encoderum = IntegerField("encoderum",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    force = FloatField("force",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    position = FloatField("position",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    setpoint = IntegerField("setpoint",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    timems = IntegerField("timems",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    timeus = IntegerField("timeus",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    log = IntegerField("log",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    forceRaw = IntegerField("forceRaw",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    encoderRaw = IntegerField("encoderRaw",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    forcemN = IntegerField("forcemN",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    encoderum = IntegerField("encoderum",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    force = FloatField("force",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    position = FloatField("position",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    setpoint = IntegerField("setpoint",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    timems = IntegerField("timems",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    timeus = IntegerField("timeus",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    log = IntegerField("log",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MonitorDataPacket(Structure):
     _fields_ = [
@@ -81,9 +81,9 @@ class MonitorDataPacket(Structure):
         }
 
 class MonitorDataPacketForm(FlaskForm):
-    forcemN = IntegerField("forcemN",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    encoderum = IntegerField("encoderum",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    setpointum = IntegerField("setpointum",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    timeus = IntegerField("timeus",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    log = IntegerField("log",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    forcemN = IntegerField("forcemN",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    encoderum = IntegerField("encoderum",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    setpointum = IntegerField("setpointum",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    timeus = IntegerField("timeus",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    log = IntegerField("log",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 

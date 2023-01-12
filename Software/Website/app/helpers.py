@@ -1,6 +1,6 @@
 import re
 import ctypes
-from .definitions.JSON import MachineProfile
+from .definitions.JSON import MachineProfile, MotionProfile, TestProfile
 from collections.abc import MutableMapping
 
 def print_ctypes_obj(obj, level=0):

@@ -17,6 +17,14 @@
 #define MAD_DS3231_SCL 38 // RTC clock pin (Output)
 #define MAD_DS3231_SDA 37 // RTC data pin (bi-directional)
 
+#define SERVO_ON 1
+#define SERVO_OFF 0
+#define PIN_SERVO_ENA 11 // Servo enable pin
+#define PIN_SERVO_PUL 13 // Servo pulse pin
+#define PIN_SERVO_DIR 12 // Servo direction pin
+#define PIN_SERVO_RDY 14 // Servo ready pin
+
+
 /**
  * @brief Main class responsible for initializing and starting components
  *

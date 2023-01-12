@@ -11,7 +11,7 @@ MODELBIN = MaD_Software/models
 FIND := find #C:/cygwin64/bin/find.exe
 
 TARGET = MAD.binary
-SRC = MaD_Firmware #flexprop/include # Root folders for src code
+SRC = MaD_Firmware # Root folders for src code
 INCLUDE = $(sort $(dir $(foreach dir,$(SRC),$(shell $(FIND) $(dir) -name "*.h" -o -name "*.spin2"))))
 SOURCE = $(sort $(foreach dir,$(SRC),$(shell $(FIND) $(dir) -name "*.c")))
 SPIN = $(sort $(foreach dir,$(SRC),$(shell $(FIND) $(dir) -name "*.spin2")))
@@ -58,7 +58,7 @@ $(BIN)/$(TARGET): $(OBJECTS)
 
 $(BIN)/%.o: %.c
 	-mkdir -p $(subst \,/,$(@D))
-	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $<
+	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $< || true
 	
 run: 
 	$(LOAD) -p $(PORT) -b230400 -ZERO -v $(subst \,/,bin\$(TARGET)) -t

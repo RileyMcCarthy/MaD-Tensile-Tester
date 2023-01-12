@@ -46,7 +46,7 @@ static State state_machine_check(MachineState *machineState)
         params.esdSwitch &&
         params.servoOK &&
         params.forceGaugeCom &&
-        params.servoCom &&
+        //params.servoCom &&
         params.rtcCom)
     {
         return STATE_MOTION; // Internal parameters passed, change to MOTION

@@ -17,16 +17,16 @@ def serial_thread():
     while True:
         data = communication.process_recieved()
         if data is not None:
-            data_json = json.dumps(flatten_dict(data.getdict()))
+            data_json = data.getdict()
             #print(f'got data: {data_json}')
             if type(data) == MachineState:
-                socketio.emit('state', {'json': data_json}, namespace = '/serial')
+                socketio.emit('state', {'json': json.dumps(data_json)}, namespace = '/serial')
             elif type(data) == MonitorDataPacket:
-                socketio.emit('data', {'json': data_json}, namespace = '/serial')
+                socketio.emit('data', {'json': json.dumps(data_json)}, namespace = '/serial')
             elif type(data) == MachineProfile:
                 #print(data_json)
-                socketio.emit('profile', {'json': data_json}, namespace = '/serial')
-        socketio.sleep(0.1)
+                socketio.emit('profile', {'json': json.dumps(flatten_dict(data_json))}, namespace = '/serial')
+        socketio.sleep(0.01)
 
 def data_thread():
     # Data thread is respondsible for sending the data request command to the serial port
@@ -34,7 +34,7 @@ def data_thread():
     while True:
         #print('Sending data command')
         communication.get_data()
-        socketio.sleep(0.5)
+        socketio.sleep(1)
 
 def state_thread():
     # State thread is respondsible for sending the state request command to the serial port

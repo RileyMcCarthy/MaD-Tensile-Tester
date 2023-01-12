@@ -88,8 +88,9 @@ $(document).ready(function () {
         }
         
         // Only update the form if we are not currently editing it
-        if ($('#formEnable').has('disabled'))
+        if ($('#formEnable').attr('disabled'))
         {
+            console.log("Updating form from serial data")
             var json = JSON.parse(data.json);
             var machineProfile = $('#machineProfile');
             for (var key in json)

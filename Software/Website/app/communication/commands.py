@@ -22,13 +22,13 @@ CMD_TYPE = {
     CMD_MCONFIG: MachineConfiguration,
     CMD_MPERFORMANCE: MachinePerformance,
     CMD_MOTIONPROFILE: MotionProfile,
-    CMD_MOTIONMODE: MotionMode,
+    CMD_MOTIONMODE: ctypes.c_int32,
     CMD_MOTIONFUNCTION: ctypes.c_int32,
-    CMD_MOTIONSTATUS: MotionStatus,
+    CMD_MOTIONSTATUS: ctypes.c_int32,
 }
 
 def start():
-    return serial_init()
+    return serial_init(CMD_TYPE)
 
 def get_ping():
     serial_read(CMD_PING)
@@ -39,8 +39,26 @@ def get_data():
 def get_state():
     serial_read(CMD_STATE)
 
+def get_motion_profile():
+    serial_read(CMD_MOTIONPROFILE)
+
+def get_motion_mode():
+    serial_read(CMD_MOTIONMODE)
+
+def set_state(state):
+    serial_write(CMD_STATE, state)
+
+def set_motion_mode(mode):
+    serial_write(CMD_MOTIONMODE, mode)
+
+def set_motion_status(status):
+    serial_write(CMD_MOTIONSTATUS, status)
+
 def set_machine_profile(profile):
     serial_write(CMD_MPROFILE, profile)
+
+def set_motion_profile(profile):
+    serial_write(CMD_MOTIONPROFILE, profile)
 
 def get_machine_profile():
     serial_read(CMD_MPROFILE)

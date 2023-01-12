@@ -84,18 +84,18 @@ class MachineConfiguration(Structure):
 
 class MachineConfigurationForm(FlaskForm):
     motorType = StringField("motorType", validators=[validators.Length(max=MAX_CONFIGURATION_MOTOR_TYPE)])
-    maxMotorTorque = FloatField("maxMotorTorque",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxMotorRPM = FloatField("maxMotorRPM",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    gearDiameter = FloatField("gearDiameter",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    gearPitch = FloatField("gearPitch",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    systemIntertia = FloatField("systemIntertia",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    staticTorque = FloatField("staticTorque",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    load = FloatField("load",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxMotorTorque = FloatField("maxMotorTorque",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxMotorRPM = FloatField("maxMotorRPM",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    gearDiameter = FloatField("gearDiameter",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    gearPitch = FloatField("gearPitch",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    systemIntertia = FloatField("systemIntertia",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    staticTorque = FloatField("staticTorque",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    load = FloatField("load",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     positionEncoderType = StringField("positionEncoderType", validators=[validators.Length(max=MAX_CONFIGURATION_ENCODER_TYPE)])
-    positionEncoderStepsPerRev = FloatField("positionEncoderStepsPerRev",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    positionEncoderStepsPerRev = FloatField("positionEncoderStepsPerRev",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     forceGauge = StringField("forceGauge", validators=[validators.Length(max=MAX_CONFIGURATION_FORCE_GAUGE)])
-    forceGaugeScaleFactor = FloatField("forceGaugeScaleFactor",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    forceGaugeZeroFactor = IntegerField("forceGaugeZeroFactor",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    forceGaugeScaleFactor = FloatField("forceGaugeScaleFactor",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    forceGaugeZeroFactor = IntegerField("forceGaugeZeroFactor",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MachinePerformance(Structure):
     _fields_ = [
@@ -130,13 +130,13 @@ class MachinePerformance(Structure):
         }
 
 class MachinePerformanceForm(FlaskForm):
-    minPosition = FloatField("minPosition",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxPosition = FloatField("maxPosition",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxVelocity = FloatField("maxVelocity",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxAcceleration = FloatField("maxAcceleration",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxForceTensile = FloatField("maxForceTensile",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxForceCompression = FloatField("maxForceCompression",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    forceGaugeNeutralOffset = FloatField("forceGaugeNeutralOffset",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    minPosition = FloatField("minPosition",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxPosition = FloatField("maxPosition",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxVelocity = FloatField("maxVelocity",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxAcceleration = FloatField("maxAcceleration",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxForceTensile = FloatField("maxForceTensile",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxForceCompression = FloatField("maxForceCompression",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    forceGaugeNeutralOffset = FloatField("forceGaugeNeutralOffset",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MachineProfile(Structure):
     _fields_ = [
@@ -181,7 +181,7 @@ class FunctionInfo(Structure):
         }
 
 class FunctionInfoForm(FlaskForm):
-    function = IntegerField("function",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    function = IntegerField("function",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     parameters = StringField("parameters")
 
 class MotionQuartet(Structure):
@@ -207,7 +207,7 @@ class MotionQuartet(Structure):
 class MotionQuartetForm(FlaskForm):
     name = StringField("name", validators=[validators.Length(max=MAX_MOTION_QUARTET_NAME)])
     function = FormField(FunctionInfoForm)
-    dwell = FloatField("dwell",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    dwell = FloatField("dwell",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MotionSet(Structure):
     _fields_ = [
@@ -238,8 +238,8 @@ class MotionSet(Structure):
 class MotionSetForm(FlaskForm):
     name = StringField("name", validators=[validators.Length(max=MAX_MOTION_PROFILE_SET_NAME)])
     type = StringField("type", validators=[validators.Length(max=MAX_MOTION_PROFILE_SET_TYPE)])
-    executions = IntegerField("executions",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    quartetCount = IntegerField("quartetCount",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    executions = IntegerField("executions",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    quartetCount = IntegerField("quartetCount",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     quartets = FormField(MotionQuartetForm)
 
 class MotionProfile(Structure):
@@ -264,7 +264,7 @@ class MotionProfile(Structure):
 
 class MotionProfileForm(FlaskForm):
     name = StringField("name", validators=[validators.Length(max=MAX_MOTION_PROFILE_NAME)])
-    setCount = IntegerField("setCount",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    setCount = IntegerField("setCount",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     sets = FormField(MotionSetForm)
 
 class SampleProfile(Structure):
@@ -304,13 +304,13 @@ class SampleProfile(Structure):
 
 class SampleProfileForm(FlaskForm):
     name = StringField("name", validators=[validators.Length(max=MAX_SAMPLE_PROFILE_NAME)])
-    length = FloatField("length",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    stretchMax = FloatField("stretchMax",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxVelocity = FloatField("maxVelocity",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxAcceleration = FloatField("maxAcceleration",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxJerk = FloatField("maxJerk",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxForceTensile = FloatField("maxForceTensile",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    maxForceCompression = FloatField("maxForceCompression",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    length = FloatField("length",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    stretchMax = FloatField("stretchMax",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxVelocity = FloatField("maxVelocity",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxAcceleration = FloatField("maxAcceleration",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxJerk = FloatField("maxJerk",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxForceTensile = FloatField("maxForceTensile",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    maxForceCompression = FloatField("maxForceCompression",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class TestProfile(Structure):
     _fields_ = [
@@ -343,7 +343,7 @@ class TestProfile(Structure):
 
 class TestProfileForm(FlaskForm):
     name = StringField("name", validators=[validators.Length(max=MAX_TEST_PROFILE_NAME)])
-    sampleSN = IntegerField("sampleSN",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    sampleSN = IntegerField("sampleSN",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     machineProfile = FormField(MachineProfileForm)
     sampleProfile = FormField(SampleProfileForm)
     motionProfile = FormField(MotionProfileForm)

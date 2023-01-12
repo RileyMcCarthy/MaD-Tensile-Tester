@@ -119,7 +119,7 @@ class MachineCheckParameters(Structure):
 
 class MachineCheckParametersForm(FlaskForm):
     switchedPower = BooleanField("switchedPower",validators=[validators.DataRequired()])
-    esdTravelLimit = IntegerField("esdTravelLimit",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    esdTravelLimit = IntegerField("esdTravelLimit",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     esdSwitch = BooleanField("esdSwitch",validators=[validators.DataRequired()])
     servoOK = BooleanField("servoOK",validators=[validators.DataRequired()])
     forceGaugeCom = BooleanField("forceGaugeCom",validators=[validators.DataRequired()])
@@ -147,9 +147,9 @@ class MotionParameters(Structure):
         }
 
 class MotionParametersForm(FlaskForm):
-    status = IntegerField("status",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    condition = IntegerField("condition",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    mode = IntegerField("mode",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    status = IntegerField("status",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    condition = IntegerField("condition",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    mode = IntegerField("mode",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
 class MachineState(Structure):
     _fields_ = [
@@ -184,11 +184,11 @@ class MachineState(Structure):
         }
 
 class MachineStateForm(FlaskForm):
-    state = IntegerField("state",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    state = IntegerField("state",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     selfCheckParameters = FormField(SelfCheckParametersForm)
     machineCheckParameters = FormField(MachineCheckParametersForm)
     motionParameters = FormField(MotionParametersForm)
-    _function = IntegerField("_function",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    _functionData = IntegerField("_functionData",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
-    _lock = IntegerField("_lock",validators=[validators.DataRequired(), validators.NumberRange(min=-2147483648, max=2147483647)])
+    _function = IntegerField("_function",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    _functionData = IntegerField("_functionData",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
+    _lock = IntegerField("_lock",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
 
