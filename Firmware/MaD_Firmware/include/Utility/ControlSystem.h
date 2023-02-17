@@ -20,7 +20,6 @@ typedef struct control_t
     MachineProfile *machineProfile;
     MonitorData *monitorData;
     MachineState *stateMachine;
-    MotionProfile motionProfile;
     int cogid;
 } ControlSystem;
 

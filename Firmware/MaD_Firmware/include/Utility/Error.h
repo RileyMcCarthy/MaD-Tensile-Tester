@@ -6,6 +6,12 @@
 #define DEBUG_WARNING(...)
 #endif
 
+#ifdef _DEBUG_INFO
+#define DEBUG_INFO printf
+#else
+#define DEBUG_INFO(...)
+#endif
+
 /**
  * @brief Error codes:
  * 0: Generic Success

@@ -1,8 +1,6 @@
 #ifndef IOBoard_H
 #define IOBoard_H
 
-#include "MCP23017.h"
-
 #define SERVO_SRDY 14 // Servo ready status (Input)
 #define SERVO_DIR 12  // Step direction (Output)
 #define SERVO_PUL 13  // Step pulse (Output)

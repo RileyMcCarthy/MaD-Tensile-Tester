@@ -9,5 +9,7 @@
 #define CMD_MOTIONMODE 7     // send/recieve motion mode
 #define CMD_MOTIONFUNCTION 8 // send/recieve motion function and data
 #define CMD_MOTIONSTATUS 9   // send/recieve motion status
-
+#define CMD_COMMAND 10     // start/send sending motion data
+#define CMD_AWK 11        // send/recieve AWK
+#define CMD_TESTDATA 12   // send/recieve test data
 #define MAD_VERSION 1

@@ -4,30 +4,24 @@
 #include "Encoder.h"
 #include <stdbool.h>
 #include "simpletools.h"
+#include "SDCard.h"
 
 #define MONITOR_MEMORY_SIZE 1000
 static long monitor_stack[MONITOR_MEMORY_SIZE];
 
+extern long motion_position_steps;
 static ForceGauge forceGauge;
 static Encoder encoder;
-
-static bool sync_setpoint;
 
 bool monitorLogData;
 
 extern hasNewData;
 
-void monitor_sync_setpoint()
-{
-  sync_setpoint = true;
-}
-
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(Monitor *monitor)
 {
-  sync_setpoint = true;
   monitor->data.log = 0;
-
+  bool isLogging = false;
   // Connect Force Gauge
   if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
   {
@@ -42,11 +36,6 @@ static void monitor_cog(Monitor *monitor)
   while (1)
   {
     bool update = false;
-    if (sync_setpoint)
-    {
-      encoder.Set(monitor->data.setpoint);
-      sync_setpoint = false;
-    }
 
     if (forceGauge.responding)
     {
@@ -60,7 +49,7 @@ static void monitor_cog(Monitor *monitor)
     else
     {
       monitor->data.forceRaw = 0;
-      printf("Force Gauge disconnected, attempting to reconnect\n");
+      //printf("Force Gauge disconnected, attempting to reconnect\n");
       force_gauge_stop(&forceGauge);
       if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
       {
@@ -81,10 +70,25 @@ static void monitor_cog(Monitor *monitor)
     // these are convinience variables for the user, can be removed later
     monitor->data.force = raw_to_force(monitor->data.forceRaw, monitor->configuration) / 1000.0; // Convert Force to N
     monitor->data.position = steps_to_mm(monitor->data.encoderRaw, monitor->configuration);      // Convert steps to mm
-
-    if (update)
+    monitor->data.setpoint = motion_position_steps;
+    if (update && monitorLogData)
     {
-      hasNewData = true;
+      if (isLogging == false)
+      {
+        isLogging = sdcard_open("test.txt", "w");
+        printf("Logging started\n");
+      }
+      else
+      {
+        printf("writing data\n");
+        while(!sdcard_write(&(monitor->data), sizeof(MonitorData)));
+      }
+    }
+    else if (!monitorLogData && isLogging)
+    {
+      sdcard_close();
+      isLogging = false;
+      printf("Logging stopped\n");
     }
   }
 }

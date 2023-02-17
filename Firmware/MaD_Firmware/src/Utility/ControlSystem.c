@@ -1,7 +1,7 @@
 #include "ControlSystem.h"
 #include "MotionPlanning.h"
+#include "MCP23017.h"
 #include "ForceGauge.h"
-#include "DYN.h"
 #include <propeller2.h>
 
 #define CONTROL_MEMORY_SIZE 20000
@@ -47,39 +47,19 @@ static bool move_servo(ControlSystem *control, MoveType type, int moveum)
     {
     case MOVE_STOP:
     {
-        // move_rel32(DYN1_ADDR, 0); // stop servo
-
-        // Read dyn position and make that the current setpoint
-        int start = _getms();
-        ReadMotorPosition32(0);
-        while (!GetMotorPosition32Ready())
-        {
-            if ((_getms() - start) > 100)
-            {
-                // printf("failed to recieve dyn position to update setpoint\n");
-                state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)false);
-                return false;
-            }
-            // printf("waitinf for position\n");
-        }
-        state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_COM, (int)true);
-        int setpointsteps = GetMotorPosition32();
-        control->monitorData->setpoint = steps_to_mm(setpointsteps, &(control->machineProfile->configuration)) / 1000.0;
-        monitor_sync_setpoint();
-        // printf("got position:%d\n",control->monitorData->setpoint);
-
+        
         break;
     }
     case MOVE_RELATIVE:
     {
         control->monitorData->setpoint += moveum;
-        move_setpoint(control);
+        //move_setpoint(control);
         break;
     }
     case MOVE_ABSOLUTE:
     {
         control->monitorData->setpoint = moveum;
-        move_setpoint(control);
+        //move_setpoint(control);
         break;
     }
     case MOVE_SPEED:
@@ -91,8 +71,6 @@ static bool move_servo(ControlSystem *control, MoveType type, int moveum)
     return true;
 }
 
-static RunMotionProfile run;
-
 /*responsible for moving machine, updating state machine, checking for faults*/
 static void control_cog(ControlSystem *control)
 {
@@ -102,9 +80,6 @@ static void control_cog(ControlSystem *control)
         // printf("MCP23017 not communicating, trying again\n");
         _waitms(100);
     }
-
-    // Start dyn communication
-    dyn_init();
 
     /*Initialize NavKey*/
     navkey_begin(&navkey, 29, 28, I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
@@ -117,9 +92,6 @@ static void control_cog(ControlSystem *control)
 
     MachineState lastState = *(control->stateMachine);
     _waitms(1000);
-
-    // Sync setpoint and dyn
-    bool hasSync = false;
 
     // For running test profiles;
     long startTime = 0;
@@ -140,17 +112,6 @@ static void control_cog(ControlSystem *control)
         mcp_update_register(&mcp);
         mcp_set_pin(&mcp, SERVO_ENABLE_PIN, SERVO_ENABLE_REGISTER, 0);
 
-        // Sync dyn and setpoint to zero
-        if (!hasSync)
-        {
-            // printf("syncing dyn\n");
-            hasSync = move_servo(control, MOVE_STOP, 0); // Moves to rel pos of 0 then syncs setpoint to dyn position
-            if (hasSync)
-            {
-                set_origin(0);
-            }
-            _waitms(1000);
-        }
 
         /*Check self check state*/
         // Charge Pump
@@ -258,10 +219,11 @@ static void control_cog(ControlSystem *control)
             }
             if (currentMachineState.motionParameters.status == MOTIONSTATUS_DISABLED)
             {
-                move_servo(control, MOVE_STOP, 0);
+                motion_disable();
             }
             else
             {
+                motion_enable();
                 if (lastState.motionParameters.status != MOTIONSTATUS_ENABLED || initial) // Motion enabled initial
                 {
                     // dyn4_send_command(&dyn4, dyn4_go_rel_pos, -1000);
@@ -498,45 +460,24 @@ static void control_cog(ControlSystem *control)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
-                        run_motion_profile_init(&run); // Create new RunMotionProfile structure
-                        startTime = _getus();
-                        startPosition = control->monitorData->position;
-                        // printf("start time: %d\n", startTime);
-                        //  json_print_motion_profile(&(control->motionProfile));
-                        //                        json_print_motion_profile(&(control->motionProfile));
+                        motion_test_start();
                         monitorLogData = true;
                     }
                     // Run the loaded test profile
 
-                    if (!run.profileComplete)
-                    {
-                        /*if (_getus() - startTime > 15000000)
-                        {
-                            run.profileComplete = true;
-                        }*/
-                        double t = (_getus() - startTime) / 1000000.0;
-
-                        // Position relative to start of motion profile (um)
-                        double relativePosition = control->monitorData->position - startPosition;
-                        // printf("monitorPos,start, relPos:%f,%f,%f\n",control->monitorData->position,startPosition,relativePosition);
-
-                        // Position is the setpoint based of the time since profile has begun (m)
-                        double position = position_profile(t, relativePosition, &run, &(control->motionProfile));
-                        // printf("t,start,setpoint,mm:%f,%f,%f,%f\n", t, startPosition, position, control->monitorData->position);
-
-                        move_servo(control, MOVE_ABSOLUTE, startPosition + (int)(position * 1000));
-                    }
-                    else
+                    if (motion_test_is_empty()) // not a great method of checking if the test is complete, but it works for now
                     {
                         monitorLogData = false;
+                        motion_test_end();
                         state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
                     }
+                    
                 }
             }
         }
         else
         {
-            move_servo(control, MOVE_STOP, 0);
+            motion_disable();
         }
         lastEncoderRead = control->monitorData->encoderRaw;
         lastState = currentMachineState;
