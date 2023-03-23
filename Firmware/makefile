@@ -3,7 +3,7 @@ PORT = /dev/ttyUSB0
 SPIN2CPP = C:\spin2cpp\spin2cpp.exe
 FLEXCC = ~/flexprop/bin/flexcc
 LOAD = ~/flexprop/bin/loadp2
-FLEXCCFLAGS=-2 -O2 -Wall -D_DEBUG_WARNING -D_DEBUG_ERROR #-D_DEBUG_INFO#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
+FLEXCCFLAGS=-2 -O2 -Wall #-D_DEBUG_WARNING -D_DEBUG_ERROR -D_DEBUG_INFO#-D_DEBUG #-g#D_DEBUG_FATFS=1#-DFF_USE_LFN
 BIN = bin
 FIND := find #C:/cygwin64/bin/find.exe
 
@@ -41,7 +41,7 @@ $(BIN)/%.o: %.c
 	$(FLEXCC) $(FLEXCCFLAGS) $(INC) -c -o $@ $< || true
 	
 run: 
-	$(LOAD) -p $(PORT) -b230400 $(subst \,/,bin\$(TARGET)) -t
+	$(LOAD)  -b230400 $(subst \,/,bin\$(TARGET)) -t
 .PHONY: clean
 .PHONY: clear
 clear:

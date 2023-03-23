@@ -44,7 +44,7 @@ double atof(const char *str)
  *
  * @return int
  */
-
+// all stdio must be done in main thread (or same cog)
 int main()
 {
     //_clkset(_SETFREQ, _CLOCKFREQ);

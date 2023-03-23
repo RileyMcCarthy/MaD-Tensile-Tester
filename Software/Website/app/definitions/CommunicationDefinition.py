@@ -12,4 +12,6 @@ CMD_MOTIONPROFILE = 6  # send/recieve motion profile
 CMD_MOTIONMODE = 7     # send/recieve motion mode
 CMD_MOTIONFUNCTION = 8 # send/recieve motion function and data
 CMD_MOTIONSTATUS = 9   # send/recieve motion status
+CMD_COMMAND = 10     # start/send sending motion data
+CMD_AWK = 11        # send/recieve AWK
 MAD_VERSION = 1

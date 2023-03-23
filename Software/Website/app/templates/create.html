@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Status{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="container m-3">
+        <h1>Create Motion Profile</h1>
+        <form action="/upload" enctype = "multipart/form-data" method = "POST">
+            <input type="file" name="file">
+            <input type="submit">
+          </form>
+    </div>
+</div>
+
+<script>
+
+</script>
+
+{% endblock %}

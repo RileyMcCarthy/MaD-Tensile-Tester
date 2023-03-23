@@ -4,272 +4,99 @@
 <div class="container shadow my-5 bg-white rounded">
     <h1>Data</h1>
     <div id="testProfile"></div>
-    <div class="row-xl">
-        <div class="shadow p-3 mb-3 bg-white rounded">
-            <canvas id="chart-position" style="width:100%;"></canvas>
+    <div class="col-xl">
+        <div class="row-xl">
+            <div class="shadow p-3 mb-3 bg-white rounded">
+                <div id="chart-position" style="height: 370px; width:100%;"></div>
+            </div>
+        </div>
+        <div class="row-xl">
+            <div class="shadow p-3 mb-3 bg-white rounded">
+                <div id="chart-force" style="height: 370px; width:100%;"></div>
+            </div>
+        </div>
+        <div class="row-xl">
+            <div class="shadow p-3 mb-3 bg-white rounded">
+                <canvas id="chart-tension" style="width:100%;"></canvas>
+            </div>
         </div>
     </div>
-    <div class="row-xl">
-        <div class="shadow p-3 mb-3 bg-white rounded">
-            <canvas id="chart-force" style="width:100%;"></canvas>
-        </div>
-    </div>
-    <div class="row-xl">
-        <div class="shadow p-3 mb-3 bg-white rounded">
-            <canvas id="chart-tension" style="width:100%;"></canvas>
-        </div>
-    </div>
-    <a href="{{ url_for('flashData') }}" download="data.csv"><button type=button">Download</button></a>
+    <a href="/" download="data.csv"><button type=button">Download</button></a>
 </div>
 
-<script>
-    window.onload = function () {
+<script type="text/javascript">
+$(document).ready(function () {
 
-        const configPosition = {
-            type: 'line',
-            responsive: true,
-            data: {
-                labels: [],
-                datasets: [
-                    {
-                        label: "Position",
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        data: [],
-                        pointRadius: 0,
-                        fill: false,
-                    },
-                    {
-                        label: "Setpoint",
-                        backgroundColor: 'rgb(0, 255, 0)',
-                        borderColor: 'rgb(0, 255, 0)',
-                        data: [],
-                        pointRadius: 0,
-                        fill: false,
-                    }],
-            },
-            options: {
-                plugins: {
-                    zoom: {
-                        zoom: {
-                            wheel: {
-                                enabled: true,
-                            },
-                            pinch: {
-                                enabled: true
-                            },
-                            mode: 'xy',
-                        }
-                    }
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Position vs. Time'
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: true
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time'
-                        },
-                        ticks: {
-                            display: false,
-                        }
-                    },
-                    y: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '(mm)'
-                        },
-                        ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 100
-                        }
-                    }
-                }
+    var chartPositionData = []; // dataPoints
+    var chartPosition = new CanvasJS.Chart("chart-position", {
+        
+        title :{
+            text: "Position"
+        },
+        data: [{
+            type: "line",
+            dataPoints: chartPositionData
+        }],
+        axisX:{
+            gridThickness: 0,
+            tickLength: 0,
+            lineThickness: 0,
+            labelFormatter: function(){
+            return " ";
             }
-        };
-        const configForce = {
-            type: 'line',
-            responsive: true,
-            data: {
-                labels: [],
-                datasets: [{
-                    label: "Force",
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: [],
-                    pointRadius: 0,
-                    fill: false,
-                }],
-            },
-            options: {
-                plugins: {
-                    zoom: {
-                        zoom: {
-                            wheel: {
-                                enabled: true,
-                            },
-                            pinch: {
-                                enabled: true
-                            },
-                            mode: 'xy',
-                        }
-                    }
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Force vs. Time'
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: true
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time'
-                        },
-                        ticks: {
-                            display: false,
-                        }
-                    },
-                    y: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '(N)'
-                        },
-                        ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 5
-                        }
-                    }
-                }
+        }
+    });
+
+    var chartForceData = []; // dataPoints
+    var chartForce = new CanvasJS.Chart("chart-force", {
+        
+        title :{
+            text: "Force"
+        },
+        data: [{
+            type: "line",
+            dataPoints: chartForceData
+        }],
+        axisX:{
+            gridThickness: 0,
+            tickLength: 0,
+            lineThickness: 0,
+            labelFormatter: function(){
+            return " ";
             }
-        };
-        const configTension = {
-            type: 'line',
-            responsive: true,
-            data: {
-                labels: [],
-                datasets: [{
-                    label: "Tension",
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: [],
-                    pointRadius: 0,
-                    fill: false,
-                }],
-            },
-            options: {
-                plugins: {
-                    zoom: {
-                        zoom: {
-                            wheel: {
-                                enabled: true,
-                            },
-                            pinch: {
-                                enabled: true
-                            },
-                            mode: 'xy',
-                        }
-                    }
-                },
-                responsive: true,
-                title: {
-                    display: true,
-                    text: 'Force vs. Length'
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: true
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '(mm)'
-                        },
-                        ticks: {
-                            display: true,
-                            suggestedMin: -20,
-                            suggestedMax: 20
-                        }
-                    },
-                    y: {
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: '(N)'
-                        },
-                        ticks: {
-                            suggestedMin: 0,    // minimum will be 0, unless there is a lower value.
-                            suggestedMax: 5
-                        }
-                    }
-                }
-            }
-        };
-        const contextPosition = document.getElementById('chart-position').getContext('2d');
-        const lineChartPosition = new Chart(contextPosition, configPosition);
-        const contextForce = document.getElementById('chart-force').getContext('2d');
-        const lineChartForce = new Chart(contextForce, configForce);
-        const contextTension = document.getElementById('chart-tension').getContext('2d');
-        const lineChartTension = new Chart(contextTension, configTension);
+        }
+    });
 
-        $.ajax({
-            url: "/flashData",
-            type: "get",
-            success: function (data) {
-                var dataObj = $.csv.toObjects(data)
-                var time = dataObj.map(function (d) { return d.time });
-                var position = dataObj.map(function (d) { return d.position });
-                var setpoint = dataObj.map(function (d) { return d.setpoint });
-                var force = dataObj.map(function (d) { return d.force });
+    var socket = io('/serial');
+    var max = 1000;
+    socket.on('testdata', function (data) {
+        if (!data) {
+            return;
+        }
+        
+        var monitor = JSON.parse(data.json);
+        var time = monitor.timeus/1000000.0;
+        var positionmm = monitor.encoderum/1000.0;
+        var force = monitor.forcemN/1000.0;
+        var setpointmm = monitor.setpointum/1000.0;
+        console.log(time, positionmm, force, setpointmm);
 
-                configPosition.data.labels = time;
-                configPosition.data.datasets[0].data = position;
-                configPosition.data.datasets[1].data = setpoint;
+        chartPositionData.push({
+                x: time,
+                y: positionmm
+            });
 
-                configForce.data.labels = time;
-                configForce.data.datasets[0].data = force;
+        chartPosition.render();
 
-                configTension.data.labels = position;
-                configTension.data.datasets[0].data = force;
+        chartForceData.push({
+                x: time,
+                y: force
+            });
 
-                lineChartPosition.update();
-                lineChartForce.update();
-                lineChartTension.update();
-            },
-            error: function (xhr) {
-                console.log(xhr)
-            }
-        });
-    };
+        chartForce.render();
+
+    });
+});
 </script>
 
 {% endblock %}

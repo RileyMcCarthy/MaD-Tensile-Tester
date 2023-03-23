@@ -12,4 +12,5 @@
 #define CMD_COMMAND 10     // start/send sending motion data
 #define CMD_AWK 11        // send/recieve AWK
 #define CMD_TESTDATA 12   // send/recieve test data
+#define CMD_TESTDATA_COUNT 13 // send/recieve test data count
 #define MAD_VERSION 1

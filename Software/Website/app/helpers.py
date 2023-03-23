@@ -1,6 +1,6 @@
 import re
 import ctypes
-from .definitions.JSON import MachineProfile, MotionProfile, TestProfile
+from .definitions.JSON import MachineProfile
 from collections.abc import MutableMapping
 
 def print_ctypes_obj(obj, level=0):
@@ -31,40 +31,6 @@ def print_ctypes_obj(obj, level=0):
 
     else:
         print('{}VALUE = {} (type={})'.format(indent, obj, type(obj)))
-
-
-def loadMotionProfile():
-    motionProfile = MotionProfile()
-    motionProfile.name = b'Test1.mp'
-    motionProfile.number = 5
-    motionProfile.setCount = 1
-    motionProfile.sets[0].name = b'Test set 1'
-    motionProfile.sets[0].number = 1
-    motionProfile.sets[0].executions = 2
-    motionProfile.sets[0].quartetCount = 2
-
-    motionProfile.sets[0].quartets[0].name = b'qrt1.qrt'
-    motionProfile.sets[0].quartets[1].function.id = 0
-    motionProfile.sets[0].quartets[1].function.parameters[0] = -20
-    motionProfile.sets[0].quartets[1].function.parameters[1] = 10
-    motionProfile.sets[0].quartets[0].dwell = 500
-    print_ctypes_obj(motionProfile.sets[0].quartets[1].function)
-
-    motionProfile.sets[0].quartets[1].name = b'qrt2.qrt'
-    motionProfile.sets[0].quartets[1].function.id = 0
-    motionProfile.sets[0].quartets[1].function.parameters[0] = 20
-    motionProfile.sets[0].quartets[1].function.parameters[1] = -10
-    motionProfile.sets[0].quartets[1].dwell = 500
-    return motionProfile
-
-
-def loadTestProfile():
-    testProfile = TestProfile()
-    testProfile.name = b'Test_Profile_1'
-    testProfile.machineProfile = loadMachineProfile()
-    testProfile.motionProfile = loadMotionProfile()
-    testProfile.comment = "Demo test profile"
-    return testProfile
 
 
 def loadMachineProfile():

@@ -37,6 +37,7 @@
         integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.21/jquery.csv.js"></script>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <title>MaD - {% block title %}Home{% endblock %}</title>
 </head>
 
@@ -55,13 +56,16 @@
                     <a class="nav-link" href="/status">Status</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/dataPage">Data</a>
+                    <a class="nav-link" href="/create">Create</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/testdata">Data</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/connect">Connect</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/test">Create</a>
+                    <a class="nav-link" href="/upload">Upload</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/settings">Settings</a>
@@ -160,15 +164,6 @@
 
 
 <script type="text/javascript">
-    var test = io();
-
-    function test_function() {
-        test.emit('machine_config')
-    };
-
-    test.on('data', function (data) {
-        console.log("getting status")
-        
-    });
+    
 </script>
 </html>

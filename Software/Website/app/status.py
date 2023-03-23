@@ -3,7 +3,7 @@ from .definitions.StateMachineDefinition import MachineState
 from .helpers import ctypes_to_dict
 import json
 from app import app, socketio
-from .helpers import flatten_dict, unflatten_dict, loadMotionProfile
+from .helpers import flatten_dict, unflatten_dict
 import app.communication as communication
 
 #def gen_frames():
@@ -67,9 +67,7 @@ def toggleStatus():
 @app.route('/run', methods=['POST'])
 def run():
     app.logger.info("Running device motion profile")
-    
-    # TODO: Remove this for loading from file
-    motionProfile = loadMotionProfile()
-    communication.set_motion_profile(motionProfile)
-    
+     
     communication.set_motion_mode(2)
+
+    return Response('success')

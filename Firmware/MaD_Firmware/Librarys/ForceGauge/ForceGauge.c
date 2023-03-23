@@ -60,11 +60,11 @@ static void continuous_data(void *arg)
     int delay = (_clockfreq() / BAUD) / 2;
     int spmode = P_ASYNC_RX | P_INVERT_IN;
     int baudcfg = 7 + ((_clockfreq() / BAUD) << 16);
-    unsigned long transmittx = delay * 35 * 2;
-    unsigned long disconnecttx = _clockfreq() / 10; // 100ms before considered disconnected
+    long transmittx = delay * 35 * 2;
+    long disconnecttx = _clockfreq() / 10; // 100ms before considered disconnected
     _pinclear(rx);
     _pinstart(rx, spmode, baudcfg, 0);
-    unsigned long lastData = _getcnt();
+    long lastData = _getcnt();
     while (1)
     {
         while (!_pinr(rx))
@@ -81,7 +81,7 @@ static void continuous_data(void *arg)
         }
         lastData = _getcnt();
         uint8_t byte = (_rdpin(rx) >> 24) & 0xFF;
-        data |= (byte << index * 8);
+        data |= (byte << index * 8); 
         index++;
         if (index >= 3)
         {
@@ -165,63 +165,8 @@ void force_gauge_stop(ForceGauge *forceGauge)
     }
 }
 
-int force_gauge_raw_to_force(int zero, double slope, int raw)
-{
-    return round(raw - zero) / (slope);
-}
-
 // returns force in milliNewtons
 int raw_to_force(int raw, MachineConfiguration *configuration)
 {
     return round((raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor));
-}
-
-int force_gauge_get_raw(ForceGauge *forceGauge, Error *err)
-{
-    seterror(err, SUCCESS);
-    int force = forceGauge->serial.rxtime(10);
-    if (force == -1)
-    {
-        forceGauge->serial.rxflush();
-        seterror(err, FORCEGAUGE_NOT_RESPONDING);
-        return -1;
-    }
-
-    // printf("%d\n", force);
-
-    int temp = forceGauge->serial.rxcheck();
-    if (temp == -1)
-    {
-        forceGauge->serial.rxflush();
-        seterror(err, FORCEGAUGE_NOT_RESPONDING);
-        return -1;
-    }
-    force |= temp << 8;
-    // printf("%d\n", temp);
-    temp = forceGauge->serial.rxcheck();
-    if (temp == -1)
-    {
-        forceGauge->serial.rxflush();
-        seterror(err, FORCEGAUGE_NOT_RESPONDING);
-        return -1;
-    }
-    force |= temp << 16;
-    forceGauge->serial.rxflush();
-    return force;
-
-    if (read_register(forceGauge, CONFIG_1) != CONFIG_DATA1)
-    {
-        seterror(err, FORCEGAUGE_CONNECTION_LOST);
-        return 0;
-    }
-
-    int dready = read_register(forceGauge, CONFIG_2);
-
-    forceGauge->serial.tx(0x55);
-    forceGauge->serial.tx(0x10); // Send RData command
-    int counter = forceGauge->serial.rxtime(10);
-    int forceRaw = forceGauge->serial.rxtime(10);
-    forceRaw |= forceGauge->serial.rxtime(10) << 8;
-    forceRaw |= forceGauge->serial.rxtime(10) << 16;
-    return forceRaw;
 }

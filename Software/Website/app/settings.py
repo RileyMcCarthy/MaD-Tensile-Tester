@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, Response
 from .definitions.JSON import MachineProfile, MachinePerformance, MachineProfileForm
-from .helpers import ctypes_to_dict,dict_to_ctypes, loadMachineProfile, loadMotionProfile
+from .helpers import ctypes_to_dict,dict_to_ctypes, loadMachineProfile
 from werkzeug.datastructures import MultiDict
 from app import app, socketio
 import app.communication as communication

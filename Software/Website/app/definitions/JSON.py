@@ -1,37 +1,16 @@
 from ctypes import Structure, c_int, c_float, c_char, c_bool
 from wtforms import BooleanField,IntegerField, StringField,FloatField, PasswordField, validators, SelectField, SubmitField, FormField, FieldList
 from flask_wtf import FlaskForm
-MAX_TOKENS = 200
 MAX_MACHINE_PROFILE_NAME = 20
 MAX_PATH_LENGTH = 50
 MAX_CONFIGURATION_MOTOR_TYPE = 20
 MAX_CONFIGURATION_ENCODER_TYPE = 20
 MAX_CONFIGURATION_FORCE_GAUGE = 20
-MAX_MOTION_PROFILE_NAME = MAX_PATH_LENGTH
-MAX_MOTION_PROFILE_SETS = 6
 MAX_SAMPLE_PROFILE_NAME = MAX_PATH_LENGTH
 MAX_TEST_PROFILE_NAME = MAX_PATH_LENGTH
 MAX_TEST_PROFILE_MP_FILENAME = 20
 MAX_TEST_PROFILE_COMMENT = 256
-MAX_MOTION_PROFILE_SET_NAME = MAX_PATH_LENGTH
-MAX_MOTION_PROFILE_SET_TYPE = 10
-MAX_MOTION_QUARTET_NAME = MAX_PATH_LENGTH
-MAX_MOTION_QUARTET_PARAMETERS = 10
-MAX_MOTION_QUARTETS = 6
-MACHINE_CONFIGURATION_FIELD_COUNT = 1
 MAX_FILE_SIZE = 1000
-MACHINE_PERFORMANCE_FIELD_COUNT = 7
-MACHINE_PROFILE_FIELD_COUNT = MACHINE_PERFORMANCE_FIELD_COUNT + MACHINE_CONFIGURATION_FIELD_COUNT + 2
-MOTION_QUARTET_FIELD_COUNT = 4 + 10
-MOTION_SET_FIELD_COUNT = 5 + 10
-MOTION_PROFILE_FIELD_COUNT = 4 + 20
-SAMPLE_PROFILE_FIELD_COUNT = 9
-TEST_PROFILE_FIELD_COUNT = 6
-class Function(c_int):
-	enum = {
-		0: "LINE",
-		1: "SIGMOID",
-	}
 class MachineConfiguration(Structure):
     _fields_ = [
         ("motorType", c_char * MAX_CONFIGURATION_MOTOR_TYPE),
@@ -163,110 +142,6 @@ class MachineProfileForm(FlaskForm):
     configuration = FormField(MachineConfigurationForm)
     performance = FormField(MachinePerformanceForm)
 
-class FunctionInfo(Structure):
-    _fields_ = [
-        ("function", c_int),
-        ("parameters", c_float * MAX_MOTION_QUARTET_PARAMETERS),
-    ]
-
-    def setdict(self, d):
-        self.function = int(d["function"])
-        self.parameters = int(d["parameters"])
-        
-
-    def getdict(self):
-        return {
-            "function": self.function,
-            "parameters": self.parameters,
-        }
-
-class FunctionInfoForm(FlaskForm):
-    function = IntegerField("function",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-    parameters = StringField("parameters")
-
-class MotionQuartet(Structure):
-    _fields_ = [
-        ("name", c_char * MAX_MOTION_QUARTET_NAME),
-        ("function", FunctionInfo),
-        ("dwell", c_float),
-    ]
-
-    def setdict(self, d):
-        self.name = str(d["name"]).encode("utf-8")
-        self.function.setdict(d["function"])
-        self.dwell = float(d["dwell"])
-        
-
-    def getdict(self):
-        return {
-            "name": self.name.decode("utf-8"),
-            "function": self.function.getdict(),
-            "dwell": self.dwell,
-        }
-
-class MotionQuartetForm(FlaskForm):
-    name = StringField("name", validators=[validators.Length(max=MAX_MOTION_QUARTET_NAME)])
-    function = FormField(FunctionInfoForm)
-    dwell = FloatField("dwell",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-
-class MotionSet(Structure):
-    _fields_ = [
-        ("name", c_char * MAX_MOTION_PROFILE_SET_NAME),
-        ("type", c_char * MAX_MOTION_PROFILE_SET_TYPE),
-        ("executions", c_int),
-        ("quartetCount", c_int),
-        ("quartets", MotionQuartet),
-    ]
-
-    def setdict(self, d):
-        self.name = str(d["name"]).encode("utf-8")
-        self.type = str(d["type"]).encode("utf-8")
-        self.executions = int(d["executions"])
-        self.quartetCount = int(d["quartetCount"])
-        self.quartets.setdict(d["quartets"])
-        
-
-    def getdict(self):
-        return {
-            "name": self.name.decode("utf-8"),
-            "type": self.type.decode("utf-8"),
-            "executions": self.executions,
-            "quartetCount": self.quartetCount,
-            "quartets": self.quartets.getdict(),
-        }
-
-class MotionSetForm(FlaskForm):
-    name = StringField("name", validators=[validators.Length(max=MAX_MOTION_PROFILE_SET_NAME)])
-    type = StringField("type", validators=[validators.Length(max=MAX_MOTION_PROFILE_SET_TYPE)])
-    executions = IntegerField("executions",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-    quartetCount = IntegerField("quartetCount",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-    quartets = FormField(MotionQuartetForm)
-
-class MotionProfile(Structure):
-    _fields_ = [
-        ("name", c_char * MAX_MOTION_PROFILE_NAME),
-        ("setCount", c_int),
-        ("sets", MotionSet),
-    ]
-
-    def setdict(self, d):
-        self.name = str(d["name"]).encode("utf-8")
-        self.setCount = int(d["setCount"])
-        self.sets.setdict(d["sets"])
-        
-
-    def getdict(self):
-        return {
-            "name": self.name.decode("utf-8"),
-            "setCount": self.setCount,
-            "sets": self.sets.getdict(),
-        }
-
-class MotionProfileForm(FlaskForm):
-    name = StringField("name", validators=[validators.Length(max=MAX_MOTION_PROFILE_NAME)])
-    setCount = IntegerField("setCount",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-    sets = FormField(MotionSetForm)
-
 class SampleProfile(Structure):
     _fields_ = [
         ("name", c_char * MAX_SAMPLE_PROFILE_NAME),
@@ -311,41 +186,4 @@ class SampleProfileForm(FlaskForm):
     maxJerk = FloatField("maxJerk",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     maxForceTensile = FloatField("maxForceTensile",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
     maxForceCompression = FloatField("maxForceCompression",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-
-class TestProfile(Structure):
-    _fields_ = [
-        ("name", c_char * MAX_TEST_PROFILE_NAME),
-        ("sampleSN", c_int),
-        ("machineProfile", MachineProfile),
-        ("sampleProfile", SampleProfile),
-        ("motionProfile", MotionProfile),
-        ("comment", c_char * MAX_TEST_PROFILE_COMMENT),
-    ]
-
-    def setdict(self, d):
-        self.name = str(d["name"]).encode("utf-8")
-        self.sampleSN = int(d["sampleSN"])
-        self.machineProfile.setdict(d["machineProfile"])
-        self.sampleProfile.setdict(d["sampleProfile"])
-        self.motionProfile.setdict(d["motionProfile"])
-        self.comment = str(d["comment"]).encode("utf-8")
-        
-
-    def getdict(self):
-        return {
-            "name": self.name.decode("utf-8"),
-            "sampleSN": self.sampleSN,
-            "machineProfile": self.machineProfile.getdict(),
-            "sampleProfile": self.sampleProfile.getdict(),
-            "motionProfile": self.motionProfile.getdict(),
-            "comment": self.comment.decode("utf-8"),
-        }
-
-class TestProfileForm(FlaskForm):
-    name = StringField("name", validators=[validators.Length(max=MAX_TEST_PROFILE_NAME)])
-    sampleSN = IntegerField("sampleSN",validators=[ validators.NumberRange(min=-2147483648, max=2147483647)])
-    machineProfile = FormField(MachineProfileForm)
-    sampleProfile = FormField(SampleProfileForm)
-    motionProfile = FormField(MotionProfileForm)
-    comment = StringField("comment", validators=[validators.Length(max=MAX_TEST_PROFILE_COMMENT)])
 
