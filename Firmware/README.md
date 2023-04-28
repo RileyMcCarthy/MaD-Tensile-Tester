@@ -1,5 +1,10 @@
 # First time setup
 
+## Platformio
+
+Remote instructions
+https://community.platformio.org/t/howto-raspberry-pi-3-as-remote-agent-oct-2020/16700
+
 ## Install flexprop
 
 use these instructions or see build instructions at https://github.com/totalspectrum/flexprop

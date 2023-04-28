@@ -41,3 +41,9 @@ void monitor_sync_setpoint();
 void monitor_set_address(int addr);
 MonitorData *monitor_read_data();
 bool monitor_begin(Monitor *monitor, MachineState *machineState, MachineConfiguration *configuration, int sampleRate);
+
+// API for reading and writing machine profiles to SD card
+bool read_sd_profile(MachineProfile * profile);
+int read_sd_card_data(MonitorData *data, int index, int count);
+int read_data_size();
+bool write_sd_profile(MachineProfile * profile);

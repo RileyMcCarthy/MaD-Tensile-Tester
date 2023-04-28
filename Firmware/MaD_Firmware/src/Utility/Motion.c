@@ -1,8 +1,8 @@
-#include "Motion.h"
-#include "MaD.h"
+#include "Utility/Motion.h"
+#include "Main/MaD.h"
 #include <stdlib.h>
-#include <propeller2.h>
 #include "StaticQueue.h"
+#include <propeller.h>
 
 #define MOTION_MEMORY_SIZE 30000
 static long motion_stack[MOTION_MEMORY_SIZE];
@@ -49,7 +49,7 @@ bool motion_add_move(int steps, int feedrate)
     MotionCommand command;
     command.steps = steps;
     command.feedrate = feedrate;
-    printf("Adding motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
+    //printf("Adding motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
     return queue_push(&manual_queue, &command);
 }
 
@@ -61,7 +61,7 @@ void motion_test_start()
 void motion_test_end()
 {
     test_mode = false;
-    printf("Ending test mode\n");
+   // printf("Ending test mode\n");
 }
 
 void motion_test_clear()
@@ -81,7 +81,7 @@ bool motion_test_is_full()
 
 bool motion_test_add_move(MotionCommand *command)
 {
-    printf("Adding test command with %d steps and %d feedrate\n", command->steps, command->feedrate);
+    //("Adding test command with %d steps and %d feedrate\n", command->steps, command->feedrate);
     return queue_push(&test_queue, (void*)command);
 }
 
@@ -112,14 +112,12 @@ static void motion_cog(void *arg)
         if (queue_isempty(queue))
         {
             // if the queue is empty, we should wait for a new command
-            if (test_mode)
-                printf("Waiting for new motion command, ERROR if this is printed in test mode\n");
             continue;
         }
         if (!queue_pop(queue, &command))
             continue;
 
-        printf("Running motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
+        //printf("Running motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
         int delayus = 1000000 / command.feedrate;
         motion_setpoint_steps += command.steps;
         while (motion_position_steps != motion_setpoint_steps) //while we haven't reached the setpoint

@@ -17,14 +17,14 @@ def serial_init(port = "/dev/serial0", baud = 1000000):
             serial.close()
 
         print("Starting Serial on port: " + port)
-        serial = Serial(port, baud, timeout=1, write_timeout=1)
+        serial = Serial(port, baud, timeout=1, write_timeout=1,inter_byte_timeout=1)
         serial.reset_input_buffer()
 
     except Exception as error:
         print("Unable to open serial: "+str(error))
         return False
     
-    #print("Serial connected using: " + serial.name)
+    print("Serial connected using: " + serial.name)
     return True
 
 def serial_recieve():

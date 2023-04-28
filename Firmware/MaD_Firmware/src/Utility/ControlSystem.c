@@ -1,8 +1,8 @@
-#include "ControlSystem.h"
+#include "Utility/ControlSystem.h"
 #include "MotionPlanning.h"
-#include "MCP23017.h"
 #include "ForceGauge.h"
-#include <propeller2.h>
+#include "MCP23017.h"
+#include <propeller.h>
 
 #define CONTROL_MEMORY_SIZE 20000
 

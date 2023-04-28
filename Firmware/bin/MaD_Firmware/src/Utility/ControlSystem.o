@@ -1,0 +1,1355 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+#line 17 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+typedef struct MachineConfiguration
+{
+    char motorType[ 20 ];
+    double maxMotorTorque;
+    double maxMotorRPM;
+    double gearDiameter;
+    double gearPitch;
+    double systemIntertia;
+    double staticTorque;
+    double load;
+    char positionEncoderType[ 20 ];
+    double positionEncoderStepsPerRev;
+    char forceGauge[ 20 ];
+    double forceGaugeScaleFactor;
+    int forceGaugeZeroFactor;
+} MachineConfiguration;
+
+typedef struct MachinePerformance
+{
+    double minPosition;
+    double maxPosition;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxForceTensile;
+    double maxForceCompression;
+    double forceGaugeNeutralOffset;
+} MachinePerformance;
+
+typedef struct MachineProfile
+{
+    char name[ 20 ];
+    MachineConfiguration configuration;
+    MachinePerformance performance;
+} MachineProfile;
+
+typedef struct SampleProfile
+{
+    char name[ 50 ];
+    double length;
+    double stretchMax;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxJerk;
+    double maxForceTensile;
+    double maxForceCompression;
+
+} SampleProfile;
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Monitor.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 4 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/compiler.h"
+#line 5 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+
+
+
+
+
+  typedef  unsigned long  size_t;
+#line 6 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 15 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef int wchar_t;
+#line 24 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef struct _Mbstate {
+  unsigned int total:5;
+  unsigned int left:5;
+  unsigned int partial:22;
+} _Mbstate_t;
+#line 7 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/null.h"
+#line 8 "/home/mad/flexprop/include/stdlib.h"
+#line 22 "/home/mad/flexprop/include/stdlib.h"
+    double atof(const char *);
+    int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long long atoll(const char *);
+
+  long double strtold(const char *nptr, char **endptr);
+  double strtod(const char *nptr, char **endptr);
+  float strtof(const char *nptr, char **endptr);
+
+    long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+    unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+  long long strtoll(const char *nptr, char **endptr, int base);
+  unsigned long long strtoull(const char *nptr, char **endptr, int base);
+
+
+    int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+    void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+
+    void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+    void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+
+
+    int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+     void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+     void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+     void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+   void _exit(int status);
+#line 56 "/home/mad/flexprop/include/stdlib.h"
+   long labs(long l);
+
+
+   long long llabs(long long ll);
+
+
+  typedef struct {
+    int quot, rem;
+  } div_t;
+
+  typedef struct {
+    long int quot, rem;
+  } ldiv_t;
+
+  typedef struct {
+    long long quot, rem;
+  } lldiv_t;
+
+  div_t div(int num, int denom);
+  ldiv_t ldiv(long num, long denom);
+  lldiv_t lldiv(long long num, long long denom);
+
+    void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+  void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+		int (*compare)(const void *, const void *));
+
+    char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+    int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+
+
+  extern int _mb_cur_max;
+
+
+
+  int mblen(const char *s, size_t n);
+  int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+  size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
+
+  int system(const char *command);
+#line 102 "/home/mad/flexprop/include/stdlib.h"
+    int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+    int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+#line 17 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+typedef struct MachineConfiguration
+{
+    char motorType[ 20 ];
+    double maxMotorTorque;
+    double maxMotorRPM;
+    double gearDiameter;
+    double gearPitch;
+    double systemIntertia;
+    double staticTorque;
+    double load;
+    char positionEncoderType[ 20 ];
+    double positionEncoderStepsPerRev;
+    char forceGauge[ 20 ];
+    double forceGaugeScaleFactor;
+    int forceGaugeZeroFactor;
+} MachineConfiguration;
+
+typedef struct MachinePerformance
+{
+    double minPosition;
+    double maxPosition;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxForceTensile;
+    double maxForceCompression;
+    double forceGaugeNeutralOffset;
+} MachinePerformance;
+
+typedef struct MachineProfile
+{
+    char name[ 20 ];
+    MachineConfiguration configuration;
+    MachinePerformance performance;
+} MachineProfile;
+
+typedef struct SampleProfile
+{
+    char name[ 50 ];
+    double length;
+    double stretchMax;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxJerk;
+    double maxForceTensile;
+    double maxForceCompression;
+
+} SampleProfile;
+#line 6 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 7 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+
+
+
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+
+typedef signed long int32_t;
+typedef unsigned long uint32_t;
+
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+
+typedef unsigned long uintptr_t;
+typedef long intptr_t;
+
+typedef int64_t intmax_t;
+typedef uint64_t uintmax_t;
+
+typedef int8_t int_least8_t;
+typedef int16_t int_least16_t;
+typedef int32_t int_least32_t;
+typedef int64_t int_least64_t;
+
+typedef uint8_t uint_least8_t;
+typedef uint16_t uint_least16_t;
+typedef uint32_t uint_least32_t;
+typedef uint64_t uint_least64_t;
+
+typedef int32_t int_fast8_t;
+typedef int32_t int_fast16_t;
+typedef int32_t int_fast32_t;
+typedef int64_t int_fast64_t;
+
+typedef uint32_t uint_fast8_t;
+typedef uint32_t uint_fast16_t;
+typedef uint32_t uint_fast32_t;
+typedef uint64_t uint_fast64_t;
+#line 8 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+
+
+
+
+
+
+typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
+
+typedef struct ForceGauge_s
+{
+    int counter;
+    unsigned int force;
+    uint8_t buffer[4];
+    FDS serial;
+    int rx, tx;
+    int forceRaw;
+    _Bool  responding;
+    int cogid;
+} ForceGauge;
+
+int force_gauge_raw_to_force(int zero, double slope, int raw);
+int raw_to_force(int raw, MachineConfiguration *configuration);
+
+_Bool  force_gauge_begin(ForceGauge *forceGauge, int rx, int tx);
+void force_gauge_stop(ForceGauge *forceGauge);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Monitor.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachine.h"
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachine.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachine.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+
+typedef enum State
+{
+    STATE_SELFCHECK,
+    STATE_MACHINECHECK,
+    STATE_MOTION
+} State;
+
+typedef enum MotionStatus
+{
+    MOTIONSTATUS_DISABLED,
+    MOTIONSTATUS_ENABLED,
+    MOTIONSTATUS_SAMPLE_LIMIT,
+    MOTIONSTATUS_MACHINE_LIMIT,
+    MOTIONSTATUS_FAULTED
+} MotionStatus;
+
+typedef enum MotionOverTravel
+{
+    MOTION_LIMIT_OK,
+    MOTION_LIMIT_UPPER,
+    MOTION_LIMIT_LOWER
+} MotionOverTravel;
+#line 30 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+typedef enum MotionCondition
+{
+    CONDITION_LENGTH,
+    CONDITION_FORCE,
+    CONDITION_TENSION,
+    CONDITION_COMPRESSION,
+    CONDITION_UPPER,
+    CONDITION_LOWER,
+    CONDITION_DOOR,
+    CONDITION_STOPPED,
+    CONDITION_MOVING,
+} MotionCondition;
+
+typedef enum MotionMode
+{
+    MODE_MANUAL,
+    MODE_TEST,
+    MODE_TEST_RUNNING
+} MotionMode;
+
+typedef enum ModeFunctions
+{
+    FUNC_MANUAL_OFF,
+    FUNC_MANUAL_INCREMENTAL_JOG,
+    FUNC_MANUAL_CONTINUOUS_JOG,
+    FUNC_MANUAL_POSITIONAL_MOVE,
+    FUNC_MANUAL_HOME,
+    FUNC_MANUAL_MOVE_GAUGE_LENGTH,
+    FUNC_MANUAL_MOVE_FORCE,
+    FUNC_TEST_LOAD,
+    FUNC_TEST_RUN,
+    FUNC_TEST_STOP,
+    FUNC_TEST_TOGGLE_HOLD_RESUME
+} ModeFunctions;
+
+typedef struct SelfCheckParameters
+{
+    _Bool  chargePump;
+} SelfCheckParameters;
+
+typedef struct MachineCheckParameters
+{
+    _Bool  switchedPower;
+    MotionOverTravel esdTravelLimit;
+    _Bool  esdSwitch;
+    _Bool  servoOK;
+    _Bool  forceGaugeCom;
+    _Bool  servoCom;
+    _Bool  rtcCom;
+
+} MachineCheckParameters;
+
+typedef struct MotionParameters
+{
+    MotionStatus status;
+    MotionCondition condition;
+    MotionMode mode;
+} MotionParameters;
+
+
+typedef struct MachineState
+{
+    State state;
+    SelfCheckParameters selfCheckParameters;
+    MachineCheckParameters machineCheckParameters;
+    MotionParameters motionParameters;
+    ModeFunctions _function;
+    int _functionData;
+    int _lock;
+} MachineState;
+
+typedef enum Parameter
+{
+    PARAM_SELF_CHARGE_PUMP,
+    PARAM_MACHINE_SWITCHED_POWER,
+    PARAM_MACHINE_ESD_TRAVEL_LIMIT,
+    PARAM_MACHINE_ESD_SWITCH,
+    PARAM_MACHINE_SERVO_OK,
+    PARAM_MACHINE_FORCE_GAUGE_COM,
+    PARAM_MACHINE_SERVO_COM,
+    PARAM_MACHINE_RTC_COM,
+    PARAM_MOTION_STATUS,
+    PARAM_MOTION_CONDITION,
+    PARAM_MOTION_MODE,
+    PARAM_FUNCTION
+} Parameter;
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachine.h"
+
+MachineState *machine_state_create();
+
+
+void machine_state_init(MachineState *machineState);
+void state_machine_set(MachineState *machineState, Parameter param, int state);
+_Bool  state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2);
+_Bool  state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2);
+_Bool  state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2);
+_Bool  state_machine_equal(MachineState *machineState1, MachineState *machineState2);
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Monitor.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Encoder/Encoder.h"
+
+
+typedef struct __using("lib/Encoder/jm_quadrature.spin2") Encoder;
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Monitor.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Monitor.h"
+typedef struct MonitorData
+{
+    int forceRaw;
+    int encoderRaw;
+    int forcemN;
+    int encoderum;
+    double force;
+    double position;
+    int setpoint;
+    unsigned int timems;
+    unsigned int timeus;
+    int log;
+} MonitorData;
+
+
+typedef struct MonitorDataPacket
+{
+    int forcemN;
+    int encoderum;
+    int setpointum;
+    unsigned int timeus;
+    int log;
+} MonitorDataPacket;
+
+typedef struct Monitor
+{
+    MonitorData data;
+    MachineState *machineState;
+    MachineConfiguration *configuration;
+    int sampleRate;
+    int cogid;
+
+    MonitorData cache;
+    int cacheLock;
+} Monitor;
+void monitor_sync_setpoint();
+void monitor_set_address(int addr);
+MonitorData *monitor_read_data();
+_Bool  monitor_begin(Monitor *monitor, MachineState *machineState, MachineConfiguration *configuration, int sampleRate);
+
+
+_Bool  read_sd_profile(MachineProfile * profile);
+int read_sd_card_data(MonitorData *data, int index, int count);
+int read_data_size();
+_Bool  write_sd_profile(MachineProfile * profile);
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey/i2cNavKey.h"
+#line 19 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey/i2cNavKey.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 20 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey/i2cNavKey.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 21 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey/i2cNavKey.h"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 22 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey/i2cNavKey.h"
+
+typedef struct __using("lib/Protocol/jm_i2c.spin2") Bus;
+
+
+enum GCONF_PARAMETER
+{
+	FLOAT_DATA = 0x01,
+	INT_DATA = 0x00,
+	WRAP_ENABLE = 0x02,
+	WRAP_DISABLE = 0x00,
+	DIRE_LEFT = 0x04,
+	DIRE_RIGHT = 0x00,
+	IPUP_DISABLE = 0x08,
+	IPUP_ENABLE = 0x00,
+	CLK_STRECH_ENABLE = 0x10,
+	CLK_STRECH_DISABLE = 0x00,
+	EEPROM_BANK1 = 0x20,
+	EEPROM_BANK2 = 0x00,
+	RESET = 0x80,
+};
+
+union Data_v
+{
+	float fval;
+	uint16_t wval;
+	int32_t val;
+	uint8_t bval[4];
+};
+typedef struct navkeystatus_t
+{
+	int UPR, UPP, DNR, DNP, RTR, RTP, LTR, LTP;
+	int CTRR, CTRP, CTRDP;
+	int RINC, RDEC, RMAX, RMIN;
+	int GP1POS, GP1NEG, GP2POS, GP2NEG, GP3POS, GP3NEG;
+	int FADEINT;
+} NavKeyStatus;
+
+typedef struct navkey_t
+{
+	Bus i2cBus;
+	int scl;
+	int sda;
+	NavKeyStatus status;
+	uint8_t _add;
+	uint16_t _stat;
+	uint8_t _stat2;
+	uint8_t _statfade;
+	uint8_t _gconf;
+	union Data_v _tem_data;
+} NavKey;
+
+void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf);
+void navkey_reset(NavKey *navkey);
+void navkey_auto_config_interrupt(NavKey *navkey);
+
+
+void navkey_update_status(NavKey *navkey);
+
+uint8_t navkey_read_gp1_conf(NavKey *navkey);
+uint8_t navkey_read_gp2_conf(NavKey *navkey);
+uint8_t navkey_read_gp3_conf(NavKey *navkey);
+uint16_t navkey_read_interrupt_config(NavKey *navkey);
+
+
+uint16_t navkey_read_status(NavKey *navkey);
+
+uint8_t navkey_read_int2(NavKey *navkey);
+
+uint8_t navkey_read_fade_status(NavKey *navkey);
+
+
+float navkey_read_counter_float(NavKey *navkey);
+int32_t navkey_read_counter_long(NavKey *navkey);
+int16_t navkey_read_counter_int(NavKey *navkey);
+int8_t navkey_read_counter_byte(NavKey *navkey);
+
+int32_t navkey_read_max(NavKey *navkey);
+float navkey_read_max_float(NavKey *navkey);
+
+int32_t navkey_read_min(NavKey *navkey);
+float navkey_read_min_float(NavKey *navkey);
+
+int32_t navkey_readStep(NavKey *navkey);
+float navkey_read_step_float(NavKey *navkey);
+
+
+uint8_t navkey_read_gp1(NavKey *navkey);
+uint8_t navkey_read_gp2(NavKey *navkey);
+uint8_t navkey_read_gp3(NavKey *navkey);
+
+
+uint8_t navkey_read_double_push_period(NavKey *navkey);
+uint8_t navkey_read_fade_gp(NavKey *navkey);
+
+
+uint8_t navkey_read_eeprom(NavKey *navkey, uint8_t add);
+
+
+uint8_t navkey_read_id_code(NavKey *navkey);
+uint8_t navkey_read_version(NavKey *navkey);
+
+
+void navkey_write_gp1_conf(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2_conf(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3_conf(NavKey *navkey, uint8_t gp3);
+void navkey_write_interrupt_config(NavKey *navkey, uint16_t interrupt);
+
+
+void navkey_write_counter(NavKey *navkey, int counter);
+
+void navkey_write_max(NavKey *navkey, int max);
+
+void navkey_write_min(NavKey *navkey, int min);
+
+void navkey_write_step(NavKey *navkey, int step);
+
+
+void navkey_write_gp1(NavKey *navkey, uint8_t gp1);
+void navkey_write_gp2(NavKey *navkey, uint8_t gp2);
+void navkey_write_gp3(NavKey *navkey, uint8_t gp3);
+
+
+void navkey_write_double_push_period(NavKey *navkey, uint8_t dperiod);
+void navkey_write_fade_gp(NavKey *navkey, uint8_t fade);
+
+void navkey_write_gamma_gp1(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp2(NavKey *navkey, uint8_t gamma);
+void navkey_write_gamma_gp3(NavKey *navkey, uint8_t gamma);
+
+
+void navkey_writeEEPROM(NavKey *navkey, uint8_t add, uint8_t data);
+
+void navkey_write8(NavKey *navkey, uint8_t reg, uint8_t data);
+void navkey_write16(NavKey *navkey, uint8_t reg, uint16_t data);
+void navkey_write32(NavKey *navkey, uint8_t reg, int32_t data);
+void navkey_write_float(NavKey *navkey, uint8_t reg, float data);
+void navkey_write24(NavKey *navkey, uint8_t reg, uint32_t data);
+#line 6 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachine.h"
+#line 7 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/IOBoard.h"
+#line 8 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/ControlSystem.h"
+
+typedef enum homingstate_e
+{
+    HOMING_NONE,
+    HOMING_COMPLETE,
+    HOMING_SEEKING,
+    HOMING_BACKING_OFF,
+    HOMING_SEEKING_SLOW
+} HomingState;
+
+typedef struct control_t
+{
+    MachineProfile *machineProfile;
+    MonitorData *monitorData;
+    MachineState *stateMachine;
+    int cogid;
+} ControlSystem;
+
+_Bool  control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine, MonitorData *monitorData);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+#line 1 "/home/mad/flexprop/include/stddef.h"
+#line 4 "/home/mad/flexprop/include/stddef.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+#line 5 "/home/mad/flexprop/include/stddef.h"
+#line 1 "/home/mad/flexprop/include/sys/null.h"
+#line 6 "/home/mad/flexprop/include/stddef.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 7 "/home/mad/flexprop/include/stddef.h"
+
+typedef long ptrdiff_t;
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+#line 17 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+typedef struct MachineConfiguration
+{
+    char motorType[ 20 ];
+    double maxMotorTorque;
+    double maxMotorRPM;
+    double gearDiameter;
+    double gearPitch;
+    double systemIntertia;
+    double staticTorque;
+    double load;
+    char positionEncoderType[ 20 ];
+    double positionEncoderStepsPerRev;
+    char forceGauge[ 20 ];
+    double forceGaugeScaleFactor;
+    int forceGaugeZeroFactor;
+} MachineConfiguration;
+
+typedef struct MachinePerformance
+{
+    double minPosition;
+    double maxPosition;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxForceTensile;
+    double maxForceCompression;
+    double forceGaugeNeutralOffset;
+} MachinePerformance;
+
+typedef struct MachineProfile
+{
+    char name[ 20 ];
+    MachineConfiguration configuration;
+    MachinePerformance performance;
+} MachineProfile;
+
+typedef struct SampleProfile
+{
+    char name[ 50 ];
+    double length;
+    double stretchMax;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxJerk;
+    double maxForceTensile;
+    double maxForceCompression;
+
+} SampleProfile;
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+#line 1 "/home/mad/flexprop/include/math.h"
+#line 77 "/home/mad/flexprop/include/math.h"
+typedef float float_t;
+typedef double double_t;
+#line 6 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 7 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning/MotionPlanning.h"
+
+typedef struct motionPeriods_s
+{
+    double x_goal;
+    double x0;
+    double v0;
+    double v_max;
+    double a_max;
+    double T1;
+    double T2;
+    double T3;
+    double a_acc;
+    double a_dec;
+    double v;
+} MotionPeriod;
+
+typedef struct setPoint_s
+{
+    double t;
+    double x;
+    double v;
+    double a;
+} SetPoint;
+
+double steps_to_mm(int steps, MachineConfiguration *config);
+int steps_to_um(int steps, MachineConfiguration *config);
+int mm_to_steps(double mm, MachineConfiguration *config);
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 6 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 7 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+#line 20 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+typedef struct __using("lib/Protocol/jm_i2c.spin2") I2CBus;
+typedef struct MCP23017_t
+{
+    I2CBus i2cBus;
+    uint8_t writeAddr, readAddr;
+    uint8_t dira, dirb;
+} MCP23017;
+
+_Bool  mcp23017_begin(MCP23017 *mcp23017, uint8_t addr, int sda, int scl);
+void mcp_update_register(MCP23017 *mcp23017);
+#line 37 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017/MCP23017.h"
+void mcp_set_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t direction);
+uint8_t mcp_get_direction(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
+
+void mcp_set_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pin(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
+
+void mcp_set_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg, uint8_t output);
+uint8_t mcp_get_pullup(MCP23017 *mcp23017, uint16_t pin, uint8_t reg);
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+#line 1 "/home/mad/flexprop/include/propeller.h"
+#line 13 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/cog.h"
+#line 14 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 15 "/home/mad/flexprop/include/propeller.h"
+#line 22 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/propeller2.h"
+#line 4 "/home/mad/flexprop/include/propeller2.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 5 "/home/mad/flexprop/include/propeller2.h"
+#line 56 "/home/mad/flexprop/include/propeller2.h"
+typedef struct _cartesian {
+   int32_t x, y;
+} cartesian_t;
+
+
+typedef struct _polar {
+   uint32_t r, t;
+} polar_t;
+
+
+typedef struct _counter64 {
+    uint32_t low, high;
+} counter64_t;
+#line 96 "/home/mad/flexprop/include/propeller2.h"
+void _clkset(uint32_t clkmode, uint32_t clkfreq);
+void _hubset(uint32_t val);
+void _reboot(void);
+
+
+int _coginit(int cog, void *pgm, void *ptr);
+#line 116 "/home/mad/flexprop/include/propeller2.h"
+void _cogstop(int cog);
+int _cogchk(int cog);
+int _cogid(void);
+
+int _locknew(void);
+void _lockret(int lock);
+
+int _locktry(int lock);
+int _lockrel(int lock);
+int _lockchk(int lock);
+
+void _cogatn(uint32_t mask);
+int _pollatn(void);
+int _waitatn(void);
+
+
+cartesian_t _rotxy(cartesian_t coord, uint32_t t);
+cartesian_t _polxy(polar_t coord);
+polar_t _xypol(cartesian_t coord);
+
+
+uint32_t _rnd(void);
+
+
+int _clz(uint32_t val);
+int _encod(uint32_t val);
+uint32_t _isqrt(uint32_t val);
+
+
+uint32_t _cnt(void);
+uint32_t _cnth(void);
+counter64_t _cnthl();
+uint32_t _getsec();
+uint32_t _getms();
+uint32_t _getus();
+
+uint32_t _pollcnt(uint32_t tick);
+void _waitcnt(uint32_t tick);
+
+void _waitx(uint32_t cycles);
+void _waitsec(uint32_t seconds);
+void _waitms(uint32_t milliseconds);
+void _waitus(uint32_t microseconds);
+
+
+void _pinw(int pin, int val);
+void _pinl(int pin);
+void _pinh(int pin);
+void _pinnot(int pin);
+void _pinrnd(int pin);
+void _pinf(int pin);
+int _pinr(int pin);
+
+
+void _wrpin(int pin, uint32_t val);
+void _wxpin(int pin, uint32_t val);
+void _wypin(int pin, uint32_t val);
+void _akpin(int pin);
+uint32_t _rdpin(int pin);
+uint32_t _rqpin(int pin);
+
+
+void _pinstart(int pin, uint32_t mode, uint32_t xval, uint32_t yval);
+
+void _pinclear(int pin);
+
+
+extern uint32_t _clockfreq(void);
+extern uint32_t _clockmode(void);
+#line 23 "/home/mad/flexprop/include/propeller.h"
+#line 6 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/ControlSystem.c"
+
+
+
+
+
+static long control_stack[ 20000 ];
+
+
+
+extern  _Bool  monitorLogData;
+
+static NavKey navkey;
+static MCP23017 mcp;
+
+typedef enum homingstate_e
+{
+    HOMING_NONE,
+    HOMING_COMPLETE,
+    HOMING_SEEKING,
+    HOMING_BACKING_OFF,
+    HOMING_SEEKING_SLOW
+} HomingState;
+
+typedef enum movetype_e
+{
+    MOVE_RELATIVE,
+    MOVE_ABSOLUTE,
+    MOVE_SPEED,
+    MOVE_STOP
+} MoveType;
+
+static void move_setpoint(ControlSystem *control)
+{
+    int setpoint = control->monitorData->setpoint;
+    int setpointSteps = mm_to_steps((setpoint) / 1000.0, &(control->machineProfile->configuration));
+    move_abs32(DYN1_ADDR, setpointSteps);
+}
+
+static  _Bool  move_servo(ControlSystem *control, MoveType type, int moveum)
+{
+    switch (type)
+    {
+    case MOVE_STOP:
+    {
+
+        break;
+    }
+    case MOVE_RELATIVE:
+    {
+        control->monitorData->setpoint += moveum;
+
+        break;
+    }
+    case MOVE_ABSOLUTE:
+    {
+        control->monitorData->setpoint = moveum;
+
+        break;
+    }
+    case MOVE_SPEED:
+    {
+
+
+    }
+    }
+    return  (1) ;
+}
+
+
+static void control_cog(ControlSystem *control)
+{
+
+    while (!mcp23017_begin(&mcp,  0 ,  26 ,  0 ))
+    {
+
+        _waitms(100);
+    }
+
+
+    navkey_begin(&navkey, 29, 28,  0b00100100 , INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
+    navkey_write_counter(&navkey, 0);
+    navkey_write_max(&navkey, 100000);
+    navkey_write_min(&navkey, -100000);
+    navkey_write_step(&navkey, 1);
+    navkey_write_double_push_period(&navkey, 300);
+    navkey_write_counter(&navkey, 0);
+
+    MachineState lastState = *(control->stateMachine);
+    _waitms(1000);
+
+
+    long startTime = 0;
+    int startPosition = 0;
+    int lastPosition = 0;
+
+    int lastEncoderRead = 0;
+
+    _Bool  initial =  (1) ;
+    int servoCheckCount = 0;
+    MonitorData lastData = *control->monitorData;
+    while (1)
+    {
+        MachineState currentMachineState = *(control->stateMachine);
+        MonitorData data = *(control->monitorData);
+        int forcemN = raw_to_force(control->monitorData->forceRaw, &(control->machineProfile->configuration));
+        MachinePerformance machinePerformance = control->machineProfile->performance;
+        mcp_update_register(&mcp);
+        mcp_set_pin(&mcp,  6 ,  _DIRA , 0);
+
+
+
+
+        if (currentMachineState.selfCheckParameters.chargePump)
+        {
+            mcp_set_pin(&mcp,  4 ,  _DIRA , 0);
+        }
+        else
+        {
+            mcp_set_pin(&mcp,  4 ,  _DIRA , 0);
+        }
+
+
+
+        if (mcp_get_pin(&mcp,  3 ,  _DIRA ) == 0)
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_SWITCHED_POWER, (int) (1) );
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_SWITCHED_POWER, (int) (0) );
+        }
+
+
+        if (mcp_get_pin(&mcp,  1 ,  _DIRA ) == 0)
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_LOWER);
+        }
+        else if (mcp_get_pin(&mcp,  0 ,  _DIRA ) == 0)
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_UPPER);
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_OK);
+        }
+
+
+        if (mcp_get_pin(&mcp,  3 ,  _DIRB ) == 1)
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_SWITCH, (int) (1) );
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_SWITCH, (int) (0) );
+        }
+
+
+        if (mcp_get_pin(&mcp,  2 ,  _DIRA ) == 1)
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int) (1) );
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int) (0) );
+        }
+
+
+
+        if ( (0) )
+        {
+        }
+        else if ( (0) )
+        {
+        }
+        else if (forcemN >= 0 && forcemN > machinePerformance.maxForceTensile * 1000)
+        {
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_TENSION);
+        }
+        else if (forcemN < 0 && forcemN < -machinePerformance.maxForceCompression * 1000)
+        {
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_COMPRESSION);
+        }
+        else if (mcp_get_pin(&mcp,  4 ,  _DIRB ) == 1)
+        {
+
+
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_UPPER);
+        }
+        else if (mcp_get_pin(&mcp,  5 ,  _DIRB ) == 1)
+        {
+
+
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_LOWER);
+        }
+        else if (mcp_get_pin(&mcp,  6 ,  _DIRB ) == 1)
+        {
+
+
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_DOOR);
+        }
+        else if ( __builtin_abs(lastEncoderRead - control->monitorData->encoderRaw)  < 2)
+        {
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_STOPPED);
+        }
+        else
+        {
+            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_MOVING);
+        }
+
+        if (currentMachineState.state == STATE_MOTION)
+        {
+            if (lastState.state != STATE_MOTION || initial)
+            {
+            }
+            if (currentMachineState.motionParameters.status == MOTIONSTATUS_DISABLED)
+            {
+                motion_disable();
+            }
+            else
+            {
+                motion_enable();
+                if (lastState.motionParameters.status != MOTIONSTATUS_ENABLED || initial)
+                {
+
+
+
+                }
+                if (currentMachineState.motionParameters.mode == MODE_MANUAL)
+                {
+                    if (lastState.motionParameters.mode != MODE_MANUAL || initial)
+                    {
+
+
+                    }
+
+                    navkey_update_status(&navkey);
+                    if (navkey.status.CTRR > 0)
+                    {
+
+
+                        if (currentMachineState.motionParameters.condition == CONDITION_STOPPED)
+                        {
+
+                            switch (currentMachineState._function)
+                            {
+                            case FUNC_MANUAL_OFF:
+                                control->stateMachine->_function = FUNC_MANUAL_INCREMENTAL_JOG;
+                                break;
+                            case FUNC_MANUAL_INCREMENTAL_JOG:
+                                control->stateMachine->_function = FUNC_MANUAL_CONTINUOUS_JOG;
+                                break;
+                            case FUNC_MANUAL_CONTINUOUS_JOG:
+                                control->stateMachine->_function = FUNC_MANUAL_POSITIONAL_MOVE;
+                                break;
+                            case FUNC_MANUAL_POSITIONAL_MOVE:
+                                control->stateMachine->_function = FUNC_MANUAL_HOME;
+                                break;
+                            case FUNC_MANUAL_HOME:
+                                control->stateMachine->_function = FUNC_MANUAL_OFF;
+                                break;
+                            case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
+                                break;
+                            case FUNC_MANUAL_MOVE_FORCE:
+                                break;
+                            default:
+                                control->stateMachine->_function = FUNC_MANUAL_OFF;
+                                break;
+                            }
+
+                        }
+                        else if (control->stateMachine->motionParameters.condition == CONDITION_MOVING)
+                        {
+                            control->stateMachine->_function = FUNC_MANUAL_OFF;
+                        }
+                    }
+
+
+                    switch (currentMachineState._function)
+                    {
+                    case FUNC_MANUAL_OFF:
+                        move_servo(control, MOVE_STOP, 0);
+                        break;
+                    case FUNC_MANUAL_INCREMENTAL_JOG:
+                        if (lastState._function != FUNC_MANUAL_INCREMENTAL_JOG || initial)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            control->stateMachine->_functionData = 1000;
+                        }
+                        if (navkey.status.LTR > 0)
+                        {
+                            if (control->stateMachine->_functionData < 10000)
+                                control->stateMachine->_functionData /= 10;
+                        }
+                        if (navkey.status.RTR > 0)
+                        {
+                            if (control->stateMachine->_functionData > 10)
+                            {
+                                control->stateMachine->_functionData *= 10;
+                            }
+                        }
+                        if (navkey.status.UPR > 0)
+                        {
+                            move_servo(control, MOVE_RELATIVE, control->stateMachine->_functionData);
+                        }
+                        if (navkey.status.DNR > 0)
+                        {
+                            move_servo(control, MOVE_RELATIVE, -1 * control->stateMachine->_functionData);
+                        }
+                        break;
+                    case FUNC_MANUAL_CONTINUOUS_JOG:
+                        if (lastState._function != FUNC_MANUAL_CONTINUOUS_JOG || initial)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            control->stateMachine->_functionData = 10000;
+                        }
+                        if (navkey.status.LTR > 0)
+                        {
+                            control->stateMachine->_functionData -= 1000;
+                        }
+                        if (navkey.status.RTR > 0)
+                        {
+                            control->stateMachine->_functionData += 1000;
+                        }
+                        if (navkey.status.UPP > 0)
+                        {
+                            move_servo(control, MOVE_SPEED, control->stateMachine->_functionData);
+                        }
+                        if (navkey.status.DNP > 0)
+                        {
+                            move_servo(control, MOVE_SPEED, -1 * control->stateMachine->_functionData);
+                        }
+                        if (navkey.status.UPR > 0)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                        }
+                        if (navkey.status.DNR > 0)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                        }
+                        break;
+                    case FUNC_MANUAL_POSITIONAL_MOVE:
+                        if (lastState._function != FUNC_MANUAL_POSITIONAL_MOVE || initial)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            control->stateMachine->_functionData = 1000 *  __builtin_round(steps_to_mm(control->monitorData->encoderRaw, &(control->machineProfile->configuration)) / 1000.0) ;
+                        }
+                        if (navkey.status.LTR > 0)
+                        {
+                            control->stateMachine->_functionData -= 1000;
+                        }
+                        if (navkey.status.RTR > 0)
+                        {
+                            control->stateMachine->_functionData += 1000;
+                        }
+                        if (navkey.status.UPR > 0)
+                        {
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->_functionData);
+                        }
+                        if (navkey.status.DNR > 0)
+                        {
+                            move_servo(control, MOVE_ABSOLUTE, control->stateMachine->_functionData);
+                        }
+                        break;
+                    case FUNC_MANUAL_HOME:
+                        if (lastState._function != FUNC_MANUAL_HOME || initial)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            control->stateMachine->_functionData = HOMING_NONE;
+                        }
+
+                        if (mcp_get_pin(&mcp,  5 ,  _DIRB ) == 1 && control->stateMachine->_functionData == HOMING_SEEKING)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            _waitms(100);
+                            move_servo(control, MOVE_SPEED, -1500);
+
+                            control->stateMachine->_functionData = HOMING_BACKING_OFF;
+
+                        }
+                        else if (mcp_get_pin(&mcp,  5 ,  _DIRB ) == 0 && control->stateMachine->_functionData == HOMING_BACKING_OFF)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            _waitms(100);
+                            move_servo(control, MOVE_SPEED, 1500);
+                            control->stateMachine->_functionData = HOMING_SEEKING_SLOW;
+                        }
+                        else if (mcp_get_pin(&mcp,  5 ,  _DIRB ) == 1 && control->stateMachine->_functionData == HOMING_SEEKING_SLOW)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                            _waitms(1000);
+
+
+                            control->stateMachine->_functionData = HOMING_COMPLETE;
+                        }
+                        if (navkey.status.UPR > 0)
+                        {
+                            control->stateMachine->_functionData = HOMING_SEEKING;
+                            move_servo(control, MOVE_SPEED, 10000);
+                        }
+                        if (navkey.status.DNR > 0)
+                        {
+                            control->stateMachine->_functionData = HOMING_SEEKING;
+                            move_servo(control, MOVE_SPEED, 10000);
+                        }
+                        break;
+                    case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
+                        move_servo(control, MOVE_STOP, 0);
+                        break;
+                    case FUNC_MANUAL_MOVE_FORCE:
+                        if (lastState._function != FUNC_MANUAL_MOVE_FORCE || initial)
+                        {
+                            control->stateMachine->_functionData = 0;
+                        }
+                        if (navkey.status.LTR > 0)
+                        {
+                            control->stateMachine->_functionData += 100;
+                        }
+                        if (navkey.status.RTR > 0)
+                        {
+                            if (control->stateMachine->_functionData > 100)
+                            {
+                                control->stateMachine->_functionData -= 100;
+                            }
+                        }
+                        if (forcemN * 1000 < control->stateMachine->_functionData)
+                        {
+                            if (navkey.status.UPP > 0)
+                            {
+                                move_servo(control, MOVE_SPEED, 100);
+                            }
+                            if (navkey.status.DNP > 0)
+                            {
+                                move_servo(control, MOVE_SPEED, 100);
+                            }
+                        }
+                        else
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                        }
+                        if (navkey.status.UPR > 0)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                        }
+                        if (navkey.status.DNR > 0)
+                        {
+                            move_servo(control, MOVE_STOP, 0);
+                        }
+                        break;
+                    }
+                }
+                else if (currentMachineState.motionParameters.mode == MODE_TEST)
+                {
+                }
+                else if (currentMachineState.motionParameters.mode == MODE_TEST_RUNNING)
+                {
+                    if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
+                    {
+                        motion_test_start();
+                        monitorLogData =  (1) ;
+                    }
+
+
+                    if (motion_test_is_empty())
+                    {
+                        monitorLogData =  (0) ;
+                        motion_test_end();
+                        state_machine_set(control->stateMachine, PARAM_MOTION_MODE, MODE_TEST);
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            motion_disable();
+        }
+        lastEncoderRead = control->monitorData->encoderRaw;
+        lastState = currentMachineState;
+        lastData = data;
+        initial =  (0) ;
+    }
+}
+
+_Bool  control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine, MonitorData *monitorData)
+{
+    control->machineProfile = machineProfile;
+    control->monitorData = monitorData;
+    control->stateMachine = stateMachine;
+    control->cogid =  __builtin_cogstart(control_cog(control), &control_stack[0]) ;
+    if (control->cogid != -1)
+    {
+        return  (1) ;
+    }
+    return  (0) ;
+}

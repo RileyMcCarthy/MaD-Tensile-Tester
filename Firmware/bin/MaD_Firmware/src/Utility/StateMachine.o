@@ -1,0 +1,418 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/StateMachine.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachine.h"
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachine.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachine.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+
+typedef enum State
+{
+    STATE_SELFCHECK,
+    STATE_MACHINECHECK,
+    STATE_MOTION
+} State;
+
+typedef enum MotionStatus
+{
+    MOTIONSTATUS_DISABLED,
+    MOTIONSTATUS_ENABLED,
+    MOTIONSTATUS_SAMPLE_LIMIT,
+    MOTIONSTATUS_MACHINE_LIMIT,
+    MOTIONSTATUS_FAULTED
+} MotionStatus;
+
+typedef enum MotionOverTravel
+{
+    MOTION_LIMIT_OK,
+    MOTION_LIMIT_UPPER,
+    MOTION_LIMIT_LOWER
+} MotionOverTravel;
+#line 30 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/StateMachineDefinition.h"
+typedef enum MotionCondition
+{
+    CONDITION_LENGTH,
+    CONDITION_FORCE,
+    CONDITION_TENSION,
+    CONDITION_COMPRESSION,
+    CONDITION_UPPER,
+    CONDITION_LOWER,
+    CONDITION_DOOR,
+    CONDITION_STOPPED,
+    CONDITION_MOVING,
+} MotionCondition;
+
+typedef enum MotionMode
+{
+    MODE_MANUAL,
+    MODE_TEST,
+    MODE_TEST_RUNNING
+} MotionMode;
+
+typedef enum ModeFunctions
+{
+    FUNC_MANUAL_OFF,
+    FUNC_MANUAL_INCREMENTAL_JOG,
+    FUNC_MANUAL_CONTINUOUS_JOG,
+    FUNC_MANUAL_POSITIONAL_MOVE,
+    FUNC_MANUAL_HOME,
+    FUNC_MANUAL_MOVE_GAUGE_LENGTH,
+    FUNC_MANUAL_MOVE_FORCE,
+    FUNC_TEST_LOAD,
+    FUNC_TEST_RUN,
+    FUNC_TEST_STOP,
+    FUNC_TEST_TOGGLE_HOLD_RESUME
+} ModeFunctions;
+
+typedef struct SelfCheckParameters
+{
+    _Bool  chargePump;
+} SelfCheckParameters;
+
+typedef struct MachineCheckParameters
+{
+    _Bool  switchedPower;
+    MotionOverTravel esdTravelLimit;
+    _Bool  esdSwitch;
+    _Bool  servoOK;
+    _Bool  forceGaugeCom;
+    _Bool  servoCom;
+    _Bool  rtcCom;
+
+} MachineCheckParameters;
+
+typedef struct MotionParameters
+{
+    MotionStatus status;
+    MotionCondition condition;
+    MotionMode mode;
+} MotionParameters;
+
+
+typedef struct MachineState
+{
+    State state;
+    SelfCheckParameters selfCheckParameters;
+    MachineCheckParameters machineCheckParameters;
+    MotionParameters motionParameters;
+    ModeFunctions _function;
+    int _functionData;
+    int _lock;
+} MachineState;
+
+typedef enum Parameter
+{
+    PARAM_SELF_CHARGE_PUMP,
+    PARAM_MACHINE_SWITCHED_POWER,
+    PARAM_MACHINE_ESD_TRAVEL_LIMIT,
+    PARAM_MACHINE_ESD_SWITCH,
+    PARAM_MACHINE_SERVO_OK,
+    PARAM_MACHINE_FORCE_GAUGE_COM,
+    PARAM_MACHINE_SERVO_COM,
+    PARAM_MACHINE_RTC_COM,
+    PARAM_MOTION_STATUS,
+    PARAM_MOTION_CONDITION,
+    PARAM_MOTION_MODE,
+    PARAM_FUNCTION
+} Parameter;
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/StateMachine.h"
+
+MachineState *machine_state_create();
+
+
+void machine_state_init(MachineState *machineState);
+void state_machine_set(MachineState *machineState, Parameter param, int state);
+_Bool  state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2);
+_Bool  state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2);
+_Bool  state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2);
+_Bool  state_machine_equal(MachineState *machineState1, MachineState *machineState2);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/StateMachine.c"
+#line 7 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/StateMachine.c"
+static State state_machine_self_check(MachineState *machineState)
+{
+    State newState;
+
+    machineState->selfCheckParameters.chargePump =  (1) ;
+
+
+    if (machineState->selfCheckParameters.chargePump)
+    {
+        newState = STATE_MACHINECHECK;
+    }
+    else
+    {
+        newState = STATE_SELFCHECK;
+    }
+
+    return newState;
+}
+#line 32 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/StateMachine.c"
+static State state_machine_check(MachineState *machineState)
+{
+
+
+    State newState = state_machine_self_check(machineState);
+    if (newState != STATE_MACHINECHECK)
+    {
+        return newState;
+    }
+
+    MachineCheckParameters params = machineState->machineCheckParameters;
+
+    if (params.switchedPower &&
+        params.esdTravelLimit == MOTION_LIMIT_OK &&
+        params.esdSwitch &&
+        params.servoOK &&
+        params.forceGaugeCom &&
+
+        params.rtcCom)
+    {
+        return STATE_MOTION;
+    }
+    else
+    {
+
+        return STATE_MACHINECHECK;
+    }
+}
+
+static State state_machine_motion(MachineState *machineState)
+{
+
+
+    State newState = state_machine_check(machineState);
+    if (newState != STATE_MOTION)
+    {
+
+        if (machineState->state == STATE_MOTION &&
+            (machineState->machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK ||
+             !machineState->machineCheckParameters.esdSwitch))
+        {
+
+
+            machineState->motionParameters.status = MOTIONSTATUS_FAULTED;
+        }
+        else
+        {
+            machineState->motionParameters.status = MOTIONSTATUS_DISABLED;
+        }
+
+        machineState->motionParameters.mode = MODE_MANUAL;
+        return newState;
+    }
+
+
+    if (machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+    {
+        switch (machineState->motionParameters.condition)
+        {
+        case CONDITION_LENGTH:
+            machineState->motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+            break;
+        case CONDITION_FORCE:
+            machineState->motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+            break;
+        case CONDITION_TENSION:
+            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            break;
+        case CONDITION_COMPRESSION:
+            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            break;
+        case CONDITION_UPPER:
+            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            break;
+        case CONDITION_LOWER:
+            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            break;
+        case CONDITION_DOOR:
+            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            break;
+        case CONDITION_STOPPED:
+            if (machineState->motionParameters.status != MOTIONSTATUS_ENABLED && machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+            {
+
+                machineState->motionParameters.status = MOTIONSTATUS_ENABLED;
+            }
+            break;
+        case CONDITION_MOVING:
+            if (machineState->motionParameters.status != MOTIONSTATUS_ENABLED && machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+            {
+
+                machineState->motionParameters.status = MOTIONSTATUS_ENABLED;
+            }
+            break;
+        }
+    }
+    else
+    {
+        machineState->motionParameters.mode = MODE_MANUAL;
+    }
+
+    return STATE_MOTION;
+}
+
+static void state_machine_update(MachineState *machineState)
+{
+    while (!_locktry(machineState->_lock))
+        ;
+
+    machineState->state = state_machine_motion(machineState);
+    _lockrel(machineState->_lock);
+}
+
+_Bool  state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2)
+{
+    return selfCheckParameters1->chargePump == selfCheckParameters2->chargePump;
+}
+
+_Bool  state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2)
+{
+    return motionParameters1->switchedPower == motionParameters2->switchedPower &&
+           motionParameters1->esdTravelLimit == motionParameters2->esdTravelLimit &&
+           motionParameters1->esdSwitch == motionParameters2->esdSwitch &&
+           motionParameters1->servoOK == motionParameters2->servoOK &&
+           motionParameters1->forceGaugeCom == motionParameters2->forceGaugeCom &&
+           motionParameters1->servoCom == motionParameters2->servoCom &&
+           motionParameters1->rtcCom == motionParameters2->rtcCom;
+}
+
+_Bool  state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2)
+{
+    return motionParameters1->status == motionParameters2->status &&
+           motionParameters1->mode == motionParameters2->mode &&
+           motionParameters1->condition == motionParameters2->condition;
+}
+
+_Bool  state_machine_equal(MachineState *machineState1, MachineState *machineState2)
+{
+    return state_machine_self_check_equal(&(machineState1->selfCheckParameters), &(machineState2->selfCheckParameters)) &&
+           state_machine_check_equal(&(machineState1->machineCheckParameters), &(machineState2->machineCheckParameters)) &&
+           state_machine_motion_equal(&(machineState1->motionParameters), &(machineState2->motionParameters)) &&
+           machineState1->state == machineState2->state &&
+           machineState1->_function == machineState2->_function &&
+           machineState1->_functionData == machineState2->_functionData;
+}
+
+
+void state_machine_set(MachineState *machineState, Parameter param, int state)
+{
+    switch (param)
+    {
+    case PARAM_SELF_CHARGE_PUMP:
+        if (machineState->selfCheckParameters.chargePump != state)
+        {
+            machineState->selfCheckParameters.chargePump = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_SWITCHED_POWER:
+        if (machineState->machineCheckParameters.switchedPower != state)
+        {
+            machineState->machineCheckParameters.switchedPower = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_ESD_TRAVEL_LIMIT:
+        if (machineState->machineCheckParameters.esdTravelLimit != state)
+        {
+            machineState->machineCheckParameters.esdTravelLimit = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_ESD_SWITCH:
+        if (machineState->machineCheckParameters.esdSwitch != state)
+        {
+            machineState->machineCheckParameters.esdSwitch = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_SERVO_OK:
+        if (machineState->machineCheckParameters.servoOK != state)
+        {
+            machineState->machineCheckParameters.servoOK = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_FORCE_GAUGE_COM:
+        if (machineState->machineCheckParameters.forceGaugeCom != state)
+        {
+            machineState->machineCheckParameters.forceGaugeCom = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_SERVO_COM:
+        if (machineState->machineCheckParameters.servoCom != state)
+        {
+            machineState->machineCheckParameters.servoCom = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MACHINE_RTC_COM:
+        if (machineState->machineCheckParameters.rtcCom != state)
+        {
+            machineState->machineCheckParameters.rtcCom = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MOTION_STATUS:
+        if (machineState->motionParameters.status != state)
+        {
+            machineState->motionParameters.status = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MOTION_CONDITION:
+        if (machineState->motionParameters.condition != state)
+        {
+            machineState->motionParameters.condition = state;
+            state_machine_update(machineState);
+        }
+        break;
+    case PARAM_MOTION_MODE:
+        if (machineState->motionParameters.mode != state)
+        {
+            if (machineState->motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
+            {
+                printf("Must be in test mode to run test\n");
+                break;
+            }
+
+            machineState->motionParameters.mode = state;
+            state_machine_update(machineState);
+        }
+    case PARAM_FUNCTION:
+        if (machineState->_function != state)
+        {
+            machineState->_function = state;
+            state_machine_update(machineState);
+        }
+        break;
+    }
+}
+
+void machine_state_init(MachineState *machineState)
+{
+    machineState->state = STATE_SELFCHECK;
+
+    machineState->selfCheckParameters.chargePump =  (0) ;
+
+    machineState->machineCheckParameters.switchedPower =  (0) ;
+    machineState->machineCheckParameters.esdTravelLimit = MOTION_LIMIT_OK;
+    machineState->machineCheckParameters.esdSwitch =  (0) ;
+    machineState->machineCheckParameters.servoOK =  (0) ;
+    machineState->machineCheckParameters.forceGaugeCom =  (0) ;
+    machineState->machineCheckParameters.servoCom =  (0) ;
+    machineState->machineCheckParameters.rtcCom =  (1) ;
+
+    machineState->motionParameters.condition = CONDITION_STOPPED;
+    machineState->motionParameters.mode = MODE_MANUAL;
+    machineState->motionParameters.status = MOTIONSTATUS_DISABLED;
+    machineState->_function = FUNC_MANUAL_OFF;
+
+    machineState->_lock = _locknew();
+    if (machineState->_lock == -1)
+    {
+
+    }
+}

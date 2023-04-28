@@ -1,0 +1,283 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/MaD.h"
+#line 32 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Main/MaD.h"
+void mad_begin();
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
+#line 1 "/home/mad/flexprop/include/sys/vfs.h"
+#line 4 "/home/mad/flexprop/include/sys/vfs.h"
+#line 1 "/home/mad/flexprop/include/sys/types.h"
+#line 6 "/home/mad/flexprop/include/sys/types.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+
+
+
+
+
+  typedef  unsigned long  size_t;
+#line 7 "/home/mad/flexprop/include/sys/types.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 15 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef int wchar_t;
+#line 24 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef struct _Mbstate {
+  unsigned int total:5;
+  unsigned int left:5;
+  unsigned int partial:22;
+} _Mbstate_t;
+#line 8 "/home/mad/flexprop/include/sys/types.h"
+#line 1 "/home/mad/flexprop/include/time.h"
+#line 6 "/home/mad/flexprop/include/time.h"
+#line 1 "/home/mad/flexprop/include/compiler.h"
+#line 7 "/home/mad/flexprop/include/time.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+#line 8 "/home/mad/flexprop/include/time.h"
+#line 13 "/home/mad/flexprop/include/time.h"
+typedef unsigned int clock_t;
+#line 29 "/home/mad/flexprop/include/time.h"
+typedef unsigned long time_t;
+
+
+
+
+struct tm {
+  int tm_sec;
+  int tm_min;
+  int tm_hour;
+  int tm_mday;
+  int tm_mon;
+  int tm_year;
+  int tm_wday;
+  int tm_yday;
+  int tm_isdst;
+};
+
+
+    clock_t clock(void)  __fromfile("libc/sys/propeller/clock.c") ;
+    time_t time(time_t *)  __fromfile("libc/time/time.c") ;
+    double difftime(time_t time2, time_t time1)  __fromfile("libc/time/difftime.c") ;
+
+    time_t mktime(struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+
+    struct tm *_gmtime_r(const time_t *t, struct tm *stm)  __fromfile("libc/time/localtim.c") ;
+    struct tm *gmtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+    struct tm *_localtime_r(const time_t *, struct tm *)  __fromfile("libc/time/localtim.c") ;
+    struct tm *localtime(const time_t *)  __fromfile("libc/time/localtim.c") ;
+
+
+    int _gettimezone(void)  __fromfile("libc/time/localtim.c") ;
+
+    unsigned long  strftime(char *s,  unsigned long  max, const char *format, const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/strftime.c") ;
+
+    char *asctime(const struct tm *stm)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+    char *asctime_r(const struct tm *stm, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+    char *ctime(const time_t *timep)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+    char *ctime_r(const time_t *timep, char *buf)  __attribute__((complexio))   __fromfile("libc/time/asctime.c") ;
+#line 75 "/home/mad/flexprop/include/time.h"
+    void _tzset(void)  __fromfile("libc/time/localtim.c") ;
+#line 9 "/home/mad/flexprop/include/sys/types.h"
+
+
+typedef long off_t;
+
+
+
+typedef long ssize_t;
+
+
+
+typedef int dev_t;
+typedef int ino_t;
+typedef unsigned int mode_t;
+
+typedef unsigned short uid_t;
+typedef unsigned short gid_t;
+
+typedef int pid_t;
+
+struct stat {
+  int st_dev;
+  int st_ino;
+  unsigned int st_mode;
+  int st_nlink;
+  uid_t st_uid;
+  gid_t st_gid;
+  int st_rdev;
+  long st_size;
+  long st_blksize;
+  long st_blocks;
+  time_t st_atime;
+  time_t st_mtime;
+  time_t st_ctime;
+};
+
+typedef struct s_vfs_file_t vfs_file_t;
+
+struct s_vfs_file_t {
+    void *vfsdata;
+    unsigned flags;
+    unsigned state;
+    int lock;
+    ssize_t (*read)(vfs_file_t *fil, void *buf, size_t count);
+    ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t count);
+    int (*putcf)(int c, vfs_file_t *fil);
+    int (*getcf)(vfs_file_t *fil);
+    int (*close)(vfs_file_t *fil);
+    int (*ioctl)(vfs_file_t *fil, int arg, void *buf);
+    int (*flush)(vfs_file_t *fil);
+    off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+
+
+    int putchar(int c) {
+        int i;
+        if (!putcf) return 0;
+        i = putcf(c, __this); return (i < 0) ? 0 : 1;
+    }
+    int getchar(void) {
+        if (!getcf) return -1;
+        return getcf(__this);
+    }
+};
+
+typedef int (*putcfunc_t)(int c, vfs_file_t *fil);
+typedef int (*getcfunc_t)(vfs_file_t *fil);
+#line 5 "/home/mad/flexprop/include/sys/vfs.h"
+#line 1 "/home/mad/flexprop/include/dirent.h"
+#line 4 "/home/mad/flexprop/include/dirent.h"
+#line 1 "/home/mad/flexprop/include/sys/limits.h"
+#line 5 "/home/mad/flexprop/include/dirent.h"
+#line 8 "/home/mad/flexprop/include/dirent.h"
+struct dirent {
+    char d_name[ (64) ];
+    unsigned long d_off;
+    unsigned long d_ino;
+    unsigned long d_size;
+    unsigned long d_mtime;
+    unsigned char d_type;
+};
+
+
+
+
+
+
+typedef struct _dir {
+    void *vfs;
+    void *vfsdata;
+    struct dirent dirent;
+} DIR;
+
+DIR *opendir(const char *name)  __fromfile("libc/unix/opendir.c") ;
+int closedir(DIR *dir)  __fromfile("libc/unix/opendir.c") ;
+struct dirent *readdir(DIR *dirp)  __fromfile("libc/unix/opendir.c") ;
+#line 6 "/home/mad/flexprop/include/sys/vfs.h"
+
+typedef DIR vfs_dir_t;
+#line 11 "/home/mad/flexprop/include/sys/vfs.h"
+struct vfs {
+
+    int (*close)(vfs_file_t *fil);
+    ssize_t (*read)(vfs_file_t *fil, void *buf, size_t siz);
+    ssize_t (*write)(vfs_file_t *fil, const void *buf, size_t siz);
+    off_t (*lseek)(vfs_file_t *fil, off_t offset, int whence);
+    int (*ioctl)(vfs_file_t *fil, unsigned long req, void *argp);
+    int (*flush)(vfs_file_t *fil);
+    void *vfs_data;
+    void *reserved;
+
+    int (*open)(vfs_file_t *fil, const char *name, int flags);
+    int (*creat)(vfs_file_t *fil, const char *pathname, mode_t mode);
+
+    int (*opendir)(vfs_dir_t *dir, const char *name);
+    int (*closedir)(vfs_dir_t *dir);
+    int (*readdir)(vfs_dir_t *dir, struct dirent *ent);
+    int (*stat)(const char *name, struct stat *buf);
+
+    int (*mkdir)(const char *name, mode_t mode);
+    int (*rmdir)(const char *name);
+
+    int (*remove)(const char *pathname);
+    int (*rename)(const char *oldname, const char *newname);
+
+    int (*init)(const char *mountname);
+    int (*deinit)(const char *mountname);
+};
+
+typedef struct vfs vfs_t;
+
+int _openraw(void *f, const char *name, unsigned flags, unsigned perm)  __fromfile("libc/unix/posixio.c") ;
+int _closeraw(void *f)  __fromfile("libc/unix/posixio.c") ;
+
+
+
+struct vfs *_getrootvfs(void);
+void _setrootvfs(struct vfs *);
+
+struct vfs *_vfs_open_host(void)  __fromfile("filesys/fs9p/fs9p_vfs.c") ;
+struct vfs *_vfs_open_sdcard(void)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+struct vfs *_vfs_open_sdcardx(int pclk = 61, int pss = 60, int pdi = 59, int pdo = 58)  __fromfile("filesys/fatfs/fatfs_vfs.c") ;
+#line 64 "/home/mad/flexprop/include/sys/vfs.h"
+struct _default_buffer {
+    int cnt;
+    unsigned char *ptr;
+    unsigned flags;
+
+
+    unsigned char buf[ 1024 ];
+};
+
+int __default_getc(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+int __default_putc(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+int __default_putc_terminal(int c, vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+int __default_flush(vfs_file_t *f)  __fromfile("libc/unix/bufio.c") ;
+
+
+char *__getfilebuffer();
+struct vfs *__getvfsforfile(char *fullname, const char *orig_name, char *full_path);
+#line 5 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
+enum
+{
+    HEAPSIZE = 32400 * 1
+};
+
+double atof(const char *str)
+{
+    int sign;
+    double number = 0.0, power = 1.0;
+
+    while (isspace(*str))
+        ++str;
+
+    sign = (*str == '-') ? -1 : 1;
+
+    if (*str == '-' || *str == '+')
+        str++;
+
+    while (isdigit(*str))
+    {
+        number = 10.0 * number + (*str - '0');
+        str++;
+    }
+
+    if (*str == '.')
+        str++;
+
+    while (isdigit(*str))
+    {
+        number = 10.0 * number + (*str - '0');
+        power *= 10.0;
+        str++;
+    }
+
+    return sign * number / power;
+}
+#line 49 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Main/main.c"
+int main()
+{
+
+    mount("/sd", _vfs_open_sdcard());
+   mad_begin();
+    while (1)
+        ;
+    return 0;
+}

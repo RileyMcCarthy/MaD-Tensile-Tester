@@ -72,7 +72,7 @@ def serial_thread():
                 #print('Recieving test data count: ', data.value)
                 global test_data_count
                 test_data_count = data.value
-        socketio.sleep(0.001)
+        socketio.sleep(0.1)
 
 def data_thread():
     # Data thread is respondsible for sending the data request command to the serial port
@@ -88,7 +88,7 @@ def state_thread():
     index = 0
     while True:
         communication.get_state()
-        socketio.sleep(1)
+        socketio.sleep(0.1)
 
 @socketio.on('profile', namespace='/serial')
 def serial_client_profile():
@@ -111,17 +111,18 @@ def test_data_reciever_thread():
             writer.writerow(['index','time(us)', 'position(um)', 'force(mN)'])
             communication.get_test_data_count()
             while test_data_count == 0:
-                socketio.sleep(0.1)
+                socketio.sleep(0.01)
             print(f'test data count: {test_data_count}')
             data_count = test_data_count
             test_data_count = 0 # reset global variable
             while data_count > index:
+                block_size = 20
                 print(f'getting test data: {index}')
-                communication.get_test_data(index, 2)
+                communication.get_test_data(index, block_size)
                 start_time = datetime.now()
                 while test_data is None:
                     time_delta = datetime.now() - start_time
-                    if time_delta.total_seconds() >= 0.1:
+                    if time_delta.total_seconds() >= 1:
                         print('timeout')
                         break
                     if test_data_complete:
@@ -134,10 +135,15 @@ def test_data_reciever_thread():
                 #    print(f'index mismatch: {test_data.log} != {index}')
                 #    continue
                 print(" size of test data is ", len(test_data))
-                index += 2
-                print(f'got test data: {test_data.timeus, test_data.encoderum, test_data.forcemN}')
-                writer.writerow([test_data.log, test_data.timeus, test_data.encoderum, test_data.forcemN])
-                socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data.getdict()))}, namespace = '/serial')
+                index += len(test_data)
+                # Ilterate through list test_data
+                for i in range(len(test_data)):
+                    print(f'got test data: {test_data[i].log, test_data[i].encoderum, test_data[i].forcemN}')
+                    writer.writerow([test_data[i].log, test_data[i].timeus, test_data[i].encoderum, test_data[i].forcemN])
+                    socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data[i].getdict()))}, namespace = '/serial')
+                #print(f'got test data: {test_data.timeus, test_data.encoderum, test_data.forcemN}')
+                #writer.writerow([test_data.log, test_data.timeus, test_data.encoderum, test_data.forcemN])
+                #socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data.getdict()))}, namespace = '/serial')
                 test_data = None
                 socketio.sleep(0.01)
         print("Done gathering data")
@@ -159,7 +165,7 @@ def gcode_sender_thread(filename):
             if not xcord or not feedrate:
                 print("No xcord or feedrate")
                 continue
-            x = round(float(xcord[0][1:])*1000)
+            x = round(float(xcord[0][1:]))
             f = int(feedrate[0][1:])
             print("G{} - X{} - F{}".format(code, x, f))
             if code[0] == "G1":

@@ -1,0 +1,465 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+#line 1 "ForceGauge.h"
+#line 4 "ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 4 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/compiler.h"
+#line 5 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+
+
+
+
+
+  typedef  unsigned long  size_t;
+#line 6 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 15 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef int wchar_t;
+#line 24 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef struct _Mbstate {
+  unsigned int total:5;
+  unsigned int left:5;
+  unsigned int partial:22;
+} _Mbstate_t;
+#line 7 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/null.h"
+#line 8 "/home/mad/flexprop/include/stdlib.h"
+#line 22 "/home/mad/flexprop/include/stdlib.h"
+    double atof(const char *);
+    int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long long atoll(const char *);
+
+  long double strtold(const char *nptr, char **endptr);
+  double strtod(const char *nptr, char **endptr);
+  float strtof(const char *nptr, char **endptr);
+
+    long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+    unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+  long long strtoll(const char *nptr, char **endptr, int base);
+  unsigned long long strtoull(const char *nptr, char **endptr, int base);
+
+
+    int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+    void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+
+    void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+    void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+
+
+    int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+     void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+     void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+     void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+   void _exit(int status);
+#line 56 "/home/mad/flexprop/include/stdlib.h"
+   long labs(long l);
+
+
+   long long llabs(long long ll);
+
+
+  typedef struct {
+    int quot, rem;
+  } div_t;
+
+  typedef struct {
+    long int quot, rem;
+  } ldiv_t;
+
+  typedef struct {
+    long long quot, rem;
+  } lldiv_t;
+
+  div_t div(int num, int denom);
+  ldiv_t ldiv(long num, long denom);
+  lldiv_t lldiv(long long num, long long denom);
+
+    void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+  void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+		int (*compare)(const void *, const void *));
+
+    char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+    int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+
+
+  extern int _mb_cur_max;
+
+
+
+  int mblen(const char *s, size_t n);
+  int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+  size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
+
+  int system(const char *command);
+#line 102 "/home/mad/flexprop/include/stdlib.h"
+    int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+    int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+#line 5 "ForceGauge.h"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+#line 17 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON/JSON.h"
+typedef struct MachineConfiguration
+{
+    char motorType[ 20 ];
+    double maxMotorTorque;
+    double maxMotorRPM;
+    double gearDiameter;
+    double gearPitch;
+    double systemIntertia;
+    double staticTorque;
+    double load;
+    char positionEncoderType[ 20 ];
+    double positionEncoderStepsPerRev;
+    char forceGauge[ 20 ];
+    double forceGaugeScaleFactor;
+    int forceGaugeZeroFactor;
+} MachineConfiguration;
+
+typedef struct MachinePerformance
+{
+    double minPosition;
+    double maxPosition;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxForceTensile;
+    double maxForceCompression;
+    double forceGaugeNeutralOffset;
+} MachinePerformance;
+
+typedef struct MachineProfile
+{
+    char name[ 20 ];
+    MachineConfiguration configuration;
+    MachinePerformance performance;
+} MachineProfile;
+
+typedef struct SampleProfile
+{
+    char name[ 50 ];
+    double length;
+    double stretchMax;
+    double maxVelocity;
+    double maxAcceleration;
+    double maxJerk;
+    double maxForceTensile;
+    double maxForceCompression;
+
+} SampleProfile;
+#line 6 "ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 7 "ForceGauge.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+
+
+
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+
+typedef signed long int32_t;
+typedef unsigned long uint32_t;
+
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+
+typedef unsigned long uintptr_t;
+typedef long intptr_t;
+
+typedef int64_t intmax_t;
+typedef uint64_t uintmax_t;
+
+typedef int8_t int_least8_t;
+typedef int16_t int_least16_t;
+typedef int32_t int_least32_t;
+typedef int64_t int_least64_t;
+
+typedef uint8_t uint_least8_t;
+typedef uint16_t uint_least16_t;
+typedef uint32_t uint_least32_t;
+typedef uint64_t uint_least64_t;
+
+typedef int32_t int_fast8_t;
+typedef int32_t int_fast16_t;
+typedef int32_t int_fast32_t;
+typedef int64_t int_fast64_t;
+
+typedef uint32_t uint_fast8_t;
+typedef uint32_t uint_fast16_t;
+typedef uint32_t uint_fast32_t;
+typedef uint64_t uint_fast64_t;
+#line 8 "ForceGauge.h"
+
+
+
+
+
+
+typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
+
+typedef struct ForceGauge_s
+{
+    int counter;
+    unsigned int force;
+    uint8_t buffer[4];
+    FDS serial;
+    int rx, tx;
+    int forceRaw;
+    _Bool  responding;
+    int cogid;
+} ForceGauge;
+
+int force_gauge_raw_to_force(int zero, double slope, int raw);
+int raw_to_force(int raw, MachineConfiguration *configuration);
+
+_Bool  force_gauge_begin(ForceGauge *forceGauge, int rx, int tx);
+void force_gauge_stop(ForceGauge *forceGauge);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+#line 1 "/home/mad/flexprop/include/math.h"
+#line 77 "/home/mad/flexprop/include/math.h"
+typedef float float_t;
+typedef double double_t;
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+#line 1 "/home/mad/flexprop/include/propeller.h"
+#line 13 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/cog.h"
+#line 14 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 15 "/home/mad/flexprop/include/propeller.h"
+#line 22 "/home/mad/flexprop/include/propeller.h"
+#line 1 "/home/mad/flexprop/include/propeller2.h"
+#line 4 "/home/mad/flexprop/include/propeller2.h"
+#line 1 "/home/mad/flexprop/include/stdint.h"
+#line 5 "/home/mad/flexprop/include/propeller2.h"
+#line 56 "/home/mad/flexprop/include/propeller2.h"
+typedef struct _cartesian {
+   int32_t x, y;
+} cartesian_t;
+
+
+typedef struct _polar {
+   uint32_t r, t;
+} polar_t;
+
+
+typedef struct _counter64 {
+    uint32_t low, high;
+} counter64_t;
+#line 96 "/home/mad/flexprop/include/propeller2.h"
+void _clkset(uint32_t clkmode, uint32_t clkfreq);
+void _hubset(uint32_t val);
+void _reboot(void);
+
+
+int _coginit(int cog, void *pgm, void *ptr);
+#line 116 "/home/mad/flexprop/include/propeller2.h"
+void _cogstop(int cog);
+int _cogchk(int cog);
+int _cogid(void);
+
+int _locknew(void);
+void _lockret(int lock);
+
+int _locktry(int lock);
+int _lockrel(int lock);
+int _lockchk(int lock);
+
+void _cogatn(uint32_t mask);
+int _pollatn(void);
+int _waitatn(void);
+
+
+cartesian_t _rotxy(cartesian_t coord, uint32_t t);
+cartesian_t _polxy(polar_t coord);
+polar_t _xypol(cartesian_t coord);
+
+
+uint32_t _rnd(void);
+
+
+int _clz(uint32_t val);
+int _encod(uint32_t val);
+uint32_t _isqrt(uint32_t val);
+
+
+uint32_t _cnt(void);
+uint32_t _cnth(void);
+counter64_t _cnthl();
+uint32_t _getsec();
+uint32_t _getms();
+uint32_t _getus();
+
+uint32_t _pollcnt(uint32_t tick);
+void _waitcnt(uint32_t tick);
+
+void _waitx(uint32_t cycles);
+void _waitsec(uint32_t seconds);
+void _waitms(uint32_t milliseconds);
+void _waitus(uint32_t microseconds);
+
+
+void _pinw(int pin, int val);
+void _pinl(int pin);
+void _pinh(int pin);
+void _pinnot(int pin);
+void _pinrnd(int pin);
+void _pinf(int pin);
+int _pinr(int pin);
+
+
+void _wrpin(int pin, uint32_t val);
+void _wxpin(int pin, uint32_t val);
+void _wypin(int pin, uint32_t val);
+void _akpin(int pin);
+uint32_t _rdpin(int pin);
+uint32_t _rqpin(int pin);
+
+
+void _pinstart(int pin, uint32_t mode, uint32_t xval, uint32_t yval);
+
+void _pinclear(int pin);
+
+
+extern uint32_t _clockfreq(void);
+extern uint32_t _clockmode(void);
+#line 23 "/home/mad/flexprop/include/propeller.h"
+#line 4 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+#line 18 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+union Data_v
+{
+    int32_t val;
+    uint8_t bval[4];
+};
+
+
+static long force_stack[ 1024 ];
+
+
+
+static void write_register(ForceGauge *forceGauge, uint8_t reg, uint8_t data)
+{
+
+
+
+
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x40 + (reg << 1));
+    forceGauge->serial.tx(data);
+}
+
+static uint8_t read_register(ForceGauge *forceGauge, uint8_t reg)
+{
+    uint8_t temp;
+
+
+
+
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x20 + (reg << 1));
+    temp = forceGauge->serial.rxtime(10);
+    return temp;
+}
+
+
+static void continuous_data(void *arg)
+{
+    ForceGauge *forceGauge = (ForceGauge *)arg;
+    int rx = forceGauge->rx;
+    int tx = forceGauge->tx;
+    int data = 0;
+    int index = 0;
+    int delay = ( (*(uint32_t *)0x14)  /  100000 ) / 2;
+    int spmode = P_ASYNC_RX | P_INVERT_IN;
+    int baudcfg = 7 + (( (*(uint32_t *)0x14)  /  100000 ) << 16);
+    long transmittx = delay * 35 * 2;
+    long disconnecttx =  (*(uint32_t *)0x14)  / 10;
+    _pinclear(rx);
+    _pinstart(rx, spmode, baudcfg, 0);
+    long lastData = _getcnt();
+    while (1)
+    {
+        while (!_pinr(rx))
+        {
+            if ((_getcnt() - lastData) > disconnecttx)
+            {
+                forceGauge->responding =  (0) ;
+            }
+            else if ((_getcnt() - lastData) > transmittx)
+            {
+                index = 0;
+                data = 0;
+            }
+        }
+        lastData = _getcnt();
+        uint8_t byte = (_rdpin(rx) >> 24) & 0xFF;
+        data |= (byte << index * 8);
+        index++;
+        if (index >= 3)
+        {
+            forceGauge->responding =  (1) ;
+            forceGauge->forceRaw = data;
+            forceGauge->counter++;
+            data = 0;
+            index = 0;
+        }
+    }
+}
+#line 107 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+_Bool  force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
+{
+    forceGauge->rx = rx;
+    forceGauge->tx = tx;
+    forceGauge->serial.start(rx, tx, 3,  100000 );
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x02);
+    _waitms(100);
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x06);
+    _waitms(100);
+
+    write_register(forceGauge,  0x01 , 0);
+    write_register(forceGauge,  0x02 , 0);
+    write_register(forceGauge,  0x03 , 0);
+    write_register(forceGauge,  0x04 , 0);
+
+    write_register(forceGauge,  0x01 ,  0b11001000 );
+    write_register(forceGauge,  0x02 ,  0b00000000 );
+    write_register(forceGauge,  0x03 ,  0b00000001 );
+    write_register(forceGauge,  0x04 ,  0b01110111 );
+    int temp;
+    if ((temp = read_register(forceGauge,  0x01 )) !=  0b11001000 )
+    {
+        return  (0) ;
+    }
+#line 146 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge/ForceGauge.c"
+    forceGauge->responding =  (1) ;
+    _waitms(100);
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x08);
+    forceGauge->cogid =  __builtin_cogstart(continuous_data(forceGauge), &force_stack[0]) ;
+    if (forceGauge->cogid <= 0)
+    {
+        return  (0) ;
+    }
+    return  (1) ;
+}
+
+void force_gauge_stop(ForceGauge *forceGauge)
+{
+    _waitms(1000);
+    if (forceGauge->cogid > 0)
+    {
+        _cogstop(forceGauge->cogid);
+    }
+}
+
+
+int raw_to_force(int raw, MachineConfiguration *configuration)
+{
+    return  __builtin_round((raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor)) ;
+}

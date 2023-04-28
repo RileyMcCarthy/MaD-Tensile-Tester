@@ -1,0 +1,742 @@
+'' =================================================================================================
+''
+''   File....... jm_fullduplexserial.spin2
+''   Purpose.... Buffered serial communications using smart pins
+''               -- mostly matches FullDuplexSerial from P1
+''               -- does NOT support half-duplex communications using shared RX/TX pin
+''   Authors.... Jon McPhalen
+''               -- based on work by Chip Gracey
+''               -- see below for terms of use
+''   E-mail..... jon.mcphalen@gmail.com
+''   Started....
+''   Updated.... 28 NOV 2022
+''               -- updated to conform with PNut v37
+''
+''   {$P2}
+''
+'' =================================================================================================
+
+{{
+
+   Note: Buffer size no longer has to be power-of-2 integer.
+
+   Note: The dec(), bin(), and hex() methods will no longer require the digits parameter as
+         in older versions of FullDuplexSerial. Use fxdec(), fxbin(), and fxhex() for code that
+         requires a specific field width.
+
+
+   The smart pin uarts use a 16-bit value for baud timing which can limit low baud rates for
+   some system frequencies -- beware of these limits when connecting to older devices.
+
+    Baud     10MHz    20MHz    40MHz    80MHz    100MHz    200MHz    300MHz     Max
+   ------    -----    -----    -----    -----    ------    ------    ------    ------
+      300     Yes       No       No       No        No        No        No      19MHz
+      600     Yes      Yes       No       No        No        No        No      39MHz
+     1200     Yes      Yes      Yes       No        No        No        No      78MHz
+     2400     Yes      Yes      Yes      Yes       Yes        No        No     157MHz
+     4800     Yes      Yes      Yes      Yes       Yes       Yes       Yes     314MHz
+
+}}
+
+
+con { fixed io pins }
+
+  RX1      = 63  { I }                                          ' programming / debug
+  TX1      = 62  { O }
+
+  SF_CS    = 61  { O }                                          ' serial flash
+  SF_SCK   = 60  { O }
+  SF_SDO   = 59  { O }
+  SF_SDI   = 58  { I }
+
+
+con { pst / formatting }
+
+  HOME     =  1                                                 ' \x01 - proposed @"" modifiers
+  CRSR_XY  =  2                                                 ' \x02
+  CRSR_LF  =  3                                                 ' \x03
+  CRSR_RT  =  4                                                 ' \x04
+  CRSR_UP  =  5                                                 ' \x05
+  CRSR_DN  =  6                                                 ' \x06
+  BELL     =  7                                                 ' \a
+  BKSP     =  8                                                 ' \b
+  TAB      =  9                                                 ' \t
+  LF       = 10                                                 ' \n
+  CLR_EOL  = 11                                                 ' \x0B
+  CLR_DN   = 12                                                 ' \x0C
+  CR       = 13                                                 ' \r
+  CRSR_X   = 14                                                 ' \x0E
+  CRSR_Y   = 15                                                 ' \x0F
+  CLS      = 16                                                 ' \f
+
+  EOF      = -1
+
+
+con
+
+  RXBUF_SIZE = 256
+  TXBUF_SIZE = 128
+
+
+obj
+
+  nstr : "jm_nstr"                                              ' number-to-string
+
+
+var
+
+  long  cog                                                     ' cog flag/id
+
+  long  rxp                                                     ' rx smart pin
+  long  txp                                                     ' tx smart pin
+  long  rxhub                                                   ' hub address of rxbuf
+  long  txhub                                                   ' hub address of txbuf
+
+  long  rxhead                                                  ' rx head index
+  long  rxtail                                                  ' rx tail index
+  long  txhead                                                  ' tx head index
+  long  txtail                                                  ' tx tail index
+
+  long  ms1                                                     ' ticks in 1ms
+  long  txdelay                                                 ' ticks to tx one byte
+
+  byte  rxbuf[RXBUF_SIZE]                                       ' buffers
+  byte  txbuf[RXBUF_SIZE]
+
+
+pub null()
+
+'' This is not an application
+
+
+pub tstart(baud) : result
+
+'' Start FDS with default pins/mode for terminal (e.g., PST)
+
+  return start(RX1, TX1, %0000, baud)
+
+
+pub start(rxpin, txpin, mode, baud) : result | baudcfg, spmode
+
+'' Start simple serial coms on rxpin and txpin at baud
+'' -- rxpin... receive pin (-1 if not used)
+'' -- txpin... transmit pin (-1 if not used)
+'' -- mode.... %0xx1 = invert rx
+''             %0x1x = invert tx
+''             %01xx = open-drain/open-source tx
+
+  stop()
+
+  if (rxpin == txpin)                                           ' pin must be unique
+    return false
+
+  longmove(@rxp, @rxpin, 2)                                     ' save pins
+  rxhub := @rxbuf                                               ' point to buffers
+  txhub := @txbuf
+
+  ms1 := clkfreq / 1000                                         ' ticks in 1ms
+  txdelay := clkfreq / baud * 11                                ' tix to transmit one byte
+
+  baudcfg := muldiv64(clkfreq, $1_0000, baud) & $FFFFFC00       ' set bit timing
+  baudcfg |= (8-1)                                              ' set bits (8)
+
+  if (rxp >= 0)                                                 ' configure rx pin if used
+    spmode := P_ASYNC_RX
+    if (mode.[0])
+      spmode |= P_INVERT_IN
+    pinstart(rxp, spmode, baudcfg, 0)
+
+  if (txp >= 0)                                                 ' configure tx pin if used
+    spmode := P_ASYNC_TX | P_OE
+    case mode.[2..1]
+      %01 : spmode |= P_INVERT_OUTPUT
+      %10 : spmode |= P_HIGH_FLOAT                              ' requires external pull-up
+      %11 : spmode |= P_INVERT_OUTPUT | P_LOW_FLOAT             ' requires external pull-down
+    pinstart(txp, spmode, baudcfg, 0)
+
+  cog := coginit(COGEXEC_NEW, @uart_mgr, @rxp) + 1              ' start uart manager cog
+
+  return cog
+
+
+pub stop()
+
+'' Stop serial driver
+'' -- frees a cog if driver was running
+
+  if (cog)                                                      ' cog active?
+    cogstop(cog-1)                                              '  yes, shut it down
+    cog := 0                                                    '  and mark stopped
+
+  longfill(@rxp,  -1, 2)                                        ' reset object globals
+  longfill(@rxhub, 0, 7)
+
+
+pub rx() : b
+
+'' Pulls byte from receive buffer if available
+'' -- will wait if buffer is empty
+
+  repeat while (rxtail == rxhead)                               ' hold while buffer empty
+
+  b := rxbuf[rxtail]                                            ' get a byte
+  if (++rxtail == RXBUF_SIZE)                                   ' update tail pointer
+    rxtail := 0
+
+
+pub rxcheck() : b
+
+'' Pulls byte from receive buffer if available
+'' -- returns -1 if buffer is empty
+
+  if (rxtail <> rxhead)                                         ' something in buffer?
+    b := rxbuf[rxtail]                                          ' get it
+    if (++rxtail == RXBUF_SIZE)                                 ' update tail pointer
+      rxtail := 0
+  else
+    b := EOF                                                    ' mark no byte available
+
+
+pub rxtime(ms) : rxbyte | t
+
+'' Wait up to ms milliseconds for a byte to be received
+'' -- returns -1 if no byte received, $00..$FF if byte available
+
+  t := getct()
+  repeat until ((rxbyte := rxcheck()) >= 0) || (((getct()-t) / ms1) >= ms)
+
+
+pub rxtix(tix) : b | t
+
+'' Waits tix clock ticks for a byte to be received
+'' -- returns -1 if no byte received
+
+  t := getct()
+  repeat until ((b := rxcheck()) >= 0) || ((getct()-t) >= tix)
+
+
+pub available() : count
+
+'' Returns # of bytes waiting in rx buffer
+
+  if (rxtail <> rxhead)                                         ' if byte(s) available
+    count := rxhead - rxtail                                    ' get count
+    if (count < 0)
+      count += RXBUF_SIZE                                       ' fix for wrap around
+
+
+pub rxflush()
+
+'' Flush receive buffer
+
+  repeat while (rxcheck() >= 0)
+
+
+pub tx(b) | n
+
+'' Move byte into transmit buffer if room is available
+'' -- will wait if buffer is full
+
+  repeat
+    n := txhead - txtail                                        ' bytes in buffer
+    n += (n < 0) ? TXBUF_SIZE : 0                               ' fix for index wrap-around
+    if (n < TXBUF_SIZE-1)
+      quit
+
+  txbuf[txhead] := b                                            ' move to buffer
+  if (++txhead == TXBUF_SIZE)                                   ' update head pointer
+    txhead := 0
+
+
+pub txn(b, n)
+
+'' Emit byte n times
+
+  repeat n
+    tx(b)
+
+
+pub str(p_str)
+
+'' Emit z-string at p_str
+
+  repeat (strsize(p_str))
+    tx(byte[p_str++])
+
+
+pub substr(p_str, len) | b
+
+'' Emit len characters of string at p_str
+'' -- aborts if end of string detected
+
+  repeat len
+    b := byte[p_str++]
+    if (b > 0)
+      tx(b)
+    else
+      quit
+
+
+pub padstr(p_str, width, padchar) | len, afw
+
+'' Emit p_str as padded field of width characters
+'' -- pad is character to use to fill out field
+'' -- positive width causes right alignment
+'' -- negative width causes left alignment
+
+  len := strsize(p_str)
+  afw := abs(width)
+
+  if (len >= afw)                                               ' string wider than field?
+    substr(p_str, afw)                                          '  yes, truncate
+  else
+    if (width > 0)                                              ' right alignment?
+      txn(padchar, width-len)
+      str(p_str)
+    else                                                        ' left alignment
+      str(p_str)
+      txn(padchar, afw-len)
+
+
+pub txflush()
+
+'' Wait for transmit buffer to empty
+'' -- will delay one byte period after buffer is empty
+
+  repeat until (txtail == txhead)                               ' let buffer empty
+  waitct(getct() + txdelay)                                     ' delay for last byte
+
+
+con { formatted strings commands }
+
+{{
+    Escaped characters
+
+      \\          backslash char
+      \%          percent char
+      \q          double quote
+      \b          backspace
+      \t          tab (horizontal)
+      \n          new line (vertical tab)
+      \r          carriage return
+      \xnn        arbitrary ASCII character (nn is hexadecimal) ' added 17 AUG 21
+      \nnn        arbitrary ASCII character (nnn is decimal)
+
+
+    Formatted arguments
+
+      %w.pf       print argument as decimal width decimal point
+      %[w[.p]]d   print argument as decimal
+      %[w[.p]]u   print argument as unsigned decimal
+      %[w[.p]]x   print argument as hex
+      %[w[.p]]o   print argument as octal
+      %[w[.p]]q   print argument as quarternary
+      %[w[.p]]b   print argument as binary
+      %[w]s       print argument as string
+      %[w]c       print argument as character (
+
+                  -- w is field width
+                     * positive w causes right alignment in field
+                     * negative w causes left alignment in field
+                  -- %ws aligns s in field (may truncate)
+                  -- %wc prints w copies of c
+                  -- p is precision characters
+                     * number of characters to use, aligned in field
+                       -- prefix with 0 if needed to match p
+                       -- for %w.pf, p is number of digits after decimal point
+}}
+
+
+pub fstr0(p_str)
+
+'' Emit string with formatting characters.
+
+  format(p_str, 0)
+
+
+pub fstr1(p_str, arg1)
+
+'' Emit string with formatting characters and one argument.
+
+  format(p_str, @arg1)
+
+
+pub fstr2(p_str, arg1, arg2)
+
+'' Emit string with formatting characters and two arguments.
+
+  format(p_str, @arg1)
+
+
+pub fstr3(p_str, arg1, arg2, arg3)
+
+'' Emit string with formatting characters and three arguments.
+
+  format(p_str, @arg1)
+
+
+pub fstr4(p_str, arg1, arg2, arg3, arg4)
+
+'' Emit string with formatting characters and four arguments.
+
+  format(p_str, @arg1)
+
+
+pub fstr5(p_str, arg1, arg2, arg3, arg4, arg5)
+
+'' Emit string with formatting characters and five arguments.
+
+  format(p_str, @arg1)
+
+
+pub fstr6(p_str, arg1, arg2, arg3, arg4, arg5, arg6)
+
+'' Emit string with formatting characters and six arguments.
+
+  format(p_str, @arg1)
+
+
+pub format(p_str, p_args) | idx, c, asc, fwidth, digits
+
+'' Emit formatted string with escape sequences and embedded values
+'' -- p_str is a pointer to the format control string
+'' -- p_args is pointer to array of longs that hold field values
+''    * field values can be numbers, characters, or pointers to strings
+
+  idx := 0                                                     ' value index
+
+  repeat
+    c := byte[p_str++]
+    if (c == 0)
+      return
+
+    elseif (c == "\")
+      c := lower(byte[p_str++])
+      if (c == "\")
+        tx("\")
+      elseif (c == "%")
+        tx("%")
+      elseif (c == "q")
+        tx(34)
+      elseif (c == "b")
+        tx(BKSP)
+      elseif (c == "t")
+        tx(TAB)
+      elseif (c == "n")
+        tx(LF)
+      elseif (c == "r")
+        tx(CR)
+      elseif (c == "x")
+        p_str, asc := get_hex(p_str)
+        if ((asc >= 0) && (asc <= 255))
+          tx(asc)
+      elseif ((c >= "0") && (c <= "9"))
+        --p_str
+        p_str, asc, _ := get_nargs(p_str)
+        if ((asc >= 0) && (asc <= 255))
+          tx(asc)
+
+    elseif (c == "%")
+      p_str, fwidth, digits := get_nargs(p_str)
+      c := lower(byte[p_str++])
+      if (lookdown(c : "dufbqox"))
+        str(nstr.fmt_number(long[p_args][idx++], c, digits, fwidth, " "))
+      elseif (c == "s")
+        str(nstr.padstr(long[p_args][idx++], fwidth, " "))
+      elseif (c == "c")
+        txn(long[p_args][idx++], (abs(fwidth)) #> 1)
+
+    else
+      tx(c)
+
+
+pub lower(c) : result
+
+  if ((c >= "A") && (c <= "Z"))
+    c += 32
+
+  return c
+
+
+pri get_hex(p_str) : p_str1, value | c                          ' added 17 AUG 2021 for \xNN
+
+'' Extract 1- or 2-digit hex value from p_str
+
+  repeat 2
+    c := lower(byte[p_str++])
+    c := lookdown(c : "0".."9", "a".."f")
+    if (c > 0)
+      value := (value << 4) | (c-1)
+    else
+      quit
+
+  p_str1 := p_str
+
+
+pri get_nargs(p_str) : p_str1, val1, val2 | c, sign
+
+'' Parse one or two numbers from string in n, -n, n.n, or -n.n format
+'' -- dpoint separates values
+'' -- only first # may be negative
+'' -- returns pointer to 1st char after value(s)
+
+  c := byte[p_str]                                              ' check for negative on first value
+  if (c == "-")
+    sign := -1
+    ++p_str
+  else
+    sign := 0
+
+  repeat                                                        ' get first value
+    c := byte[p_str++]
+    if ((c >= "0") && (c <= "9"))
+      val1 := (val1 * 10) + (c - "0")
+    else
+      if (sign)
+        val1 := -val1
+      quit
+
+  if (c == ".")                                                 ' if dpoint
+    repeat                                                      '  get second value
+      c := byte[p_str++]
+      if ((c >= "0") && (c <= "9"))
+        val2 := (val2 * 10) + (c - "0")
+      else
+        quit
+
+  p_str1 := p_str-1                                             ' back up to non-digit
+
+
+pub fmt_number(value, base, digits, width, pad)
+
+'' Emit value converted to number in padded field
+'' -- value is converted using base as radix
+''    * 99 for decimal with digits after decimal point
+'' -- digits is max number of digits to use
+'' -- width is width of final field (max)
+'' -- pad is character that fills out field
+
+  str(nstr.fmt_number(value, base, digits, width, pad))
+
+
+pub dec(value)
+
+'' Emit value as decimal
+
+  str(nstr.itoa(value, 10, 0))
+
+
+pub fxdec(value, digits)
+
+'' Emit value as decimal using fixed # of digits
+'' -- may add leading zeros
+
+  str(nstr.itoa(value, 10, digits))
+
+
+pub jdec(value, digits, width, pad)
+
+'' Emit value as decimal using fixed # of digits
+'' -- aligned in padded field (negative width to left-align)
+'' -- digits is max number of digits to use
+'' -- width is width of final field (max)
+'' -- pad is character that fills out field
+
+  str(nstr.fmt_number(value, "d", digits, width, pad))
+
+
+pub dpdec(value, dp)
+
+'' Emit value as decimal with decimal point
+'' -- dp is number of digits after decimal point
+
+  str(nstr.dpdec(value, dp))
+
+
+pub jdpdec(value, dp, width, pad)
+
+'' Emit value as decimal with decimal point
+'' -- aligned in padded field (negative width to left-align)
+'' -- dp is number of digits after decimal point
+'' -- width is width of final field (max)
+'' -- pad is character that fills out field
+
+  str(nstr.fmt_number(value, "f", dp, width, pad))
+
+
+pub hex(value)
+
+'' Emit value as hexadecimal
+
+  str(nstr.itoa(value, 16, 0))
+
+
+pub fxhex(value, digits)
+
+'' Emit value as hexadecimal using fixed # of digits
+
+  str(nstr.itoa(value, 16, digits))
+
+
+pub jhex(value, digits, width, pad)
+
+'' Emit value as quarternary using fixed # of digits
+'' -- aligned inside field
+'' -- pad fills out field
+
+  str(nstr.fmt_number(value, "x", digits, width, pad))
+
+
+pub oct(value)
+
+'' Emit value as octal
+
+  str(nstr.itoa(value, 8, 0))
+
+
+pub fxoct(value, digits)
+
+'' Emit value as octal using fixed # of digits
+
+  str(nstr.itoa(value, 8, digits))
+
+
+pub joct(value, digits, width, pad)
+
+'' Emit value as octal using fixed # of digits
+'' -- aligned inside field
+'' -- pad fills out field
+
+  str(nstr.fmt_number(value, "o", digits, width, pad))
+
+
+pub qrt(value)
+
+'' Emit value as quarternary
+
+  str(nstr.itoa(value, 4, 0))
+
+
+pub fxqrt(value, digits)
+
+'' Emit value as quarternary using fixed # of digits
+
+  str(nstr.itoa(value, 4, digits))
+
+
+pub jqrt(value, digits, width, pad)
+
+'' Emit value as quarternary using fixed # of digits
+'' -- aligned inside field
+'' -- pad fills out field
+
+  str(nstr.fmt_number(value, "q", digits, width, pad))
+
+
+pub bin(value)
+
+'' Emit value as binary
+
+  str(nstr.itoa(value, 2, 0))
+
+
+pub fxbin(value, digits)
+
+'' Emit value as binary using fixed # of digits
+
+  str(nstr.itoa(value, 2, digits))
+
+
+pub jbin(value, digits, width, pad)
+
+'' Emit value as binary using fixed # of digits
+'' -- aligned inside field
+'' -- pad fills out field
+
+  str(nstr.fmt_number(value, "b", digits, width, pad))
+
+
+dat { smart pin uart/buffer manager }
+
+                        org
+
+uart_mgr                setq      #4-1                          ' get 4 parameters from hub
+                        rdlong    rxd, ptra
+
+
+uart_main               testb     rxd, #31              wc      ' rx in use?
+        if_nc           call      #rx_serial
+
+                        testb     txd, #31              wc      ' tx in use?
+        if_nc           call      #tx_serial
+
+                        jmp       #uart_main
+
+
+rx_serial               testp     rxd                   wc      ' anything waiting?
+        if_nc           ret
+
+                        rdpin     t3, rxd                       ' read new byte
+                        shr       t3, #24                       ' align lsb
+                        mov       t1, p_rxbuf                   ' t1 := @rxbuf
+                        rdlong    t2, ptra[4]                   ' t2 := rxhead
+                        add       t1, t2
+                        wrbyte    t3, t1                        ' rxbuf[rxhead] := t3
+                        incmod    t2, #(RXBUF_SIZE-1)           ' update head index
+        _ret_           wrlong    t2, ptra[4]                   ' write head index back to hub
+
+
+tx_serial               rdpin     t1, txd               wc      ' check busy flag
+        if_c            ret                                     '  abort if busy
+
+                        rdlong    t1, ptra[6]                   ' t1 = txhead
+                        rdlong    t2, ptra[7]                   ' t2 = txtail
+                        cmp       t1, t2                wz      ' byte(s) to tx?
+        if_e            ret
+
+                        mov       t1, p_txbuf                   ' start of tx buffer
+                        add       t1, t2                        ' add tail index
+                        rdbyte    t3, t1                        ' t3 := txbuf[txtail]
+                        wypin     t3, txd                       ' load into sp uart
+                        incmod    t2, #(TXBUF_SIZE-1)           ' update tail index
+        _ret_           wrlong    t2, ptra[7]                   ' write tail index back to hub
+
+
+' --------------------------------------------------------------------------------------------------
+
+rxd                     res       1                             ' receive pin
+txd                     res       1                             ' transmit pin
+p_rxbuf                 res       1                             ' pointer to rxbuf
+p_txbuf                 res       1                             ' pointer to txbuf
+
+t1                      res       1                             ' work vars
+t2                      res       1
+t3                      res       1
+
+                        fit       496
+
+
+con { license }
+
+{{
+
+  Terms of Use: MIT License
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  software and associated documentation files (the "Software"), to deal in the Software
+  without restriction, including without limitation the rights to use, copy, modify,
+  merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to the following
+  conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies
+  or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+  PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+  OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+}}

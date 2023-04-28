@@ -1,11 +1,12 @@
-#include "Monitor.h"
-#include "IOBoard.h"
+#include "Utility/Monitor.h"
+#include "Utility/IOBoard.h"
 #include "ForceGauge.h"
 #include "Encoder.h"
 #include <stdbool.h>
-#include "simpletools.h"
+#include <simpletools.h>
 #include <stdio.h>
 #include <JSON.h>
+#include <propeller.h>
 
 #define MONITOR_MEMORY_SIZE 3000
 static long monitor_stack[MONITOR_MEMORY_SIZE];
@@ -19,7 +20,7 @@ bool monitorLogData;
 // SD Card Variables
 MachineProfile sd_card_profile;
 int read_profile_status = 0;
-MonitorData sd_card_data;
+MonitorData sd_card_data[255];
 int read_data_index = -1;
 int read_data_count = 0;
 
@@ -29,9 +30,9 @@ static bool get_force(ForceGauge *forceGauge, MachineState *state, int lastLog)
   {
     return forceGauge->counter != lastLog;
   }
-  printf("Force Gauge disconnected, attempting to reconnect\n");
+  //printf("Force Gauge disconnected, attempting to reconnect\n");
   force_gauge_stop(forceGauge);
-  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX) == SUCCESS)
+  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX))
   {
     //printf("Force Gauge reconnected\n");
     state_machine_set(state, PARAM_MACHINE_FORCE_GAUGE_COM, true);
@@ -52,8 +53,8 @@ static void read_sd()
       if (file != NULL)
       {
         fseek(file, read_data_index * sizeof(MonitorData), SEEK_SET);
-        int n = fread(&sd_card_data, sizeof(MonitorData), read_data_count, file);
-        printf("Read test data: %d\n",sd_card_data.log);
+        int n = fread(sd_card_data, sizeof(MonitorData), read_data_count, file);
+        printf("Read test data: %d\n",sd_card_data[0].log);
         fclose(file);
         read_data_count = n/sizeof(MonitorData);
         if (read_data_count == 0)
@@ -276,7 +277,7 @@ int read_sd_card_data(MonitorData *data, int index, int count)
       return false;
     }
   }
-  memcpy(data, &sd_card_data, sizeof(MonitorData)*read_data_count);
+  memcpy(data, sd_card_data, sizeof(MonitorData)*read_data_count);
   //printf("read_sd_card_data: %d\n", read_data_count);
   return read_data_count;
 }

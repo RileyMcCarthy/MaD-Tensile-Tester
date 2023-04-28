@@ -1,0 +1,52 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/include",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/src",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Encoder",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Queue",
+                "/Users/rileymccarthy/.platformio/packages/toolchain-flexprop/include",
+                "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Protocol",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/include",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/src",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/NavKey",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Encoder",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MotionPlanning",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/MCP23017",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/ForceGauge",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/JSON",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Queue",
+                    "/Users/rileymccarthy/.platformio/packages/toolchain-flexprop/include",
+                    "/Volumes/madshare/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Protocol",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60107",
+                ""
+            ],
+            "compilerPath": "/Users/rileymccarthy/.platformio/packages/toolchain-flexprop/bin/flexcc.mac",
+            "compilerArgs": [
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

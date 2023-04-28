@@ -1,10 +1,8 @@
-#include "MaD.h"
-#include "JSON.h"
-#include <stdio.h>
 #include <stdint.h>
-#include "ControlSystem.h"
-#include "Error.h"
-#include <propeller2.h>
+#include "Main/MaD.h"
+#include "JSON.h"
+#include "Utility/ControlSystem.h"
+#include "Utility/Error.h"
 
 static Monitor monitor;
 static ControlSystem control;
@@ -31,7 +29,6 @@ static void load_machine_profile()
 void mad_begin()
 {
   machine_state_init(&machineState);
-  mount("/sd", _vfs_open_sdcard());
   if (motion_begin())
   {
     // printf("Motion started\n");

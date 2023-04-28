@@ -1,6 +1,7 @@
 #define P2_TARGET_MHZ 180
-#include <sys/p2es_clock.h>
-#include "MaD.h"
+//#include <sys/p2es_clock.h>
+#include "Main/MaD.h"
+#include <sys/vfs.h>
 enum
 {
     HEAPSIZE = 32400 * 1
@@ -48,7 +49,8 @@ double atof(const char *str)
 int main()
 {
     //_clkset(_SETFREQ, _CLOCKFREQ);
-    mad_begin();
+    mount("/sd", _vfs_open_sdcard());
+   mad_begin();
     while (1)
         ;
     return 0;

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "propeller2.h": "c",
+        "staticqueue.h": "c",
+        "stdbool.h": "c"
+    }
+}

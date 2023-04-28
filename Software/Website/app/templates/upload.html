@@ -3,17 +3,60 @@
 {% block content %}
 
 <div class="container">
-    <div class="container m-3">
-        <h1>Motion Profile</h1>
-        <form action="/upload" enctype = "multipart/form-data" method = "POST">
-            <input type="file" name="file">
-            <input type="submit">
-          </form>
-    </div>
+    <h1>File Upload</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="filename">File Name:</label>
+        <input type="text" id="filename" name="filename" required><br><br>
+        <label for="file">Choose a file:</label>
+        <input type="file" id="file" name="file" required><br><br>
+        <input type="submit" value="Upload">
+    </form>
+    <hr>
+    <h1>Uploaded Files</h1>
+    <form action="/select" method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>File Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td><input type="radio" name="selected_file" value="{{ file }}" required></td>
+                    <td>{{ file }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Queue Profile">
+    </form>
+    <hr>
+    <h1>Create G-code File</h1>
+    <form action="/generate" method="POST">
+        <label for="function">Function:</label>
+        <textarea id="function" name="function" rows="5" cols="50" style="display:none;"></textarea>
+        <label for="sample_time">Sample Time (in seconds):</label>
+        <input type="number" id="sample_time" name="sample_time" step="0.01" min="0.01" required><br><br>
+        <label for="total_time">Total Time (in seconds):</label>
+        <input type="number" id="total_time" name="total_time" step="0.01" min="0.01" required><br><br>
+        <label for="gcode_filename">G-code File Name:</label>
+        <input type="text" id="gcode_filename" name="gcode_filename" required><br><br>
+        <input type="submit" value="Generate G-code">
+    </form>
 </div>
 
 <script>
-
+    var editor = CodeMirror.fromTextArea(document.getElementById("function"), {
+        mode: "python",
+        lineNumbers: true,
+        indentUnit: 4,
+        theme: "default"
+    });
+    // Set the default value for the editor
+    editor.setValue('import math\n\ndef gcode_function(time):\n    return math.sin(time)  # Example function, replace with your own');
 </script>
 
 {% endblock %}

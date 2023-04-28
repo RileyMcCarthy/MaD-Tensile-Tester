@@ -1,0 +1,188 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Queue/StaticQueue.c"
+#line 1 "StaticQueue.h"
+#line 1 "/home/mad/flexprop/include/stdbool.h"
+#line 2 "StaticQueue.h"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 4 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/compiler.h"
+#line 5 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+
+
+
+
+
+  typedef  unsigned long  size_t;
+#line 6 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 15 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef int wchar_t;
+#line 24 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef struct _Mbstate {
+  unsigned int total:5;
+  unsigned int left:5;
+  unsigned int partial:22;
+} _Mbstate_t;
+#line 7 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/null.h"
+#line 8 "/home/mad/flexprop/include/stdlib.h"
+#line 22 "/home/mad/flexprop/include/stdlib.h"
+    double atof(const char *);
+    int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long long atoll(const char *);
+
+  long double strtold(const char *nptr, char **endptr);
+  double strtod(const char *nptr, char **endptr);
+  float strtof(const char *nptr, char **endptr);
+
+    long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+    unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+  long long strtoll(const char *nptr, char **endptr, int base);
+  unsigned long long strtoull(const char *nptr, char **endptr, int base);
+
+
+    int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+    void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+
+    void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+    void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+
+
+    int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+     void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+     void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+     void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+   void _exit(int status);
+#line 56 "/home/mad/flexprop/include/stdlib.h"
+   long labs(long l);
+
+
+   long long llabs(long long ll);
+
+
+  typedef struct {
+    int quot, rem;
+  } div_t;
+
+  typedef struct {
+    long int quot, rem;
+  } ldiv_t;
+
+  typedef struct {
+    long long quot, rem;
+  } lldiv_t;
+
+  div_t div(int num, int denom);
+  ldiv_t ldiv(long num, long denom);
+  lldiv_t lldiv(long long num, long long denom);
+
+    void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+  void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+		int (*compare)(const void *, const void *));
+
+    char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+    int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+
+
+  extern int _mb_cur_max;
+
+
+
+  int mblen(const char *s, size_t n);
+  int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+  size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
+
+  int system(const char *command);
+#line 102 "/home/mad/flexprop/include/stdlib.h"
+    int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+    int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+#line 3 "StaticQueue.h"
+typedef struct StaticQueue_t {
+    void *buf;
+    int front;
+    int rear;
+    int size;
+    int max_size;
+    int item_size;
+    int _lock;
+} StaticQueue;
+
+void queue_init(StaticQueue *queue, void *buf, int max_size, int item_size);
+_Bool  queue_push(StaticQueue *queue, void *data);
+_Bool  queue_pop(StaticQueue *queue, void *data);
+void queue_empty(StaticQueue *queue);
+_Bool  queue_isempty(StaticQueue *queue);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/lib/Queue/StaticQueue.c"
+
+void queue_init(StaticQueue *queue, void *buf, int max_size, int item_size) {
+    queue->buf = buf;
+    queue->max_size = max_size;
+    queue->item_size = item_size;
+    queue->front = 0;
+    queue->rear = 0;
+    queue->_lock = _locknew();
+    if (queue->_lock == -1)
+        return;
+}
+
+_Bool  queue_push(StaticQueue *queue, void *data) {
+    if (data ==  (0) )
+        return  (0) ;
+
+    while (!_locktry(queue->_lock))
+        ;
+
+    if (queue_isfull(queue))
+    {
+        printf("Error: Queue is full\n");
+        _lockrel(queue->_lock);
+        return  (0) ;
+    }
+
+    memcpy(&(queue->buf[queue->rear*queue->item_size]), data, queue->item_size);
+    queue->rear++;
+    if (queue->rear == queue->max_size)
+        queue->rear = 0;
+
+    _lockrel(queue->_lock);
+    return  (1) ;
+}
+
+_Bool  queue_pop(StaticQueue *queue, void *data) {
+    while (!_locktry(queue->_lock))
+        ;
+    if (queue_isempty(queue)) {
+        _lockrel(queue->_lock);
+        return  (0) ;
+    }
+
+    if (data !=  (0) )
+        memcpy(data, &(queue->buf[queue->item_size*queue->front]), queue->item_size);
+    queue->front++;
+    if (queue->front == queue->max_size)
+        queue->front = 0;
+
+    _lockrel(queue->_lock);
+    return  (1) ;
+}
+
+_Bool  queue_isempty(StaticQueue *queue) {
+    return queue->rear == queue->front;
+}
+
+_Bool  queue_isfull(StaticQueue *queue) {
+    return queue->rear == queue->front -1 || (queue->front == 0 && queue->rear == queue->max_size - 1);
+}
+
+void queue_empty(StaticQueue *queue)
+{
+    while (!_locktry(queue->_lock))
+        ;
+    queue->front = 0;
+    queue->rear = 0;
+    _lockrel(queue->_lock);
+}

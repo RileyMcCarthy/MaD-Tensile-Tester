@@ -6,11 +6,11 @@ def curve_func(x):
 
 # Set up the G-code generator
 x_start = 0      # Starting X position
-x_end = 10       # Ending X position
-x_step = 0.1     # Step size for X
+x_end = 100       # Ending X position
+x_step = 1     # Step size for X (in steps)
 z_height = 5     # Z position (height above work surface)
 feed_rate_max = 1000   # Maximum feed rate
-feed_rate_min = 100    # Minimum feed rate
+feed_rate_min = 0    # Minimum feed rate
 time_max = 10           # Maximum time to complete the curve
 time_min = 0.1          # Minimum time to complete the curve
 

@@ -1,0 +1,223 @@
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/Error.c"
+#line 1 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+#line 23 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/include/Utility/Error.h"
+typedef enum Error_e
+{
+    SUCCESS,
+    FAIL,
+
+    DISPLAY_NOT_FOUND = 2,
+    DISPLAY_PLL_FAIL,
+    DISPLAY_SDRAM_FAIL,
+
+    RTC_RESET = 51,
+    RTC_NOT_FOUND,
+
+    DYN4_NOT_RESPONDING = 101,
+    DYN4_CONNECTION_LOST,
+    DYN4_COG_FAIL,
+
+    FORCEGAUGE_NOT_RESPONDING = 151,
+    FORCEGAUGE_CONNECTION_LOST,
+    FORCEGAUGE_COG_FAIL,
+
+    JSON_FILE_ERROR = 201,
+    JSON_FILE_NOT_FOUND,
+    JSON_FILE_READ_FAIL,
+    JSON_FILE_WRITE_FAIL,
+    JSON_FILE_INVALID,
+    JSON_FILE_EMPTY,
+    JSON_FILE_NOT_VALID,
+
+    MCP23017_NOT_FOUND = 251,
+
+    W25QXX_NOT_FOUND = 301,
+    W25QXX_NOT_AVAILABLE,
+    W25QXX_INVALID_ID,
+
+    SEM_NOT_AVAILABLE = 351
+} Error;
+
+void print_error(Error value);
+void seterror(Error *err, Error value);
+#line 2 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/Error.c"
+#line 1 "/home/mad/flexprop/include/stdlib.h"
+#line 4 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/compiler.h"
+#line 5 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/size_t.h"
+
+
+
+
+
+  typedef  unsigned long  size_t;
+#line 6 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/wchar_t.h"
+#line 15 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef int wchar_t;
+#line 24 "/home/mad/flexprop/include/sys/wchar_t.h"
+typedef struct _Mbstate {
+  unsigned int total:5;
+  unsigned int left:5;
+  unsigned int partial:22;
+} _Mbstate_t;
+#line 7 "/home/mad/flexprop/include/stdlib.h"
+#line 1 "/home/mad/flexprop/include/sys/null.h"
+#line 8 "/home/mad/flexprop/include/stdlib.h"
+#line 22 "/home/mad/flexprop/include/stdlib.h"
+    double atof(const char *);
+    int atoi(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long atol(const char *)  __fromfile("libc/stdlib/atoi.c") ;
+    long long atoll(const char *);
+
+  long double strtold(const char *nptr, char **endptr);
+  double strtod(const char *nptr, char **endptr);
+  float strtof(const char *nptr, char **endptr);
+
+    long strtol(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtol.c") ;
+    unsigned long strtoul(const char *nptr, char **endptr, int base)  __fromfile("libc/stdlib/strtoul.c") ;
+  long long strtoll(const char *nptr, char **endptr, int base);
+  unsigned long long strtoull(const char *nptr, char **endptr, int base);
+
+
+    int rand(void)  __fromfile("libc/stdlib/rand.c") ;
+    void srand(unsigned int seed)  __fromfile("libc/stdlib/rand.c") ;
+
+    void *malloc(size_t n)  __fromfile("libc/stdlib/malloc.c") ;
+    void *calloc(size_t, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void *realloc(void *, size_t)  __fromfile("libc/stdlib/malloc.c") ;
+    void free(void *)  __fromfile("libc/stdlib/malloc.c") ;
+
+
+    int atexit(void (*func)(void))  __fromfile("libc/stdlib/exit.c") ;
+     void exit(int status)  __fromfile("libc/stdlib/exit.c") ;
+     void abort(void)  __fromfile("libc/stdlib/abort.c") ;
+     void _Exit(int status)  __fromfile("libc/stdlib/_Exit.c") ;
+   void _exit(int status);
+#line 56 "/home/mad/flexprop/include/stdlib.h"
+   long labs(long l);
+
+
+   long long llabs(long long ll);
+
+
+  typedef struct {
+    int quot, rem;
+  } div_t;
+
+  typedef struct {
+    long int quot, rem;
+  } ldiv_t;
+
+  typedef struct {
+    long long quot, rem;
+  } lldiv_t;
+
+  div_t div(int num, int denom);
+  ldiv_t ldiv(long num, long denom);
+  lldiv_t lldiv(long long num, long long denom);
+
+    void qsort(void *base, size_t nmemb, size_t size, int (*compare)(const void *, const void *))  __fromfile("libc/stdlib/qsort.c") ;
+  void *bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+		int (*compare)(const void *, const void *));
+
+    char *getenv(const char *name)  __fromfile("libc/stdlib/getenv.c") ;
+    int putenv(const char *name)  __fromfile("libc/stdlib/putenv.c") ;
+
+
+  extern int _mb_cur_max;
+
+
+
+  int mblen(const char *s, size_t n);
+  int mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n);
+  size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
+
+  int system(const char *command);
+#line 102 "/home/mad/flexprop/include/stdlib.h"
+    int _itoa_prec( unsigned int x, char *buf, unsigned base, int prec );
+    int _lltoa_prec( unsigned long long x, char *buf, unsigned base, int prec );
+#line 3 "/home/mad/Tensile-Testing-Machine/Firmware/MaD_Firmware/src/Utility/Error.c"
+
+void print_error(Error value)
+{
+    switch (value)
+    {
+    case SUCCESS:
+        printf("SUCCESS\n");
+        break;
+    case FAIL:
+        printf("FAIL\n");
+        break;
+    case DISPLAY_NOT_FOUND:
+        printf("DISPLAY_NOT_FOUND\n");
+        break;
+    case DISPLAY_PLL_FAIL:
+        printf("DISPLAY_PLL_FAIL\n");
+        break;
+    case DISPLAY_SDRAM_FAIL:
+        printf("DISPLAY_SDRAM_FAIL\n");
+        break;
+    case RTC_RESET:
+        printf("RTC_RESET\n");
+        break;
+    case RTC_NOT_FOUND:
+        printf("RTC_NOT_FOUND\n");
+        break;
+    case DYN4_NOT_RESPONDING:
+        printf("DYN4_NOT_RESPONDING\n");
+        break;
+    case DYN4_CONNECTION_LOST:
+        printf("DYN4_CONNECTION_LOST\n");
+        break;
+    case DYN4_COG_FAIL:
+        printf("DYN4_COG_FAIL\n");
+        break;
+    case FORCEGAUGE_NOT_RESPONDING:
+        printf("FORCEGAUGE_NOT_RESPONDING\n");
+        break;
+    case FORCEGAUGE_CONNECTION_LOST:
+        printf("FORCEGAUGE_CONNECTION_LOST\n");
+        break;
+    case FORCEGAUGE_COG_FAIL:
+        printf("FORCEGAUGE_COG_FAIL\n");
+        break;
+    case JSON_FILE_ERROR:
+        printf("JSON_FILE_ERROR\n");
+        break;
+    case JSON_FILE_NOT_FOUND:
+        printf("JSON_FILE_NOT_FOUND\n");
+        break;
+    case JSON_FILE_READ_FAIL:
+        printf("JSON_FILE_READ_FAIL\n");
+        break;
+    case JSON_FILE_WRITE_FAIL:
+        printf("JSON_FILE_WRITE_FAIL\n");
+        break;
+    case JSON_FILE_INVALID:
+        printf("JSON_FILE_INVALID\n");
+        break;
+    case JSON_FILE_EMPTY:
+        printf("JSON_FILE_EMPTY\n");
+        break;
+    case JSON_FILE_NOT_VALID:
+        printf("JSON_FILE_NOT_VALID\n");
+        break;
+    case MCP23017_NOT_FOUND:
+        printf("MCP23017_NOT_FOUND\n");
+        break;
+    default:
+        printf("UNKNOWN ERROR\n");
+        break;
+    }
+}
+
+inline void seterror(Error *err, Error value)
+{
+    if (err !=  (0) )
+    {
+        *err = value;
+    }
+}

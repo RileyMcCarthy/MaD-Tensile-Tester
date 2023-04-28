@@ -1,10 +1,11 @@
-#include "Communication.h"
+#include "Main/Communication/Communication.h"
+#include "Utility/StateMachine.h"
+#include "Utility/Error.h"
+#include "Utility/Motion.h"
+#include "Utility/Monitor.h"
 #include <stdlib.h>
-#include "StateMachine.h"
-#include "Error.h"
-#include "Motion.h"
-#include <stdio.h>
 #include "StaticQueue.h"
+#include <propeller.h>
 /* Command structure
  * w<7 cmd bits> <N> <N data>... <CRC>
  * ________ ________ ________
@@ -14,8 +15,8 @@
 
 #define COMMUNICATION_MEMORY_SIZE 3000
 static long comm_stack[COMMUNICATION_MEMORY_SIZE];
+typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
 
-typedef struct __using("jm_fullduplexserial.spin2") FDS;
 static FDS fds;
 
 // @TODO RETURN CHECKSUM FOR VALIDATION IT WAS RECIEVED CORRECTLY
@@ -56,6 +57,7 @@ static bool send(int cmd, char *buf, uint16_t size)
     fds.tx(cmd);
     fds.tx(size);
     fds.tx(size>>8);
+    //fds.txn(bufCopy, size);
     for (unsigned int i = 0; i < size; i++)
     {
         fds.tx(bufCopy[i]);
@@ -196,7 +198,7 @@ void beginCommunication(CommunicationData * arg)
                 uint8_t count;
                 if (receive((char *)&index, sizeof(uint32_t)) && receive((char *)&count, sizeof(uint32_t)))
                 {                    
-                    MonitorData buffer[10];
+                    MonitorData buffer[255];
                     //printf("index:%d,count:%d\n", index, count);
                     if (read_sd_card_data(buffer, index, count) != 0)
                     {
@@ -215,8 +217,7 @@ void beginCommunication(CommunicationData * arg)
                 // send the number of test data points
                 DEBUG_INFO("Sending test data count\n");
                 int count = read_data_size();
-               // printf("count:%d\n", count);
-                send(CMD_TESTDATA_COUNT, (char *)&count, sizeof(uint32_t));
+                send(CMD_TESTDATA_COUNT, (char *)&count, sizeof(int32_t));
                 break;
             }
             default:

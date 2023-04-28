@@ -10,3 +10,4 @@ eventlet
 flask_sqlalchemy
 flask_migrate
 Werkzeug
+numpy
