@@ -1,31 +1,38 @@
-# For PCBs designed using KiCad: http://www.kicad-pcb.org/
-# Format documentation: http://kicad-pcb.org/help/file-formats/
-
-# Temporary files
-*.000
-*.bak
-*.bck
-*.kicad_pcb-bak
-*.sch-bak
-*~
-_autosave-*
-*.tmp
-*-save.pro
-*-save.kicad_pcb
-fp-info-cache
-
-# Netlist files (exported from Eeschema)
-*.net
-
-# Autorouter files (exported from Pcbnew)
-*.dsn
-*.ses
-
-# Exported BOM files
-*.xml
-*.csv
-
-Firmware/bin/**
-Firmware/win/**
+*.code-workspace
 .vscode
-Hardware/MAD_P2/MAD_P2-backups/MAD_P2-2022-05-05_210712.zip
+.snapshots
+.DS_Store
+._.DS_Store
+venv/
+*.o
+*.pyc
+.pio/
+
+# Firmware
+Firmware/bin/
+
+
+# Hardware
+## Temporary files
+Hardware/**/*.000
+Hardware/**/*.bak
+Hardware/**/*.bck
+Hardware/**/*.kicad_pcb-bak
+Hardware/**/*.sch-bak
+Hardware/**/*~
+Hardware/**/_autosave-*
+Hardware/**/*.tmp
+Hardware/**/*-save.pro
+Hardware/**/*-save.kicad_pcb
+Hardware/**/fp-info-cache
+
+## Netlist files (exported from Eeschema)
+Hardware/**/*.net
+
+## Autorouter files (exported from Pcbnew)
+Hardware/**/*.dsn
+Hardware/**/*.ses
+
+## Exported BOM files
+Hardware/**/*.xml
+Hardware/**/*.csv
