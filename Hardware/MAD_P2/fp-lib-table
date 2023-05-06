@@ -1,6 +1,0 @@
-(fp_lib_table
-  (lib (name Tensile_Board)(type KiCad)(uri C:/Users/riley/Documents/Propeller/Tensile-Testing-Machine/Hardware/Tensile_Board/KICAD/Librarys/Tensile_Board.pretty)(options "")(descr ""))
-  (lib (name Librarys)(type KiCad)(uri ${KIPRJMOD}/Librarys.pretty)(options "")(descr ""))
-  (lib (name MAD_P2)(type KiCad)(uri ${KIPRJMOD}/MAD_P2.pretty)(options "")(descr ""))
-  (lib (name MaD_Power_Board)(type KiCad)(uri ${KIPRJMOD}/Librarys/MaD_Power_Board.pretty)(options "")(descr ""))
-)

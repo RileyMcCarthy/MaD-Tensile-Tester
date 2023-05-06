@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "PROPELLER_2")(type "KiCad")(uri "${KIPRJMOD}/Library/PROPELLER_2")(options "")(descr ""))
+  (lib (name "P2_EDGE_MODULE_SOCKET")(type "KiCad")(uri "${KIPRJMOD}/Library/P2_EDGE_MODULE_SOCKET")(options "")(descr ""))
+)

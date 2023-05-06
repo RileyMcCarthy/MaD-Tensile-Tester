@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name Tensile_Board)(type Legacy)(uri ${KIPRJMOD}/Librarys/Tensile_Board.lib)(options "")(descr ""))
-)

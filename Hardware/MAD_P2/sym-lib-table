@@ -1,6 +1,0 @@
-(sym_lib_table
-  (lib (name MAD_Board)(type Legacy)(uri ${KIPRJMOD}/MAD_Board.lib)(options "")(descr ""))
-  (lib (name MAD_P2-rescue)(type Legacy)(uri ${KIPRJMOD}/MAD_P2-rescue.lib)(options "")(descr ""))
-  (lib (name Parallax-P2)(type Legacy)(uri ${KIPRJMOD}/Parallax-P2.lib)(options "")(descr ""))
-  (lib (name Power-cache)(type Legacy)(uri ${KIPRJMOD}/Librarys/Power-cache.lib)(options "")(descr ""))
-)

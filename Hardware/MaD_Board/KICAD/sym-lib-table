@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name MAD_Board)(type Legacy)(uri ${KIPRJMOD}/Librarys/MAD_Board.lib)(options "")(descr ""))
-)
