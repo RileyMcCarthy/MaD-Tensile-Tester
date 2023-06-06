@@ -18,6 +18,8 @@ jobs:
         python-version: '3.9'
     - name: Install PlatformIO Core
       run: pip install --upgrade platformio
+    - name: Install propeller platformio platform
+      run: pio pkg install https://github.com/RileyMcCarthy/platform-propeller.git
     - name: Build platformio project
       run: |
         cd Firmware/MaD_Firmware
