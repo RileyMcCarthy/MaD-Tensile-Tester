@@ -1,4 +1,4 @@
-name: Build Firmware
+name: Build MaD Firmware
 
 on:
   push:
