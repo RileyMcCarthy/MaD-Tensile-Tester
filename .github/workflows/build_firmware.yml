@@ -1,0 +1,27 @@
+name: Build Firmware
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install PlatformIO Core
+      run: pip install --upgrade platformio
+    - name: Build platformio project
+      run: |
+        cd Firmware/MaD_Firmware
+        pio run -e propeller2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: program-${{ github.run_number }}.bin
+        path: Firmware/MaD_Firmware/.pio/build/propeller2/program
