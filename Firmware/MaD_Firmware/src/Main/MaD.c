@@ -22,6 +22,7 @@ static void load_machine_profile()
   printf("Read config.txt:%s\n", machineProfile.name);
 }
 
+
 /**
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
