@@ -19,11 +19,11 @@ jobs:
     - name: Install PlatformIO Core
       run: pip install --upgrade platformio
     - name: Install propeller platformio platform
+      working-directory: Firmware/MaD_Firmware
       run: pio pkg install --platform https://github.com/RileyMcCarthy/platform-propeller.git
     - name: Build platformio project
-      run: |
-        cd Firmware/MaD_Firmware
-        pio run -e propeller2
+      working-directory: Firmware/MaD_Firmware
+      run: pio run -e propeller2
     - uses: actions/upload-artifact@v3
       with:
         name: program-${{ github.run_number }}.bin
