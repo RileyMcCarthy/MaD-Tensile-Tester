@@ -2,6 +2,7 @@ from app import app, socketio, ALLOWED_EXTENSIONS
 from flask import render_template, request, jsonify, Response, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 from .base import gcode_sender_thread
+import app.communication as communication
 import os
 import numpy as np
 from io import StringIO
@@ -82,3 +83,13 @@ def generate_gcode():
             prev_x = x_position
 
     return 'file has been created!'
+
+@app.route('/jog', methods=['POST'])
+def jog_machine():
+    g = int(request.form['g'])
+    x = int(request.form['x'])
+    f = int(request.form['f'])
+    command = {'G': g, 'X': x, 'F': f}
+    print(command)
+    communication.set_manual_command(command)
+    return Response('jogged machine')

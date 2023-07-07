@@ -1,6 +1,7 @@
 #include "ForceGauge.h"
 #include <math.h>
 #include <propeller.h>
+#include <smartpins.h>
 
 #define CONFIG_0 0x00 // Configuration register 0
 #define CONFIG_1 0x01 // Configuration register 1
@@ -108,7 +109,7 @@ bool force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
     forceGauge->rx = rx;
     forceGauge->tx = tx;
-    forceGauge->serial.start(rx, tx, 3, BAUD);
+    forceGauge->serial.start(rx, tx, 0, BAUD);//3
     forceGauge->serial.tx(0x55); // Synchronization word
     forceGauge->serial.tx(0x02); // POWERDDOWN
     _waitms(100);
@@ -165,7 +166,7 @@ void force_gauge_stop(ForceGauge *forceGauge)
 }
 
 // returns force in milliNewtons
-int raw_to_force(int raw, MachineConfiguration *configuration)
+int raw_to_force(int raw, int zero, int slope)
 {
-    return round((raw - configuration->forceGaugeZeroFactor) / (configuration->forceGaugeScaleFactor));
+    return round((raw - zero) / slope);
 }

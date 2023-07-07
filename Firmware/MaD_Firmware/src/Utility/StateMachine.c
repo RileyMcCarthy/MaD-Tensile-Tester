@@ -1,17 +1,20 @@
 #include "Utility/StateMachine.h"
+#include "Utility/Debug.h"
+static MachineState machine_state;
+static int machine_state_lock;
 
 /**
  * @brief Initial state on power up. Automatic transition into if any Self Check condition not satisfied. No motion shall occur in Self Check state.
  *
  */
-static State state_machine_self_check(MachineState *machineState)
+static State state_machine_self_check()
 {
     State newState;
 
-    machineState->selfCheckParameters.chargePump = true;
+    machine_state.selfCheckParameters.chargePump = true;
 
     // Decide the next state
-    if (machineState->selfCheckParameters.chargePump)
+    if (machine_state.selfCheckParameters.chargePump)
     {
         newState = STATE_MACHINECHECK;
     }
@@ -29,25 +32,25 @@ static State state_machine_self_check(MachineState *machineState)
  * Motion Status is Disabled in Machine Check State.
  *
  */
-static State state_machine_check(MachineState *machineState)
+static State state_machine_check()
 {
-
+return STATE_MOTION; // @DYN2
     // Check previous state
-    State newState = state_machine_self_check(machineState);
+    State newState = state_machine_self_check();
     if (newState != STATE_MACHINECHECK) // Ensure self check state is satisfied
     {
         return newState;
     }
 
-    MachineCheckParameters params = machineState->machineCheckParameters;
+    MachineCheckParameters params = machine_state.machineCheckParameters;
     // Check internal parameters
     if (params.switchedPower &&
         params.esdTravelLimit == MOTION_LIMIT_OK &&
         params.esdSwitch &&
         params.servoOK &&
-        params.forceGaugeCom &&
+        params.forceGaugeCom
         //params.servoCom &&
-        params.rtcCom)
+        )
     {
         return STATE_MOTION; // Internal parameters passed, change to MOTION
     }
@@ -58,88 +61,79 @@ static State state_machine_check(MachineState *machineState)
     }
 }
 
-static State state_machine_motion(MachineState *machineState)
+static State state_machine_motion()
 {
 
     // Decide the next state
-    State newState = state_machine_check(machineState);
+    State newState = state_machine_check();
     if (newState != STATE_MOTION) // Set default exit state parameters
     {
         // Set state based internal parameters
-        if (machineState->state == STATE_MOTION && // Ensure previous state is MOTION
-            (machineState->machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK ||
-             !machineState->machineCheckParameters.esdSwitch)) // Check for esd fault
+        if (machine_state.state == STATE_MOTION && // Ensure previous state is MOTION
+            (machine_state.machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK ||
+             !machine_state.machineCheckParameters.esdSwitch)) // Check for esd fault
         {
             // Motion exited due to esd fault
             // printf("motion faulted\n");
-            machineState->motionParameters.status = MOTIONSTATUS_FAULTED;
+            machine_state.motionParameters.status = MOTIONSTATUS_FAULTED;
         }
         else
         {
-            machineState->motionParameters.status = MOTIONSTATUS_DISABLED;
+            machine_state.motionParameters.status = MOTIONSTATUS_DISABLED;
         }
         // printf("machine check failed\n");
-        machineState->motionParameters.mode = MODE_MANUAL;
+        //machine_state.motionParameters.mode = MODE_MANUAL; @DYN2
         return newState;
     }
 
     // Check internal parameters
-    if (machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+    if (machine_state.motionParameters.status != MOTIONSTATUS_DISABLED)
     {
-        switch (machineState->motionParameters.condition) // Update status based on condition
+        switch (machine_state.motionParameters.condition) // Update status based on condition
         {
         case CONDITION_LENGTH:
-            machineState->motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+         //   machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
             break;
         case CONDITION_FORCE:
-            machineState->motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+         //   machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
             break;
         case CONDITION_TENSION:
-            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_COMPRESSION:
-            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+         //   machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_UPPER:
-            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_LOWER:
-            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_DOOR:
-            machineState->motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+           // machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_STOPPED:
-            if (machineState->motionParameters.status != MOTIONSTATUS_ENABLED && machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+            if (machine_state.motionParameters.status != MOTIONSTATUS_ENABLED && machine_state.motionParameters.status != MOTIONSTATUS_DISABLED)
             {
                 // Motion returning from condition, enter enabled state
-                machineState->motionParameters.status = MOTIONSTATUS_ENABLED;
+                machine_state.motionParameters.status = MOTIONSTATUS_ENABLED;
             }
             break;
         case CONDITION_MOVING:
-            if (machineState->motionParameters.status != MOTIONSTATUS_ENABLED && machineState->motionParameters.status != MOTIONSTATUS_DISABLED)
+            if (machine_state.motionParameters.status != MOTIONSTATUS_ENABLED && machine_state.motionParameters.status != MOTIONSTATUS_DISABLED)
             {
                 // Motion returning from condition, enter enabled state
-                machineState->motionParameters.status = MOTIONSTATUS_ENABLED;
+                machine_state.motionParameters.status = MOTIONSTATUS_ENABLED;
             }
             break;
         }
     }
     else
     {
-        machineState->motionParameters.mode = MODE_MANUAL;
+        machine_state.motionParameters.mode = MODE_MANUAL;
     }
 
     return STATE_MOTION;
-}
-
-static void state_machine_update(MachineState *machineState)
-{
-    while (!_locktry(machineState->_lock))
-        ;
-    // printf("waiting for lock to release\n"); // waits for lock to be available then claims it
-    machineState->state = state_machine_motion(machineState);
-    _lockrel(machineState->_lock);
 }
 
 bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2)
@@ -154,8 +148,7 @@ bool state_machine_check_equal(MachineCheckParameters *motionParameters1, Machin
            motionParameters1->esdSwitch == motionParameters2->esdSwitch &&
            motionParameters1->servoOK == motionParameters2->servoOK &&
            motionParameters1->forceGaugeCom == motionParameters2->forceGaugeCom &&
-           motionParameters1->servoCom == motionParameters2->servoCom &&
-           motionParameters1->rtcCom == motionParameters2->rtcCom;
+           motionParameters1->servoCom == motionParameters2->servoCom;
 }
 
 bool state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2)
@@ -170,130 +163,127 @@ bool state_machine_equal(MachineState *machineState1, MachineState *machineState
     return state_machine_self_check_equal(&(machineState1->selfCheckParameters), &(machineState2->selfCheckParameters)) &&
            state_machine_check_equal(&(machineState1->machineCheckParameters), &(machineState2->machineCheckParameters)) &&
            state_machine_motion_equal(&(machineState1->motionParameters), &(machineState2->motionParameters)) &&
-           machineState1->state == machineState2->state &&
-           machineState1->_function == machineState2->_function &&
-           machineState1->_functionData == machineState2->_functionData;
+           machineState1->state == machineState2->state;
 }
 
 //@TODO use locks to prevent concurrent access to machineState (only require lock if upddating information)
-void state_machine_set(MachineState *machineState, Parameter param, int state)
+bool state_machine_set(Parameter param, int state)
 {
+    while (!_locktry(machine_state_lock))
+        ;
     switch (param)
     {
     case PARAM_SELF_CHARGE_PUMP:
-        if (machineState->selfCheckParameters.chargePump != state)
+        if (machine_state.selfCheckParameters.chargePump != state)
         {
-            machineState->selfCheckParameters.chargePump = state;
-            state_machine_update(machineState);
+            machine_state.selfCheckParameters.chargePump = state;
         }
         break;
     case PARAM_MACHINE_SWITCHED_POWER:
-        if (machineState->machineCheckParameters.switchedPower != state)
+        if (machine_state.machineCheckParameters.switchedPower != state)
         {
-            machineState->machineCheckParameters.switchedPower = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.switchedPower = state;
+            
         }
         break;
     case PARAM_MACHINE_ESD_TRAVEL_LIMIT:
-        if (machineState->machineCheckParameters.esdTravelLimit != state)
+        if (machine_state.machineCheckParameters.esdTravelLimit != state)
         {
-            machineState->machineCheckParameters.esdTravelLimit = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.esdTravelLimit = state;
+            
         }
         break;
     case PARAM_MACHINE_ESD_SWITCH:
-        if (machineState->machineCheckParameters.esdSwitch != state)
+        if (machine_state.machineCheckParameters.esdSwitch != state)
         {
-            machineState->machineCheckParameters.esdSwitch = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.esdSwitch = state;
+            
         }
         break;
     case PARAM_MACHINE_SERVO_OK:
-        if (machineState->machineCheckParameters.servoOK != state)
+        if (machine_state.machineCheckParameters.servoOK != state)
         {
-            machineState->machineCheckParameters.servoOK = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.servoOK = state;
+            
         }
         break;
     case PARAM_MACHINE_FORCE_GAUGE_COM:
-        if (machineState->machineCheckParameters.forceGaugeCom != state)
+        if (machine_state.machineCheckParameters.forceGaugeCom != state)
         {
-            machineState->machineCheckParameters.forceGaugeCom = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.forceGaugeCom = state;
+            
         }
         break;
     case PARAM_MACHINE_SERVO_COM:
-        if (machineState->machineCheckParameters.servoCom != state)
+        if (machine_state.machineCheckParameters.servoCom != state)
         {
-            machineState->machineCheckParameters.servoCom = state;
-            state_machine_update(machineState);
-        }
-        break;
-    case PARAM_MACHINE_RTC_COM:
-        if (machineState->machineCheckParameters.rtcCom != state)
-        {
-            machineState->machineCheckParameters.rtcCom = state;
-            state_machine_update(machineState);
+            machine_state.machineCheckParameters.servoCom = state;
+            
         }
         break;
     case PARAM_MOTION_STATUS:
-        if (machineState->motionParameters.status != state)
+        if (machine_state.motionParameters.status != state)
         {
-            machineState->motionParameters.status = state;
-            state_machine_update(machineState);
+            machine_state.motionParameters.status = state;
+            
         }
         break;
     case PARAM_MOTION_CONDITION:
-        if (machineState->motionParameters.condition != state)
+        if (machine_state.motionParameters.condition != state)
         {
-            machineState->motionParameters.condition = state;
-            state_machine_update(machineState);
+            machine_state.motionParameters.condition = state;
+            
         }
         break;
     case PARAM_MOTION_MODE:
-        if (machineState->motionParameters.mode != state)
+        if (machine_state.motionParameters.mode != state)
         {
-            if (machineState->motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
+            if (machine_state.motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
             { // Must be in test mode to run test
-                printf("Must be in test mode to run test\n");
+                DEBUG_ERROR("%s","Must be in test mode to run test\n");
+                return false;
                 break;
             }
 
-            machineState->motionParameters.mode = state;
-            state_machine_update(machineState);
+            machine_state.motionParameters.mode = state;
+            
         }
-    case PARAM_FUNCTION:
-        if (machineState->_function != state)
-        {
-            machineState->_function = state;
-            state_machine_update(machineState);
-        }
-        break;
     }
+
+    machine_state.state = state_machine_motion();
+    _lockrel(machine_state_lock);
+    return true;
 }
 
-void machine_state_init(MachineState *machineState)
+bool get_machine_state(MachineState *machineState)
 {
-    machineState->state = STATE_SELFCHECK;
+    while (!_locktry(machine_state_lock))
+        ;
+    memcpy(machineState, &machine_state, sizeof(MachineState));
+    _lockrel(machine_state_lock);
+    return true;
+}
 
-    machineState->selfCheckParameters.chargePump = false;
+void machine_state_init()
+{
+    machine_state.state = STATE_SELFCHECK;
 
-    machineState->machineCheckParameters.switchedPower = false;
-    machineState->machineCheckParameters.esdTravelLimit = MOTION_LIMIT_OK;
-    machineState->machineCheckParameters.esdSwitch = false;
-    machineState->machineCheckParameters.servoOK = false;
-    machineState->machineCheckParameters.forceGaugeCom = false;
-    machineState->machineCheckParameters.servoCom = false;
-    machineState->machineCheckParameters.rtcCom = true;
+    machine_state.selfCheckParameters.chargePump = false;
 
-    machineState->motionParameters.condition = CONDITION_STOPPED;
-    machineState->motionParameters.mode = MODE_MANUAL;
-    machineState->motionParameters.status = MOTIONSTATUS_DISABLED;
-    machineState->_function = FUNC_MANUAL_OFF;
+    machine_state.machineCheckParameters.switchedPower = false;
+    machine_state.machineCheckParameters.esdTravelLimit = MOTION_LIMIT_OK;
+    machine_state.machineCheckParameters.esdSwitch = false;
+    machine_state.machineCheckParameters.servoOK = false;
+    machine_state.machineCheckParameters.forceGaugeCom = false;
+    machine_state.machineCheckParameters.servoCom = false;
 
-    machineState->_lock = _locknew();
-    if (machineState->_lock == -1)
+    machine_state.motionParameters.condition = CONDITION_STOPPED;
+    machine_state.motionParameters.mode = MODE_MANUAL;
+    machine_state.motionParameters.status = MOTIONSTATUS_DISABLED;
+
+    machine_state_lock = _locknew();
+    if (machine_state_lock== -1)
     {
-        // printf("Error allocating new lock\n");
+         DEBUG_ERROR("%s", "Error allocating new lock\n");
     }
 }

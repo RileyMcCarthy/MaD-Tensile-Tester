@@ -2,6 +2,7 @@ from serial import Serial, to_bytes
 from .helpers import crc8
 from threading import RLock
 import ctypes
+import time
 
 SYNC_BYTE = 0x55
 WRITE_BYTE = 128
@@ -15,18 +16,14 @@ def serial_init(port = "/dev/serial0", baud = 1000000):
     try:
         if serial is not None and serial.isOpen():
             serial.close()
-
-        print("Starting Serial on port: " + port)
+        print("Starting Serial on port: " + port + " with baud: "+ baud)
         serial = Serial(port, baud, timeout=1, write_timeout=1,inter_byte_timeout=1)
         serial.reset_input_buffer()
-
+        print("Serial connected using: " + serial.name)
+        return True
     except Exception as error:
         print("Unable to open serial: "+str(error))
         return False
-    
-    print("Serial connected using: " + serial.name)
-    return True
-
 def serial_recieve():
     global serial
     # parses a packet from the serial buffer, returns cmd, data
@@ -71,13 +68,16 @@ def serial_recieve():
     except Exception as err:
         print("Exception reading length byte: " + str(err))
         return None
-    #print(f'Length: {length}')
+
     # read the data
     data = None
     try:
         data = serial.read(length)
         if data is None:
             print("No data found")
+            return None
+        if len(data) != length:
+            print("Invalid data length")
             return None
     except Exception as err:
         print("Exception reading data: " + str(err))
@@ -95,11 +95,12 @@ def serial_recieve():
         return None
 
     # check the crc
-    if crc8(data,length) != crc:
+    crc_calc = crc8(data,length)
+    if crc_calc != crc:
         print(f'Legnth: {length}')
         print(f'Command: {cmd}')
         print(f'Data: {data}')
-        print(f'Invalid CRC {crc8(data,length)} != {crc}')
+        print(f'Invalid CRC {crc_calc} != {crc}')
         return None
 
     return cmd, data, length
@@ -115,7 +116,15 @@ def send(cmd, data):
         try:
             serial.write(bytearray([SYNC_BYTE, cmd]))
             if (data != None):
-                serial.write(data)
+                byte_data = bytes(data, 'utf-8') + b'\x00'
+                byte_size = len(byte_data).to_bytes(2, 'little')
+                byte_crc = crc8(byte_data, len(byte_data)).to_bytes(2, 'little')
+                print("Sending: " ,byte_data , " bytes")
+                print("Size: ", byte_size)
+                print("CRC: ", byte_crc)
+                serial.write(byte_size)
+                serial.write(byte_data)
+                serial.write(byte_crc)
         except Exception as error:
             print("Exception while sending write command: " + str(error))
 
@@ -126,3 +135,6 @@ def serial_read(cmd, data = None):
 def serial_write(cmd, data):
     # Sends a write command with data
     send(cmd | WRITE_BYTE, data)
+
+def serial_test():
+    send(0x55, None)

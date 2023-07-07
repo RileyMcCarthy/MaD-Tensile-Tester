@@ -17,20 +17,6 @@ run:
 	$(PYTHON) MaD.py
 	#. $(ACTIVATE); export FLASK_APP=MaD.py; flask run --host=0.0.0.0
 
-convert: convertclean $(DEFINITIONS)
-
-convertclean:
-	rm -rf $(DEFINITIONBIN)
-
-$(DEFINITIONBIN):
-	mkdir -p $@
-
-$(DEFINITIONBIN)/__init__.py: $(DEFINITIONBIN)
-	touch $@
-
-%.py: %.h $(DEFINITIONBIN)/__init__.py
-	$(PYTHON) c2py.py $< -o $(DEFINITIONBIN)/$(@F)
-
 venvc: clean $(VENV)/bin/activate
 
 venv: $(VENV)/bin/activate

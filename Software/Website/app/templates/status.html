@@ -217,10 +217,11 @@
             }
             
             var monitor = JSON.parse(data.json);
-            var time = monitor.timeus/1000000.0;
-            var positionmm = monitor.encoderum/1000.0;
-            var force = monitor.forcemN/1000.0;
-            var setpointmm = monitor.setpointum/1000.0;
+
+            var time = monitor['Time']/1000000.0;
+            var positionmm = monitor['Position']/1000.0;
+            var force = monitor['Force']/1000.0;
+            var setpointmm = monitor['Setpoint']/1000.0;
             console.log(time, positionmm, force, setpointmm);
 
             chartPositionData.push({
@@ -249,26 +250,44 @@
             } 
 
             json = JSON.parse(data.json);
-            console.log(json);
-            selfCheck = json.selfCheckParameters;
-            update_header("selfCheckParameters", json.state!=0);
-            update_boolean("chargePump", selfCheck.chargePump);
+            
+            state = json['State']
+            
+            selfCheck = json['Self Check Parameters'];
+            chargePump = selfCheck['Charge Pump'];
+
+            machineCheckParameters = json['Machine Check Parameters'];
+            switchedPower = machineCheckParameters['Switched Power'];
+            esdTravelLimit = machineCheckParameters['ESD Travel Limit'];
+            esdSwitch = machineCheckParameters['ESD Switch'];
+            servoOK = machineCheckParameters['Servo OK'];
+            forceGaugeCom = machineCheckParameters['Force Gauge Com'];
+            servoCom = machineCheckParameters['Servo Com'];
+
+            motionParameters = json['Motion Parameters'];
+            status = motionParameters['Status'];
+            condition = motionParameters['Condition'];
+            mode = motionParameters['Mode'];
+
+            console.log(selfCheck);
+            update_header("selfCheckParameters", state !=0);
+            update_boolean("chargePump", chargePump);
         
             machineCheck = json.machineCheckParameters;
-            update_header("machineCheckParameters", json.state!=0&&json.state!=1);
-            update_boolean("switchedPower", machineCheck.switchedPower);
-            update_value("esdTravelLimit", machineCheck.esdTravelLimit);
-            update_boolean("esdSwitch", machineCheck.esdSwitch);
-            update_boolean("servoOK", machineCheck.servoOK);
-            update_boolean("forceGaugeCom", machineCheck.forceGaugeCom);
-            update_boolean("servoCom", machineCheck.servoCom);
+            update_header("machineCheckParameters", state!=0&&state!=1);
+            update_boolean("switchedPower", switchedPower);
+            update_value("esdTravelLimit", esdTravelLimit);
+            update_boolean("esdSwitch", esdSwitch);
+            update_boolean("servoOK", servoOK);
+            update_boolean("forceGaugeCom", forceGaugeCom);
+            update_boolean("servoCom", servoCom);
 
             motionParameters = json.motionParameters;
-            update_value("status", motionParameters.status);
-            update_value("condition", motionParameters.condition);
-            update_value("mode", motionParameters.mode);
+            update_value("status", status);
+            update_value("condition", condition);
+            update_value("mode", mode);
 
-            $(`[json-id="status"]`).prop('disabled', "2".localeCompare(json.state));
+            //$(`[json-id="status"]`).prop('disabled', "2".localeCompare(json.state));
         });
     });
 </script>

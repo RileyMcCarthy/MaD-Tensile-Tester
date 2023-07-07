@@ -52,6 +52,7 @@ bool queue_pop(StaticQueue *queue, void *data) {
     return true;
 }
 
+
 bool queue_isempty(StaticQueue *queue) {
     return queue->rear == queue->front;
 }

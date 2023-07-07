@@ -1,5 +1,4 @@
 from flask import render_template, Response, request
-from .definitions.StateMachineDefinition import MachineState
 from .helpers import ctypes_to_dict
 import json
 from app import app, socketio

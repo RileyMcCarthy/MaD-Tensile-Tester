@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+
 typedef struct StaticQueue_t {
     void *buf;
     int front;

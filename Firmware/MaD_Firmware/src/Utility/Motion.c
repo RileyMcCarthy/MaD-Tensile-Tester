@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "StaticQueue.h"
 #include <propeller.h>
+#include "Utility/Debug.h"
 
 #define MOTION_MEMORY_SIZE 30000
 static long motion_stack[MOTION_MEMORY_SIZE];
@@ -15,8 +16,8 @@ static long motion_feedrate_steps_per_second = 0;
 #define MAX_SIZE_MANUAL 100
 #define MAX_SIZE_TEST 10
 
-static MotionCommand manual_buffer[MAX_SIZE_MANUAL];
-static MotionCommand test_buffer[MAX_SIZE_TEST];
+static Move manual_buffer[MAX_SIZE_MANUAL];
+static Move test_buffer[MAX_SIZE_TEST];
 
 static StaticQueue manual_queue;
 static StaticQueue test_queue;
@@ -40,17 +41,15 @@ void motion_clear()
 }
 
 // returns false if queue is full
-bool motion_add_move(int steps, int feedrate)
+bool motion_add_move(Move *command)
 {
     if (!motion_enabled)
     {
         return false;
     }
-    MotionCommand command;
-    command.steps = steps;
-    command.feedrate = feedrate;
-    //printf("Adding motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
-    return queue_push(&manual_queue, &command);
+
+    DEBUG_INFO("Adding manual motion command with %d steps and %d feedrate\n", command->x, command->f);
+    return queue_push(&manual_queue, command);
 }
 
 void motion_test_start()
@@ -71,7 +70,7 @@ void motion_test_clear()
 
 bool motion_test_is_empty()
 {
-    return queue_isempty(&test_queue);
+    return queue_isempty(&test_queue) && motion_position_steps == motion_setpoint_steps;
 }
 
 bool motion_test_is_full()
@@ -79,7 +78,7 @@ bool motion_test_is_full()
     return queue_isfull(&test_queue);
 }
 
-bool motion_test_add_move(MotionCommand *command)
+bool motion_test_add_move(Move *command)
 {
     //("Adding test command with %d steps and %d feedrate\n", command->steps, command->feedrate);
     return queue_push(&test_queue, (void*)command);
@@ -97,13 +96,14 @@ long motion_get_setpoint()
 
 static void motion_cog(void *arg)
 {
+    motion_setpoint_steps = 0;
     test_mode = false;
-    queue_init(&manual_queue, manual_buffer, MAX_SIZE_MANUAL, sizeof(MotionCommand));
-    queue_init(&test_queue, test_buffer, MAX_SIZE_TEST, sizeof(MotionCommand));
+    queue_init(&manual_queue, manual_buffer, MAX_SIZE_MANUAL, sizeof(Move));
+    queue_init(&test_queue, test_buffer, MAX_SIZE_TEST, sizeof(Move));
     motion_enabled = true;
     while(true)
     {
-        MotionCommand command;
+        Move command;
         StaticQueue *queue = &manual_queue;
         if (test_mode)
         {
@@ -118,18 +118,30 @@ static void motion_cog(void *arg)
             continue;
 
         //printf("Running motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
-        int delayus = 1000000 / command.feedrate;
-        motion_setpoint_steps += command.steps;
+        int delayus = 1000000 / command.f;
+        if (command.g == 0)
+         {
+             motion_setpoint_steps += command.x;
+         }
+         else if (command.g == 1)
+         {
+             motion_setpoint_steps -= command.x;
+         }
+         else
+         {
+             DEBUG_ERROR("%s","Invalid motion command g value!!!\n");
+         }
+
         while (motion_position_steps != motion_setpoint_steps) //while we haven't reached the setpoint
         {
             if (motion_enabled)
             {
-                if (motion_setpoint_steps > motion_position_steps)
+                if (command.g == 0)
                 {
                     _pinl(PIN_SERVO_DIR);
                     motion_position_steps++;
                 }
-                else if (motion_setpoint_steps < motion_position_steps)
+                else if (command.g == 1)
                 {
                     _pinh(PIN_SERVO_DIR);
                     motion_position_steps--;

@@ -11,32 +11,17 @@ static double velocity(double t, double vi, double a)
     return (vi + a * t);
 }
 
-double steps_to_mm(int steps, MachineConfiguration *config)
+double steps_to_mm(int steps, double diameter, double stepmm)
 {
-    if (config == NULL)
-    {
-        // printf("steps_to_mm: config is NULL\n");
-        return 0;
-    }
-    return steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev;
+    return steps * (diameter * 3.14159) / stepmm;
 }
 
-int steps_to_um(int steps, MachineConfiguration *config)
+int steps_to_um(int steps, double diameter, double stepmm)
 {
-    if (config == NULL)
-    {
-        // printf("steps_to_mm: config is NULL\n");
-        return 0;
-    }
-    return (int)round(steps * (config->gearDiameter * 3.14159) / config->positionEncoderStepsPerRev * 1000);
+    return (int)round(steps * (diameter * 3.14159) / stepmm * 1000);
 }
 
-int mm_to_steps(double mm, MachineConfiguration *config)
+int mm_to_steps(double mm, double diameter, double stepmm)
 {
-    if (config == NULL)
-    {
-        // printf("mm_to_steps: config is NULL\n");
-        return 0;
-    }
-    return (int)round(mm * (double)config->positionEncoderStepsPerRev / (double)(config->gearDiameter * 3.14159));
+    return (int)round(mm * stepmm / (double)(diameter * 3.14159));
 }

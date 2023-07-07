@@ -1,10 +1,15 @@
 #ifndef ControlSystem_H
 #define ControlSystem_H
-#include "JSON.h"
-#include "Monitor.h"
-#include "i2cNavKey.h"
 #include "StateMachine.h"
 #include "IOBoard.h"
+
+#define MAX_SAMPLE_PROFILE_NAME 50
+
+#define MAX_TEST_PROFILE_NAME 50
+#define MAX_TEST_PROFILE_MP_FILENAME 20
+#define MAX_TEST_PROFILE_COMMENT 256
+
+#define MAX_FILE_SIZE 1000
 
 typedef enum homingstate_e
 {
@@ -15,14 +20,6 @@ typedef enum homingstate_e
     HOMING_SEEKING_SLOW
 } HomingState;
 
-typedef struct control_t
-{
-    MachineProfile *machineProfile;
-    MonitorData *monitorData;
-    MachineState *stateMachine;
-    int cogid;
-} ControlSystem;
-
-bool control_begin(ControlSystem *control, MachineProfile *machineProfile, MachineState *stateMachine,  MonitorData *monitorData);
+bool control_begin();
 
 #endif

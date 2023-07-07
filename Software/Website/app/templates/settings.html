@@ -5,14 +5,10 @@
 <div class="container">
     <div class="container m-3">
         <h1>Motion Profile</h1>
-        <button onclick=editForm()>Modify</button>
-        <a href="{{url_for('settings_default')}}"><button>Load Template</button></a>
         <div class="container rounded bg-light p-3">
-            <form id = "machineProfile" method="post" style="display: none;">
-                <fieldset id="formEnable" {% if not editable %}disabled{% else %}{% endif %}>
-                    {{ render_form(form) }}
-                    <button type="submit">Submit</button>
-                </fieldset>
+            <form id="jsonForm">
+                <div id="formContainer"></div>
+                <button type="submit">Submit</button>
             </form>
         </div>
         <p id="loading">Loading</p>
@@ -21,37 +17,109 @@
 
 <script>
 
-function editForm() {
-    console.log("Edit Form")
-    $('#formEnable').removeAttr('disabled');
-};
+// Function to generate the form
+function generateForm(data, parentKey = '') {
+    var formContainer = document.getElementById('formContainer');
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+        var value = data[key];
+        var inputName = parentKey ? parentKey + '.' + key : key;
+        var inputId = inputName.replace(/\s+/g, '-').toLowerCase();
+        var label = document.createElement('label');
+        label.setAttribute('for', inputId);
+        label.textContent = key;
+        formContainer.appendChild(label);
+        if (typeof value === 'object') {
+            var lineBreak = document.createElement('br');
+            formContainer.appendChild(lineBreak);
+            generateForm(value, inputName);
+        } else {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'text');
+            input.setAttribute('name', inputName);
+            input.setAttribute('id', inputId);
+            input.setAttribute('value', value);
+            formContainer.appendChild(input);
+        }
+        var lineBreak = document.createElement('br');
+        formContainer.appendChild(lineBreak);
+        }
+    }
+}
 
 $(document).ready(function () {
+    var form = document.getElementById('jsonForm');
+    var mp_json = {};
+    var socket = io('/serial');
+    
+    socket.emit('profile');
 
-    function setFormErrors(form, json) {
-        for (var key in json)
+    socket.on('profile', function (data) {
+        mp_json = JSON.parse(data.json);
+        console.log(data.json);
+        if (!data || !data.json)
         {
-            var input = form.find('#' + key + '-error');
-            if (input)
-            {
-                input.html(json[key]);
-            }
+            return; // Invalid data
         }
-    };
 
-    function clearErrors(form) {
-        form.find('.error').html('');
-    };
+        $('#loading').hide();
 
-    $('#machineProfile').submit(function (e) {
-        var url = "{{ url_for('settings_save') }}"; // send the form data here.
+        generateForm(mp_json)
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent the form from submitting normally
+
+      var formElements = document.getElementById('jsonForm').elements;
+
+      // Build the updated JSON object
+      var updatedJson = {};
+      for (var i = 0; i < formElements.length; i++) {
+        var element = formElements[i];
+        var elementName = element.name;
+        var elementValue = element.value;
+
+        if (!elementValue.trim()) {
+            continue;
+        }
+
+        // Parse numeric values as numbers
+        if (!isNaN(elementValue)) {
+        elementValue = Number(elementValue);
+        }
+
+        if (Number.isInteger(elementValue)) {
+            elementValue = parseInt(elementValue);
+        }
+
+        // Update the JSON object with the new value
+        var keys = elementName.split('.');
+        var obj = updatedJson;
+        for (var j = 0; j < keys.length; j++) {
+          var key = keys[j];
+          if (j === keys.length - 1) {
+            obj[key] = elementValue;
+          } else {
+            obj[key] = obj[key] || {};
+            obj = obj[key];
+          }
+        }
+      }
+      console.log(updatedJson);
+      // Convert the updated JSON object back to a string
+      var updatedJsonString = JSON.stringify(updatedJson);
+      console.log(updatedJsonString);
+
+      // Perform your submission logic here, such as sending the updated JSON to a server
+      var url = "{{ url_for('settings_save') }}"; // send the form data here.
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#machineProfile').serialize(), // serializes the form's elements.
+            contentType: "application/json",
+            data: updatedJsonString, // serializes the form's elements.
             success: function (data) {
                 console.log(data)  // display the returned data in the console.
-                clearErrors($('#machineProfile'));
                 window.alert(data);
             },
             error: function (data) {
@@ -60,52 +128,11 @@ $(document).ready(function () {
                     return; // Invalid data
                 }
                 console.log(data)
-                var machineProfile = $('#machineProfile');
-                setFormErrors(machineProfile, data.responseJSON)
             }
         });
-        e.preventDefault(); // block the traditional submission of the form.
-    });
-
-    // Inject our CSRF token into our AJAX request.
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", "{{ form.csrf_token._value() }}")
-            }
-        }
-    })
-
-    var socket = io('/serial');
-    
-    socket.emit('profile');
-
-    socket.on('profile', function (data) {
-        console.log(data);
-        if (!data || !data.json)
-        {
-            return; // Invalid data
-        }
-        
-        // Only update the form if we are not currently editing it
-        if ($('#formEnable').attr('disabled'))
-        {
-            console.log("Updating form from serial data")
-            var json = JSON.parse(data.json);
-            var machineProfile = $('#machineProfile');
-            for (var key in json)
-            {
-                var input = machineProfile.find('#' + key);
-                if (input)
-                {
-                    input.val(json[key]);
-                }
-            }
-        }
-        $('#machineProfile').show();
-        $('#loading').hide();
     });
 });
+
 </script>
 
 {% endblock %}

@@ -1,14 +1,10 @@
 from flask import render_template, request
 from queue import Queue
 from .helpers import ctypes_to_dict
-from app.definitions.Motion import MotionCommand
-from app.definitions.Monitor import MonitorDataPacket, MonitorData
-from app.definitions.StateMachineDefinition import MachineState, MotionMode, MotionStatus
-from app.definitions.JSON import MachineProfile, MachineConfiguration, MachinePerformance
 import json
 from app import app, socketio
 import app.communication as communication
-from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT
+from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT,CMD_STATE,CMD_DATA,CMD_MPROFILE
 from collections.abc import MutableMapping
 from .helpers import flatten_dict
 from threading import Lock
@@ -26,53 +22,41 @@ test_data = None
 test_data_count = 0
 test_data_complete = False
 
-def serial_thread():
+def serial_thread(serial_port, serial_baud):
     # Serial thread is responsible for reading the serial port and sending the data to the client
     print('starting serial task')
-    while not communication.start():
+    while not communication.start(serial_port, serial_baud):
         print('serial failed to start')
         socketio.sleep(1)
     while True:
         res = communication.process_recieved()
         if res is not None:
-            cmd, data = res
+            cmd, data_json = res
             #print(f'got data: {data_json}')
-            if type(data) == MachineState:
-                data_json = data.getdict()
+            if cmd == CMD_STATE:
                 socketio.emit('state', {'json': json.dumps(data_json)}, namespace = '/serial')
-            elif type(data) == MonitorDataPacket:  
-                data_json = data.getdict()
+            elif cmd == CMD_DATA:  
                 socketio.emit('data', {'json': json.dumps(data_json)}, namespace = '/serial')
-            elif type(data) == MachineProfile:
-                data_json = data.getdict()
-                #print(data_json)f
-                socketio.emit('profile', {'json': json.dumps(flatten_dict(data_json))}, namespace = '/serial')
+            elif cmd == CMD_MPROFILE:
+                socketio.emit('profile', {'json': json.dumps(data_json)}, namespace = '/serial')
             elif cmd == CMD_AWK:
-                data_integer = int.from_bytes(data, byteorder='big')
-                print('Recieving ack command: ', data_integer)
                 global gcode_ack
-                if data_integer == 0:
-                    gcode_ack = "OK"
-                    print('got ack')
-                elif data_integer == 1:
-                    gcode_ack = "FAIL"
-                    print('got nak')
-                elif data_integer == 2:
-                    gcode_ack = "BUSY"
-                    print('busy')
+                print('Recieving ack command: ', data_json['awk'])
+                gcode_ack = data_json['awk']
+                print('Recieving ack command: ', gcode_ack)
             elif cmd == CMD_TESTDATA:
-                print('Recieving test data: ', data)
+                print('Recieving test data: ', data_json)
                 global test_data_complete
                 global test_data
-                test_data_complete = data is None
-                test_data = data
+                test_data_complete = data_json.Test_Data is None
+                test_data = data_json.Test_Data
                 print('got:',test_data,' of size ',len(test_data))
                 #socketio.emit('test_data', {'json': json.dumps(data_integer)}, namespace = '/serial')
             elif cmd == CMD_TESTDATA_COUNT:
                 #print('Recieving test data count: ', data.value)
                 global test_data_count
-                test_data_count = data.value
-        socketio.sleep(0.1)
+                test_data_count = data_json.test_count
+        socketio.sleep(0.01)
 
 def data_thread():
     # Data thread is respondsible for sending the data request command to the serial port
@@ -80,7 +64,7 @@ def data_thread():
     while True:
         #print('Sending data command')
         communication.get_data()
-        socketio.sleep(0.01)
+        socketio.sleep(1)
 
 def state_thread():
     # State thread is respondsible for sending the state request command to the serial port
@@ -88,7 +72,7 @@ def state_thread():
     index = 0
     while True:
         communication.get_state()
-        socketio.sleep(0.1)
+        socketio.sleep(1)
 
 @socketio.on('profile', namespace='/serial')
 def serial_client_profile():
@@ -151,6 +135,7 @@ def test_data_reciever_thread():
 def gcode_sender_thread(filename):
     global gcode_lock
     with gcode_lock:
+        # SHould clear test buffer first!!!
         print('starting gcode sender task')
         # open file
         with open(filename) as f:
@@ -167,13 +152,10 @@ def gcode_sender_thread(filename):
                 continue
             x = round(float(xcord[0][1:]))
             f = int(feedrate[0][1:])
-            print("G{} - X{} - F{}".format(code, x, f))
-            if code[0] == "G1":
-                x = -x
-            command = MotionCommand()
-            command.steps = x
-            command.feedrate = f
-            command.last = False
+            g = code[0][1]
+            print("G{} - X{} - F{}".format(g, x, f))
+            command = {'G': int(g), 'X': x, 'F': f}
+            print(command)
             gcode_ack = "NONE"
             communication.set_motion_command(command)
             timeout = time.time() + 10   # 10 seconds from now
@@ -190,9 +172,4 @@ def gcode_sender_thread(filename):
                         print("Timeout")
                         return
                 socketio.sleep(0.1)
-        last_command = MotionCommand()
-        last_command.steps = 0
-        last_command.feedrate = 0
-        last_command.last = True
-        communication.set_motion_command(last_command)
         print('gcode sender task finished successfully')

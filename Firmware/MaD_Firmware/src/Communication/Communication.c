@@ -1,11 +1,16 @@
 #include "Main/Communication/Communication.h"
 #include "Utility/StateMachine.h"
-#include "Utility/Error.h"
+#include "Utility/JsonEncoder.h"
+#include "Utility/JsonDecoder.h"
+#include "Utility/Debug.h"
 #include "Utility/Motion.h"
 #include "Utility/Monitor.h"
 #include <stdlib.h>
 #include "StaticQueue.h"
 #include <propeller.h>
+#include "Memory/MachineProfile.h"
+#include "Main/MaD.h"
+#include "Main/Communication/CRC.h"
 /* Command structure
  * w<7 cmd bits> <N> <N data>... <CRC>
  * ________ ________ ________
@@ -19,361 +24,491 @@ typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
 
 static FDS fds;
 
+#define CMD_WRITE 128
+#define CMD_PING 0           // test communication
+#define CMD_DATA 1           // send monitor data
+#define CMD_STATE 2          // send machine state
+#define CMD_MPROFILE 3       // send/recieve machine profile
+#define CMD_MCONFIG 4        // send/recieve machine configuration
+#define CMD_MPERFORMANCE 5   // send/receive machine performance
+#define CMD_MOTIONPROFILE 6  // send/recieve motion profile
+#define CMD_MOTIONMODE 7     // send/recieve motion mode
+#define CMD_MOTIONFUNCTION 8 // send/recieve motion function and data
+#define CMD_MOTIONSTATUS 9   // send/recieve motion status
+#define CMD_MOVE 10     // start/send sending motion data
+#define CMD_AWK 11        // send/recieve AWK
+#define CMD_TESTDATA 12   // send/recieve test data
+#define CMD_TESTDATA_COUNT 13 // send/recieve test data count
+#define CMD_MANUAL 14 // send/recieve manual control data
+#define MAD_VERSION 1
+static bool command_to_string(char *buf, int size, uint8_t cmd)
+{
+    switch(cmd)
+    {
+        case CMD_PING:
+            snprintf(buf, size, "CMD_PING");
+            break;
+        case CMD_DATA:
+            snprintf(buf, size, "CMD_DATA");
+            break;
+        case CMD_STATE:
+            snprintf(buf, size, "CMD_STATE");
+            break;
+        case CMD_MPROFILE:
+            snprintf(buf, size, "CMD_MPROFILE");
+            break;
+        case CMD_MCONFIG:
+            snprintf(buf, size, "CMD_MCONFIG");
+            break;
+        case CMD_MPERFORMANCE:
+            snprintf(buf, size, "CMD_MPERFORMANCE");
+            break;
+        case CMD_MOTIONPROFILE:
+            snprintf(buf, size, "CMD_MOTIONPROFILE");
+            break;
+        case CMD_MOTIONMODE:
+            snprintf(buf, size, "CMD_MOTIONMODE");
+            break;
+        case CMD_MOTIONFUNCTION:
+            snprintf(buf, size, "CMD_MOTIONFUNCTION");
+            break;
+        case CMD_MOTIONSTATUS:
+            snprintf(buf, size, "CMD_MOTIONSTATUS");
+            break;
+        case CMD_MOVE:
+            snprintf(buf, size, "CMD_MOVE");
+            break;
+        case CMD_AWK:
+            snprintf(buf, size, "CMD_AWK");
+            break;
+        case CMD_TESTDATA:
+            snprintf(buf, size, "CMD_TESTDATA");
+            break;
+        case CMD_TESTDATA_COUNT:
+            snprintf(buf, size, "CMD_TESTDATA_COUNT");
+            break; 
+        default:
+            snprintf(buf, size, "UNKNOWN");
+            return false;
+    }
+    return true;
+}
+
 // @TODO RETURN CHECKSUM FOR VALIDATION IT WAS RECIEVED CORRECTLY
-static bool receive(char *buf, unsigned int size)
+static uint16_t receive(char *buf, int max_size)
 {
     if (buf == NULL)
     {
-        return false;
+        return 0;
     }
+
+    // Read data size
+    uint16_t size = fds.rxtime(10);
+    if (size == -1)
+    {
+        DEBUG_WARNING("%s", "invalid data recieved\n");
+        return 0;
+    }
+
+    size |= fds.rxtime(10) << 8;
+    if (size == -1)
+    {
+        DEBUG_WARNING("%s","invalid data recieved\n");
+        return 0;
+    }
+
+    DEBUG_INFO("Recieved data of size: %d\n", size);
+
+    if (size > max_size-1)
+    {
+        DEBUG_WARNING("invalid data recieved, data is larger then buffer: buf=%d, max=%d\n", size, max_size);
+        return 0;
+    }
+    // Read data
     for (unsigned int i = 0; i < size; i++)
     {
         buf[i] = fds.rxtime(10);
         if (buf[i] == -1)
         {
-            DEBUG_WARNING("invalid data recieved\n");
-            return false;
+            DEBUG_WARNING("%s","invalid data recieved\n");
+            return 0;
         }
     }
-    return true;
+    DEBUG_WARNING("Recieved data: %s\n", buf);
+    // Read CRC
+    uint8_t crc = fds.rxtime(10);
+    if (crc == -1)
+    {
+        DEBUG_WARNING("%s","invalid data recieved\n");
+        return 0;
+    }
+
+    // Check CRC
+    if (crc != crc8(buf, size))
+    {
+        DEBUG_WARNING("%s","invalid data recieved\n");
+        return 0;
+    }
+
+    return size;
 }
+
+// copying shouldnt need to happen, lock data before sending it...
 
 static bool send(int cmd, char *buf, uint16_t size)
 {
     DEBUG_INFO("Sending data of size: %d\n", size);
 
-    char *bufCopy = NULL;
-    if (size != 0)
-    {
-        bufCopy = (char *)__builtin_alloca(size);
-        memcpy(bufCopy, buf, size);
-        if (bufCopy == NULL)
-        {
-            DEBUG_WARNING("Failed to send: buffer is empty\n");
-            return false;
-        }
-    }
     fds.tx(0x55);
     fds.tx(cmd);
     fds.tx(size);
-    fds.tx(size>>8);
-    //fds.txn(bufCopy, size);
-    for (unsigned int i = 0; i < size; i++)
+    fds.tx(size >> 8);
+
+    for (int i = 0; i < size; i++)
     {
-        fds.tx(bufCopy[i]);
+        fds.tx(buf[i]);
     }
-    unsigned crc = crc8(bufCopy, size);
+    unsigned crc = crc8(buf, size);
     fds.tx(crc);
     return true;
 }
 
-static int recieveCMD(Monitor *monitor)
+static int recieveCMD()
 {
     while (1)
     {
-        while (fds.rxcheck() != 0x55)
+        int res;
+        //DEBUG_INFO("%s","about to wait\n");
+        while ((res = fds.rxtime(1000)) != 0x55)
         {
+            
         }
         int cmd = fds.rxtime(10);
         if (cmd != -1)
         {
+            //DEBUG_INFO("GOT CMD: %d\n", cmd);
             return cmd;
         }
     }
 }
 
-typedef struct communicationData
+static void load_machine_profile()
 {
-    MachineProfile *machineProfile;
-    MachineState *machineState;
-    Monitor *monitor;
-    ControlSystem *control;
-} CommunicationData;
+    DEBUG_INFO("%s","Loading machine profile\n");
+    if (!sd_profile_exists())
+    {
+        // Load default profile, one does not exist
+        DEBUG_WARNING("%s","No machine profile found, loading default\n");
+        MachineProfile temp_profile;
+        memset(&temp_profile, 0, sizeof(MachineProfile));
+        strcpy(temp_profile.name,"DEFAULT");
+        if (!write_sd_profile(&temp_profile))
+        {
+            DEBUG_ERROR("%s","Failed to write machine profile!\n");
+        }
+    }
+    
+    DEBUG_INFO("%s","Reading sd profile from sd\n");
+    MachineProfile machine_profile_temp;
+    if (!read_sd_profile(&machine_profile_temp))
+    {
+        DEBUG_ERROR("%s","Failed to read machine profile from SD card, default should have been loaded!\n");
+    }
 
-static void load_machine_profile(MachineProfile *profile)
-{
-  //printf("Reading config.txt\n");
-  if (!read_sd_profile(profile))
-  {
-   // printf("Failed to read config.txt\n");
+    DEBUG_INFO("%s","Loading machine profile from SD card\n");
+    
+    // Load profile from SD card
+    MachineProfile *machine_profile;
+    if (!lock_machine_profile_ms(&machine_profile, 100))
+    {
+        DEBUG_ERROR("%s","Failed to lock machine profile, default should have been loaded!\n");
+        return;
+    }
+    memcpy(machine_profile, &machine_profile_temp, sizeof(MachineProfile));
+    unlock_machine_profile();
+    
+    DEBUG_INFO("%s","Machine profile loaded\n");
     return;
-  }
-  //printf("Read config.txt:%s\n", profile.name);
+    
 }
 
-void beginCommunication(CommunicationData * arg)
+#define MAX_BUFFER_SIZE 1000
+static char recieved_json[MAX_BUFFER_SIZE];
+static void command_respond(uint8_t cmd)
 {
-    MachineProfile *machineProfile = arg->machineProfile;
-    MachineState *machineState = arg->machineState;
-    Monitor *monitor = arg->monitor;
-    ControlSystem *control = arg->control;
-    load_machine_profile(machineProfile);
-    // Begin main loop
-    fds.start(57, 56, 0, 1000000);
-    while (1)
+    char cmd_str[30];
+    command_to_string(cmd_str, 30, cmd);
+    DEBUG_INFO("Responding to command: %s\n",cmd_str);
+    switch (cmd)
     {
-        DEBUG_INFO("Waiting for command\n");
-        int cmd = recieveCMD(monitor);
-        DEBUG_INFO("cmd:%d,write:%d\n", cmd & ~CMD_WRITE, (cmd & CMD_WRITE) == CMD_WRITE);
-        if ((cmd & CMD_WRITE) != CMD_WRITE)
-        {
-            DEBUG_INFO("Sending data\n");
-            switch (cmd)
-            {
-            case CMD_PING:
-            {
-                DEBUG_INFO("pinging device back\n");
-                uint8_t res = MAD_VERSION;
-                send(CMD_PING, (char *)&res, 1);
-                break;
-            }
-            case CMD_AWK:
-            {
-                DEBUG_INFO("Sending delayed awk\n");
-                uint8_t awk = 0;
-                send(CMD_AWK, (char *)&awk, 1);
-                break;
-            }
-            case CMD_DATA:
-            {
-                DEBUG_INFO("%d,%d\n", monitor->data.forcemN, monitor->data.log);
-                MonitorDataPacket packet;
-                packet.forcemN = monitor->data.forcemN;
-                packet.encoderum = monitor->data.encoderum;
-                packet.setpointum = monitor->data.setpoint;
-                packet.timeus = monitor->data.timeus;
-                packet.log = monitor->data.log;
-                // printf("%d\n", packet.timeus);
-                send(CMD_DATA, (char *)&packet, sizeof(MonitorDataPacket));
+    case CMD_PING:
+    {
+        DEBUG_INFO("%s","Sending ping with firmware version\n");
+        char *res = "{\"version\": \"1.0.0\"}";
+        send(CMD_PING, res, strlen(res)+1);
+        break;
+    }
+    case CMD_AWK:
+    {
+        DEBUG_INFO("%s","Sending delayed awk\n");
+        uint8_t awk = 0;
+        char buf[100];
+        snprintf(buf, 100, "{\"awk\": %d}",awk);
+        send(CMD_AWK, buf, strlen(buf));
+        break;
+    }
+    case CMD_DATA:
+    {
+        MonitorData monitor_data;
+        get_monitor_data(&monitor_data, 10);
+        DEBUG_INFO("Sending Data (%d)\n", monitor_data.log);
+        char buf[200];
+        snprintf(buf, 200, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d}",
+            monitor_data.forcemN, monitor_data.encoderum, monitor_data.setpoint, monitor_data.timeus, monitor_data.log);
+        send(CMD_DATA, buf, strlen(buf)); // dont send null ptr
 
-                break;
-            }
-            case CMD_STATE:
+        break;
+    }
+    case CMD_STATE:
+    {
+        DEBUG_INFO("%s","Sending machine state\n");
+        MachineState machine_state;
+        get_machine_state(&machine_state);
+        char *buf = machine_state_to_json(&machine_state);
+        if (buf == NULL)
+        {
+            DEBUG_ERROR("%s","Failed to convert machine state to json\n");
+            return;
+        }
+        send(CMD_STATE, buf, strlen(buf));
+        unlock_json_buffer();
+        _waitms(10);
+        break;
+    }
+    case CMD_MPROFILE:
+    {
+        DEBUG_INFO("%s","Sending machine profile\n");
+
+        // Access machine profile in memory
+        MachineProfile *machine_profile;
+        if (!lock_machine_profile_ms(&machine_profile, 10))
+        {
+            return;
+        }
+    
+        MachineProfile machine_profile_copy;
+        memcpy(&machine_profile_copy, machine_profile, sizeof(MachineProfile));
+        
+        unlock_machine_profile();
+
+        // Convert to json
+        char *buf = machine_profile_to_json(&machine_profile_copy);
+        if (buf == NULL)
+        {
+            DEBUG_ERROR("%s","Failed to convert machine profile to json\n");
+            return;
+        }
+        DEBUG_INFO("Sending machine profile: %s\n", buf);
+        send(CMD_MPROFILE, buf, strlen(buf));
+        unlock_json_buffer();
+        break;
+    }
+    case CMD_TESTDATA:
+    {
+        DEBUG_INFO("%s","Sending test data\n");
+        uint32_t index;
+        uint8_t count;
+
+        TestDataRequest req;
+        json_to_test_data_request(&req, recieved_json);
+
+        MonitorData buffer[255];
+        if (read_sd_card_data(buffer, req.index, req.count) != 0)
+        {
+            char *buf = test_data_to_json(buffer, req.count, req.index);
+            if (buf == NULL)
             {
-                DEBUG_INFO("Sending machine state\n");
-                send(CMD_STATE, (char *)machineState, sizeof(MachineState));
-                break;
+                DEBUG_ERROR("%s","Failed to convert test data to json\n");
+                return;
             }
-            case CMD_MPROFILE:
+            send(CMD_TESTDATA, buf, strlen(buf));
+            unlock_json_buffer();
+        }
+        break;
+    }
+    case CMD_TESTDATA_COUNT:
+    {
+        // send the number of test data points
+        DEBUG_INFO("%s","Sending test data count\n");
+        int count = read_data_size();
+        char buf[100];
+        snprintf(buf, 100, "{\"test_count\":%d}", count);
+        send(CMD_TESTDATA_COUNT, buf, strlen(buf));
+        break;
+    }
+    default:
+    {
+        DEBUG_WARNING("%s","Write Command not found\n");
+        break;
+    }
+    }
+}
+
+void command_recieve(uint8_t cmd)
+{
+    DEBUG_INFO("%s","Recieving Data from command\n");
+    if (!receive(recieved_json, MAX_BUFFER_SIZE))
+    {
+        DEBUG_WARNING("%s","failed to receive command data\n");
+        return;
+    }
+    DEBUG_INFO("Recieved: %s\n", recieved_json);
+    switch (cmd)
+    {
+    case CMD_MPROFILE:
+    {
+        DEBUG_INFO("%s","Getting machine profile\n");
+        MachineProfile temp;
+        if (!json_to_machine_profile(&temp, recieved_json))
+        {
+            DEBUG_WARNING("%s","failed to parse machine profile\n");
+            break;
+        }
+
+        MachineProfile *machine_profile;
+        if (!lock_machine_profile_ms(&machine_profile, 10))
+        {
+            return;
+        }
+
+        memcpy(machine_profile, &temp, sizeof(MachineProfile));
+        write_sd_profile(machine_profile);
+
+        unlock_machine_profile();
+        DEBUG_INFO("%s","Machine profile updated\n");
+        break;
+    }
+    case CMD_MOTIONMODE:
+    {
+        //@TODO remove motion status hardcode
+        state_machine_set(PARAM_MOTION_STATUS, MOTIONSTATUS_ENABLED);
+        DEBUG_INFO("%s","Getting motion mode\n");
+
+        MotionMode mode;
+        if (!json_to_motion_mode(&mode, recieved_json))
+        {
+            DEBUG_WARNING("%s","failed to parse motion mode\n");
+            break;
+        }
+
+        DEBUG_INFO("Setting motion mode: %d\n", mode);
+        state_machine_set(PARAM_MOTION_MODE, mode);
+        break;
+    }
+    case CMD_MOTIONSTATUS:
+    {
+        DEBUG_WARNING("%s","Getting motion status\n");
+        MotionStatus status;
+
+        if (!json_to_motion_status(&status, recieved_json))
+        {
+            DEBUG_WARNING("%s","failed to parse motion status\n");
+            break;
+        }
+
+        state_machine_set(PARAM_MOTION_STATUS, status);
+
+        break;
+    }
+    case CMD_MOVE:
+    {
+        DEBUG_WARNING("%s","Getting test command\n");
+        char awk[30];
+        strncpy(awk, "OK", 30);
+
+        Move move;
+        if (json_to_move(&move, recieved_json))
+        {
+            if (motion_test_add_move(&move))
             {
-                DEBUG_INFO("Sending machine profile\n");
-                send(CMD_MPROFILE, (char *)machineProfile, sizeof(MachineProfile));
-                break;
+                DEBUG_WARNING("%s","move added\n");
+                strncpy(awk, "OK", 30);
             }
-            case CMD_MCONFIG:
+            else
             {
-                DEBUG_INFO("Sending machine configuration\n");
-                send(CMD_MCONFIG, (char *)&(machineProfile->configuration), sizeof(MachineConfiguration));
-                break;
-            }
-            case CMD_MPERFORMANCE:
-            {
-                DEBUG_INFO("Sending machine performance\n");
-                send(CMD_MPERFORMANCE, (char *)&(machineProfile->performance), sizeof(MachinePerformance));
-                break;
-            }
-            case CMD_MOTIONMODE:
-            {
-                DEBUG_INFO("Sending motion mode\n");
-                send(CMD_MOTIONMODE, (char *)&(machineState->motionParameters.mode), sizeof(MotionMode));
-                break;
-            }
-            case CMD_MOTIONFUNCTION:
-            {
-                DEBUG_INFO("Sending motion function and data\n");
-                send(CMD_MOTIONFUNCTION, (char *)&(machineState->_function), sizeof(int));
-                send(CMD_MOTIONFUNCTION, (char *)&(machineState->_functionData), sizeof(int));
-                break;
-            }
-            case CMD_MOTIONSTATUS:
-            {
-                DEBUG_INFO("Sending motion status\n");
-                send(CMD_MOTIONSTATUS, (char *)&(machineState->motionParameters.status), sizeof(int));
-                break;
-            }
-            case CMD_TESTDATA:
-            {
-                DEBUG_INFO("Sending test data\n");
-                uint32_t index;
-                uint8_t count;
-                if (receive((char *)&index, sizeof(uint32_t)) && receive((char *)&count, sizeof(uint32_t)))
-                {                    
-                    MonitorData buffer[255];
-                    //printf("index:%d,count:%d\n", index, count);
-                    if (read_sd_card_data(buffer, index, count) != 0)
-                    {
-                        //printf("Got dat!\n");
-                        send(CMD_TESTDATA, (char *)buffer, sizeof(MonitorData)*count);
-                    }
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive test data's index\n");
-                }
-                break;
-            }
-            case CMD_TESTDATA_COUNT:
-            {
-                // send the number of test data points
-                DEBUG_INFO("Sending test data count\n");
-                int count = read_data_size();
-                send(CMD_TESTDATA_COUNT, (char *)&count, sizeof(int32_t));
-                break;
-            }
-            default:
-            {
-                DEBUG_WARNING("Write Command not found\n");
-                break;
-            }
+                strncpy(awk, "BUSY", 30);
+                DEBUG_WARNING("%s","failed to add move\n");
             }
         }
         else
         {
-            DEBUG_INFO("Recieving Data\n");
-            switch (cmd & ~CMD_WRITE)
+            strncpy(awk, "FAIL", 30);
+            DEBUG_ERROR("%s","failed to parse test command\n");
+            break;
+        }
+        
+        char buf[100];
+        snprintf(buf, 100, "{\"awk\": \"%s\"}", awk);
+
+        send(CMD_AWK, buf, strlen(buf)); // send ack, 0 is success, 1 is fail, 2 is busy
+        break;
+    }
+    case CMD_MANUAL:
+    {
+        DEBUG_INFO("%s","Getting manual command\n");
+
+        Move move;
+        if (json_to_move(&move, recieved_json))
+        {
+            if (motion_add_move(&move))
             {
-            case CMD_MPROFILE:
+                DEBUG_INFO("Adding move G:%d X%d F%d\n", move.g, move.x, move.f);
+            }
+            else
             {
-                DEBUG_INFO("Getting machine profile: %d\n", sizeof(MachineProfile));
-                MachineProfile temp;
-                if (receive((char *)&temp, sizeof(MachineProfile)))
-                {
-                    memcpy(machineProfile, &temp,sizeof(MachineProfile));
-                    write_sd_profile(machineProfile);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive machine profile\n");
-                }
+                DEBUG_WARNING("%s","failed to add move\n");
                 break;
             }
-            case CMD_MCONFIG:
-            {
-                DEBUG_INFO("Getting machine configuration\n");
-                MachineConfiguration configuration;
-                if (receive((char *)&configuration, sizeof(MachineConfiguration)))
-                {
-                    machineProfile->configuration = configuration;
-                    DEBUG_INFO("test var:%f\n", machineProfile->configuration.maxMotorTorque);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive machine configuration\n");
-                }
-                break;
-            }
-            case CMD_MPERFORMANCE:
-            {
-                DEBUG_INFO("Getting machine performance\n");
-                MachinePerformance performance;
-                if (receive((char *)&performance, sizeof(MachinePerformance)))
-                {
-                    machineProfile->performance = performance;
-                    DEBUG_INFO("test var:%f\n", machineProfile->performance.maxVelocity);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive machine performance\n");
-                }
-                break;
-            }
-            case CMD_MOTIONMODE:
-            {
-                //@TODO remove motion status hardcode
-                state_machine_set(machineState, PARAM_MOTION_STATUS, MOTIONSTATUS_ENABLED);
-                DEBUG_INFO("Getting motion mode\n");
-                MotionMode mode;
-                if (receive((char *)&mode, sizeof(int)))
-                {
-                    state_machine_set(machineState, PARAM_MOTION_MODE, mode);
-                    DEBUG_INFO("test var:%d\n", machineState->motionParameters.mode);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive motion mode\n");
-                }
-                break;
-            }
-            case CMD_MOTIONFUNCTION:
-            {
-                DEBUG_INFO("Getting motion function,data\n");
-                int function;
-                int data;
-                if (receive((char *)&function, sizeof(int)) && receive((char *)&data, sizeof(int)))
-                {
-                    machineState->_function = function;
-                    machineState->_functionData = data;
-                    DEBUG_INFO("Function,data:%d,%d\n", machineState->_function, machineState->_functionData);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive function and data\n");
-                }
-                break;
-            }
-            case CMD_MOTIONSTATUS:
-            {
-                DEBUG_WARNING("Getting motion status\n");
-                MotionStatus status;
-                if (receive((char *)&status, sizeof(int)))
-                {
-                    state_machine_set(machineState, PARAM_MOTION_STATUS, status);
-                    DEBUG_WARNING("Motion Status:%d\n", machineState->motionParameters.status);
-                }
-                else
-                {
-                    DEBUG_WARNING("failed to receive motion status\n");
-                }
-                break;
-            }
-            case CMD_COMMAND:
-            {
-                DEBUG_INFO("Getting test command\n");
-                uint8_t buf = 0;
-                MotionCommand command;
-                if (receive((char*)&command, sizeof(MotionCommand)))
-                {
-                    if (motion_test_add_move(&command))
-                    {
-                        buf = 0;
-                        send(CMD_AWK, (char *)&buf, sizeof(uint8_t)); // send ack, 0 is success, 1 is fail, 2 is busy
-                    }else
-                    {
-                        buf = 2;
-                        send(CMD_AWK, (char *)&buf, sizeof(uint8_t)); // send ack, 0 is success, 1 is fail, 2 is busy
-                    }
-                }
-                else
-                {
-                    buf = 1;
-                    send(CMD_AWK, (char *)&buf, sizeof(uint8_t)); // send ack, 0 is success, 1 is fail, 2 is busy
-                    DEBUG_WARNING("failed to receive command\n");
-                }
-                break;
-            }
-            default:
-            {
-                DEBUG_WARNING("unknown command\n");
-                break;
-            }
-            }
+        }
+        else
+        {
+            DEBUG_ERROR("%s","failed to parse manual command\n");
+            break;
+        }
+        break;
+    }
+    default:
+    {
+        DEBUG_WARNING("%s","unknown command\n");
+        break;
+    }
+    }
+}
+
+static void beginCommunication(void *arg)
+{
+    load_machine_profile();
+    // Begin main loop
+    fds.start(RPI_RX, RPI_TX, 0, 115200);
+    while (1)
+    {
+        DEBUG_INFO("%s","Waiting for command\n");
+        int cmd = recieveCMD();
+        DEBUG_INFO("cmd:%d,write:%d\n", (cmd & ~CMD_WRITE), ((cmd & CMD_WRITE) == CMD_WRITE));
+        if ((cmd & CMD_WRITE) != CMD_WRITE)
+        {
+            command_respond(cmd);
+        }
+        else
+        {
+            command_recieve(cmd & ~CMD_WRITE);
         }
     }
 }
 
-static CommunicationData communicationData;
-bool start_communication(MachineProfile *machineProfile, MachineState *machineState, Monitor *monitor, ControlSystem *control)
+bool start_communication()
 {
-    communicationData.machineProfile = machineProfile;
-    communicationData.machineState = machineState;
-    communicationData.monitor = monitor;
-    communicationData.control = control;
-    //beginCommunication(&communicationData);
-    //return;
-    monitor->cogid = _cogstart_C(beginCommunication, &communicationData, &comm_stack[0], sizeof(long) * COMMUNICATION_MEMORY_SIZE);
-    if (monitor->cogid != -1)
-    {
-      return true;
-    }
-    return false;
+    // Start communication cog
+    int id = _cogstart_C(beginCommunication, NULL, &comm_stack[0], sizeof(long) * COMMUNICATION_MEMORY_SIZE);
+    return id != -1;
 }

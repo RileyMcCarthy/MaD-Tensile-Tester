@@ -1,9 +1,7 @@
 #ifndef MotionPlanning_H
 #define MotionPlanning_H
 #include <stddef.h>
-#include <JSON.h>
 #include <math.h>
-#include <stdbool.h>
 
 typedef struct motionPeriods_s
 {
@@ -28,7 +26,7 @@ typedef struct setPoint_s
     double a;
 } SetPoint;
 
-double steps_to_mm(int steps, MachineConfiguration *config);
-int steps_to_um(int steps, MachineConfiguration *config);
-int mm_to_steps(double mm, MachineConfiguration *config);
+double steps_to_mm(int steps, double diameter, double stepmm);
+int steps_to_um(int steps, double diameter, double stepmm);
+int mm_to_steps(double mm, double diameter, double stepmm);
 #endif
