@@ -4,6 +4,17 @@
 
 static MachineProfile machine_profile;
 static int _machine_profile_lock = -1;
+static bool _machine_profile_loaded = false;
+
+bool machine_profile_loaded()
+{
+    return _machine_profile_loaded;
+}
+
+void set_machine_profile_loaded(bool loaded)
+{
+    _machine_profile_loaded = loaded;
+}
 
 int init_machine_profile()
 {

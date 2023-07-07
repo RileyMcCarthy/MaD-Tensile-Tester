@@ -76,10 +76,10 @@ def generate_gcode():
         prev_x = 0
         for time, x_position in zip(time_values, x_positions):
             feedrate = (x_position - prev_x) / sample_time  # Calculate feedrate in mm/s
-            feedrate_mm_per_min = int(round(feedrate * 60))  # Convert feedrate to mm/minute and round to integer
-            command = "G1" if feedrate_mm_per_min < 0 else "G0"
+            feedrate_mm_per_s = int(round(feedrate))  # Convert feedrate to mm/minute and round to integer
+            command = "G1" if feedrate_mm_per_s < 0 else "G0"
             deltax = x_position - prev_x; # temporary for compatibility with old code, should be abolsute posirtion values
-            f.write(f"{command} X{deltax:.2f} F{abs(feedrate_mm_per_min)}\n")
+            f.write(f"{command} X{deltax} F{abs(feedrate_mm_per_s)}\n")
             prev_x = x_position
 
     return 'file has been created!'
@@ -92,4 +92,11 @@ def jog_machine():
     command = {'G': g, 'X': x, 'F': f}
     print(command)
     communication.set_manual_command(command)
-    return Response('jogged machine')
+    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    return render_template('upload.html', files=files)
+
+@app.route('/set_gauge_length', methods=['POST'])
+def gauge_length():
+    print("setting gauge length")
+    communication.set_gauge_length()
+    return "done"

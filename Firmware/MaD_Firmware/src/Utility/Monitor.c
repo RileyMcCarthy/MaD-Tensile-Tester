@@ -16,18 +16,20 @@ extern long motion_position_steps;
 static ForceGauge forceGauge;
 static Encoder encoder;
 
+bool loaded_mp = false;
+
 bool monitorLogData;
 
-static bool get_force(ForceGauge *forceGauge, int lastLog)
+static bool get_force(int lastLog)
 {
-  if (forceGauge->responding)
+  if (forceGauge.responding)
   {
-    return forceGauge->counter != lastLog;
+    return forceGauge.counter != lastLog;
   }
-  //printf("Force Gauge disconnected, attempting to reconnect\n");
+  DEBUG_ERROR("%s","Force Gauge disconnected, attempting to reconnect\n");
   // maybe force gauge should do this reconnect itself?
-  force_gauge_stop(forceGauge);
-  if (force_gauge_begin(forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX))
+  force_gauge_stop(&forceGauge);
+  if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX))
   {
     //printf("Force Gauge reconnected\n");
     DEBUG_INFO("%s","Force Gauge reconnected\n");
@@ -77,6 +79,7 @@ static void read_sd()
         }
         
         DEBUG_INFO("read_profile_status: %s\n", sd_card->sd_card_profile.name);
+        DEBUG_INFO("offset %d\n", sd_card->sd_card_profile.configuration.forceGaugeOffset);
         sd_card->sd_card_state = SD_CARD_SUCCESS;
         break;
       }
@@ -173,6 +176,7 @@ static void read_sd()
           break;
         }
         sd_card->sd_card_state = SD_CARD_SUCCESS;
+        loaded_mp = false;
         break;
       }
     case SD_CARD_FILE_EXISTS:
@@ -207,6 +211,12 @@ bool get_monitor_data(MonitorData *data, int timeout_ms)
   return true;
 }
 
+static bool trigger_set_gauge = false;
+void set_gauge_length()
+{
+trigger_set_gauge = true;
+}
+
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(int samplerate)
 {
@@ -214,26 +224,31 @@ static void monitor_cog(int samplerate)
 
   FILE *testFile = NULL;
 
-  MachineProfile *profile_ptr;
   MachineProfile machine_profile;
-  while (!lock_machine_profile_ms(&profile_ptr,1000))
-  {
-    DEBUG_ERROR("%s","Failed to lock machine profile\n");
-  }
-  memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
-  unlock_machine_profile();
   
   // Set up encoder
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
   long lastTime = _getms();
   int force_count = 0;
   int force_raw = 0;
+  int gauge_length = 0;
   while (1)
   {
     long start = _getus();
     bool update = false;
+    if (machine_profile_loaded() && !loaded_mp)
+    {
+      MachineProfile *profile_ptr = NULL;
+      while (!lock_machine_profile_ms(&profile_ptr,1000))
+      {
+        DEBUG_ERROR("%s","Failed to lock machine profile\n");
+      }
+      memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
+      unlock_machine_profile();
+      loaded_mp = true;
+    }
 
-    /*if (get_force(&forceGauge, force_count))
+    if (get_force(force_count))
     {
       force_count = forceGauge.counter; // Increment when new data is added to buffer, used for checking if data is new.
       force_raw = forceGauge.forceRaw;
@@ -242,11 +257,12 @@ static void monitor_cog(int samplerate)
     else
     {
       force_raw = 0; // Force gauge not responding, set to 0
-    }*/
+    }
     
     long forceus = _getus() - start;
 
     MonitorData *monitor_data;
+    if (update)
     if (lock_monitor_data_ms(&monitor_data, 1000))
     {
       monitor_data->log = monitor_data->log + 1; // Increment when new data is added to buffer, used for checking if data is new.
@@ -256,9 +272,15 @@ static void monitor_cog(int samplerate)
       monitor_data->timeus = _getus();
       monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
       monitor_data->encoderum = steps_to_um(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);
+      monitor_data->gauge = monitor_data->encoderum - gauge_length;
       monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
       monitor_data->position = steps_to_mm(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);      // Convert steps to mm
       monitor_data->setpoint = motion_get_setpoint();
+      if (trigger_set_gauge)
+      {
+        trigger_set_gauge = false;
+        gauge_length = monitor_data->encoderum;
+      }
       unlock_monitor_data();
       update = true;
     }
@@ -280,13 +302,13 @@ static void monitor_cog(int samplerate)
           DEBUG_ERROR("%s","Failed to open file test.txt for writing\n");
           monitorLogData = false;
         }else{
-          fprintf(testFile,"Time (ms), Time (us), Force (mN), Encoder (um), Setpoint (um)\n");
+          fprintf(testFile,"Time (us), Force (mN), Encoder (um), Gauge (um) Setpoint (um)\n");
         }
       }
       if (update && testFile != NULL)
       {
         // Write data to file
-        fprintf(testFile, "%d, %d, %d, %d,%d\n", monitor_data->timems, monitor_data->timeus, monitor_data->forceRaw, monitor_data->encoderRaw,monitor_data->setpoint);
+        fprintf(testFile, "%d, %d, %d,%d\n",  monitor_data->timeus, monitor_data->forcemN, monitor_data->encoderum,monitor_data->gauge,monitor_data->setpoint);
       }
     }
     else if (testFile != NULL)
@@ -300,8 +322,6 @@ static void monitor_cog(int samplerate)
       // Execute SD card commands
       read_sd();
     }
-
-    _waitms(1);
   }
 }
 

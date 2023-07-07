@@ -53,7 +53,7 @@ static bool inner_json_to_machine_configuration(const json_t *json, MachineConfi
     DEBUG_INFO("SUCCESS: %d\n", success);
     DEBUG_INFO("Motor Type: %s\n", configuration->motorType);
     success &= json_property_to_int(json, "Max Motor RPM", &(configuration->maxMotorRPM));
-    DEBUG_INFO("SUCCESS: %d\n", success);
+    DEBUG_INFO("SUCCESS: %d\n", success);   
     DEBUG_INFO("Max Motor RPM: %d\n", configuration->maxMotorRPM);
     success &= json_property_to_int(json, "Max Motor Torque", &(configuration->maxMotorTorque));
     success &= json_property_to_int(json, "Gear Diameter (mm)", &(configuration->gearDiameter));

@@ -9,12 +9,13 @@
 #define CONFIG_3 0x03 // Configuration register 3
 #define CONFIG_4 0x04 // Configuration register 4
 
-#define CONFIG_DATA1 0b11001000
+// 0bxxx first three determines speed
+#define CONFIG_DATA1 0b00001000
 #define CONFIG_DATA2 0b00000000
 #define CONFIG_DATA3 0b00000001
 #define CONFIG_DATA4 0b01110111
 
-#define BAUD 100000
+#define BAUD 115200
 
 union Data_v
 {
@@ -60,7 +61,7 @@ static void continuous_data(void *arg)
     int data = 0;
     int index = 0;
     int delay = (_clockfreq() / BAUD) / 2;
-    int spmode = P_ASYNC_RX | P_INVERT_IN;
+    int spmode = P_ASYNC_RX;
     int baudcfg = 7 + ((_clockfreq() / BAUD) << 16);
     long transmittx = delay * 35 * 2;
     long disconnecttx = _clockfreq() / 10; // 100ms before considered disconnected
@@ -75,7 +76,7 @@ static void continuous_data(void *arg)
             {
                 forceGauge->responding = false;
             }
-            else if ((_getcnt() - lastData) > transmittx)
+            else if ((_getcnt() - lastData) > transmittx && index > 0)
             {
                 index = 0;
                 data = 0;
@@ -117,37 +118,21 @@ bool force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
     forceGauge->serial.tx(0x06); // Reset
     _waitms(100);
 
-    write_register(forceGauge, CONFIG_1, 0); // Setting data mode to continuous
-    write_register(forceGauge, CONFIG_2, 0); // Setting data counter on
-    write_register(forceGauge, CONFIG_3, 0); // Setting data counter on
-    write_register(forceGauge, CONFIG_4, 0); // Setting data counter on
-
     write_register(forceGauge, CONFIG_1, CONFIG_DATA1); // Setting data mode to continuous
     write_register(forceGauge, CONFIG_2, CONFIG_DATA2); // Setting data counter on
     write_register(forceGauge, CONFIG_3, CONFIG_DATA3); // Setting data counter on
-    write_register(forceGauge, CONFIG_4, CONFIG_DATA4); // Setting data counter on
+    //write_register(forceGauge, CONFIG_4, CONFIG_DATA4); // Setting data counter on CHANGED
     int temp;
     if ((temp = read_register(forceGauge, CONFIG_1)) != CONFIG_DATA1)
     {
         return false;
     }
-    /*    else if ((temp = read_register(forceGauge, CONFIG_2)) != CONFIG_DATA2)
-        {
-
-            return FORCEGAUGE_NOT_RESPONDING;
-        }
-        else if ((temp = read_register(forceGauge, CONFIG_3)) != CONFIG_DATA3)
-        {
-            return FORCEGAUGE_NOT_RESPONDING;
-        }
-        else if ((temp = read_register(forceGauge, CONFIG_4)) != CONFIG_DATA4)
-        {
-            return FORCEGAUGE_NOT_RESPONDING;
-        }*/
     forceGauge->responding = true;
     _waitms(100);
     forceGauge->serial.tx(0x55);
     forceGauge->serial.tx(0x08);
+    _waitms(100);
+    forceGauge->serial.stop();
     forceGauge->cogid = _cogstart_C(continuous_data, forceGauge, &force_stack[0], sizeof(long) * FORCE_MEMORY_SIZE);
     if (forceGauge->cogid <= 0)
     {

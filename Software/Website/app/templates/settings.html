@@ -39,6 +39,7 @@ function generateForm(data, parentKey = '') {
             input.setAttribute('name', inputName);
             input.setAttribute('id', inputId);
             input.setAttribute('value', value);
+            input.setAttribute('required', true);
             formContainer.appendChild(input);
         }
         var lineBreak = document.createElement('br');

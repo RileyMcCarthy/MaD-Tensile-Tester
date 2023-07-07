@@ -17,6 +17,7 @@ CMD_AWK = 11
 CMD_TESTDATA = 12
 CMD_TESTDATA_COUNT = 13
 CMD_MANUAL = 14
+CMD_GAUGE_LENGTH = 15
 
 def test():
     return serial_test()
@@ -67,6 +68,9 @@ def set_motion_mode(mode):
     # Converts mode value to json
     data = {"Mode": mode}
     serial_write(CMD_MOTIONMODE, json.dumps(data))
+
+def set_gauge_length():
+    serial_read(CMD_GAUGE_LENGTH)
 
 def set_motion_status(status):
     # Converts status value to json

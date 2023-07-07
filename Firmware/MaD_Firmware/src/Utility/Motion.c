@@ -4,6 +4,7 @@
 #include "StaticQueue.h"
 #include <propeller.h>
 #include "Utility/Debug.h"
+#include "Memory/MachineProfile.h"
 
 #define MOTION_MEMORY_SIZE 30000
 static long motion_stack[MOTION_MEMORY_SIZE];
@@ -96,6 +97,19 @@ long motion_get_setpoint()
 
 static void motion_cog(void *arg)
 {
+    MachineProfile machine_profile;
+    while (!machine_profile_loaded())
+    ;
+    MachineProfile *profile_ptr = NULL;
+    while (!lock_machine_profile_ms(&profile_ptr,1000))
+    {
+      DEBUG_ERROR("%s","Failed to lock machine profile for motion\n");
+    }
+    memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
+    unlock_machine_profile();
+    
+    int steps_per_mm = 10;//machine_profile.configuration.NEEDTOMAKEVARFOROUTPUTSTEPS;
+
     motion_setpoint_steps = 0;
     test_mode = false;
     queue_init(&manual_queue, manual_buffer, MAX_SIZE_MANUAL, sizeof(Move));
@@ -109,23 +123,34 @@ static void motion_cog(void *arg)
         {
             queue = &test_queue;
         }
+
         if (queue_isempty(queue))
         {
             // if the queue is empty, we should wait for a new command
             continue;
         }
+
+        // Should have a mode for pausing all motion, but for now just disable motion
+        // motion enable should not be here as the queue should be cleared once disabled
+        // pause should remember only stop new step and directions from executing
+        if (!motion_enabled && false)
+        {
+            continue;
+        }
+
         if (!queue_pop(queue, &command))
             continue;
 
         //printf("Running motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
-        int delayus = 1000000 / command.f;
+        int delayus = 1000000 / (command.f * steps_per_mm);
+        int steps = command.x * steps_per_mm;
         if (command.g == 0)
          {
-             motion_setpoint_steps += command.x;
+             motion_setpoint_steps += steps;
          }
          else if (command.g == 1)
          {
-             motion_setpoint_steps -= command.x;
+             motion_setpoint_steps -= steps;
          }
          else
          {
@@ -152,8 +177,10 @@ static void motion_cog(void *arg)
                 _waitus(delayus/2);
             }else
             {
+                DEBUG_ERROR("%s","Motion disabled!!!\n");
                 motion_setpoint_steps = motion_position_steps;
                 queue_empty(&manual_queue);
+                queue_empty(&test_queue);
                 break;
             }
         }

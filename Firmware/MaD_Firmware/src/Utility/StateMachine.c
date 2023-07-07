@@ -34,7 +34,6 @@ static State state_machine_self_check()
  */
 static State state_machine_check()
 {
-return STATE_MOTION; // @DYN2
     // Check previous state
     State newState = state_machine_self_check();
     if (newState != STATE_MACHINECHECK) // Ensure self check state is satisfied
@@ -82,7 +81,7 @@ static State state_machine_motion()
             machine_state.motionParameters.status = MOTIONSTATUS_DISABLED;
         }
         // printf("machine check failed\n");
-        //machine_state.motionParameters.mode = MODE_MANUAL; @DYN2
+        machine_state.motionParameters.mode = MODE_MANUAL;
         return newState;
     }
 
@@ -92,25 +91,25 @@ static State state_machine_motion()
         switch (machine_state.motionParameters.condition) // Update status based on condition
         {
         case CONDITION_LENGTH:
-         //   machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
             break;
         case CONDITION_FORCE:
-         //   machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_SAMPLE_LIMIT;
             break;
         case CONDITION_TENSION:
-          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_COMPRESSION:
-         //   machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_UPPER:
-          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_LOWER:
-          //  machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_DOOR:
-           // machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
+            machine_state.motionParameters.status = MOTIONSTATUS_MACHINE_LIMIT;
             break;
         case CONDITION_STOPPED:
             if (machine_state.motionParameters.status != MOTIONSTATUS_ENABLED && machine_state.motionParameters.status != MOTIONSTATUS_DISABLED)
@@ -169,6 +168,7 @@ bool state_machine_equal(MachineState *machineState1, MachineState *machineState
 //@TODO use locks to prevent concurrent access to machineState (only require lock if upddating information)
 bool state_machine_set(Parameter param, int state)
 {
+    bool res = true;
     while (!_locktry(machine_state_lock))
         ;
     switch (param)
@@ -241,24 +241,28 @@ bool state_machine_set(Parameter param, int state)
             if (machine_state.motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
             { // Must be in test mode to run test
                 DEBUG_ERROR("%s","Must be in test mode to run test\n");
-                return false;
+                res = false;
                 break;
             }
-
-            machine_state.motionParameters.mode = state;
-            
+            else
+            {
+                machine_state.motionParameters.mode = state;
+            }
         }
+        break;
     }
 
     machine_state.state = state_machine_motion();
     _lockrel(machine_state_lock);
-    return true;
+    return res;
 }
 
 bool get_machine_state(MachineState *machineState)
 {
     while (!_locktry(machine_state_lock))
-        ;
+    {
+        //DEBUG_ERROR("%s","Failed to get machine state lock\n");
+    }
     memcpy(machineState, &machine_state, sizeof(MachineState));
     _lockrel(machine_state_lock);
     return true;

@@ -120,48 +120,48 @@ static void control_cog(void *arg)
 
         /*Update Machine Check State parameters*/
         // Switched power
-        /*if (mcp_get_pin(&mcp, SWITCHED_POWER_PIN, SWITCHED_POWER_REGISTER) == 0)
+        if (true)
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_SWITCHED_POWER, (int)true);
+            state_machine_set(PARAM_MACHINE_SWITCHED_POWER, (int)true);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_SWITCHED_POWER, (int)false);
+            state_machine_set(PARAM_MACHINE_SWITCHED_POWER, (int)false);
         }
 
         // ESD Distance limits
-        if (mcp_get_pin(&mcp, ESD_LIMIT_MIN_PIN_NUMBER, ESD_LIMIT_MIN_PIN_REGISTER) == 0)
+        if (false)
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_LOWER);
+            state_machine_set(PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_LOWER);
         }
-        else if (mcp_get_pin(&mcp, ESD_LIMIT_MAX_PIN_NUMBER, ESD_LIMIT_MAX_PIN_REGISTER) == 0)
+        else if (false)
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_UPPER);
+            state_machine_set(PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_UPPER);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_OK);
+            state_machine_set(PARAM_MACHINE_ESD_TRAVEL_LIMIT, MOTION_LIMIT_OK);
         }
 
         // ESD
-        if (mcp_get_pin(&mcp, ESD_ACTIVE_PIN, ESD_ACTIVE_REGISTER) == 1)
+        if (true)
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_SWITCH, (int)true);
+            state_machine_set(PARAM_MACHINE_ESD_SWITCH, (int)true);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_ESD_SWITCH, (int)false);
+            state_machine_set(PARAM_MACHINE_ESD_SWITCH, (int)false);
         }
 
         // Servo Ok
-        if (mcp_get_pin(&mcp, SRVORDY_PIN, SRVORDY_REGISTER) == 1)
+        if (true)
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int)true);
+            state_machine_set(PARAM_MACHINE_SERVO_OK, (int)true);
         }
         else
         {
-            state_machine_set(control->stateMachine, PARAM_MACHINE_SERVO_OK, (int)false);
-        }*/
+            state_machine_set(PARAM_MACHINE_SERVO_OK, (int)false);
+        }
 
         /*Update Motion State parameters*/
         // Check conditions for motion
@@ -171,32 +171,32 @@ static void control_cog(void *arg)
         else if (false) // FORCE
         {
         }
-        else if (forcemN >= 0 && forcemN > profile.performance.maxForceTensile * 1000) // Tension
+        else if (forcemN >= 0 && forcemN > profile.performance.maxForceTensile) // Tension
         {
             state_machine_set(PARAM_MOTION_CONDITION, CONDITION_TENSION);
         }
-        else if (forcemN < 0 && forcemN < -1*profile.performance.maxForceCompression * 1000) // Compression
+        else if (forcemN < 0 && forcemN < -1*profile.performance.maxForceCompression) // Compression
         {
             state_machine_set(PARAM_MOTION_CONDITION, CONDITION_COMPRESSION);
         }
-        /*else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MAX, DISTANCE_LIMIT_MAX_REGISTER) == 1) // UPPER
+        else if (false) // UPPER
         {
             // Error machine out of bounds (Upper Limit)
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_UPPER);
+            state_machine_set(PARAM_MOTION_CONDITION, CONDITION_UPPER);
         }
-        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1) // LOWER
+        else if (false) // LOWER
         {
             // Error machine out of bounds
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_LOWER);
+            state_machine_set(PARAM_MOTION_CONDITION, CONDITION_LOWER);
         }
-        else if (mcp_get_pin(&mcp, DOOR_SWITCH, DOOR_SWITCH_REGISTER) == 1) // Door
+        else if (false) // Door
         {
             // Error machine door open
             // Update state machine
-            state_machine_set(control->stateMachine, PARAM_MOTION_CONDITION, CONDITION_DOOR);
-        }*/
+            state_machine_set(PARAM_MOTION_CONDITION, CONDITION_DOOR);
+        }
         else if (abs(lastEncoderRead - monitor_data.encoderRaw) < 2) // STOPPED
         {
             state_machine_set(PARAM_MOTION_CONDITION, CONDITION_STOPPED);
@@ -212,6 +212,10 @@ static void control_cog(void *arg)
             {
             }
             if (currentMachineState.motionParameters.status == MOTIONSTATUS_DISABLED)
+            {
+                motion_disable();
+            }
+            else if (currentMachineState.motionParameters.status == MOTIONSTATUS_MACHINE_LIMIT)
             {
                 motion_disable();
             }

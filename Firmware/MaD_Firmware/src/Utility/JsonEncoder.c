@@ -66,17 +66,17 @@ static bool machine_configuration_to_json(MachineConfiguration *configuration)
     success &= open_json_block();
 
     success &= string_to_json("Motor Type", configuration->motorType);
-    success &= double_to_json("Max Motor RPM", configuration->maxMotorRPM);
-    success &= double_to_json("Max Motor Torque", configuration->maxMotorTorque);
-    success &= double_to_json("Gear Diameter (mm)", configuration->gearDiameter);
-    success &= double_to_json("Gear Pitch (mm)", configuration->gearPitch);
-    success &= double_to_json("System Inertia", configuration->systemIntertia);
-    success &= double_to_json("Static Torque", configuration->staticTorque);
-    success &= double_to_json("Load", configuration->load);
+    success &= int_to_json("Max Motor RPM", configuration->maxMotorRPM);
+    success &= int_to_json("Max Motor Torque", configuration->maxMotorTorque);
+    success &= int_to_json("Gear Diameter (mm)", configuration->gearDiameter);
+    success &= int_to_json("Gear Pitch (mm)", configuration->gearPitch);
+    success &= int_to_json("System Inertia", configuration->systemIntertia);
+    success &= int_to_json("Static Torque", configuration->staticTorque);
+    success &= int_to_json("Load", configuration->load);
     success &= string_to_json("Position Encoder Type", configuration->positionEncoderType);
-    success &= double_to_json("Position Encoder (steps/um)", configuration->encoderStepsPerUM);
+    success &= int_to_json("Position Encoder (steps/um)", configuration->encoderStepsPerUM);
     success &= string_to_json("Force Gauge Name", configuration->forceGauge);
-    success &= double_to_json("Force Gauge Gain", configuration->forceGaugeGain);
+    success &= int_to_json("Force Gauge Gain", configuration->forceGaugeGain);
     success &= int_to_json("Force Gauge Offset", configuration->forceGaugeOffset);
 
     success &= delete_json_last_comma();
@@ -93,13 +93,13 @@ static bool machine_performance_to_json(MachinePerformance *performance)
     success &= header_to_json("Performance");
     success &= open_json_block();
 
-    success &= double_to_json("Position Minimum", performance->minPosition);
-    success &= double_to_json("Position Maximum", performance->maxPosition);
-    success &= double_to_json("Velocity Maximum", performance->maxVelocity);
-    success &= double_to_json("Acceleration Maximum", performance->maxAcceleration);
-    success &= double_to_json("Force Tensile Maximum", performance->maxForceTensile);
-    success &= double_to_json("Force Compression Maximum", performance->maxForceCompression);
-    success &= double_to_json("Force gauge Neutral Offset", performance->forceGaugeNeutralOffset);
+    success &= int_to_json("Position Minimum", performance->minPosition);
+    success &= int_to_json("Position Maximum", performance->maxPosition);
+    success &= int_to_json("Velocity Maximum", performance->maxVelocity);
+    success &= int_to_json("Acceleration Maximum", performance->maxAcceleration);
+    success &= int_to_json("Force Tensile Maximum", performance->maxForceTensile);
+    success &= int_to_json("Force Compression Maximum", performance->maxForceCompression);
+    success &= int_to_json("Force gauge Neutral Offset", performance->forceGaugeNeutralOffset);
 
     success &= delete_json_last_comma();
     success &= close_json_block();
@@ -188,13 +188,13 @@ char *sample_profile_to_json(SampleProfile *sample)
     success &= open_json_block();
 
     success &= string_to_json("Name", sample->name);
-    success &= double_to_json("Length", sample->length);
-    success &= double_to_json("Stretch Max", sample->stretchMax);
-    success &= double_to_json("Max Velocity", sample->maxVelocity);
-    success &= double_to_json("Max Acceleration", sample->maxAcceleration);
-    success &= double_to_json("Max Jerk", sample->maxJerk);
-    success &= double_to_json("Max Force Tensile", sample->maxForceTensile);
-    success &= double_to_json("Max Force Compression", sample->maxForceCompression);
+    success &= int_to_json("Length", sample->length);
+    success &= int_to_json("Stretch Max", sample->stretchMax);
+    success &= int_to_json("Max Velocity", sample->maxVelocity);
+    success &= int_to_json("Max Acceleration", sample->maxAcceleration);
+    success &= int_to_json("Max Jerk", sample->maxJerk);
+    success &= int_to_json("Max Force Tensile", sample->maxForceTensile);
+    success &= int_to_json("Max Force Compression", sample->maxForceCompression);
 
     success &= delete_json_last_comma();
     success &= close_json_block();

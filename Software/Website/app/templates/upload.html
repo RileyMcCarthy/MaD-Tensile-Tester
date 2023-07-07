@@ -57,10 +57,25 @@
         <input type="text" id="f" name="f" step="1" min="0" required><br>
         <input type="submit" value="Jog!">
     </form>
+    #button to call the endpoint /set_gauge_length
+    <h1>Set Gauge Length</h1>
+    <button onclick="set_gauge_length()">Set Gauge Length</button>
     <br>
 </div>
 
 <script>
+    function set_gauge_length() {
+        $.ajax({
+            url: "/set_gauge_length",
+            type: "post",
+            success: function (data) {
+                console.log("Set Gauge Length");
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    }
     var editor = CodeMirror.fromTextArea(document.getElementById("function"), {
         mode: "python",
         lineNumbers: true,

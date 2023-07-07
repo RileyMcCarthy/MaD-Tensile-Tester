@@ -2,6 +2,7 @@
 //#include <sys/p2es_clock.h>
 #include "Main/MaD.h"
 #include <sys/vfs.h>
+#include <sys/p2es_clock.h>
 enum
 {
     HEAPSIZE = 32400 * 1

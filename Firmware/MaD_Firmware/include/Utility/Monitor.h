@@ -16,4 +16,5 @@ int read_sd_card_data(MonitorData *data, int index, int count);
 int read_data_size();
 bool write_sd_profile(MachineProfile * profile);
 bool get_monitor_data(MonitorData *data, int timeout_ms);
+void set_gauge_length();
 #endif

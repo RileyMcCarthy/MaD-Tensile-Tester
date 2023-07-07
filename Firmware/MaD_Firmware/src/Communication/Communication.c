@@ -40,6 +40,8 @@ static FDS fds;
 #define CMD_TESTDATA 12   // send/recieve test data
 #define CMD_TESTDATA_COUNT 13 // send/recieve test data count
 #define CMD_MANUAL 14 // send/recieve manual control data
+#define CMD_SET_GAUGE 15
+
 #define MAD_VERSION 1
 static bool command_to_string(char *buf, int size, uint8_t cmd)
 {
@@ -134,7 +136,7 @@ static uint16_t receive(char *buf, int max_size)
             return 0;
         }
     }
-    DEBUG_WARNING("Recieved data: %s\n", buf);
+
     // Read CRC
     uint8_t crc = fds.rxtime(10);
     if (crc == -1)
@@ -226,7 +228,8 @@ static void load_machine_profile()
     }
     memcpy(machine_profile, &machine_profile_temp, sizeof(MachineProfile));
     unlock_machine_profile();
-    
+
+    set_machine_profile_loaded(true);    
     DEBUG_INFO("%s","Machine profile loaded\n");
     return;
     
@@ -237,8 +240,8 @@ static char recieved_json[MAX_BUFFER_SIZE];
 static void command_respond(uint8_t cmd)
 {
     char cmd_str[30];
-    command_to_string(cmd_str, 30, cmd);
-    DEBUG_INFO("Responding to command: %s\n",cmd_str);
+    //command_to_string(cmd_str, 30, cmd); THIS WOULD BREAK IT< IDK WHY WTF?
+    DEBUG_INFO("Responding to command: %d\n",cmd);
     switch (cmd)
     {
     case CMD_PING:
@@ -262,9 +265,9 @@ static void command_respond(uint8_t cmd)
         MonitorData monitor_data;
         get_monitor_data(&monitor_data, 10);
         DEBUG_INFO("Sending Data (%d)\n", monitor_data.log);
-        char buf[200];
-        snprintf(buf, 200, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d}",
-            monitor_data.forcemN, monitor_data.encoderum, monitor_data.setpoint, monitor_data.timeus, monitor_data.log);
+        char buf[300];
+        snprintf(buf, 300, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d, \"Raw\":%d}",
+            monitor_data.forcemN, monitor_data.encoderum, monitor_data.setpoint, monitor_data.timeus, monitor_data.log,monitor_data.forceRaw);
         send(CMD_DATA, buf, strlen(buf)); // dont send null ptr
 
         break;
@@ -346,6 +349,12 @@ static void command_respond(uint8_t cmd)
         send(CMD_TESTDATA_COUNT, buf, strlen(buf));
         break;
     }
+    case CMD_SET_GAUGE:
+    {
+        DEBUG_WARNING("%s","Setting gauge\n");
+        set_gauge_length();
+        break;
+    }
     default:
     {
         DEBUG_WARNING("%s","Write Command not found\n");
@@ -407,7 +416,7 @@ void command_recieve(uint8_t cmd)
     }
     case CMD_MOTIONSTATUS:
     {
-        DEBUG_WARNING("%s","Getting motion status\n");
+        DEBUG_INFO("%s","Getting motion status\n");
         MotionStatus status;
 
         if (!json_to_motion_status(&status, recieved_json))

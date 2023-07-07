@@ -19,6 +19,7 @@ typedef struct MonitorData
     int encoderRaw;      // Raw encoder value
     int forcemN;         // Force in mN
     int encoderum;       // Encoder in um
+    int gauge;           // Gauge value in mN
     double force;        // Force value in N
     double position;     // Position value in mm
     int setpoint;        // Setpoint in um
