@@ -22,6 +22,8 @@ bool monitorLogData;
 
 static bool get_force(int lastLog)
 {
+  state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 1);
+  return true;
   if (forceGauge.responding)
   {
     return forceGauge.counter != lastLog;
@@ -377,7 +379,7 @@ bool read_sd_profile(MachineProfile * profile)
   }
   
   MonitorSDCard *sd_card;
-  if (!lock_sd_card(&sd_card))
+  if (!lock_sd_card_ms(&sd_card,10))
   {
     DEBUG_WARNING("%s","Failed to lock monitor reading machine profile\n");
     return false;

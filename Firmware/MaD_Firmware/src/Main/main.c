@@ -17,7 +17,7 @@ enum
 // all stdio must be done in main thread (or same cog)
 int main()
 {
-    //_clkset(_SETFREQ, _CLOCKFREQ);
+    //_clkset(_SETFREQ, _CLOCKFREQ); // Change clock freq to 180 caused errors...
     mount("/sd", _vfs_open_sdcard());
     mad_begin();
     while (1)

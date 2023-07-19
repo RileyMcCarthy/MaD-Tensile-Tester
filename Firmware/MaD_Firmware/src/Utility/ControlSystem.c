@@ -215,7 +215,7 @@ static void control_cog(void *arg)
             {
                 motion_disable();
             }
-            else if (currentMachineState.motionParameters.status == MOTIONSTATUS_MACHINE_LIMIT)
+            else if (false && currentMachineState.motionParameters.status == MOTIONSTATUS_MACHINE_LIMIT)
             {
                 motion_disable();
             }
@@ -458,6 +458,7 @@ static void control_cog(void *arg)
                 {
                     if (lastState.motionParameters.mode != MODE_TEST_RUNNING)
                     {
+                        DEBUG_WARNING("%s","Starting Test\n");
                         motion_test_start();
                         monitorLogData = true;
                     }
@@ -465,6 +466,7 @@ static void control_cog(void *arg)
 
                     if (motion_test_is_empty()) // not a great method of checking if the test is complete, but it works for now
                     {
+                        DEBUG_WARNING("%s","Ending Test\n");
                         monitorLogData = false;
                         motion_test_end();
                         state_machine_set(PARAM_MOTION_MODE, MODE_TEST);

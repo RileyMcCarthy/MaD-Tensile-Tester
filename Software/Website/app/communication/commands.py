@@ -82,11 +82,7 @@ def process_recieved():
     res = serial_recieve()
     if res is None:
         return None
-    #//print("recieving data")
     cmd, data, size = res
-    #print(data)
     decoded = data.decode("utf-8")
-    #print(decoded)
-
     json_dict = json.loads(decoded)
     return cmd, json_dict

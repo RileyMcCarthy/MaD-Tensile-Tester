@@ -66,7 +66,6 @@ bool json_property_to_double(const json_t *json, const char *name, double *value
         return false;
     }
     double temp = json_getReal(property);
-    printf("temp: %f\n", temp);
     memcpy(value, &temp, sizeof(double));
     return true;
 }

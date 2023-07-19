@@ -56,10 +56,10 @@
                         {{display_boolean("Servo Comm","servoCom")}}
 
                         {{display_header("Motion","motionParameters")}}
-                        {{display_button("Status","status", "toggleStatus()", "btn-success")}}
+                        {{display_value("Status","status")}}
                         {{display_value("Condition","condition")}}
-                        {{display_button("Mode","mode", "toggleMode()", "btn-success")}}
-                        {{display_button("","Run", "run()", "btn-success")}}
+                        {{display_value("Mode","mode")}}
+                        {{display_value("","Run")}}
                     </div>
                 </div>
             </div>
@@ -68,6 +68,9 @@
                     <div class="row-xl">
                         <div class="col">
                             <h3>Control</h3>
+                            <button onclick=toggleStatus()>Toggle Status</button>
+                            <button onclick=toggleMode()>Toggle Mode</button>
+                            <button onclick=run()>Run Test</button>
                         </div>
                     </div>
                     <div class="row-xl">
@@ -99,7 +102,43 @@
 
 
 <script type="text/javascript">
+    const State = [
+            'STATE_SELFCHECK',
+            'STATE_MACHINECHECK',
+            'STATE_MOTION'
+            ];
 
+            const MotionStatus = [
+            'MOTIONSTATUS_DISABLED',
+            'MOTIONSTATUS_ENABLED',
+            'MOTIONSTATUS_SAMPLE_LIMIT',
+            'MOTIONSTATUS_MACHINE_LIMIT',
+            'MOTIONSTATUS_FAULTED'
+            ];
+
+            const MotionOverTravel = [
+            'MOTION_LIMIT_OK',
+            'MOTION_LIMIT_UPPER',
+            'MOTION_LIMIT_LOWER'
+            ];
+
+            const MotionCondition = [
+            'CONDITION_LENGTH',
+            'CONDITION_FORCE',
+            'CONDITION_TENSION',
+            'CONDITION_COMPRESSION',
+            'CONDITION_UPPER',
+            'CONDITION_LOWER',
+            'CONDITION_DOOR',
+            'CONDITION_STOPPED',
+            'CONDITION_MOVING'
+            ];
+
+            const MotionMode = [
+            'MODE_MANUAL',
+            'MODE_TEST',
+            'MODE_TEST_RUNNING'
+            ]; 
     function update_boolean(id, value) {
         if (value) {
             $(`[json-id="${id}"]`).attr("class", "bi-check-square-fill");
@@ -142,7 +181,7 @@
             url: "/toggleStatus",
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({status: get_value("status")}),
+            data: JSON.stringify({status: MotionStatus.indexOf(get_value("status"))}),
             success: function (data) {
                 console.log("Toggling Status");
             },
@@ -157,7 +196,7 @@
             url: "/toggleMode",
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({mode: get_value("mode")}),
+            data: JSON.stringify({mode: MotionMode.indexOf(get_value("mode"))}),
             success: function (data) {
                 console.log("Toggling Mode");
             },
@@ -258,16 +297,16 @@
 
             machineCheckParameters = json['Machine Check Parameters'];
             switchedPower = machineCheckParameters['Switched Power'];
-            esdTravelLimit = machineCheckParameters['ESD Travel Limit'];
+            esdTravelLimit = MotionOverTravel[machineCheckParameters['ESD Travel Limit']];
             esdSwitch = machineCheckParameters['ESD Switch'];
             servoOK = machineCheckParameters['Servo OK'];
             forceGaugeCom = machineCheckParameters['Force Gauge Com'];
             servoCom = machineCheckParameters['Servo Com'];
 
             motionParameters = json['Motion Parameters'];
-            status = motionParameters['Status'];
-            condition = motionParameters['Condition'];
-            mode = motionParameters['Mode'];
+            status = MotionStatus[motionParameters['Status']];
+            condition = MotionCondition[motionParameters['Condition']];
+            mode = MotionMode[motionParameters['Mode']];
 
             console.log(selfCheck);
             update_header("selfCheckParameters", state !=0);

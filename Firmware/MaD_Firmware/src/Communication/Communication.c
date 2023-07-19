@@ -141,14 +141,14 @@ static uint16_t receive(char *buf, int max_size)
     uint8_t crc = fds.rxtime(10);
     if (crc == -1)
     {
-        DEBUG_WARNING("%s","invalid data recieved\n");
+        DEBUG_WARNING("%s","no crc recieved\n");
         return 0;
     }
 
     // Check CRC
     if (crc != crc8(buf, size))
     {
-        DEBUG_WARNING("%s","invalid data recieved\n");
+        DEBUG_WARNING("%s","invalid crc recieved\n");
         return 0;
     }
 
@@ -215,6 +215,7 @@ static void load_machine_profile()
     if (!read_sd_profile(&machine_profile_temp))
     {
         DEBUG_ERROR("%s","Failed to read machine profile from SD card, default should have been loaded!\n");
+        _reboot();
     }
 
     DEBUG_INFO("%s","Loading machine profile from SD card\n");
@@ -263,7 +264,11 @@ static void command_respond(uint8_t cmd)
     case CMD_DATA:
     {
         MonitorData monitor_data;
-        get_monitor_data(&monitor_data, 10);
+        if (!get_monitor_data(&monitor_data, 10))
+        {
+            DEBUG_ERROR("%s","Unable to lock monitor data\n");
+            break;
+        }
         DEBUG_INFO("Sending Data (%d)\n", monitor_data.log);
         char buf[300];
         snprintf(buf, 300, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d, \"Raw\":%d}",
@@ -438,7 +443,8 @@ void command_recieve(uint8_t cmd)
         Move move;
         if (json_to_move(&move, recieved_json))
         {
-            if (motion_test_add_move(&move))
+            //if (motion_test_add_move(&move))
+            if (true)
             {
                 DEBUG_WARNING("%s","move added\n");
                 strncpy(awk, "OK", 30);
@@ -457,8 +463,8 @@ void command_recieve(uint8_t cmd)
         }
         
         char buf[100];
-        snprintf(buf, 100, "{\"awk\": \"%s\"}", awk);
-
+        snprintf(buf, 100, "{\"awk\":\"%s\"}", awk);
+        DEBUG_INFO("Sending awk: %s\n",awk);
         send(CMD_AWK, buf, strlen(buf)); // send ack, 0 is success, 1 is fail, 2 is busy
         break;
     }

@@ -16,6 +16,7 @@ from datetime import datetime
 
 gcode_lock = Lock()
 gcode_ack = "NONE"
+gcode_ack_lock = Lock()
 
 test_data_lock = Lock()
 test_data = None
@@ -29,7 +30,10 @@ def serial_thread(serial_port, serial_baud):
         print('serial failed to start')
         socketio.sleep(1)
     while True:
-        res = communication.process_recieved()
+        try:
+            res = communication.process_recieved()
+        except:
+            app.logger.error("Failed to process incomming data!")
         if res is not None:
             cmd, data_json = res
             #print(f'got data: {data_json}')
@@ -41,9 +45,10 @@ def serial_thread(serial_port, serial_baud):
                 socketio.emit('profile', {'json': json.dumps(data_json)}, namespace = '/serial')
             elif cmd == CMD_AWK:
                 global gcode_ack
-                print('Recieving ack command: ', data_json['awk'])
-                gcode_ack = data_json['awk']
-                print('Recieving ack command: ', gcode_ack)
+                global gcode_ack_lock
+                with gcode_ack_lock:
+                    gcode_ack = data_json['awk']
+                    print('Recieving ack command:"', gcode_ack,'"')
             elif cmd == CMD_TESTDATA:
                 print('Recieving test data: ', data_json)
                 global test_data_complete
@@ -86,6 +91,7 @@ def test_data_reciever_thread():
     # Data thread is respondsible for sending the data request command to the serial port
     print('starting test_data_reciever')
     index = 0
+    global test_data_lock
     with test_data_lock:
         global test_data
         global test_data_count
@@ -132,9 +138,24 @@ def test_data_reciever_thread():
                 socketio.sleep(0.01)
         print("Done gathering data")
 
+def gcode_to_dict(gcode_string):
+    gcode_dict = {}
+    words = gcode_string.split()
+    
+    for word in words:
+        command = word[0]
+        value_str = word[1:]
+        if '.' in value_str:  # Check if value contains a decimal point
+            value = float(value_str)
+        else:
+            value = int(value_str)
+        gcode_dict[command] = value
+    return gcode_dict
+
 def gcode_sender_thread(filename):
     global gcode_lock
-    with gcode_lock:
+    print("aquireing gocve lock!")
+    if gcode_lock.acquire(timeout = 1):
         # SHould clear test buffer first!!!
         print('starting gcode sender task')
         # open file
@@ -144,32 +165,30 @@ def gcode_sender_thread(filename):
         global gcode_ack
         for line in lines:
             print(f'sending gcode: {line}')
-            code = re.findall(r'[G]\d+', line)
-            xcord = re.findall(r'[X]\d+\.\d+', line)
-            feedrate = re.findall(r'[F]\d+', line)
-            if not xcord or not feedrate:
-                print("No xcord or feedrate")
-                continue
-            x = round(float(xcord[0][1:]))
-            f = int(feedrate[0][1:])
-            g = code[0][1]
-            print("G{} - X{} - F{}".format(g, x, f))
-            command = {'G': int(g), 'X': x, 'F': f}
-            print(command)
-            gcode_ack = "NONE"
+            command = gcode_to_dict(line)
+            global gcode_ack_lock
+            with gcode_ack_lock:
+                gcode_ack = "NONE"
             communication.set_motion_command(command)
             timeout = time.time() + 10   # 10 seconds from now
             while True:
-                if gcode_ack == "OK":
+                result = "NONE"
+                with gcode_ack_lock:
+                    result = gcode_ack
+                if result == "OK":
                     break
-                elif gcode_ack == "FAIL":
+                elif result == "FAIL":
                     communication.set_motion_command(command) # try again
-                elif gcode_ack == "BUSY":
+                elif result == "BUSY":
+                    # should wait for ok before trying again...
                     communication.set_motion_command(command) # try again
-                    pass
-                elif gcode_ack == "NONE":
+                elif result == "NONE":
                     if time.time() > timeout:
-                        print("Timeout")
+                        app.logger.error("Timeout in gcode sender!")
+                        gcode_lock.release()
                         return
                 socketio.sleep(0.1)
-        print('gcode sender task finished successfully')
+        gcode_lock.release()
+        app.logger.info('gcode sender task finished successfully')
+    else:
+        app.logger.warn("Unable to start gcode sender, locked!")

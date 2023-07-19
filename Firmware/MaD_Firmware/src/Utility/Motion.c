@@ -5,8 +5,19 @@
 #include <propeller.h>
 #include "Utility/Debug.h"
 #include "Memory/MachineProfile.h"
+#include <smartpins.h>
+#include <math.h>
 
-#define MOTION_MEMORY_SIZE 30000
+#define G0_RAPID_MOVE 0
+#define G1_LINEAR_MOVE 1
+#define G2_ClOCKWISE_ARC 2
+#define G3_COUNTERCLOCKWISE_ARC 3
+#define G4_DWELL 4
+#define G28_HOME 28
+#define G90_ABSOLUTE 90
+#define G91_RELATIVE 91
+
+#define MOTION_MEMORY_SIZE 3000
 static long motion_stack[MOTION_MEMORY_SIZE];
 
 static bool motion_enabled = false;
@@ -15,7 +26,7 @@ long motion_position_steps = 0;
 static long motion_feedrate_steps_per_second = 0;
 
 #define MAX_SIZE_MANUAL 100
-#define MAX_SIZE_TEST 10
+#define MAX_SIZE_TEST 100
 
 static Move manual_buffer[MAX_SIZE_MANUAL];
 static Move test_buffer[MAX_SIZE_TEST];
@@ -24,6 +35,7 @@ static StaticQueue manual_queue;
 static StaticQueue test_queue;
 
 static bool test_mode = false;
+static bool relative_mode = false;
 
 void motion_enable()
 {
@@ -108,7 +120,7 @@ static void motion_cog(void *arg)
     memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
     unlock_machine_profile();
     
-    int steps_per_mm = 10;//machine_profile.configuration.NEEDTOMAKEVARFOROUTPUTSTEPS;
+    int steps_per_mm = 1;
 
     motion_setpoint_steps = 0;
     test_mode = false;
@@ -129,7 +141,7 @@ static void motion_cog(void *arg)
             // if the queue is empty, we should wait for a new command
             continue;
         }
-
+        DEBUG_WARNING("%s","Queue is not empty!\n");
         // Should have a mode for pausing all motion, but for now just disable motion
         // motion enable should not be here as the queue should be cleared once disabled
         // pause should remember only stop new step and directions from executing
@@ -140,49 +152,95 @@ static void motion_cog(void *arg)
 
         if (!queue_pop(queue, &command))
             continue;
+        DEBUG_INFO("Running command: %d\n", command.g);
 
-        //printf("Running motion command with %d steps and %d feedrate\n", command.steps, command.feedrate);
-        int delayus = 1000000 / (command.f * steps_per_mm);
-        int steps = command.x * steps_per_mm;
-        if (command.g == 0)
-         {
-             motion_setpoint_steps += steps;
-         }
-         else if (command.g == 1)
-         {
-             motion_setpoint_steps -= steps;
-         }
-         else
-         {
-             DEBUG_ERROR("%s","Invalid motion command g value!!!\n");
-         }
-
-        while (motion_position_steps != motion_setpoint_steps) //while we haven't reached the setpoint
+        if (motion_enabled)
         {
-            if (motion_enabled)
+            switch(command.g)
             {
-                if (command.g == 0)
+                case G0_RAPID_MOVE || G1_LINEAR_MOVE:
                 {
-                    _pinl(PIN_SERVO_DIR);
-                    motion_position_steps++;
+                    if (abs(command.f) < 0.001)
+                    {
+                        DEBUG_WARNING("G0/G1 Command has zero feedrate: %d\n",command.f);
+                        continue;
+                    }
+                    motion_setpoint_steps = round(command.x * steps_per_mm);
+                    int delta_steps = motion_setpoint_steps - motion_position_steps;
+                    bool direction = delta_steps > 0;
+                    if (direction)
+                    {
+                        _pinl(PIN_SERVO_DIR);
+                    }
+                    else
+                    {
+                        _pinh(PIN_SERVO_DIR);
+                    }
+                    
+                    
+                    int clkticks_per_step = (60 * CLKFREQ/round(steps_per_mm * command.f));
+                    if (clkticks_per_step > 65535)
+                    {
+                        DEBUG_INFO("Slow step pulses: %d\n", clkticks_per_step);
+                        // Pulses too slow for hardware
+                        for (int i =0;i<delta_steps;i++)
+                        {
+                            _pinl(PIN_SERVO_PUL);
+                            _waitus(clkticks_per_step >> 1);
+                            _pinh(PIN_SERVO_PUL);
+                            _waitus(clkticks_per_step >> 1);
+                            if (direction)
+                                motion_position_steps++;
+                            else
+                                motion_position_steps--;
+                        }
+                        if (motion_position_steps != motion_setpoint_steps)
+                            DEBUG_ERROR("Position doesnt equal setpoint: %d != %d\n",motion_position_steps,motion_setpoint_steps);
+                    }
+                    else
+                    {
+                        DEBUG_ERROR("Feature not implemented, using fast pulse: %d\n",clkticks_per_step);
+                        continue;
+                        // Fast enough to use hardware
+                        uint32_t pulseTiming = ((clkticks_per_step >> 1) << 16) | clkticks_per_step; // Frequency of Pulse in ms
+                        _pinstart(PIN_SERVO_PUL, P_PULSE, pulseTiming, delta_steps);
+                        
+                        int start_position_steps = motion_position_steps;
+                        int remaining_steps = delta_steps;
+
+                        // wait for smartpin to finish
+                        while ((remaining_steps = _rqpin(PIN_SERVO_PUL)) != 0)
+                        {
+                            // Update position steps
+                            motion_position_steps = start_position_steps + (delta_steps - remaining_steps);
+                            if (!motion_enabled)
+                                break; // Exit early if motion is disabled
+                        }
+                        motion_position_steps = start_position_steps + delta_steps;
+                    }
+                    break;
                 }
-                else if (command.g == 1)
+                case G2_ClOCKWISE_ARC:
                 {
-                    _pinh(PIN_SERVO_DIR);
-                    motion_position_steps--;
+                    break;
                 }
-                _pinl(PIN_SERVO_PUL);
-                _waitus(delayus/2);
-                _pinh(PIN_SERVO_PUL);
-                _waitus(delayus/2);
-            }else
-            {
-                DEBUG_ERROR("%s","Motion disabled!!!\n");
-                motion_setpoint_steps = motion_position_steps;
-                queue_empty(&manual_queue);
-                queue_empty(&test_queue);
-                break;
+                case G3_COUNTERCLOCKWISE_ARC:
+                {
+                    break;
+                }
+                case G4_DWELL:
+                {
+                    _waitms(command.p);
+                    break;
+                }
             }
+        }else
+        {
+            DEBUG_ERROR("%s","Motion disabled!!!\n");
+            motion_setpoint_steps = motion_position_steps;
+            queue_empty(&manual_queue);
+            queue_empty(&test_queue);
+            break;
         }
     }
 }

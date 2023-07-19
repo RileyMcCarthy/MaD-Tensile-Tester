@@ -28,7 +28,10 @@ if __name__ == "__main__":
         socketio.start_background_task(serial_thread, serial_port, serial_baud)
         socketio.start_background_task(state_thread)
         socketio.start_background_task(target=data_thread)
-        socketio.run(app, port=server_port, host="0.0.0.0",
-                     debug=True, use_reloader=False)
+        socketio.run(app,
+                     port=server_port,
+                     host="0.0.0.0",
+                     debug=True,
+                     use_reloader=False)
     except KeyboardInterrupt:
         pass

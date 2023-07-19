@@ -3,10 +3,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct Move{
-    uint8_t g; // 0 = move, 1 = home, 2 = set position
-    int x; // steps to move
-    int f; // steps per second
+typedef struct Move {
+    uint8_t g; // Gcode command
+    double x; // Position in mm
+    double f; // Feedrate in mm/min
+    int p; // ms to pause motion
 } Move;
 
 void motion_enable();

@@ -20,7 +20,6 @@ bool queue_push(StaticQueue *queue, void *data) {
     
     if (queue_isfull(queue))
     {
-        printf("Error: Queue is full\n");
         _lockrel(queue->_lock);
         return false;
     }

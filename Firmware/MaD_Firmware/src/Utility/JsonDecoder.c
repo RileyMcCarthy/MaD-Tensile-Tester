@@ -232,7 +232,16 @@ bool json_to_move(Move *move, char *json)
 
     bool success = true;
     success &= json_property_to_int(parser, "G", (int*)&(move->g));
-    success &= json_property_to_int(parser, "X", (int*)&(move->x));
-    success &= json_property_to_int(parser, "F", (int*)&(move->f));
+    if (success && (move->g == 0 || move->g == 1))
+    {
+        DEBUG_INFO("%s","Parsing G0 or G1 mov\n");
+        success &= json_property_to_double(parser, "X", (double*)&(move->x));
+        success &= json_property_to_double(parser, "F", (double*)&(move->f));
+    }
+    else if (success && (move->g == 4))
+    {
+        DEBUG_INFO("%s","Parsing G4 move\n");
+        success &= json_property_to_int(parser, "P", (int*)&(move->p));
+    }
     return success;
 }

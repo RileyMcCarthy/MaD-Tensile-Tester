@@ -4,16 +4,65 @@
 
 <div class="container">
     <div class="container m-3">
-        <h1>Create Motion Profile</h1>
-        <form action="/upload" enctype = "multipart/form-data" method = "POST">
-            <input type="file" name="file">
-            <input type="submit">
-          </form>
+        <h1>Create G-code File</h1>
+        <form action="/generate" method="POST">
+            <label for="function">Function:</label>
+            <textarea id="function" name="function" rows="5" cols="50" style="display:none;"></textarea>
+            <label for="sample_time">Sample Time (in seconds):</label>
+            <input type="number" id="sample_time" name="sample_time" step="0.01" min="0.01" required><br><br>
+            <label for="total_time">Total Time (in seconds):</label>
+            <input type="number" id="total_time" name="total_time" step="0.01" min="0.01" required><br><br>
+            <label for="gcode_filename">G-code File Name:</label>
+            <input type="text" id="gcode_filename" name="gcode_filename" required><br><br>
+            <input type="submit" value="Generate G-code">
+        </form>
     </div>
+    <h1>Motion Profile Editor</h1>
+    <h2>Profile: {{ profile.name }}</h2>
+
+    <h3>Add Set</h3>
+    <form action="/add_set" method="POST">
+        <label for="set_name">Set Name:</label>
+        <input type="text" id="set_name" name="set_name" required>
+        <button type="submit">Add Set</button>
+    </form>
+
+    <h3>Sets</h3>
+    <ul>
+        {% for set_index, set_obj in enumerate(profile.sets) %}
+            <li>
+                {{ set_obj.name }}
+                <form action="/remove_set/{{ set_index }}" method="POST" style="display:inline">
+                    <button type="submit">Remove Set</button>
+                </form>
+                <form action="/add_quartet/{{ set_index }}" method="POST" style="display:inline">
+                    <button type="submit">Add Quartet</button>
+                </form>
+
+                <ul>
+                    {% for quartet_index, quartet in enumerate(set_obj.quartets) %}
+                        <li>
+                            {{ quartet.name }}
+                            <form action="/remove_quartet/{{ set_index }}/{{ quartet_index }}" method="POST" style="display:inline">
+                                <button type="submit">Remove Quartet</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
 </div>
 
 <script>
-
+var editor = CodeMirror.fromTextArea(document.getElementById("function"), {
+        mode: "python",
+        lineNumbers: true,
+        indentUnit: 4,
+        theme: "default"
+    });
+    // Set the default value for the editor
+    editor.setValue('import math\n\ndef gcode_function(time):\n    return math.sin(time)  # Example function, replace with your own');
 </script>
 
 {% endblock %}

@@ -1,13 +1,14 @@
 from app import app, socketio, ALLOWED_EXTENSIONS
 from flask import render_template, request, jsonify, Response, flash, redirect, url_for
 from werkzeug.utils import secure_filename
-from .base import gcode_sender_thread
+from .base import gcode_sender_thread, gcode_to_dict
 import app.communication as communication
 import os
 import numpy as np
 from io import StringIO
 import sys
 import contextlib
+import json
 
 @app.route('/upload', methods=['GET'])
 def upload_page():
@@ -42,47 +43,37 @@ def select():
     # Process the selected file as needed
     return f'Selected file: {selected_file}'
 
-def run_function_string(func_str, time):
-    with contextlib.redirect_stdout(StringIO()) as output:
-        exec(func_str, globals())
-        result = gcode_function(time)
-    return result
-
-# Add this new route after the '/select' route
-@app.route('/generate', methods=['POST'])
-def generate_gcode():
-    function_str = request.form['function']
-    sample_time = float(request.form['sample_time'])
-    total_time = float(request.form['total_time'])
-
-    func = lambda x: run_function_string(function_str, x)
-
-    # Generate G-code file
-    gcode_filename = request.form['gcode_filename']
-    if not gcode_filename.endswith('.gcode'):
-        gcode_filename += '.gcode'
-    gcode_filepath = os.path.join(app.config['UPLOAD_FOLDER'], gcode_filename)
-
-    # Calculate time values and x_positions (results of func(time))
-    time_values = [i * sample_time for i in range(int(total_time / sample_time) + 1)]
-    x_positions = [func(time) for time in time_values]
-    
-    with open(gcode_filepath, 'w') as f:
-        # Write initial G-code commands
-       # f.write("G90\n")  # Absolute positioning, temporary for compatibility with old code
-        #f.write("G0 X0\n")  # Move to the starting point
-
-        # Write G0 commands for linear interpolations based on time and X positions
-        prev_x = 0
-        for time, x_position in zip(time_values, x_positions):
-            feedrate = (x_position - prev_x) / sample_time  # Calculate feedrate in mm/s
-            feedrate_mm_per_s = int(round(feedrate))  # Convert feedrate to mm/minute and round to integer
-            command = "G1" if feedrate_mm_per_s < 0 else "G0"
-            deltax = x_position - prev_x; # temporary for compatibility with old code, should be abolsute posirtion values
-            f.write(f"{command} X{deltax} F{abs(feedrate_mm_per_s)}\n")
-            prev_x = x_position
-
-    return 'file has been created!'
+@app.route('/gcode_file_to_moves', methods=['POST'])
+def gcode_file_to_moves():
+    selected_file_json = request.get_json()
+    selected_file = selected_file_json['filename']
+    print(selected_file)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], selected_file)
+    with open(path) as f:
+        lines = f.readlines()
+    # Convert gcode lines to array of dict
+    cordinates = []
+    last_position = 0
+    time = 0
+    for line in lines:
+        print(f'sending gcode: {line}')
+        command = gcode_to_dict(line)
+        if command['G'] == 4:
+            position = last_position
+            time += command['P']/1000.0
+        elif command['G'] == 0 or command['G'] == 1:
+            position = command['X'] # mm
+            feedrate = command['F'] # mm/min
+            if feedrate != 0:
+                time += (position-last_position)/(feedrate/60)
+        elif command['G'] == 122:
+            break # end of gcode file
+        else:
+            continue # Skip unknown gcode commands
+        cord = {"X": time, "Y": position}
+        cordinates.append(cord)
+        last_position = position
+    return json.dumps(cordinates)
 
 @app.route('/jog', methods=['POST'])
 def jog_machine():
@@ -100,3 +91,66 @@ def gauge_length():
     print("setting gauge length")
     communication.set_gauge_length()
     return "done"
+
+class MotionQuartet:
+    def __init__(self):
+        self.name = ""
+        self.function = None # Format: position = function(time)
+        self.execution_time = 0.0
+        self.dwell = 0.0
+
+class MotionSet:
+    def __init__(self):
+        self.name = ""
+        self.executions = 0
+        self.quartets = []
+
+class MotionProfile:
+    def __init__(self):
+        self.name = ""
+        self.sets = []
+
+profile = MotionProfile()
+set1 = MotionSet()
+quartet1 = MotionQuartet()
+
+set1.quartets.append(quartet1)
+profile.sets.append(set1)
+
+# Create a sample motion profile
+profile = MotionProfile()
+set1 = MotionSet()
+quartet1 = MotionQuartet()
+set1.quartets.append(quartet1)
+profile.sets.append(set1)
+
+# Define routes
+@app.route('/create')
+def index():
+    return render_template('create.html', profile=profile)
+
+@app.route('/create/add_set', methods=['POST'])
+def add_set():
+    name = request.form['set_name']
+    new_set = MotionSet()
+    new_set.name = name
+    profile.sets.append(new_set)
+    return redirect('/create')
+
+@app.route('/create/remove_set/<int:set_index>', methods=['POST'])
+def remove_set(set_index):
+    profile.sets.pop(set_index)
+    return redirect('/create')
+
+@app.route('/create/add_quartet/<int:set_index>', methods=['POST'])
+def add_quartet(set_index):
+    set_obj = profile.sets[set_index]
+    new_quartet = MotionQuartet()
+    set_obj.quartets.append(new_quartet)
+    return redirect('/create')
+
+@app.route('/create/remove_quartet/<int:set_index>/<int:quartet_index>', methods=['POST'])
+def remove_quartet(set_index, quartet_index):
+    set_obj = profile.sets[set_index]
+    set_obj.quartets.pop(quartet_index)
+    return redirect('/create')

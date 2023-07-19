@@ -24,7 +24,7 @@
             <tbody>
                 {% for file in files %}
                 <tr>
-                    <td><input type="radio" name="selected_file" value="{{ file }}" required></td>
+                    <td><input type="radio" name="selected_file" value="{{ file }}" onclick=file_selected(this.value) required></td>
                     <td>{{ file }}</td>
                 </tr>
                 {% endfor %}
@@ -32,6 +32,7 @@
         </table>
         <br>
         <input type="submit" value="Queue Profile">
+        <div id="chartContainer" style="height: 300px; width: 100%;"></div>
     </form>
     <hr>
     <h1>Create G-code File</h1>
@@ -64,6 +65,50 @@
 </div>
 
 <script>
+        var chartData = [];
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            title:{
+                text: "Try Zooming and Panning" 
+            },
+            data: [{
+                type: "line",
+                dataPoints: chartData
+            }],
+        });
+        chart.render();
+
+        function file_selected(file)
+        {
+            console.log(file);
+            $.ajax({
+                url: "/gcode_file_to_moves",
+                type: "post",
+                data: JSON.stringify({"filename": file}),
+                contentType: "application/json",
+                success: function (data_json) {
+                    cordinates = JSON.parse(data_json)
+                    console.log(cordinates);
+                    
+                    chartData.length = 0; // clear array
+                    for (var i = 0; i < cordinates.length; i += 1) {
+                        chartData.push({
+                            x: cordinates[i].X,
+                            y: cordinates[i].Y         
+                        });
+                        console.log("adding cord: ",cordinates[i].X, " ", cordinates[i].Y);
+                    }
+                    chart.options.title.text = file;
+                    chart.render();
+                },
+                error: function (xhr) {
+                    //Handel error
+                }
+            });
+        }
+    
+
     function set_gauge_length() {
         $.ajax({
             url: "/set_gauge_length",
@@ -76,6 +121,7 @@
             }
         });
     }
+    
     var editor = CodeMirror.fromTextArea(document.getElementById("function"), {
         mode: "python",
         lineNumbers: true,
