@@ -2,6 +2,7 @@
 #define DEBUG_H
 
 #include <stdio.h>
+#include "StaticQueue.h"
 
 #ifndef __WORKSPACE__
 #define __WORKSPACE__ ""
@@ -30,7 +31,9 @@ extern _stdio_debug_lock;
 #endif
 
 #ifdef _DEBUG_ERROR
-#define DEBUG_ERROR(fmt, ...) while (!_locktry(_stdio_debug_lock)); fprintf(stdout, ANSI_COLOR_RED "%s:%d: " fmt ANSI_COLOR_RESET,__FILE__+strlen(__WORKSPACE__), __LINE__, __VA_ARGS__); _lockrel(_stdio_debug_lock)
+#define DEBUG_ERROR(fmt, ...) while (!_locktry(_stdio_debug_lock));\
+fprintf(stdout, ANSI_COLOR_RED "%s:%d: " fmt ANSI_COLOR_RESET,__FILE__+strlen(__WORKSPACE__), __LINE__, __VA_ARGS__);\
+_lockrel(_stdio_debug_lock);
 #else
 #define DEBUG_ERROR(...)
 #endif

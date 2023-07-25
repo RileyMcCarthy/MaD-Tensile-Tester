@@ -69,7 +69,7 @@ def data_thread():
     while True:
         #print('Sending data command')
         communication.get_data()
-        socketio.sleep(1)
+        socketio.sleep(0.2)
 
 def state_thread():
     # State thread is respondsible for sending the state request command to the serial port
@@ -139,11 +139,15 @@ def test_data_reciever_thread():
         print("Done gathering data")
 
 def gcode_to_dict(gcode_string):
+    valid_commands = ['G', 'X', 'F', 'P']
     gcode_dict = {}
     words = gcode_string.split()
     
     for word in words:
         command = word[0]
+        if command not in valid_commands:
+            print(f'Invalid gcode command: {command}, valid commands are: {valid_commands}')
+            continue
         value_str = word[1:]
         if '.' in value_str:  # Check if value contains a decimal point
             value = float(value_str)
@@ -171,6 +175,7 @@ def gcode_sender_thread(filename):
                 gcode_ack = "NONE"
             communication.set_motion_command(command)
             timeout = time.time() + 10   # 10 seconds from now
+            retries = 0
             while True:
                 result = "NONE"
                 with gcode_ack_lock:
@@ -179,9 +184,15 @@ def gcode_sender_thread(filename):
                     break
                 elif result == "FAIL":
                     communication.set_motion_command(command) # try again
+                    retries += 1
+                    if retries > 5:
+                        app.logger.error("Failed to send gcode, too many retries!")
+                        gcode_lock.release()
+                        return
                 elif result == "BUSY":
                     # should wait for ok before trying again...
                     communication.set_motion_command(command) # try again
+                    socketio.sleep(0.5) # slow down sending
                 elif result == "NONE":
                     if time.time() > timeout:
                         app.logger.error("Timeout in gcode sender!")

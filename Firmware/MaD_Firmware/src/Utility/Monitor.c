@@ -17,13 +17,10 @@ static ForceGauge forceGauge;
 static Encoder encoder;
 
 bool loaded_mp = false;
-
-bool monitorLogData;
+static bool monitorLogData;
 
 static bool get_force(int lastLog)
 {
-  state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 1);
-  return true;
   if (forceGauge.responding)
   {
     return forceGauge.counter != lastLog;
@@ -227,6 +224,7 @@ static void monitor_cog(int samplerate)
   FILE *testFile = NULL;
 
   MachineProfile machine_profile;
+  monitorLogData = false;
   
   // Set up encoder
   encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
@@ -273,11 +271,11 @@ static void monitor_cog(int samplerate)
       monitor_data->timems = _getms();
       monitor_data->timeus = _getus();
       monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
-      monitor_data->encoderum = steps_to_um(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);
+      monitor_data->encoderum = motion_get_position()*1000;//steps_to_um(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);
       monitor_data->gauge = monitor_data->encoderum - gauge_length;
       monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
-      monitor_data->position = steps_to_mm(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);      // Convert steps to mm
-      monitor_data->setpoint = motion_get_setpoint();
+      monitor_data->position = motion_get_position()*1000;//steps_to_mm(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);      // Convert steps to mm
+      monitor_data->setpoint = motion_get_setpoint()*1000;
       if (trigger_set_gauge)
       {
         trigger_set_gauge = false;
@@ -292,9 +290,13 @@ static void monitor_cog(int samplerate)
     }
 
     long encoderus = _getus() - start - forceus;
-
-    if (monitorLogData)
+    
+    MachineState machineState;
+    get_machine_state(&machineState);
+    
+    if (machineState.motionParameters.mode == MODE_TEST_RUNNING)
     {
+      monitorLogData = true;
       if (testFile == NULL)
       {
         // Begin Logging data
@@ -302,7 +304,7 @@ static void monitor_cog(int samplerate)
         if (testFile == NULL)
         {
           DEBUG_ERROR("%s","Failed to open file test.txt for writing\n");
-          monitorLogData = false;
+          state_machine_set(PARAM_MOTION_MODE, MODE_TEST);
         }else{
           fprintf(testFile,"Time (us), Force (mN), Encoder (um), Gauge (um) Setpoint (um)\n");
         }
@@ -315,6 +317,7 @@ static void monitor_cog(int samplerate)
     }
     else if (testFile != NULL)
     {
+      monitorLogData = false;
       // Stop Logging
       fclose(testFile);
       testFile = NULL;

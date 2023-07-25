@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "Main/Communication/Communication.h"
 #include "Utility/StateMachine.h"
 #include "Utility/JsonEncoder.h"
@@ -5,12 +6,11 @@
 #include "Utility/Debug.h"
 #include "Utility/Motion.h"
 #include "Utility/Monitor.h"
-#include <stdlib.h>
 #include "StaticQueue.h"
-#include <propeller.h>
 #include "Memory/MachineProfile.h"
 #include "Main/MaD.h"
 #include "Main/Communication/CRC.h"
+#include <propeller.h>
 /* Command structure
  * w<7 cmd bits> <N> <N data>... <CRC>
  * ________ ________ ________
@@ -18,7 +18,7 @@
  * <CRC> = check
  */
 
-#define COMMUNICATION_MEMORY_SIZE 3000
+#define COMMUNICATION_MEMORY_SIZE 8000
 static long comm_stack[COMMUNICATION_MEMORY_SIZE];
 typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
 
@@ -41,6 +41,7 @@ static FDS fds;
 #define CMD_TESTDATA_COUNT 13 // send/recieve test data count
 #define CMD_MANUAL 14 // send/recieve manual control data
 #define CMD_SET_GAUGE 15
+#define CMD_NOTIFY_ERROR 16
 
 #define MAD_VERSION 1
 static bool command_to_string(char *buf, int size, uint8_t cmd)
@@ -96,67 +97,6 @@ static bool command_to_string(char *buf, int size, uint8_t cmd)
     return true;
 }
 
-// @TODO RETURN CHECKSUM FOR VALIDATION IT WAS RECIEVED CORRECTLY
-static uint16_t receive(char *buf, int max_size)
-{
-    if (buf == NULL)
-    {
-        return 0;
-    }
-
-    // Read data size
-    uint16_t size = fds.rxtime(10);
-    if (size == -1)
-    {
-        DEBUG_WARNING("%s", "invalid data recieved\n");
-        return 0;
-    }
-
-    size |= fds.rxtime(10) << 8;
-    if (size == -1)
-    {
-        DEBUG_WARNING("%s","invalid data recieved\n");
-        return 0;
-    }
-
-    DEBUG_INFO("Recieved data of size: %d\n", size);
-
-    if (size > max_size-1)
-    {
-        DEBUG_WARNING("invalid data recieved, data is larger then buffer: buf=%d, max=%d\n", size, max_size);
-        return 0;
-    }
-    // Read data
-    for (unsigned int i = 0; i < size; i++)
-    {
-        buf[i] = fds.rxtime(10);
-        if (buf[i] == -1)
-        {
-            DEBUG_WARNING("%s","invalid data recieved\n");
-            return 0;
-        }
-    }
-
-    // Read CRC
-    uint8_t crc = fds.rxtime(10);
-    if (crc == -1)
-    {
-        DEBUG_WARNING("%s","no crc recieved\n");
-        return 0;
-    }
-
-    // Check CRC
-    if (crc != crc8(buf, size))
-    {
-        DEBUG_WARNING("%s","invalid crc recieved\n");
-        return 0;
-    }
-
-    return size;
-}
-
-// copying shouldnt need to happen, lock data before sending it...
-
 static bool send(int cmd, char *buf, uint16_t size)
 {
     DEBUG_INFO("Sending data of size: %d\n", size);
@@ -192,6 +132,77 @@ static int recieveCMD()
             return cmd;
         }
     }
+}
+static char awk_buf[100]; // Should use json encode buffer
+static void send_awk(uint8_t cmd, const char *awk)
+{
+    snprintf(awk_buf, 100, "{\"cmd\":\"%d\",\"awk\":\"%s\"}", cmd, awk);
+    send(CMD_AWK, awk_buf, strlen(awk_buf)); // send ack, 0 is success, 1 is fail, 2 is busy
+}
+
+// @TODO RETURN CHECKSUM FOR VALIDATION IT WAS RECIEVED CORRECTLY
+static uint16_t receive(uint8_t cmd, char *buf, int max_size)
+{
+    if (buf == NULL)
+    {
+        return 0;
+    }
+
+    // Read data size
+    uint16_t size = fds.rxtime(10);
+    if (size == -1)
+    {
+        DEBUG_WARNING("%s", "invalid data recieved\n");
+        send_awk(cmd, "FAIL");
+        return 0;
+    }
+
+    size |= fds.rxtime(10) << 8;
+    if (size == -1)
+    {
+        DEBUG_WARNING("%s","invalid data recieved\n");
+        send_awk(cmd, "FAIL");
+        return 0;
+    }
+
+    DEBUG_INFO("Recieved data of size: %d\n", size);
+
+    if (size > max_size-1)
+    {
+        DEBUG_WARNING("invalid data recieved, data is larger then buffer: buf=%d, max=%d\n", size, max_size);
+        send_awk(cmd, "FAIL");
+        return 0;
+    }
+    // Read data
+    for (unsigned int i = 0; i < size; i++)
+    {
+        buf[i] = fds.rxtime(10);
+        if (buf[i] == -1)
+        {
+            DEBUG_WARNING("%s","invalid data recieved\n");
+            send_awk(cmd, "FAIL");
+            return 0;
+        }
+    }
+
+    // Read CRC
+    uint8_t crc = fds.rxtime(10);
+    if (crc == -1)
+    {
+        DEBUG_WARNING("%s","no crc recieved\n");
+        send_awk(cmd, "FAIL");
+        return 0;
+    }
+
+    // Check CRC
+    if (crc != crc8(buf, size))
+    {
+        DEBUG_WARNING("%s","invalid crc recieved\n");
+        send_awk(cmd, "FAIL");
+        return 0;
+    }
+
+    return size;
 }
 
 static void load_machine_profile()
@@ -238,27 +249,28 @@ static void load_machine_profile()
 
 #define MAX_BUFFER_SIZE 1000
 static char recieved_json[MAX_BUFFER_SIZE];
+
+#define MAX_RESPONSE_SIZE 500
+static char response_json[MAX_RESPONSE_SIZE]; // REMOVE THIS, should use json encoder buffer
+
+static MonitorData test_data_buffer[255];
+
 static void command_respond(uint8_t cmd)
 {
-    char cmd_str[30];
-    //command_to_string(cmd_str, 30, cmd); THIS WOULD BREAK IT< IDK WHY WTF?
     DEBUG_INFO("Responding to command: %d\n",cmd);
     switch (cmd)
     {
     case CMD_PING:
     {
         DEBUG_INFO("%s","Sending ping with firmware version\n");
-        char *res = "{\"version\": \"1.0.0\"}";
-        send(CMD_PING, res, strlen(res)+1);
+        strncpy(response_json, "{\"version\": \"1.0.0\"}", MAX_RESPONSE_SIZE);
+        send(CMD_PING, response_json, strlen(response_json)+1);
         break;
     }
     case CMD_AWK:
     {
         DEBUG_INFO("%s","Sending delayed awk\n");
-        uint8_t awk = 0;
-        char buf[100];
-        snprintf(buf, 100, "{\"awk\": %d}",awk);
-        send(CMD_AWK, buf, strlen(buf));
+        send_awk(cmd, "OK");
         break;
     }
     case CMD_DATA:
@@ -270,10 +282,9 @@ static void command_respond(uint8_t cmd)
             break;
         }
         DEBUG_INFO("Sending Data (%d)\n", monitor_data.log);
-        char buf[300];
-        snprintf(buf, 300, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d, \"Raw\":%d}",
+        snprintf(response_json, MAX_RESPONSE_SIZE, "{\"Force\":%d,\"Position\":%d,\"Setpoint\":%d,\"Time\":%d,\"Log\":%d, \"Raw\":%d}",
             monitor_data.forcemN, monitor_data.encoderum, monitor_data.setpoint, monitor_data.timeus, monitor_data.log,monitor_data.forceRaw);
-        send(CMD_DATA, buf, strlen(buf)); // dont send null ptr
+        send(CMD_DATA, response_json, strlen(response_json)); // dont send null ptr
 
         break;
     }
@@ -330,10 +341,9 @@ static void command_respond(uint8_t cmd)
         TestDataRequest req;
         json_to_test_data_request(&req, recieved_json);
 
-        MonitorData buffer[255];
-        if (read_sd_card_data(buffer, req.index, req.count) != 0)
+        if (read_sd_card_data(test_data_buffer, req.index, req.count) != 0)
         {
-            char *buf = test_data_to_json(buffer, req.count, req.index);
+            char *buf = test_data_to_json(test_data_buffer, req.count, req.index);
             if (buf == NULL)
             {
                 DEBUG_ERROR("%s","Failed to convert test data to json\n");
@@ -349,9 +359,8 @@ static void command_respond(uint8_t cmd)
         // send the number of test data points
         DEBUG_INFO("%s","Sending test data count\n");
         int count = read_data_size();
-        char buf[100];
-        snprintf(buf, 100, "{\"test_count\":%d}", count);
-        send(CMD_TESTDATA_COUNT, buf, strlen(buf));
+        snprintf(response_json, MAX_RESPONSE_SIZE, "{\"test_count\":%d}", count);
+        send(CMD_TESTDATA_COUNT, response_json, strlen(response_json));
         break;
     }
     case CMD_SET_GAUGE:
@@ -371,7 +380,7 @@ static void command_respond(uint8_t cmd)
 void command_recieve(uint8_t cmd)
 {
     DEBUG_INFO("%s","Recieving Data from command\n");
-    if (!receive(recieved_json, MAX_BUFFER_SIZE))
+    if (!receive(cmd, recieved_json, MAX_BUFFER_SIZE))
     {
         DEBUG_WARNING("%s","failed to receive command data\n");
         return;
@@ -437,35 +446,30 @@ void command_recieve(uint8_t cmd)
     case CMD_MOVE:
     {
         DEBUG_WARNING("%s","Getting test command\n");
-        char awk[30];
-        strncpy(awk, "OK", 30);
 
         Move move;
         if (json_to_move(&move, recieved_json))
         {
-            //if (motion_test_add_move(&move))
-            if (true)
+            if (motion_test_add_move(&move))
+            //if (true)
             {
                 DEBUG_WARNING("%s","move added\n");
-                strncpy(awk, "OK", 30);
+                send_awk(cmd, "OK");
+                break;
             }
             else
             {
-                strncpy(awk, "BUSY", 30);
+                send_awk(cmd, "BUSY");
                 DEBUG_WARNING("%s","failed to add move\n");
+                break;
             }
         }
         else
         {
-            strncpy(awk, "FAIL", 30);
+            send_awk(cmd, "FAIL");
             DEBUG_ERROR("%s","failed to parse test command\n");
             break;
         }
-        
-        char buf[100];
-        snprintf(buf, 100, "{\"awk\":\"%s\"}", awk);
-        DEBUG_INFO("Sending awk: %s\n",awk);
-        send(CMD_AWK, buf, strlen(buf)); // send ack, 0 is success, 1 is fail, 2 is busy
         break;
     }
     case CMD_MANUAL:

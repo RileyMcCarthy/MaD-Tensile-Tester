@@ -7,6 +7,7 @@
 #include "Memory/MachineProfile.h"
 #include <smartpins.h>
 #include <math.h>
+#include "Utility/StateMachine.h"
 
 #define G0_RAPID_MOVE 0
 #define G1_LINEAR_MOVE 1
@@ -16,13 +17,14 @@
 #define G28_HOME 28
 #define G90_ABSOLUTE 90
 #define G91_RELATIVE 91
+#define G122 122 // End of profile
 
-#define MOTION_MEMORY_SIZE 3000
+#define MOTION_MEMORY_SIZE 10000
 static long motion_stack[MOTION_MEMORY_SIZE];
 
 static bool motion_enabled = false;
-static long motion_setpoint_steps = 0;
-long motion_position_steps = 0;
+static int motion_setpoint_steps = 0;
+static int motion_position_steps = 0;
 static long motion_feedrate_steps_per_second = 0;
 
 #define MAX_SIZE_MANUAL 100
@@ -106,7 +108,7 @@ long motion_get_setpoint()
 {
     return motion_setpoint_steps;
 }
-
+#define TEST_QUEUE_EMPTY_PERIOD 1000
 static void motion_cog(void *arg)
 {
     MachineProfile machine_profile;
@@ -123,15 +125,21 @@ static void motion_cog(void *arg)
     int steps_per_mm = 1;
 
     motion_setpoint_steps = 0;
+    motion_position_steps = 0;
     test_mode = false;
     queue_init(&manual_queue, manual_buffer, MAX_SIZE_MANUAL, sizeof(Move));
     queue_init(&test_queue, test_buffer, MAX_SIZE_TEST, sizeof(Move));
     motion_enabled = true;
+    int queue_last_time = 0;
+
     while(true)
     {
+        MachineState machineState;
+        get_machine_state(&machineState);
         Move command;
         StaticQueue *queue = &manual_queue;
-        if (test_mode)
+        bool test_running = machineState.motionParameters.mode == MODE_TEST_RUNNING;
+        if (test_running)
         {
             queue = &test_queue;
         }
@@ -139,9 +147,20 @@ static void motion_cog(void *arg)
         if (queue_isempty(queue))
         {
             // if the queue is empty, we should wait for a new command
+            if (test_running)
+            {
+                int currentms = _getms();
+                if (currentms - queue_last_time > TEST_QUEUE_EMPTY_PERIOD)
+                {
+                    DEBUG_WARNING("%s","Test queue empty for too long, ending test\n");
+                    state_machine_set(PARAM_MOTION_MODE, MODE_TEST); // End of profile
+                }
+            }
             continue;
         }
-        DEBUG_WARNING("%s","Queue is not empty!\n");
+
+        queue_last_time = _getms();
+
         // Should have a mode for pausing all motion, but for now just disable motion
         // motion enable should not be here as the queue should be cleared once disabled
         // pause should remember only stop new step and directions from executing
@@ -178,24 +197,26 @@ static void motion_cog(void *arg)
                     }
                     
                     
-                    int clkticks_per_step = (60 * CLKFREQ/round(steps_per_mm * command.f));
+                    int clkticks_per_step = (60 * CLKFREQ/(steps_per_mm * command.f));
                     if (clkticks_per_step > 65535)
                     {
                         DEBUG_INFO("Slow step pulses: %d\n", clkticks_per_step);
                         // Pulses too slow for hardware
-                        for (int i =0;i<delta_steps;i++)
+                        for (int i =0;i<abs(delta_steps);i++)
                         {
                             _pinl(PIN_SERVO_PUL);
-                            _waitus(clkticks_per_step >> 1);
+                            _waitx(clkticks_per_step >> 1);
                             _pinh(PIN_SERVO_PUL);
-                            _waitus(clkticks_per_step >> 1);
+                            _waitx(clkticks_per_step >> 1);
                             if (direction)
                                 motion_position_steps++;
                             else
                                 motion_position_steps--;
                         }
                         if (motion_position_steps != motion_setpoint_steps)
+                        {
                             DEBUG_ERROR("Position doesnt equal setpoint: %d != %d\n",motion_position_steps,motion_setpoint_steps);
+                        }
                     }
                     else
                     {
@@ -231,6 +252,12 @@ static void motion_cog(void *arg)
                 case G4_DWELL:
                 {
                     _waitms(command.p);
+                    break;
+                }
+                case G122:
+                {
+                    state_machine_set(PARAM_MOTION_MODE, MODE_TEST); // End of profile
+                    DEBUG_WARNING("%s","End of profile\n");
                     break;
                 }
             }

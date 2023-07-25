@@ -2,30 +2,17 @@
 
 ## Platformio
 
-Remote instructions
-https://community.platformio.org/t/howto-raspberry-pi-3-as-remote-agent-oct-2020/16700
+Install the flexprop platformio platform using the instructions at the link below
+https://github.com/RileyMcCarthy/platform-propeller
 
-## Install flexprop
-
-use these instructions or see build instructions at https://github.com/totalspectrum/flexprop
-
-```
-cd $HOME
-mkdir -p src
-cd src
-sudo apt-get update
-sudo apt-get install build-essential
-sudo apt-get install bison git tk8.6-dev
-sudo apt-get install texlive-latex-recommended pandoc
-git clone --recursive https://github.com/totalspectrum/flexprop --branch v5.9.19
-cd flexprop
-make install INSTALL=~/flexprop
-```
+Open the platformio.ini in the Firmware/MaD_Firmware folder and compile!
 
 ## Enable Serial
 
 `sudo raspi-config`
 Go to Interface Options and enable SPI and Serial
+
+// This is for fast serial, not required!!!
 
 sudo nano /boot/config.txt
 add: dtoverlay = disable-bt
@@ -54,21 +41,27 @@ sudo apt-get upgradesudo apt-get install -y libhdf5-dev libhdf5-serial-dev pytho
 sudo apt-get install libmemcached-dev zlib1g-dev
 ```
 
-## Create pyhon venv
+## Install Website Dependecies
 
-`make guideps'
+Will need to have or install NodeJS and NPM
+
+```
+curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash - # Enable NodeSource Repo
+sudo apt install nodejs # Install nodejs
+npm --version # Verify install
+```
+
+Go to Software/Website and run:
+
+`make install'
 
 # Run web GUI
 
-`make gui # this will run the flask-socketio webpage that we will use to interact with the RPI`
-
-# Build and upload to the RPI
-
-`make flexpropc # builds a clean image that will be uploaded to a connected propeller 2, will also run a debug terminal`
+`make run # this will run the flask-socketio webpage that we will use to interact with the RPI`
 
 # Usage
 
-The RPI must be connected to the MaDP2 using serial port 0 and SPI port 0 using RPI hardware interfaces.
+The RPI should be connected to the MaDP2 using serial port 0 using RPI hardware interfaces.
 
 # Running display on PI
 
