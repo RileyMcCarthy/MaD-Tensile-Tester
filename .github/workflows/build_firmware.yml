@@ -1,0 +1,30 @@
+name: Build MaD Firmware
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install PlatformIO Core
+      run: pip install --upgrade platformio
+    - name: Install propeller platformio platform
+      working-directory: Firmware/MaD_Firmware
+      run: pio pkg install --platform https://github.com/RileyMcCarthy/platform-propeller.git
+    - name: Build platformio project
+      working-directory: Firmware/MaD_Firmware
+      run: pio run -e propeller2
+    - uses: actions/upload-artifact@v3
+      with:
+        name: program-${{ github.run_number }}.bin
+        path: Firmware/MaD_Firmware/.pio/build/propeller2/program
