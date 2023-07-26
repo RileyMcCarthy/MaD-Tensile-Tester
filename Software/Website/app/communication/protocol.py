@@ -28,7 +28,6 @@ def serial_recieve():
     global serial
     # parses a packet from the serial buffer, returns cmd, data
     if (serial == None):
-        print("Serial is not initialized")
         return None
 
     # check if there is data in the buffer

@@ -13,6 +13,7 @@
     <script src="{{ url_for('static', filename='node_modules/@canvasjs/charts/canvasjs.min.js')}}"></script>
     <script src="{{ url_for('static', filename='node_modules/codemirror/lib/codemirror.js')}}"></script>
     <script src="{{ url_for('static', filename='node_modules/codemirror/mode/python/python.js')}}"></script>
+    <script src="{{ url_for('static', filename='node_modules/bs5-utils/dist/js/Bs5Utils.js')}}"></script>
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.css')}}">
@@ -22,7 +23,6 @@
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
         <a class="navbar-brand" href="/">MaD P2</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
@@ -51,84 +51,6 @@
         </div>
     </nav>
 
-    {% macro render_field(field) -%}
-
-        {% if field.type in ['CSRFTokenField', 'HiddenField'] %}
-        {{ field() }}
-        {% else %}
-
-        {% set with_label = kwargs.pop('with_label', True) %}
-        {% set placeholder = kwargs.pop('placeholder', field.label.text) %}
-        {% set class_ = kwargs.pop('class_', '') %}
-
-        <div class="form-group {% if field.errors %}error{% endif %}">
-
-            {% if with_label %}
-            <label for="{{ field.id }}"
-                class="control-label">
-                {{ field.label.text }}
-            </label>
-            {% endif %}
-
-            {% if field.type == 'BooleanField' %}
-            <div class="checkbox">
-                <label>
-                    {{ field(class_=class_, **kwargs) }}
-                    {{ field.label.text|safe }}
-                </label>
-            </div>
-            {% else %}
-
-            {% if field.type in ('TextField', 'TextAreaField', 'PasswordField',
-                                'IntegerField') %}
-
-            {% set class_ = class_ + ' input-xlarge form-control' %}
-
-            {% elif field.type == 'FileField' %}
-
-            {% set class_ = class_ + ' input-file form-control' %}
-
-            {% endif %}
-
-            {% if field.type == 'SelectField' %}
-
-            {{ field(class_=class_, **kwargs) }}
-
-            {% else %}
-
-            {{ field(class_=class_, placeholder=placeholder, **kwargs) }}
-
-            {% endif %}
-
-            {% endif %}
-
-            
-            <small id="{{field.id}}-error"class="error form-text text-danger"></small>
-            
-
-            {% if field.description %}
-            <p class="help-block">{{ field.description|safe }}</p>
-            {% endif %}
-
-        </div>
-        {% endif %}
-    {%- endmacro %}
-
-    {% macro render_form(form) -%}
-        {%- for field in form %}
-            {% if field.type == 'FormField' %}
-                <div class="form-group">
-                    <label for="{{ field.id }}" class="control-label">
-                        <h3>{{ field.label.text }}</h3>
-                    </label>
-                    {{ render_form(field) }}
-                </div>
-            {% else %}
-                {{ render_field(field) }}
-            {% endif %}
-        {%- endfor %}
-    {%- endmacro %}
-
     <div class="container-fluid">
         {% block content %}
         <div>
@@ -141,6 +63,30 @@
 
 
 <script type="text/javascript">
-    
+const bs5Utils = new Bs5Utils();
+var socket_serial = io('/serial');
+socket_serial.on('notification', function (data) {
+  if (!data || !data.json) {
+    return;
+  }
+  console.log(data.json);
+  var notification = JSON.parse(data.json);
+  var delayMs = notification.timeout;
+  if (notification.type == 'warning') {
+    bs5Utils.Snack.show('warning', notification.message, delay = delayMs, dismissible = true);
+  }
+  else if (notification.type == 'error') {
+    bs5Utils.Snack.show('danger', notification.message, delay = delayMs, dismissible = true);
+  }
+  else if (notification.type == 'info') {
+    bs5Utils.Snack.show('info', notification.message, delay = delayMs, dismissible = true);
+  }
+  else if (notification.type == 'success') {
+    bs5Utils.Snack.show('success', notification.message, delay = delayMs, dismissible = true);
+  }
+  else {
+    bs5Utils.Snack.show('primary', notification.message, delay = delayMs, dismissible = true);
+  }
+});
 </script>
 </html>

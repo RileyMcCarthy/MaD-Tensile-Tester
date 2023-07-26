@@ -13,6 +13,18 @@
 #define PIN_SERVO_DIR 7 // Servo direction pin
 #define PIN_SERVO_RDY 5 // Servo ready pin
 
+#define CHARGE_PUMP 28
+#define ESD_UPPER 16
+#define ESD_LOWER 17
+#define ESD_ACTIVE 18
+#define ENDSTOP_UPPER 19
+#define ENDSTOP_LOWER 20
+#define ENDSTOP_DOOR 21
+
+#define NAVKEY_SDA 15
+#define NAVKEY_SCL 14
+#define NAVKEY_INT 13
+
 /**
  * @brief Main class responsible for initializing and starting components
  *

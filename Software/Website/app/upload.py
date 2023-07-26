@@ -1,7 +1,7 @@
 from app import app, socketio, ALLOWED_EXTENSIONS
 from flask import render_template, request, jsonify, Response, flash, redirect, url_for
 from werkzeug.utils import secure_filename
-from .base import gcode_sender_thread, gcode_to_dict
+from .base import gcode_sender_thread, gcode_to_dict, emit_notification
 import app.communication as communication
 import os
 import numpy as np
@@ -22,7 +22,8 @@ def allowed_file(filename):
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return redirect(request.url)
+        emit_notification('error', 'No file found in request!')
+        return redirect(url_for('upload_page'))
 
     file = request.files['file']
     filename = request.form['filename']
@@ -31,17 +32,17 @@ def upload_file():
         filename += '.gcode'
     if file and filename:
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return 'File uploaded successfully.'
+        emit_notification('success', 'File uploaded successfully!')
     else:
-        return 'Error: File or filename missing.'
+        emit_notification('error', 'No file selected!')
+    return redirect(url_for('upload_page'))
 
 @app.route('/select', methods=['POST'])
 def select():
     selected_file = request.form['selected_file']
     path = os.path.join(app.config['UPLOAD_FOLDER'], selected_file)
     socketio.start_background_task(target=gcode_sender_thread, filename=path)
-    # Process the selected file as needed
-    return f'Selected file: {selected_file}'
+    return f"Sending {selected_file} file to machine"
 
 @app.route('/gcode_file_to_moves', methods=['POST'])
 def gcode_file_to_moves():
@@ -83,14 +84,13 @@ def jog_machine():
     command = {'G': g, 'X': x, 'F': f}
     print(command)
     communication.set_manual_command(command)
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
-    return render_template('upload.html', files=files)
+    return redirect(url_for('upload_page'))
 
 @app.route('/set_gauge_length', methods=['POST'])
 def gauge_length():
     print("setting gauge length")
     communication.set_gauge_length()
-    return "done"
+    return redirect(url_for('upload_page'))
 
 class MotionQuartet:
     def __init__(self):

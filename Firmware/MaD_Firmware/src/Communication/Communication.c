@@ -41,7 +41,7 @@ static FDS fds;
 #define CMD_TESTDATA_COUNT 13 // send/recieve test data count
 #define CMD_MANUAL 14 // send/recieve manual control data
 #define CMD_SET_GAUGE 15
-#define CMD_NOTIFY_ERROR 16
+#define CMD_NOTIICATION 16
 
 #define MAD_VERSION 1
 static bool command_to_string(char *buf, int size, uint8_t cmd)

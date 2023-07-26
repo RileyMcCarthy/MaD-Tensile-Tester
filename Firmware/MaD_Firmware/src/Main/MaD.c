@@ -12,6 +12,8 @@ int _stdio_debug_lock;
  */
 void mad_begin()
 {
+  //_pinh(28);
+  //while(1);
   _stdio_debug_lock = _locknew();
   if (_stdio_debug_lock == -1)
   {

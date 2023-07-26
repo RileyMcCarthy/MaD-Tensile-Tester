@@ -13,7 +13,7 @@
     </form>
     <hr>
     <h1>Uploaded Files</h1>
-    <form action="/select" method="POST">
+    <form id="queue_select_file" method="POST">
         <table>
             <thead>
                 <tr>
@@ -65,48 +65,101 @@
 </div>
 
 <script>
-        var chartData = [];
-        var chart = new CanvasJS.Chart("chartContainer", {
-            animationEnabled: true,
-            zoomEnabled: true,
-            title:{
-                text: "Try Zooming and Panning" 
-            },
-            data: [{
-                type: "line",
-                dataPoints: chartData
-            }],
+    function queue_select_file() {
+        console.log("Queueing Profile");
+        $.ajax({
+            type: 'POST',
+            url: '/select',
+            data: $('#queue_select_file').serialize(),
+            success: function(res) {
+                bs5Utils.Modal.show({
+                    type: 'primary',
+                    title: res,
+                    buttons: [
+                        {
+                            type: 'dismiss',
+                            text: 'OK',
+                            class: 'btn btn-sm btn-secondary'
+                        }
+                    ],
+                    centered: true,
+                    dismissible: true,
+                    backdrop: 'static',
+                    keyboard: false,
+                    focus: false
+                });
+            }
         });
-        chart.render();
-
-        function file_selected(file)
-        {
-            console.log(file);
-            $.ajax({
-                url: "/gcode_file_to_moves",
-                type: "post",
-                data: JSON.stringify({"filename": file}),
-                contentType: "application/json",
-                success: function (data_json) {
-                    cordinates = JSON.parse(data_json)
-                    console.log(cordinates);
-                    
-                    chartData.length = 0; // clear array
-                    for (var i = 0; i < cordinates.length; i += 1) {
-                        chartData.push({
-                            x: cordinates[i].X,
-                            y: cordinates[i].Y         
-                        });
-                        console.log("adding cord: ",cordinates[i].X, " ", cordinates[i].Y);
+    }
+    $(document).ready(function() {
+        $('#queue_select_file').submit(function(event) {
+            event.preventDefault();
+            bs5Utils.Modal.show({
+                type: 'primary',
+                title: "Confirm Queueing Profile",
+                dismissible: false,
+                buttons: [
+                    {
+                        text: 'Queue Profile!',
+                        class: 'btn btn-sm btn-primary',
+                        handler: () => {
+                            queue_select_file();
+                            this.hide();
+                        }
+                    },
+                    {
+                        type: 'dismiss',
+                        text: 'Exit',
+                        class: 'btn btn-sm btn-secondary'
                     }
-                    chart.options.title.text = file;
-                    chart.render();
-                },
-                error: function (xhr) {
-                    //Handel error
-                }
+                ],
+                centered: true,
+                backdrop: 'static',
+                keyboard: false,
+                focus: false
             });
-        }
+        });
+    });
+    var chartData = [];
+    var chart = new CanvasJS.Chart("chartContainer", {
+        animationEnabled: true,
+        zoomEnabled: true,
+        title:{
+            text: "Try Zooming and Panning" 
+        },
+        data: [{
+            type: "line",
+            dataPoints: chartData
+        }],
+    });
+    
+    function file_selected(file)
+    {
+        console.log(file);
+        $.ajax({
+            url: "/gcode_file_to_moves",
+            type: "post",
+            data: JSON.stringify({"filename": file}),
+            contentType: "application/json",
+            success: function (data_json) {
+                cordinates = JSON.parse(data_json)
+                console.log(cordinates);       
+                chartData.length = 0; // clear array
+                for (var i = 0; i < cordinates.length; i += 1) {
+                    chartData.push({
+                        x: cordinates[i].X,
+                        y: cordinates[i].Y         
+                    });
+                    console.log("adding cord: ",cordinates[i].X, " ", cordinates[i].Y);
+                }
+                chart.options.title.text = file;
+                chart.render();
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    }
     
 
     function set_gauge_length() {

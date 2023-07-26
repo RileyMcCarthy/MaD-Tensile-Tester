@@ -6,6 +6,7 @@
 #include <propeller.h>
 #include "i2cNavKey.h"
 #include "Memory/MachineProfile.h"
+#include "Main/MaD.h"
 #define CONTROL_MEMORY_SIZE 5000
 
 #define CONTROL_DEGUB 0
@@ -53,8 +54,17 @@ static void control_cog(void *arg)
 {
     arg;
 
+    /* Initialize IO */
+    _pinr(ESD_UPPER);
+    _pinr(ESD_LOWER);
+    _pinr(ESD_ACTIVE);
+    _pinr(ENDSTOP_UPPER);
+    _pinr(ENDSTOP_LOWER);
+    _pinr(ENDSTOP_DOOR);
+
+
     /*Initialize NavKey*/
-    navkey_begin(&navkey, 29, 28, I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
+    navkey_begin(&navkey, NAVKEY_SCL, NAVKEY_SDA, I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
     navkey_write_counter(&navkey, 0);              /* Reset the counter value */
     navkey_write_max(&navkey, 100000);             /* Set the maximum threshold*/
     navkey_write_min(&navkey, -100000);            /* Set the minimum threshold */
@@ -109,11 +119,12 @@ static void control_cog(void *arg)
         // Charge Pump
         if (currentMachineState.selfCheckParameters.chargePump)
         {
-        //   mcp_set_pin(&mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
+            //printf("Charge Pump\n");
+            _pinh(CHARGE_PUMP);
         }
         else
         {
-         //   mcp_set_pin(&mcp, CHARGE_PUMP_PIN, CHARGE_PUMP_REGISTER, 0);
+            _pinh(CHARGE_PUMP);
         }
 
         /*Update Machine Check State parameters*/
