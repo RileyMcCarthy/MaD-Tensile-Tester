@@ -65,58 +65,17 @@
 </div>
 
 <script>
-    function queue_select_file() {
-        console.log("Queueing Profile");
-        $.ajax({
-            type: 'POST',
-            url: '/select',
-            data: $('#queue_select_file').serialize(),
-            success: function(res) {
-                bs5Utils.Modal.show({
-                    type: 'primary',
-                    title: res,
-                    buttons: [
-                        {
-                            type: 'dismiss',
-                            text: 'OK',
-                            class: 'btn btn-sm btn-secondary'
-                        }
-                    ],
-                    centered: true,
-                    dismissible: true,
-                    backdrop: 'static',
-                    keyboard: false,
-                    focus: false
-                });
-            }
-        });
-    }
     $(document).ready(function() {
         $('#queue_select_file').submit(function(event) {
             event.preventDefault();
-            bs5Utils.Modal.show({
-                type: 'primary',
-                title: "Confirm Queueing Profile",
-                dismissible: false,
-                buttons: [
-                    {
-                        text: 'Queue Profile!',
-                        class: 'btn btn-sm btn-primary',
-                        handler: () => {
-                            queue_select_file();
-                            this.hide();
-                        }
-                    },
-                    {
-                        type: 'dismiss',
-                        text: 'Exit',
-                        class: 'btn btn-sm btn-secondary'
-                    }
-                ],
-                centered: true,
-                backdrop: 'static',
-                keyboard: false,
-                focus: false
+            console.log("Queueing Profile");
+            $.ajax({
+                type: 'POST',
+                url: '/select',
+                data: $('#queue_select_file').serialize(),
+                success: function(res) {
+
+                }
             });
         });
     });

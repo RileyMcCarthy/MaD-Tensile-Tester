@@ -23,17 +23,23 @@ test_data = None
 test_data_count = 0
 test_data_complete = False
 
-def emit_notification(type, message, timeout = 3000):
-    notification = {'type': type, 'message': message, 'timeout': timeout}
-    socketio.emit('notification', {'json': json.dumps(notification)}, namespace = '/serial')
+def emit_notification(type, message, timeout = None):
     if type == 'error':
+        if timeout is None:
+            timeout = 10000
         app.logger.error(message)
     elif type == 'warning':
+        if timeout is None:
+            timeout = 4000
         app.logger.warn(message)
     elif type == 'success':
+        if timeout is None:
+            timeout = 4000
         app.logger.info(message)
     else:
         app.logger.info(message)
+    notification = {'type': type, 'message': message, 'timeout': timeout}
+    socketio.emit('notification', {'json': json.dumps(notification)}, namespace = '/serial')
 
 def ack_handler(data_json):
     if 'awk' not in data_json:
@@ -181,11 +187,14 @@ def gcode_to_dict(gcode_string):
     return gcode_dict
 
 def gcode_sender_thread(filename):
+    timeout_period = 5
     global gcode_lock
     print("aquireing gcode lock!")
     if gcode_lock.acquire(timeout = 1):
         # SHould clear test buffer first!!!
-        app.logger.info(f'Uploading {filename} to Device!')
+        # isolated filename from file path
+        file = re.search(r'[^\\/]+$', filename).group(0)
+        emit_notification("success",f'Queueing {file} Profile on Device!',timeout_period*1000)
         # open file
         with open(filename) as f:
             lines = f.readlines()
@@ -198,7 +207,7 @@ def gcode_sender_thread(filename):
             with gcode_ack_lock:
                 gcode_ack = "NONE"
             communication.set_motion_command(command)
-            timeout = time.time() + 5   # 10 seconds from now
+            timeout = time.time() + timeout_period   # 5 seconds from now
             retries = 0
             while True:
                 result = "NONE"

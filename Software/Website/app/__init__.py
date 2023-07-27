@@ -10,7 +10,7 @@ ALLOWED_EXTENSIONS = {'gcode', 'nc', 'txt'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-socketio = SocketIO(app, async_mode="threading")
+socketio = SocketIO(app)
 #camera = cv2.VideoCapture(-1)
 
 from app import base, status, settings, upload, data, create

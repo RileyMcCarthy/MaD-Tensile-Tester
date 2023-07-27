@@ -3,66 +3,202 @@
 {% block content %}
 
 <div class="container">
-    <div class="container m-3">
-        <h1>Create G-code File</h1>
-        <form action="/generate" method="POST">
-            <label for="function">Function:</label>
-            <textarea id="function" name="function" rows="5" cols="50" style="display:none;"></textarea>
-            <label for="sample_time">Sample Time (in seconds):</label>
-            <input type="number" id="sample_time" name="sample_time" step="0.01" min="0.01" required><br><br>
-            <label for="total_time">Total Time (in seconds):</label>
-            <input type="number" id="total_time" name="total_time" step="0.01" min="0.01" required><br><br>
-            <label for="gcode_filename">G-code File Name:</label>
-            <input type="text" id="gcode_filename" name="gcode_filename" required><br><br>
-            <input type="submit" value="Generate G-code">
+    <div class="container mt-4">
+        <h1>Motion Profile Editor</h1>
+        <form id="profile_form" class="form-inline mb-3">
+            <div class="form-group">
+                <label for="profile_name" class="mr-2">Profile Name:</label>
+                <input type="text" id="profile_name" name="profile_name" class="form-control mr-2" value="{{ profile.name }}" required>
+            </div>
+        </form>
+
+        <h3>Sets</h3>
+        <ul class="list-group">
+            {% for set_index, set_obj in profile.sets | with_index %}
+                <li class="list-group-item">
+                    <form id="set_form_{{ set_index }}" class="form-inline mb-2">
+                        <div class="form-group">
+                            <label for="set_name_{{ set_index }}" class="mr-2">Set Name:</label>
+                            <input type="text" id="set_name_{{ set_index }}" name="set_name_{{ set_index }}" class="form-control mr-2" value="{{ set_obj['name'] }}" required>
+                        </div>
+                    </form>
+
+                    <ul id="quartet_list_{{ set_index }}" class="list-group mt-2">
+                        {% for quartet_index, quartet in set_obj['quartets'] | with_index %}
+                            <li class="list-group-item">
+                                <form id="quartet_form_{{ set_index }}_{{ quartet_index }}" class="form-inline">
+                                    <div class="form-group">
+                                        <label for="quartet_name_{{ set_index }}_{{ quartet_index }}" class="mr-2">Quartet Name:</label>
+                                        <input type="text" id="quartet_name_{{ set_index }}_{{ quartet_index }}" name="quartet_name_{{ set_index }}_{{ quartet_index }}" class="form-control mr-2" value="{{ quartet['name'] }}" required>
+
+                                        <label for="quartet_function_{{ set_index }}_{{ quartet_index }}" class="mr-2">Function:</label>
+                                        <input type="text" id="quartet_function_{{ set_index }}_{{ quartet_index }}" name="quartet_function_{{ set_index }}_{{ quartet_index }}" class="form-control mr-2" value="{{ quartet['function'] }}" required>
+
+                                        <label for="quartet_execution_time_{{ set_index }}_{{ quartet_index }}" class="mr-2">Execution Time:</label>
+                                        <input type="number" id="quartet_execution_time_{{ set_index }}_{{ quartet_index }}" name="quartet_execution_time_{{ set_index }}_{{ quartet_index }}" class="form-control mr-2" value="{{ quartet['execution_time'] }}" step="0.1" required>
+
+                                        <label for="quartet_dwell_{{ set_index }}_{{ quartet_index }}" class="mr-2">Dwell:</label>
+                                        <input type="number" id="quartet_dwell_{{ set_index }}_{{ quartet_index }}" name="quartet_dwell_{{ set_index }}_{{ quartet_index }}" class="form-control mr-2" value="{{ quartet['dwell'] }}" step="0.1" required>
+                                    </div>
+                                </form>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="remove_quartet('{{set_index}}', '{{quartet_index}}')">Remove Quartet</button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="remove_set('{{set_index}}')">Remove Set</button>
+                    <form id="add_quartet_form_{{ set_index }}" class="form-inline">
+                        <button type="submit" class="btn btn-success btn-sm">Add Quartet</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+        <form id="add_set_form" class="form-inline">
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Add Set</button>
+            </div>
         </form>
     </div>
-    <h1>Motion Profile Editor</h1>
-    <h2>Profile: {{ profile.name }}</h2>
-
-    <h3>Add Set</h3>
-    <form action="/add_set" method="POST">
-        <label for="set_name">Set Name:</label>
-        <input type="text" id="set_name" name="set_name" required>
-        <button type="submit">Add Set</button>
-    </form>
-
-    <h3>Sets</h3>
-    <ul>
-        {% for set_index, set_obj in enumerate(profile.sets) %}
-            <li>
-                {{ set_obj.name }}
-                <form action="/remove_set/{{ set_index }}" method="POST" style="display:inline">
-                    <button type="submit">Remove Set</button>
-                </form>
-                <form action="/add_quartet/{{ set_index }}" method="POST" style="display:inline">
-                    <button type="submit">Add Quartet</button>
-                </form>
-
-                <ul>
-                    {% for quartet_index, quartet in enumerate(set_obj.quartets) %}
-                        <li>
-                            {{ quartet.name }}
-                            <form action="/remove_quartet/{{ set_index }}/{{ quartet_index }}" method="POST" style="display:inline">
-                                <button type="submit">Remove Quartet</button>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
 </div>
 
 <script>
-var editor = CodeMirror.fromTextArea(document.getElementById("function"), {
-        mode: "python",
-        lineNumbers: true,
-        indentUnit: 4,
-        theme: "default"
+    // Remove Set
+    function remove_set(setId) {
+        $.ajax({
+            type: 'POST',
+            url: '/create/remove_set/' + setId,
+            success: function (data) {
+                alert(data.message);
+                location.reload();
+            }
+        });
+    };
+   $(document).ready(function () {
+        // Find all items with id quartet_list_* and make them sortable
+        var quartets = document.querySelectorAll('[id^="quartet_list_"]');
+        console.log(quartets);
+        // Loop over quartets and make them sortable
+        quartets.forEach(quartet => {
+            console.log("making quarte sortable");
+            Sortable.create(quartet, {
+            group: 'foo',
+            animation: 100,
+            easing: "cubic-bezier(1, 0, 0, 1)"
+            });
+        });
+
+        // Profile Name Update
+        $('#profile_name').change(function () {
+            var profileName = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: '/create/update_profile',
+                contentType: 'application/json',
+                data: JSON.stringify({ profile_name: profileName }),
+                success: function (data) {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Add Set
+        $('#add_set_form').submit(function (event) {
+            event.preventDefault(); // Prevent the default form submission
+            var setName = $('#set_name').val();
+            $.ajax({
+                type: 'POST',
+                url: '/create/add_set',
+                contentType: 'application/json',
+                success: function (data) {
+                    alert(data.message);
+                    location.reload();
+                }
+            });
+        });
+
+        // Remove Quartet
+        function remove_quartet(event) {
+            event.preventDefault(); // Prevent the default form submission
+            var idParts = this.id.split('_');
+            var setId = idParts[3];
+            var quartetId = idParts[4];
+            $.ajax({
+                type: 'POST',
+                url: '/create/remove_quartet/' + setId + '/' + quartetId,
+                success: function (data) {
+                    alert(data.message);
+                    location.reload();
+                }
+            });
+        };
+
+        $('[id^="add_quartet_form_"]').submit(function (event) {
+            event.preventDefault();
+            var setId = $(this).attr('id').replace('add_quartet_form_', '');
+            var quartetName = $('#quartet_name_' + setId).val();
+            var quartetFunction = $('#quartet_function_' + setId).val();
+            var quartetExecutionTime = $('#quartet_execution_time_' + setId).val();
+            var quartetDwell = $('#quartet_dwell_' + setId).val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/create/add_quartet/' + setId,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    quartet_name: quartetName,
+                    quartet_function: quartetFunction,
+                    quartet_execution_time: quartetExecutionTime,
+                    quartet_dwell: quartetDwell
+                }),
+                success: function (data) {
+                    alert(data.message);
+                    location.reload();
+                }
+            });
+        });
+
+        // Update Set Name
+        $('[id^="set_form_"]').change(function (event) {
+            event.preventDefault();
+            var setId = $(this).attr('id').replace('set_form_', '');
+            var setName = $('#set_name_' + setId).val();
+            $.ajax({
+                type: 'POST',
+                url: '/create/update_set/' + setId,
+                contentType: 'application/json',
+                data: JSON.stringify({ set_name: setName }),
+                success: function (data) {
+                    alert(data.message);
+                }
+            });
+        });
+
+        // Update Quartet Parameters
+        $('[id^="quartet_form_"]').change(function () {
+            var idParts = this.id.split('_');
+            var setId = idParts[2];
+            var quartetId = idParts[3];
+            var quartetName = $('#quartet_name_' + setId + '_' + quartetId).val();
+            var quartetFunction = $('#quartet_function_' + setId + '_' + quartetId).val();
+            var quartetExecutionTime = $('#quartet_execution_time_' + setId + '_' + quartetId).val();
+            var quartetDwell = $('#quartet_dwell_' + setId + '_' + quartetId).val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/create/update_quartet/' + setId + '/' + quartetId,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    quartet_name: quartetName,
+                    quartet_function: quartetFunction,
+                    quartet_execution_time: quartetExecutionTime,
+                    quartet_dwell: quartetDwell
+                }),
+                success: function (data) {
+                    alert(data.message);
+                }
+            });
+        });
+        
     });
-    // Set the default value for the editor
-    editor.setValue('import math\n\ndef gcode_function(time):\n    return math.sin(time)  # Example function, replace with your own');
 </script>
 
 {% endblock %}

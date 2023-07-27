@@ -110,7 +110,7 @@ def send(cmd, data):
     global lock
     with lock:
         if (serial == None):
-            print("Serial is not initialized")
+            #print("Serial is not initialized")
             return
         try:
             serial.write(bytearray([SYNC_BYTE, cmd]))

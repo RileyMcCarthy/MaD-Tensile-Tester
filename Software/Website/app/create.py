@@ -16,11 +16,75 @@ def run_function_string(func_str, time):
         result = gcode_function(time)
     return result
 
-#@app.route('/create', methods=['GET'])
-#def create_page():
-#    files = os.listdir(app.config['UPLOAD_FOLDER'])
-#    return render_template('create.html', files=files)
+@app.template_filter('with_index')
+def with_index(iterable):
+    return zip(range(len(iterable)), iterable)
 
+profile = {
+    "name": "",
+    "sets": []
+}
+
+@app.route('/create/')
+def index():
+    return render_template('create.html', profile=profile)
+
+@app.route('/create/add_set', methods=['POST'])
+def add_set():
+    new_set = {
+        "name": "",
+        "quartets": []
+    }
+    profile["sets"].append(new_set)
+    return jsonify({'message': 'Set added successfully'})
+
+@app.route('/create/remove_set/<int:set_index>', methods=['POST'])
+def remove_set(set_index):
+    profile["sets"].pop(set_index)
+    return jsonify({'message': 'Set removed successfully'})
+
+@app.route('/create/add_quartet/<int:set_index>', methods=['POST'])
+def add_quartet(set_index):
+    set_obj = profile["sets"][set_index]
+    data = request.json
+    new_quartet = {
+        "name": data.get('quartet_name', ''),
+        "function": data.get('quartet_function', None),
+        "execution_time": float(data.get('quartet_execution_time', 0.0)),
+        "dwell": float(data.get('quartet_dwell', 0.0))
+    }
+    set_obj["quartets"].append(new_quartet)
+    return jsonify({'message': 'Quartet added successfully'})
+
+@app.route('/create/remove_quartet/<int:set_index>/<int:quartet_index>', methods=['POST'])
+def remove_quartet(set_index, quartet_index):
+    set_obj = profile["sets"][set_index]
+    set_obj["quartets"].pop(quartet_index)
+    return jsonify({'message': 'Quartet removed successfully'})
+
+@app.route('/create/update_profile', methods=['POST'])
+def update_profile():
+    data = request.json
+    profile['name'] = data.get('profile_name', profile['name'])
+    return jsonify({'message': 'Profile name updated successfully'})
+
+@app.route('/create/update_set/<int:set_index>', methods=['POST'])
+def update_set(set_index):
+    set_obj = profile["sets"][set_index]
+    data = request.json
+    set_obj['name'] = data.get('set_name', set_obj['name'])
+    return jsonify({'message': 'Set name updated successfully'})
+
+@app.route('/create/update_quartet/<int:set_index>/<int:quartet_index>', methods=['POST'])
+def update_quartet(set_index, quartet_index):
+    set_obj = profile["sets"][set_index]
+    quartet = set_obj["quartets"][quartet_index]
+    data = request.json
+    quartet['name'] = data.get('quartet_name', '')
+    quartet['function'] = data.get('quartet_function', None)
+    quartet['execution_time'] = float(data.get('quartet_execution_time', 0.0))
+    quartet['dwell'] = float(data.get('quartet_dwell', 0.0))
+    return jsonify({'message': 'Quartet updated successfully'})
 @app.route('/generate', methods=['POST'])
 def generate_gcode():
     function_str = request.form['function']

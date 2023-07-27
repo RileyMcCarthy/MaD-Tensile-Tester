@@ -124,7 +124,7 @@ static void control_cog(void *arg)
         }
         else
         {
-            _pinh(CHARGE_PUMP);
+            _pinl(CHARGE_PUMP);
         }
 
         /*Update Machine Check State parameters*/

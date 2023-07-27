@@ -16,6 +16,7 @@ Software/Website/app/static/node_modules
 
 # Hardware
 ## Temporary files
+Hardware/Tensile_Board/KICAD/Tensile_Board-backups
 Hardware/MaD_Edge/MaD_Edge-backups
 Hardware/MaD_Edge/production
 Hardware/**/*.000
