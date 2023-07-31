@@ -1,6 +1,5 @@
 #include "Utility/Monitor.h"
 #include "Utility/StateMachine.h"
-#include "Utility/IOBoard.h"
 #include "Utility/Debug.h"
 #include "ForceGauge.h"
 #include "Encoder.h"
@@ -227,7 +226,7 @@ static void monitor_cog(int samplerate)
   monitorLogData = false;
   
   // Set up encoder
-  encoder.start(DYN4_ENCODER_A, DYN4_ENCODER_B, -1, false, 0, -100000, 100000);
+  encoder.start(SERVO_ENCODER_A, SERVO_ENCODER_B, -1, false, 0, -100000, 100000);
   long lastTime = _getms();
   int force_count = 0;
   int force_raw = 0;
@@ -271,11 +270,11 @@ static void monitor_cog(int samplerate)
       monitor_data->timems = _getms();
       monitor_data->timeus = _getus();
       monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
-      monitor_data->encoderum = motion_get_position()*1000;//steps_to_um(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);
+      monitor_data->encoderum = motion_get_position()*1000/machine_profile.configuration.encoderStepsPermm;
       monitor_data->gauge = monitor_data->encoderum - gauge_length;
       monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
-      monitor_data->position = motion_get_position()*1000;//steps_to_mm(monitor_data->encoderRaw, machine_profile.configuration.gearDiameter, machine_profile.configuration.encoderStepsPerUM);      // Convert steps to mm
-      monitor_data->setpoint = motion_get_setpoint()*1000;
+      monitor_data->position = motion_get_position()*1000/machine_profile.configuration.encoderStepsPermm;
+      monitor_data->setpoint = motion_get_setpoint()*1000/machine_profile.configuration.encoderStepsPermm;
       if (trigger_set_gauge)
       {
         trigger_set_gauge = false;

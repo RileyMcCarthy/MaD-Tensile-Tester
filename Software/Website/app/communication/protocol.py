@@ -24,6 +24,7 @@ def serial_init(port = "/dev/serial0", baud = 1000000):
     except Exception as error:
         print("Unable to open serial: "+str(error))
         return False
+
 def serial_recieve():
     global serial
     # parses a packet from the serial buffer, returns cmd, data
@@ -38,12 +39,13 @@ def serial_recieve():
     try:
         start = None
         while start != SYNC_BYTE:
-            start = serial.read(1)[0]
-            if start is None:
+            res = serial.read(1)
+            if res == b'':
                 print("No start byte found")
                 return None
+            start = res[0]
     except Exception as err:
-        print("Exception waiting for start byte: " + str(err))
+        print("Exception while indexing start byte " + str(err))
         return None
 
     # read the command byte

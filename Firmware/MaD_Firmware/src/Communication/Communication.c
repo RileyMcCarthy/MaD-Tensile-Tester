@@ -451,22 +451,21 @@ void command_recieve(uint8_t cmd)
         if (json_to_move(&move, recieved_json))
         {
             if (motion_test_add_move(&move))
-            //if (true)
             {
                 DEBUG_WARNING("%s","move added\n");
-                send_awk(cmd, "OK");
+                send_awk(CMD_MOVE, "OK");
                 break;
             }
             else
             {
-                send_awk(cmd, "BUSY");
+                send_awk(CMD_MOVE, "BUSY");
                 DEBUG_WARNING("%s","failed to add move\n");
                 break;
             }
         }
         else
         {
-            send_awk(cmd, "FAIL");
+            send_awk(CMD_MOVE, "FAIL");
             DEBUG_ERROR("%s","failed to parse test command\n");
             break;
         }

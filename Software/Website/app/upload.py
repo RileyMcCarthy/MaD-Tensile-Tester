@@ -66,7 +66,7 @@ def gcode_file_to_moves():
             position = command['X'] # mm
             feedrate = command['F'] # mm/min
             if feedrate != 0:
-                time += (position-last_position)/(feedrate/60)
+                time += abs(position-last_position)/(feedrate/60)
         elif command['G'] == 122:
             break # end of gcode file
         else:

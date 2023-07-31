@@ -10,10 +10,17 @@ int _stdio_debug_lock;
  * @brief Starts the display, motion control, and all MaD board related tasks. Should never exit
  *
  */
+#include "i2cNavKey.h"
 void mad_begin()
 {
-  //_pinh(28);
-  //while(1);
+ /* _pinh(CHARGE_PUMP_PIN);
+  _pinh(PIN_SERVO_DIR);
+  while(1){
+    _pinl(PIN_SERVO_PUL);
+    _waitms(1);
+    _pinh(PIN_SERVO_PUL);
+    _waitms(1);
+  }*/
   _stdio_debug_lock = _locknew();
   if (_stdio_debug_lock == -1)
   {

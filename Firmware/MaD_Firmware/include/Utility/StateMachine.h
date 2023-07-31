@@ -18,12 +18,14 @@ typedef enum MotionStatus
     MOTIONSTATUS_FAULTED        // Motion is disabled due to fault (ie. ESD switch, ESD travel)
 } MotionStatus;
 
-typedef enum MotionOverTravel
+typedef enum ESDChain_s
 {
-    MOTION_LIMIT_OK,    // No limit
-    MOTION_LIMIT_UPPER, // Upper limit
-    MOTION_LIMIT_LOWER  // Lower limit
-} MotionOverTravel;
+    ESD_OK,    // No limit
+    ESD_POWER, // ESD Power is off
+    ESD_UPPER, // Upper limit
+    ESD_LOWER,  // Lower limit
+    ESD_SWITCH // ESD switch
+} ESDChain;
 
 /**
  * @brief Motion conditions ordered from most to least critical.
@@ -39,7 +41,7 @@ typedef enum MotionCondition
     CONDITION_LOWER,       // Machine lower travel limit exceeded
     CONDITION_DOOR,        // Door is open
     CONDITION_STOPPED,     // Motor is stationary
-    CONDITION_MOVING,      // Motion is moving
+    CONDITION_MOVING      // Motion is moving
 } MotionCondition;
 
 typedef enum MotionMode
@@ -56,12 +58,10 @@ typedef struct SelfCheckParameters
 
 typedef struct MachineCheckParameters
 {
-    bool switchedPower;              // Switched power is activated to IO board. RED/GREEN buttons. ( GPI_1). Control.c. implemented, changed to GPI12
-    MotionOverTravel esdTravelLimit; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
-    bool esdSwitch;                  // User ESD switch is activated ( GPI_4 ). Control.c. implemented (big red button)
+    ESDChain esdChain; // Over travel limit status of upper/lower ( GPI_2/3 ). Control.c. implemented, needs switched power on
     bool servoOK;                    // Servo ready signal recieved ( GPI_11 ). Control.c, implemented
     bool forceGaugeCom;              // Force gauge communicating. ControlSystem.c, implemented
-    bool servoCom;                   // DYN4 is communicating. Control.c
+    bool servoCom;                   // DYN4 is communicating. Control.c, test by sending single pulse and checking encoder?
 } MachineCheckParameters;
 
 typedef struct MotionParameters
@@ -83,13 +83,10 @@ typedef struct MachineState
 typedef enum Parameter
 {
     PARAM_SELF_CHARGE_PUMP,
-    PARAM_MACHINE_SWITCHED_POWER,
-    PARAM_MACHINE_ESD_TRAVEL_LIMIT,
-    PARAM_MACHINE_ESD_SWITCH,
+    PARAM_MACHINE_ESD_CHAIN,
     PARAM_MACHINE_SERVO_OK,
     PARAM_MACHINE_FORCE_GAUGE_COM,
     PARAM_MACHINE_SERVO_COM,
-    PARAM_MACHINE_RTC_COM,
     PARAM_MOTION_STATUS,
     PARAM_MOTION_CONDITION,
     PARAM_MOTION_MODE,
@@ -103,4 +100,16 @@ bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, S
 bool state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2);
 bool state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2);
 bool state_machine_equal(MachineState *machineState1, MachineState *machineState2);
+
+char * machine_state_to_string(State state);
+State string_to_machine_state(char *state);
+char * motion_status_to_string(MotionStatus motionStatus);
+MotionStatus string_to_motion_status(char *motionStatus);
+char * esd_chain_to_string(ESDChain esdChain);
+ESDChain string_to_esd_chain(char *esdChain);
+char * motion_condition_to_string(MotionCondition motionCondition);
+MotionCondition string_to_motion_condition(char *motionCondition);
+char * motion_mode_to_string(MotionMode motionMode);
+MotionMode string_to_motion_mode(char *motionMode);
+
 #endif

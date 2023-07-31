@@ -13,6 +13,8 @@ def shutdown():
     return "Shutting down!"
 
 if __name__ == "__main__":
+    data_rate = 0.2
+    status_rate = 0.5
     serial_port = "/dev/serial0"
     serial_baud=9600
     server_port = 5001
@@ -24,10 +26,14 @@ if __name__ == "__main__":
         serial_port = config['DEFAULT']['SERIAL_PORT']
     if "SERIAL_BAUD" in config['DEFAULT']:
         serial_baud = config['DEFAULT']['SERIAL_BAUD']
+    if "STATUS_RATE" in config['DEFAULT']:
+        status_rate = float(config['DEFAULT']['STATUS_RATE'])
+    if "DATA_RATE" in config['DEFAULT']:
+        data_rate = float(config['DEFAULT']['DATA_RATE'])
     try:
         socketio.start_background_task(serial_thread, serial_port, serial_baud)
-        socketio.start_background_task(state_thread)
-        socketio.start_background_task(target=data_thread)
+        socketio.start_background_task(state_thread, status_rate)
+        socketio.start_background_task(data_thread, data_rate)
         socketio.run(app,
                      port=server_port,
                      host="0.0.0.0",

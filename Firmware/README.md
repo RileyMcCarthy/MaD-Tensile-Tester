@@ -10,28 +10,9 @@ Open the platformio.ini in the Firmware/MaD_Firmware folder and compile!
 ## Enable Serial
 
 `sudo raspi-config`
-Go to Interface Options and enable SPI and Serial
+Go to Interface Options and enable Serial
 
-// This is for fast serial, not required!!!
-
-sudo nano /boot/config.txt
-add: dtoverlay = disable-bt
-sudo reboot
-
-If worked then:
-ls -l /dev/serial\*
-lrwxrwxrwx 1 root root 7 Nov 24 21:17 /dev/serial0 -> ttyAMA0
-lrwxrwxrwx 1 root root 5 Nov 24 21:17 /dev/serial1 -> ttyS0
-
-sudo nano /boot/cmdline.txt
-Remove: console=serial0,115200
-sudo reboot
-
-Disable bluetooth:
-sudo systemctl disable hciuart.service
-sudo systemctl disable bluealsa.service
-sudo systemctl disable bluetooth.service
-sudo reboot
+!!! On Raspberry pi 4 disable Serial Console, this uses the serial port for logging into the device
 
 ## Install and update packages
 
@@ -57,7 +38,7 @@ Go to Software/Website and run:
 
 # Run web GUI
 
-`make run # this will run the flask-socketio webpage that we will use to interact with the RPI`
+`sudo make run # this will run the flask-socketio webpage that we will use to interact with the RPI`
 
 # Usage
 

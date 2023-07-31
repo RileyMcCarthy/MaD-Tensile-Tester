@@ -43,12 +43,10 @@ static State state_machine_check()
 
     MachineCheckParameters params = machine_state.machineCheckParameters;
     // Check internal parameters
-    if (params.switchedPower &&
-        params.esdTravelLimit == MOTION_LIMIT_OK &&
-        params.esdSwitch &&
+    if (params.esdChain == ESD_OK &&
         params.servoOK &&
-        params.forceGaugeCom
-        //params.servoCom &&
+        params.forceGaugeCom &&
+        params.servoCom
         )
     {
         return STATE_MOTION; // Internal parameters passed, change to MOTION
@@ -69,8 +67,7 @@ static State state_machine_motion()
     {
         // Set state based internal parameters
         if (machine_state.state == STATE_MOTION && // Ensure previous state is MOTION
-            (machine_state.machineCheckParameters.esdTravelLimit != MOTION_LIMIT_OK ||
-             !machine_state.machineCheckParameters.esdSwitch)) // Check for esd fault
+        (machine_state.machineCheckParameters.esdChain != ESD_OK)) // Check for esd fault
         {
             // Motion exited due to esd fault
             // printf("motion faulted\n");
@@ -135,36 +132,6 @@ static State state_machine_motion()
     return STATE_MOTION;
 }
 
-bool state_machine_self_check_equal(SelfCheckParameters *selfCheckParameters1, SelfCheckParameters *selfCheckParameters2)
-{
-    return selfCheckParameters1->chargePump == selfCheckParameters2->chargePump;
-}
-
-bool state_machine_check_equal(MachineCheckParameters *motionParameters1, MachineCheckParameters *motionParameters2)
-{
-    return motionParameters1->switchedPower == motionParameters2->switchedPower &&
-           motionParameters1->esdTravelLimit == motionParameters2->esdTravelLimit &&
-           motionParameters1->esdSwitch == motionParameters2->esdSwitch &&
-           motionParameters1->servoOK == motionParameters2->servoOK &&
-           motionParameters1->forceGaugeCom == motionParameters2->forceGaugeCom &&
-           motionParameters1->servoCom == motionParameters2->servoCom;
-}
-
-bool state_machine_motion_equal(MotionParameters *motionParameters1, MotionParameters *motionParameters2)
-{
-    return motionParameters1->status == motionParameters2->status &&
-           motionParameters1->mode == motionParameters2->mode &&
-           motionParameters1->condition == motionParameters2->condition;
-}
-
-bool state_machine_equal(MachineState *machineState1, MachineState *machineState2)
-{
-    return state_machine_self_check_equal(&(machineState1->selfCheckParameters), &(machineState2->selfCheckParameters)) &&
-           state_machine_check_equal(&(machineState1->machineCheckParameters), &(machineState2->machineCheckParameters)) &&
-           state_machine_motion_equal(&(machineState1->motionParameters), &(machineState2->motionParameters)) &&
-           machineState1->state == machineState2->state;
-}
-
 //@TODO use locks to prevent concurrent access to machineState (only require lock if upddating information)
 bool state_machine_set(Parameter param, int state)
 {
@@ -174,69 +141,47 @@ bool state_machine_set(Parameter param, int state)
     switch (param)
     {
     case PARAM_SELF_CHARGE_PUMP:
-        if (machine_state.selfCheckParameters.chargePump != state)
         {
             machine_state.selfCheckParameters.chargePump = state;
         }
         break;
-    case PARAM_MACHINE_SWITCHED_POWER:
-        if (machine_state.machineCheckParameters.switchedPower != state)
+    case PARAM_MACHINE_ESD_CHAIN:
         {
-            machine_state.machineCheckParameters.switchedPower = state;
-            
-        }
-        break;
-    case PARAM_MACHINE_ESD_TRAVEL_LIMIT:
-        if (machine_state.machineCheckParameters.esdTravelLimit != state)
-        {
-            machine_state.machineCheckParameters.esdTravelLimit = state;
-            
-        }
-        break;
-    case PARAM_MACHINE_ESD_SWITCH:
-        if (machine_state.machineCheckParameters.esdSwitch != state)
-        {
-            machine_state.machineCheckParameters.esdSwitch = state;
+            machine_state.machineCheckParameters.esdChain = state;
             
         }
         break;
     case PARAM_MACHINE_SERVO_OK:
-        if (machine_state.machineCheckParameters.servoOK != state)
         {
             machine_state.machineCheckParameters.servoOK = state;
             
         }
         break;
     case PARAM_MACHINE_FORCE_GAUGE_COM:
-        if (machine_state.machineCheckParameters.forceGaugeCom != state)
         {
             machine_state.machineCheckParameters.forceGaugeCom = state;
             
         }
         break;
     case PARAM_MACHINE_SERVO_COM:
-        if (machine_state.machineCheckParameters.servoCom != state)
         {
             machine_state.machineCheckParameters.servoCom = state;
             
         }
         break;
     case PARAM_MOTION_STATUS:
-        if (machine_state.motionParameters.status != state)
         {
             machine_state.motionParameters.status = state;
             
         }
         break;
     case PARAM_MOTION_CONDITION:
-        if (machine_state.motionParameters.condition != state)
         {
             machine_state.motionParameters.condition = state;
             
         }
         break;
     case PARAM_MOTION_MODE:
-        if (machine_state.motionParameters.mode != state)
         {
             if (machine_state.motionParameters.mode != MODE_TEST && state == MODE_TEST_RUNNING)
             { // Must be in test mode to run test
@@ -268,15 +213,271 @@ bool get_machine_state(MachineState *machineState)
     return true;
 }
 
+#define SELF_CHECK_STRING "SELF CHECK"
+#define MACHINE_CHECK_STRING "MACHINE CHECK"
+#define MOTION_STRING "MOTION"
+
+char * machine_state_to_string(State state)
+{
+    switch (state)
+    {
+    case STATE_SELFCHECK:
+        return SELF_CHECK_STRING;
+    case STATE_MACHINECHECK:
+        return MACHINE_CHECK_STRING;
+    case STATE_MOTION:
+        return MOTION_STRING;
+    default:
+        return "UNKNOWN";
+    }
+}
+
+State string_to_machine_state(char *state)
+{
+    if (strcmp(state, SELF_CHECK_STRING) == 0)
+    {
+        return STATE_SELFCHECK;
+    }
+    else if (strcmp(state, MACHINE_CHECK_STRING) == 0)
+    {
+        return STATE_MACHINECHECK;
+    }
+    else if (strcmp(state, MOTION_STRING) == 0)
+    {
+        return STATE_MOTION;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+#define MOTION_STATUS_DISABLED_STRING "DISABLED"
+#define MOTION_STATUS_ENABLED_STRING "ENABLED"
+#define MOTION_STATUS_FAULTED_STRING "FAULTED"
+#define MOTION_STATUS_SAMPLE_LIMIT_STRING "SAMPLE_LIMIT"
+#define MOTION_STATUS_MACHINE_LIMIT_STRING "MACHINE_LIMIT"
+
+char * motion_status_to_string(MotionStatus motionStatus)
+{
+    switch (motionStatus)
+    {
+    case MOTIONSTATUS_DISABLED:
+        return MOTION_STATUS_DISABLED_STRING;
+    case MOTIONSTATUS_ENABLED:
+        return MOTION_STATUS_ENABLED_STRING;
+    case MOTIONSTATUS_FAULTED:
+        return MOTION_STATUS_FAULTED_STRING;
+    case MOTIONSTATUS_SAMPLE_LIMIT:
+        return MOTION_STATUS_SAMPLE_LIMIT_STRING;
+    case MOTIONSTATUS_MACHINE_LIMIT:
+        return MOTION_STATUS_MACHINE_LIMIT_STRING;
+    default:
+        return "UNKNOWN";
+    }
+}
+
+MotionStatus string_to_motion_status(char *motionStatus)
+{
+    if (strcmp(motionStatus, MOTION_STATUS_DISABLED_STRING) == 0)
+    {
+        return MOTIONSTATUS_DISABLED;
+    }
+    else if (strcmp(motionStatus, MOTION_STATUS_ENABLED_STRING) == 0)
+    {
+        return MOTIONSTATUS_ENABLED;
+    }
+    else if (strcmp(motionStatus, MOTION_STATUS_FAULTED_STRING) == 0)
+    {
+        return MOTIONSTATUS_FAULTED;
+    }
+    else if (strcmp(motionStatus, MOTION_STATUS_SAMPLE_LIMIT_STRING) == 0)
+    {
+        return MOTIONSTATUS_SAMPLE_LIMIT;
+    }
+    else if (strcmp(motionStatus, MOTION_STATUS_MACHINE_LIMIT_STRING) == 0)
+    {
+        return MOTIONSTATUS_MACHINE_LIMIT;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+#define ESD_CHAIN_OK_STRING "OK"
+#define ESD_CHAIN_POWER_STRING "POWER"
+#define ESD_CHAIN_LOWER_STRING "LOWER"
+#define ESD_CHAIN_UPPER_STRING "UPPER"
+#define ESD_CHAIN_SWITCH_STRING "SWITCH"
+
+char * esd_chain_to_string(ESDChain esdChain)
+{
+    switch (esdChain)
+    {
+    case ESD_OK:
+        return ESD_CHAIN_OK_STRING;
+    case ESD_POWER:
+        return ESD_CHAIN_POWER_STRING;
+    case ESD_LOWER:
+        return ESD_CHAIN_LOWER_STRING;
+    case ESD_UPPER:
+        return ESD_CHAIN_UPPER_STRING;
+    case ESD_SWITCH:
+        return ESD_CHAIN_SWITCH_STRING;
+    default:
+        return "UNKNOWN";
+    }
+}
+
+ESDChain string_to_esd_chain(char *esdChain)
+{
+    if (strcmp(esdChain, ESD_CHAIN_OK_STRING) == 0)
+    {
+        return ESD_OK;
+    }
+    else if (strmp(esdChain, ESD_CHAIN_POWER_STRING) == 0)
+    {
+        return ESD_POWER;
+    }
+    else if (strcmp(esdChain, ESD_CHAIN_LOWER_STRING) == 0)
+    {
+        return ESD_LOWER;
+    }
+    else if (strcmp(esdChain, ESD_CHAIN_UPPER_STRING) == 0)
+    {
+        return ESD_UPPER;
+    }
+    else if (strcmp(esdChain, ESD_CHAIN_SWITCH_STRING) == 0)
+    {
+        return ESD_SWITCH;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+#define CONDITION_FORCE_STRING "FORCE"
+#define CONDITION_TENSION_STRING "TENSION"
+#define CONDITION_COMPRESSION_STRING "COMPRESSION"
+#define CONDITION_UPPER_STRING "UPPER"
+#define CONDITION_LOWER_STRING "LOWER"
+#define CONDITION_DOOR_STRING "DOOR"
+#define CONDITION_STOPPED_STRING "STOPPED"
+#define CONDITION_MOVING_STRING "MOVING"
+
+char * motion_condition_to_string(MotionCondition motionCondition)
+{
+    switch (motionCondition)
+    {
+    case CONDITION_FORCE:
+        return CONDITION_FORCE_STRING;
+    case CONDITION_TENSION:
+        return CONDITION_TENSION_STRING;
+    case CONDITION_COMPRESSION:
+        return CONDITION_COMPRESSION_STRING;
+    case CONDITION_UPPER:
+        return CONDITION_UPPER_STRING;
+    case CONDITION_LOWER:
+        return CONDITION_LOWER_STRING;
+    case CONDITION_DOOR:
+        return CONDITION_DOOR_STRING;
+    case CONDITION_STOPPED:
+        return CONDITION_STOPPED_STRING;
+    case CONDITION_MOVING:
+        return CONDITION_MOVING_STRING;
+    default:
+        return "UNKNOWN";
+    }
+}
+
+MotionCondition string_to_motion_condition(char *motionCondition)
+{
+    if (strcmp(motionCondition, CONDITION_FORCE_STRING) == 0)
+    {
+        return CONDITION_FORCE;
+    }
+    else if (strcmp(motionCondition, CONDITION_TENSION_STRING) == 0)
+    {
+        return CONDITION_TENSION;
+    }
+    else if (strcmp(motionCondition, CONDITION_COMPRESSION_STRING) == 0)
+    {
+        return CONDITION_COMPRESSION;
+    }
+    else if (strcmp(motionCondition, CONDITION_UPPER_STRING) == 0)
+    {
+        return CONDITION_UPPER;
+    }
+    else if (strcmp(motionCondition, CONDITION_LOWER_STRING) == 0)
+    {
+        return CONDITION_LOWER;
+    }
+    else if (strcmp(motionCondition, CONDITION_DOOR_STRING) == 0)
+    {
+        return CONDITION_DOOR;
+    }
+    else if (strcmp(motionCondition, CONDITION_STOPPED_STRING) == 0)
+    {
+        return CONDITION_STOPPED;
+    }
+    else if (strcmp(motionCondition, CONDITION_MOVING_STRING) == 0)
+    {
+        return CONDITION_MOVING;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+#define MODE_MANUAL_STRING "MANUAL"
+#define MODE_TEST_STRING "TEST"
+#define MODE_TEST_RUNNING_STRING "TEST_RUNNING"
+
+char * motion_mode_to_string(MotionMode motionMode)
+{
+    switch (motionMode)
+    {
+    case MODE_MANUAL:
+        return MODE_MANUAL_STRING;
+    case MODE_TEST:
+        return MODE_TEST_STRING;
+    case MODE_TEST_RUNNING:
+        return MODE_TEST_RUNNING_STRING;
+    default:
+        return "UNKNOWN";
+    }
+}
+
+MotionMode string_to_motion_mode(char *motionMode)
+{
+    if (strcmp(motionMode, MODE_MANUAL_STRING) == 0)
+    {
+        return MODE_MANUAL;
+    }
+    else if (strcmp(motionMode, MODE_TEST_STRING) == 0)
+    {
+        return MODE_TEST;
+    }
+    else if (strcmp(motionMode, MODE_TEST_RUNNING_STRING) == 0)
+    {
+        return MODE_TEST_RUNNING;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 void machine_state_init()
 {
     machine_state.state = STATE_SELFCHECK;
 
     machine_state.selfCheckParameters.chargePump = false;
 
-    machine_state.machineCheckParameters.switchedPower = false;
-    machine_state.machineCheckParameters.esdTravelLimit = MOTION_LIMIT_OK;
-    machine_state.machineCheckParameters.esdSwitch = false;
+    machine_state.machineCheckParameters.esdChain = ESD_OK;
     machine_state.machineCheckParameters.servoOK = false;
     machine_state.machineCheckParameters.forceGaugeCom = false;
     machine_state.machineCheckParameters.servoCom = false;

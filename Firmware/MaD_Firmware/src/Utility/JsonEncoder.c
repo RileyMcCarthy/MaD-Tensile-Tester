@@ -26,9 +26,7 @@ static bool machine_check_parameters_to_json(MachineCheckParameters *parameters)
     success &= header_to_json("Machine Check Parameters");
     success &= open_json_block();
 
-    success &= int_to_json("Switched Power", parameters->switchedPower);
-    success &= int_to_json("ESD Travel Limit", parameters->esdTravelLimit);
-    success &= int_to_json("ESD Switch", parameters->esdSwitch);
+    success &= string_to_json("ESD Chain", esd_chain_to_string(parameters->esdChain));
     success &= int_to_json("Servo OK", parameters->servoOK);
     success &= int_to_json("Force Gauge Com", parameters->forceGaugeCom);
     success &= int_to_json("Servo Com", parameters->servoCom);
@@ -47,9 +45,9 @@ static bool motion_parameters_to_json(MotionParameters *parameters)
     success &= header_to_json("Motion Parameters");
     success &= open_json_block();
 
-    success &= int_to_json("Status", parameters->status);
-    success &= int_to_json("Condition", parameters->condition);
-    success &= int_to_json("Mode", parameters->mode);
+    success &= string_to_json("Status", motion_status_to_string(parameters->status));
+    success &= string_to_json("Condition", motion_condition_to_string(parameters->condition));
+    success &= string_to_json("Mode", motion_mode_to_string(parameters->mode));
 
     success &= delete_json_last_comma();
     success &= close_json_block();
@@ -74,7 +72,8 @@ static bool machine_configuration_to_json(MachineConfiguration *configuration)
     success &= int_to_json("Static Torque", configuration->staticTorque);
     success &= int_to_json("Load", configuration->load);
     success &= string_to_json("Position Encoder Type", configuration->positionEncoderType);
-    success &= int_to_json("Position Encoder (steps/um)", configuration->encoderStepsPerUM);
+    success &= int_to_json("Position Encoder (steps/mm)", configuration->encoderStepsPermm);
+    success &= int_to_json("Servo Step (steps/mm)", configuration->servoStepPermm);
     success &= string_to_json("Force Gauge Name", configuration->forceGauge);
     success &= int_to_json("Force Gauge Gain", configuration->forceGaugeGain);
     success &= int_to_json("Force Gauge Offset", configuration->forceGaugeOffset);
@@ -124,7 +123,7 @@ char *machine_state_to_json(MachineState *state)
     bool success = true;
     success &= open_json_block();
 
-    success &= int_to_json("State", state->state);
+    success &= string_to_json("State", machine_state_to_string(state->state));
     success &= self_check_parameters_to_json(&(state->selfCheckParameters));
     success &= machine_check_parameters_to_json(&(state->machineCheckParameters));
     success &= motion_parameters_to_json(&(state->motionParameters));

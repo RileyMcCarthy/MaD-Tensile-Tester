@@ -48,9 +48,7 @@
                         {{display_boolean("Charge Pump","chargePump")}}
 
                         {{display_header("Machine Check","machineCheckParameters")}}
-                        {{display_boolean("Switch Power","switchedPower")}}
-                        {{display_value("ESD Travel","esdTravelLimit")}}
-                        {{display_boolean("ESD Switch","esdSwitch")}}
+                        {{display_value("ESD Chain","esdChain")}}
                         {{display_boolean("Servo Ready","servoOK")}}
                         {{display_boolean("Force Comm","forceGaugeCom")}}
                         {{display_boolean("Servo Comm","servoCom")}}
@@ -97,48 +95,16 @@
                 </div>
             </div>
         </div>
+        <div class="col-xl">
+            <h3 class="mt-5">Live Streaming</h3>
+            <img src="{{ url_for('video_feed') }}" width="100%">
+        </div>
     </div>
 </div>
 
 
 <script type="text/javascript">
-    const State = [
-            'STATE_SELFCHECK',
-            'STATE_MACHINECHECK',
-            'STATE_MOTION'
-            ];
-
-            const MotionStatus = [
-            'MOTIONSTATUS_DISABLED',
-            'MOTIONSTATUS_ENABLED',
-            'MOTIONSTATUS_SAMPLE_LIMIT',
-            'MOTIONSTATUS_MACHINE_LIMIT',
-            'MOTIONSTATUS_FAULTED'
-            ];
-
-            const MotionOverTravel = [
-            'MOTION_LIMIT_OK',
-            'MOTION_LIMIT_UPPER',
-            'MOTION_LIMIT_LOWER'
-            ];
-
-            const MotionCondition = [
-            'CONDITION_LENGTH',
-            'CONDITION_FORCE',
-            'CONDITION_TENSION',
-            'CONDITION_COMPRESSION',
-            'CONDITION_UPPER',
-            'CONDITION_LOWER',
-            'CONDITION_DOOR',
-            'CONDITION_STOPPED',
-            'CONDITION_MOVING'
-            ];
-
-            const MotionMode = [
-            'MODE_MANUAL',
-            'MODE_TEST',
-            'MODE_TEST_RUNNING'
-            ]; 
+    
     function update_boolean(id, value) {
         if (value) {
             $(`[json-id="${id}"]`).attr("class", "bi-check-square-fill");
@@ -181,7 +147,7 @@
             url: "/toggleStatus",
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({status: MotionStatus.indexOf(get_value("status"))}),
+            data: JSON.stringify({status: get_value("status")}),
             success: function (data) {
                 console.log("Toggling Status");
             },
@@ -196,7 +162,7 @@
             url: "/toggleMode",
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({mode: MotionMode.indexOf(get_value("mode"))}),
+            data: JSON.stringify({mode: get_value("mode")}),
             success: function (data) {
                 console.log("Toggling Mode");
             },
@@ -296,27 +262,23 @@
             chargePump = selfCheck['Charge Pump'];
 
             machineCheckParameters = json['Machine Check Parameters'];
-            switchedPower = machineCheckParameters['Switched Power'];
-            esdTravelLimit = MotionOverTravel[machineCheckParameters['ESD Travel Limit']];
-            esdSwitch = machineCheckParameters['ESD Switch'];
+            esdChain = machineCheckParameters['ESD Chain'];
             servoOK = machineCheckParameters['Servo OK'];
             forceGaugeCom = machineCheckParameters['Force Gauge Com'];
             servoCom = machineCheckParameters['Servo Com'];
 
             motionParameters = json['Motion Parameters'];
-            status = MotionStatus[motionParameters['Status']];
-            condition = MotionCondition[motionParameters['Condition']];
-            mode = MotionMode[motionParameters['Mode']];
+            status = motionParameters['Status'];
+            condition = motionParameters['Condition'];
+            mode = motionParameters['Mode'];
 
             console.log(selfCheck);
-            update_header("selfCheckParameters", state !=0);
+            update_header("selfCheckParameters", state != "SELF CHECK");
             update_boolean("chargePump", chargePump);
         
             machineCheck = json.machineCheckParameters;
-            update_header("machineCheckParameters", state!=0&&state!=1);
-            update_boolean("switchedPower", switchedPower);
-            update_value("esdTravelLimit", esdTravelLimit);
-            update_boolean("esdSwitch", esdSwitch);
+            update_header("machineCheckParameters", state!="SELF CHECK"&&state!="MACHINE CHECK");
+            update_value("esdChain", esdChain);
             update_boolean("servoOK", servoOK);
             update_boolean("forceGaugeCom", forceGaugeCom);
             update_boolean("servoCom", servoCom);
@@ -325,7 +287,7 @@
             update_value("status", status);
             update_value("condition", condition);
             update_value("mode", mode);
-
+ 
             //$(`[json-id="status"]`).prop('disabled', "2".localeCompare(json.state));
         });
     });

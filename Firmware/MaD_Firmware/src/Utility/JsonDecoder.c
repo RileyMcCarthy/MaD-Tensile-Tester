@@ -22,9 +22,9 @@ static bool json_to_self_check_parameters(const json_t *json, SelfCheckParameter
 static bool json_to_machine_check_parameters(const json_t *json, MachineCheckParameters *parameters)
 {
     bool success = true;
-    success &= json_property_to_bool(json, "Switched Power", &(parameters->switchedPower));
-    success &= json_property_to_int(json, "ESD Travel Limit",&(parameters->esdTravelLimit));
-    success &= json_property_to_bool(json, "ESD Switch",&(parameters->esdSwitch));
+    char *property = NULL;
+    success &= json_property_to_string_ref(json, "ESD Chain",&property);
+    parameters->esdChain = esd_chain_from_string(property);
     success &= json_property_to_bool(json, "Servo OK",&(parameters->servoOK));
     success &= json_property_to_bool(json, "Force Gauge Com",&(parameters->forceGaugeCom));
     success &= json_property_to_bool(json, "Servo Com",&(parameters->servoCom));
@@ -34,9 +34,15 @@ static bool json_to_machine_check_parameters(const json_t *json, MachineCheckPar
 static bool json_to_motion_parameters(const json_t *json, MotionParameters *parameters)
 {
     bool success = true;
-    success &= json_property_to_int(json, "Status", &(parameters->status));
-    success &= json_property_to_int(json, "Condition", &(parameters->condition));
-    success &= json_property_to_int(json, "Mode", &(parameters->mode));
+    char *property = NULL;
+    success &= json_property_to_string_ref(json, "Status", &property);
+    parameters->status = string_to_motion_status(property);
+    
+    success &= json_property_to_string_ref(json, "Condition", &property);
+    parameters->condition = string_to_motion_condition(property);
+    
+    success &= json_property_to_string_ref(json, "Mode", &property);
+    parameters->mode = string_to_motion_mode(property);
     return success;
 }
 
@@ -50,29 +56,16 @@ static bool inner_json_to_machine_configuration(const json_t *json, MachineConfi
 {
     bool success = true;
     success &= json_property_to_string(json, "Motor Type", configuration->motorType, MAX_CONFIGURATION_MOTOR_TYPE);
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("Motor Type: %s\n", configuration->motorType);
     success &= json_property_to_int(json, "Max Motor RPM", &(configuration->maxMotorRPM));
-    DEBUG_INFO("SUCCESS: %d\n", success);   
-    DEBUG_INFO("Max Motor RPM: %d\n", configuration->maxMotorRPM);
     success &= json_property_to_int(json, "Max Motor Torque", &(configuration->maxMotorTorque));
     success &= json_property_to_int(json, "Gear Diameter (mm)", &(configuration->gearDiameter));
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("Diameter: %d\n", configuration->gearDiameter);
     success &= json_property_to_int(json, "Gear Pitch (mm)", &(configuration->gearPitch));
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("Intertia: %d\n", configuration->gearPitch);
     success &= json_property_to_int(json, "System Inertia", &(configuration->systemIntertia));
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("Intertia: %d\n", configuration->systemIntertia);
     success &= json_property_to_int(json, "Static Torque", &(configuration->staticTorque));
     success &= json_property_to_int(json, "Load", &(configuration->load));
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("load: %d\n", configuration->load);
     success &= json_property_to_string(json, "Position Encoder Type",configuration->positionEncoderType, MAX_CONFIGURATION_ENCODER_TYPE);
-    DEBUG_INFO("SUCCESS: %d\n", success);
-    DEBUG_INFO("enc type: %s\n", configuration->positionEncoderType);
-    success &= json_property_to_int(json, "Position Encoder (steps/um)", &(configuration->encoderStepsPerUM));
+    success &= json_property_to_int(json, "Position Encoder (steps/mm)", &(configuration->encoderStepsPermm));
+    success &= json_property_to_int(json, "Servo Step (steps/mm)", &(configuration->servoStepPermm));
     success &= json_property_to_string(json, "Force Gauge Name", configuration->forceGauge, MAX_CONFIGURATION_FORCE_GAUGE);
     success &= json_property_to_int(json, "Force Gauge Gain", &(configuration->forceGaugeGain));
     success &= json_property_to_int(json, "Force Gauge Offset", &(configuration->forceGaugeOffset));
@@ -210,7 +203,9 @@ bool json_to_motion_mode(MotionMode *mode, char *json)
     const json_t *parser = json_create_static(json);
 
     bool success = true;
-    success &= json_property_to_int(parser, "Mode", mode);
+    char *property;
+    success &= json_property_to_string_ref(parser, "Mode", &property);
+    *mode = string_to_motion_mode(property);
     return success;
 }
 
@@ -220,7 +215,9 @@ bool json_to_motion_status(MotionStatus *status, char *json)
     const json_t *parser = json_create_static(json);
 
     bool success = true;
-    success &= json_property_to_int(parser, "Status", status);
+    char *property = NULL;
+    success &= json_property_to_string_ref(parser, "Status", &property);
+    *status = string_to_motion_status(property);
     return success;
 }
 

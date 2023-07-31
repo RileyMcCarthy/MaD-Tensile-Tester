@@ -184,8 +184,19 @@ static void motion_cog(void *arg)
                         DEBUG_WARNING("G0/G1 Command has zero feedrate: %d\n",command.f);
                         continue;
                     }
-                    motion_setpoint_steps = round(command.x * steps_per_mm);
-                    int delta_steps = motion_setpoint_steps - motion_position_steps;
+                    int delta_steps = 0;
+                    int steps = (int)(command.x * machine_profile.configuration.servoStepPermm);
+                    int feedrate = (int)(command.f * machine_profile.configuration.servoStepPermm);
+                    if (relative_mode)
+                    {
+                        delta_steps = steps;
+                        motion_setpoint_steps += delta_steps;
+                    }
+                    else
+                    {
+                        motion_setpoint_steps = steps;
+                        delta_steps = motion_setpoint_steps - motion_position_steps;
+                    }
                     bool direction = delta_steps > 0;
                     if (direction)
                     {
@@ -196,8 +207,10 @@ static void motion_cog(void *arg)
                         _pinh(PIN_SERVO_DIR);
                     }
                     
-                    
-                    int clkticks_per_step = (60 * CLKFREQ/(steps_per_mm * command.f));
+                    // need to use floating point math as 60*clockfreq is greater then max integer
+                    // SHOULD CHECK IF GREATER THEN MAX INTEGER (VERY SLOW SPEEDS)
+                    uint32_t clkticks_per_step = (60.0/(double)feedrate)*_clockfreq();
+                    DEBUG_WARNING("CLOCKFREQ: %d, FEEDRATE: %d\n",_clockfreq()*60, feedrate);
                     if (clkticks_per_step > 65535)
                     {
                         DEBUG_INFO("Slow step pulses: %d\n", clkticks_per_step);
@@ -252,6 +265,16 @@ static void motion_cog(void *arg)
                 case G4_DWELL:
                 {
                     _waitms(command.p);
+                    break;
+                }
+                case G90_ABSOLUTE:
+                {
+                    relative_mode = false;
+                    break;
+                }
+                case G91_RELATIVE:
+                {
+                    relative_mode = true;
                     break;
                 }
                 case G122:

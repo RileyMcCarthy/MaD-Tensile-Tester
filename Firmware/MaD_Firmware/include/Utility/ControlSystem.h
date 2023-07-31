@@ -1,7 +1,6 @@
 #ifndef ControlSystem_H
 #define ControlSystem_H
 #include "StateMachine.h"
-#include "IOBoard.h"
 
 #define MAX_SAMPLE_PROFILE_NAME 50
 

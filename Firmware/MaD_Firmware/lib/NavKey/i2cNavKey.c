@@ -359,21 +359,22 @@ void navkey_reset(NavKey *navkey)
 void navkey_update_status(NavKey *navkey)
 {
   int16_t reg = readNavKeyInt(navkey, REG_STATUSB2);
-  navkey->status.UPR = reg & UPR;
-  navkey->status.UPP = reg & UPP;
-  navkey->status.DNR = reg & DNR;
-  navkey->status.DNP = reg & DNP;
-  navkey->status.RTR = reg & RTR;
-  navkey->status.RTP = reg & RTP;
-  navkey->status.LTR = reg & LTR;
-  navkey->status.LTP = reg & LTP;
-  navkey->status.CTRR = reg & CTRR;
-  navkey->status.CTRP = reg & CTRP;
-  navkey->status.CTRDP = reg & CTRDP;
-  navkey->status.RINC = reg & RINC;
-  navkey->status.RDEC = reg & RDEC;
-  navkey->status.RMAX = reg & RMAX;
-  navkey->status.RMIN = reg & RMIN;
+  navkey->status.UPR = (reg & UPR)!= 0;
+  navkey->status.UPP = (reg & UPP)!= 0;
+  navkey->status.DNR = (reg & DNR)!= 0;
+  navkey->status.DNP = (reg & DNP)!= 0;
+  navkey->status.RTR = (reg & RTR)!= 0;
+  navkey->status.RTP = (reg & RTP)!= 0;
+  navkey->status.LTR = (reg & LTR)!= 0;
+  navkey->status.LTP = (reg & LTP)!= 0;
+  navkey->status.CTRR = (reg & CTRR)!= 0;
+  navkey->status.CTRP = (reg & CTRP)!= 0;
+  navkey->status.CTRDP = (reg & CTRDP);
+  navkey->status.RINC = (reg & RINC) != 0;
+  navkey->status.RDEC = (reg & RDEC) != 0;
+  navkey->status.RMAX = (reg & RMAX) != 0;
+  navkey->status.RMIN = (reg & RMIN) != 0;
+  navkey->status.raw = reg;
 }
 
 /** Return the GP1 Configuration**/

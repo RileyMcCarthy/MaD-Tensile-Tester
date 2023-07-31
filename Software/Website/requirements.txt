@@ -11,3 +11,4 @@ flask_sqlalchemy
 flask_migrate
 Werkzeug
 numpy
+opencv-python

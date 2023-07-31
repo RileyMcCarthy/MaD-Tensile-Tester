@@ -31,6 +31,19 @@ bool json_property_to_string(const json_t *parser, const char *name, char *value
     return true;
 }
 
+bool json_property_to_string_ref(const json_t *parser, const char *name, char **value)
+{
+    const json_t *property = json_getProperty(parser, name);
+    if (property == NULL || JSON_TEXT != json_getType(property))
+    {
+        ////DEBUG_ERROR("Error, the %s property is not found.\n", name);
+        return false;
+    }
+    
+    *value = json_getValue(property);
+    return true;
+}
+
 bool json_property_to_int(const json_t *parser, const char *name, int *value)
 {
     const json_t *property = json_getProperty(parser, name);

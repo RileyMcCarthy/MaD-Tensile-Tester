@@ -7,6 +7,7 @@
 
 /** Decoding **/
 bool json_property_to_string(const json_t *parser, const char *name, char *value, size_t length);
+bool json_property_to_string_ref(const json_t *parser, const char *name, char **value);
 bool json_property_to_int(const json_t *parser, const char *name, int *value);
 bool json_property_to_bool(const json_t *parser, const char *name, bool *value);
 bool json_property_to_double(const json_t *json, const char *name, double *value);

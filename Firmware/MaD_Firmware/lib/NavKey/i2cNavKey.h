@@ -49,9 +49,10 @@ union Data_v
 };
 typedef struct navkeystatus_t
 {
-	int UPR, UPP, DNR, DNP, RTR, RTP, LTR, LTP;
-	int CTRR, CTRP, CTRDP;
-	int RINC, RDEC, RMAX, RMIN;
+	uint16_t raw;
+	bool UPR, UPP, DNR, DNP, RTR, RTP, LTR, LTP;
+	bool CTRR, CTRP, CTRDP;
+	bool RINC, RDEC, RMAX, RMIN;
 	int GP1POS, GP1NEG, GP2POS, GP2NEG, GP3POS, GP3NEG;
 	int FADEINT;
 } NavKeyStatus;

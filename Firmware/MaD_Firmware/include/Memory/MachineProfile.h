@@ -16,9 +16,10 @@ typedef struct MachineConfiguration
     int staticTorque;                                      // Static torque of the motor (milli-Nm)
     int load;                                              // Estimated load of the system (mN)
     char positionEncoderType[MAX_CONFIGURATION_ENCODER_TYPE]; // Encoder used for the position measurement (encoder or distance scale)
-    int encoderStepsPerUM;                        // steps per um of position encoder (step/um)
+    int encoderStepsPermm;                        // steps per um of position encoder (step/mm)
+    int servoStepPermm; //Steps per mm of servo motor
     char forceGauge[MAX_CONFIGURATION_FORCE_GAUGE];           // Force gauge used (model)
-    int forceGaugeGain;                             // Force scale factor (mN/step)
+    int forceGaugeGain;                             // Force scale factor 
     int forceGaugeOffset;                                 // Force offset (steps)
 } MachineConfiguration;
 
