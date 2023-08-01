@@ -127,7 +127,7 @@ static void control_cog(void *arg)
         /*Update Machine Check State parameters*/
 
         // ESD Distance limits
-        if (_pinr(ESD_POWER_PIN) == ESD_POWER_PIN_TRIGGERED && FALSE)
+        if (_pinr(ESD_POWER_PIN) == ESD_POWER_PIN_TRIGGERED)
         {
             state_machine_set(PARAM_MACHINE_ESD_CHAIN, ESD_POWER);
         }

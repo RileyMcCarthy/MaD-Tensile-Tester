@@ -10,11 +10,6 @@ camera = cv2.VideoCapture(-1)
 
 def gen_frames():
     while True:
-        if not camera.isOpened():
-            app.logger.warning("Cannot open camera, trying again")
-            camera.open(-1)
-            socketio.sleep(5)
-            continue
         success, frame = camera.read()  # read the camera frame
         if not success:
             app.logger.warning("failed to read camera info")
@@ -28,6 +23,12 @@ def gen_frames():
 @app.route('/video_feed')
 def video_feed():
     app.logger.info("Starting video feed")
+    if not camera.isOpened():
+            app.logger.warning("Cannot open camera, trying again")
+            socketio.sleep(5)
+            camera.open(-1)
+            return Response(b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + b'\r\n', mimetype='multipart/x-mixed-replace; boundary=frame')
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/')

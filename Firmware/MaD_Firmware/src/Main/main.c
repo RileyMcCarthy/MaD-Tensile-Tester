@@ -3,9 +3,10 @@
 #include "Main/MaD.h"
 #include <sys/vfs.h>
 #include <sys/p2es_clock.h>
+#include "Encoder.h"
 enum
 {
-    HEAPSIZE = 32400 * 1
+    HEAPSIZE = 32400 * 2
 };
 
 /**
@@ -17,6 +18,18 @@ enum
 // all stdio must be done in main thread (or same cog)
 int main()
 {
+    Encoder encoder;
+    _pinl(PIN_SERVO_DIR);
+    _pinh(CHARGE_PUMP_PIN);
+    encoder.start(SERVO_ENCODER_A, SERVO_ENCODER_B, -1, false, 0, -100000, 100000);
+    while(1)
+    {
+        printf("Encoder: %d\n", encoder.value());
+        _pinl(PIN_SERVO_PUL);
+        _waitms(10);
+        _pinh(PIN_SERVO_PUL);
+        _waitms(10);
+    }
     //_clkset(_SETFREQ, _CLOCKFREQ); // Change clock freq to 180 caused errors...
     mount("/sd", _vfs_open_sdcard());
     mad_begin();

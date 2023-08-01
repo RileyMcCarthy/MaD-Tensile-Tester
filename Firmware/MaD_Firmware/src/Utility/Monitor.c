@@ -8,9 +8,6 @@
 #include <propeller.h>
 #include "Main/MaD.h"
 
-#define MONITOR_MEMORY_SIZE 3000
-static long monitor_stack[MONITOR_MEMORY_SIZE];
-
 extern long motion_position_steps;
 static ForceGauge forceGauge;
 static Encoder encoder;
