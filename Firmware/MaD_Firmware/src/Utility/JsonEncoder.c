@@ -110,6 +110,35 @@ static bool machine_performance_to_json(MachinePerformance *performance)
 
 /** Public Structure to JSON **/
 
+char * notification_to_json(Notification * notification)
+{
+    if (!lock_json_buffer())
+    {
+        return NULL; // Buffer is in use, do not attempt to write to it
+    }
+
+    // Initialize the JSON buffer
+    clear_json_buffer();
+
+    bool success = true;
+    success &= open_json_block();
+
+    success &= string_to_json("Type", notification->type);
+    success &= string_to_json("Message", notification->message);
+
+    success &= delete_json_last_comma();
+    success &= close_json_block();
+
+    if (success)
+    {
+        return get_json_buffer();
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
 char *machine_state_to_json(MachineState *state)
 {
     if (!lock_json_buffer())

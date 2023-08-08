@@ -52,6 +52,35 @@ static uint8_t read_register(ForceGauge *forceGauge, uint8_t reg)
     return temp;
 }
 
+static bool force_gauge_reset(ForceGauge *forceGauge)
+{
+    forceGauge->serial.start(forceGauge->rx, forceGauge->tx, 0, BAUD);//3
+    forceGauge->serial.tx(0x55); // Synchronization word
+    forceGauge->serial.tx(0x02); // POWERDDOWN
+    _waitms(100);
+    forceGauge->serial.tx(0x55); // Synchronization word
+    forceGauge->serial.tx(0x06); // Reset
+    _waitms(100);
+
+    write_register(forceGauge, CONFIG_1, CONFIG_DATA1); // Setting data mode to continuous
+    write_register(forceGauge, CONFIG_2, CONFIG_DATA2); // Setting data counter on
+    write_register(forceGauge, CONFIG_3, CONFIG_DATA3); // Setting data counter on
+    //write_register(forceGauge, CONFIG_4, CONFIG_DATA4); // Setting data counter on CHANGED
+    forceGauge->serial.tx(0x55);
+    forceGauge->serial.tx(0x08);
+    int temp;
+    if ((temp = read_register(forceGauge, CONFIG_1)) != CONFIG_DATA1)
+    {
+        _waitms(100);
+        forceGauge->serial.stop();
+        return false;
+    }
+
+    _waitms(100);
+    forceGauge->serial.stop();
+    return true;
+}
+
 // Can be updated to use simpleSerial.spin2? inside spin folder of flexprop
 static void continuous_data(void *arg)
 {
@@ -75,6 +104,13 @@ static void continuous_data(void *arg)
             if ((_getcnt() - lastData) > disconnecttx)
             {
                 forceGauge->responding = false;
+                if (force_gauge_reset(forceGauge))
+                {
+                    _pinclear(rx);
+                    _pinstart(rx, spmode, baudcfg, 0);
+                    forceGauge->responding = true;
+                    continue;
+                }
             }
             else if ((_getcnt() - lastData) > transmittx && index > 0)
             {
@@ -108,31 +144,12 @@ static void continuous_data(void *arg)
  */
 bool force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 {
+    force_gauge_stop(forceGauge);
     forceGauge->rx = rx;
     forceGauge->tx = tx;
-    forceGauge->serial.start(rx, tx, 0, BAUD);//3
-    forceGauge->serial.tx(0x55); // Synchronization word
-    forceGauge->serial.tx(0x02); // POWERDDOWN
-    _waitms(100);
-    forceGauge->serial.tx(0x55); // Synchronization word
-    forceGauge->serial.tx(0x06); // Reset
-    _waitms(100);
+    
+    forceGauge->responding = force_gauge_reset(forceGauge);
 
-    write_register(forceGauge, CONFIG_1, CONFIG_DATA1); // Setting data mode to continuous
-    write_register(forceGauge, CONFIG_2, CONFIG_DATA2); // Setting data counter on
-    write_register(forceGauge, CONFIG_3, CONFIG_DATA3); // Setting data counter on
-    //write_register(forceGauge, CONFIG_4, CONFIG_DATA4); // Setting data counter on CHANGED
-    int temp;
-    if ((temp = read_register(forceGauge, CONFIG_1)) != CONFIG_DATA1)
-    {
-        return false;
-    }
-    forceGauge->responding = true;
-    _waitms(100);
-    forceGauge->serial.tx(0x55);
-    forceGauge->serial.tx(0x08);
-    _waitms(100);
-    forceGauge->serial.stop();
     forceGauge->cogid = _cogstart_C(continuous_data, forceGauge, &force_stack[0], sizeof(long) * FORCE_MEMORY_SIZE);
     if (forceGauge->cogid <= 0)
     {
@@ -143,7 +160,6 @@ bool force_gauge_begin(ForceGauge *forceGauge, int rx, int tx)
 
 void force_gauge_stop(ForceGauge *forceGauge)
 {
-    _waitms(1000);
     if (forceGauge->cogid > 0)
     {
         _cogstop(forceGauge->cogid);

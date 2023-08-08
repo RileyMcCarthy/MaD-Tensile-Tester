@@ -4,7 +4,7 @@ from .helpers import ctypes_to_dict
 import json
 from app import app, socketio
 import app.communication as communication
-from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT,CMD_STATE,CMD_DATA,CMD_MPROFILE,CMD_MOVE
+from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT,CMD_STATE,CMD_DATA,CMD_MPROFILE,CMD_MOVE, CMD_NOTIFICATION
 from collections.abc import MutableMapping
 from .helpers import flatten_dict
 from threading import Lock
@@ -24,21 +24,26 @@ test_data_count = 0
 test_data_complete = False
 
 def emit_notification(type, message, timeout = None):
-    if type == 'error':
+    type = type.lower()
+    if type.lower() == 'error':
         if timeout is None:
             timeout = 10000
         app.logger.error(message)
-    elif type == 'warning':
+    elif type.lower() == 'warning':
         if timeout is None:
             timeout = 4000
         app.logger.warn(message)
-    elif type == 'success':
+    elif type.lower() == 'success':
         if timeout is None:
             timeout = 4000
         app.logger.info(message)
     else:
         app.logger.info(message)
-    notification = {'type': type, 'message': message, 'timeout': timeout}
+    try:
+        trimmed_message = message.split("::", 1)[1]
+    except:
+        trimmed_message = message
+    notification = {'type': type, 'message': trimmed_message, 'timeout': timeout}
     socketio.emit('notification', {'json': json.dumps(notification)}, namespace = '/serial')
 
 def ack_handler(data_json):
@@ -73,7 +78,7 @@ def serial_thread(serial_port, serial_baud):
         try:
             res = communication.process_recieved()
         except Exception as err:
-            app.logger.error("Failed to process incomming data!")
+            app.logger.error("Failed to process incomming data: " + str(err))
             continue
         
         if res is None:
@@ -100,7 +105,10 @@ def serial_thread(serial_port, serial_baud):
         elif cmd == CMD_TESTDATA_COUNT:
             #print('Recieving test data count: ', data.value)
             global test_data_count
-            test_data_count = data_json.test_count
+            test_data_count = data_json['test_count']
+        elif cmd == CMD_NOTIFICATION:
+            print("Recieving notification: ", data_json)
+            emit_notification(data_json['Type'], data_json['Message'], 5000)
 
 def data_thread(period):
     # Data thread is respondsible for sending the data request command to the serial port
@@ -139,9 +147,14 @@ def test_data_reciever_thread():
             writer = csv.writer(f, delimiter=',', quotechar='|')
             writer.writerow(['index','time(us)', 'position(um)', 'force(mN)'])
             communication.get_test_data_count()
+            timeout = time.time() + 5   # 5 seconds from now
             while test_data_count == 0:
+                if time.time() > timeout:
+                    print('timeout')
+                    return
                 socketio.sleep(0.01)
             print(f'test data count: {test_data_count}')
+            emit_notification('success', 'Recieving test data of size' + str(test_data_count))
             data_count = test_data_count
             test_data_count = 0 # reset global variable
             while data_count > index:
@@ -152,34 +165,52 @@ def test_data_reciever_thread():
                 while test_data is None:
                     time_delta = datetime.now() - start_time
                     if time_delta.total_seconds() >= 1:
-                        print('timeout')
+                        emit_notification('error', 'Failed to recieve test data, timeout')
                         break
                     if test_data_complete:
-                        print('End of data')
+                        emit_notification('success', 'Recieved all test data')
                         return
                     socketio.sleep(0.01)
                 if test_data is None:
                     continue
-                #if test_data.log != index:
-                #    print(f'index mismatch: {test_data.log} != {index}')
-                #    continue
                 print(" size of test data is ", len(test_data))
                 index += len(test_data)
                 # Ilterate through list test_data
                 for i in range(len(test_data)):
-                    print(f'got test data: {test_data[i].log, test_data[i].encoderum, test_data[i].forcemN}')
-                    writer.writerow([test_data[i].log, test_data[i].timeus, test_data[i].encoderum, test_data[i].forcemN])
+                    print(f'got test data: {test_data[i].encoderum, test_data[i].forcemN}')
+                    writer.writerow([test_data[i].timeus, test_data[i].encoderum, test_data[i].forcemN])
                     socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data[i].getdict()))}, namespace = '/serial')
-                #print(f'got test data: {test_data.timeus, test_data.encoderum, test_data.forcemN}')
-                #writer.writerow([test_data.log, test_data.timeus, test_data.encoderum, test_data.forcemN])
-                #socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data.getdict()))}, namespace = '/serial')
                 test_data = None
                 socketio.sleep(0.01)
+        emit_notification('success', 'Recieved all test data')
         print("Done gathering data")
+
+def generate_gcode_from_profile(json_file_path):
+    with open(json_file_path, 'r') as json_file:
+        json_data = json.load(json_file)
+
+    gcode_str = '; G-code generated from JSON\n'
+    gcode_str += '; Name: ' + json_data['name'] + '\n\n'
+    
+    for set_data in json_data['sets']:
+        gcode_str += '; Set: ' + set_data['name'] + '\n'
+        for _ in range(set_data['executions']):
+            gcode_str += set_data['gcode'] + '\n'
+        gcode_str += '\n'
+    
+    return gcode_str
+
+def remove_comments(gcode_string):
+    # Regular expression pattern to match comments (lines starting with semicolon)
+    pattern = r'^\s*;.*$'
+    
+    # Use re.MULTILINE to match comments on multiple lines
+    return re.sub(pattern, '', gcode_string, flags=re.MULTILINE)
 
 def gcode_to_dict(gcode_string):
     valid_commands = {'G': int, 'X': float, 'F': float, 'P': int}
     gcode_dict = {}
+    gcode_string = remove_comments(gcode_string)
     words = gcode_string.split()
     
     for word in words:
@@ -189,9 +220,47 @@ def gcode_to_dict(gcode_string):
             continue
         value_str = word[1:]
         gcode_dict[command] = valid_commands[command](value_str)
+    if 'G' not in gcode_dict:
+        return None
     return gcode_dict
 
+def send_gcode(line, timeout_period=5):
+    print(f'sending gcode: {line}')
+    command = gcode_to_dict(line)
+    if command is None:
+        return "SKIP"
+    global gcode_ack
+    global gcode_ack_lock
+    with gcode_ack_lock:
+        gcode_ack = "NONE"
+    communication.set_motion_command(command)
+    timeout = time.time() + timeout_period   # 5 seconds from now
+    retries = 0
+    while True:
+        result = "NONE"
+        with gcode_ack_lock:
+            result = gcode_ack
+        if result == "OK":
+            return command
+        elif result == "FAIL":
+            communication.set_motion_command(command) # try again
+            retries += 1
+            if retries > 5:
+                emit_notification('error', 'Failed to send gcode, too many retries!')
+                return None
+        elif result == "BUSY":
+            # should wait for ok before trying again...
+            communication.set_motion_command(command) # try again
+            socketio.sleep(1) # slow down sending
+        elif result == "NONE":
+            if time.time() > timeout:
+                emit_notification('error', 'Timeout sending gcode to device!')
+                return
+        socketio.sleep(0.1)
+
 def gcode_sender_thread(filename):
+    start_command = "G90"
+    end_command = "G122"
     timeout_period = 5
     global gcode_lock
     print("aquireing gcode lock!")
@@ -201,42 +270,16 @@ def gcode_sender_thread(filename):
         file = re.search(r'[^\\/]+$', filename).group(0)
         emit_notification("success",f'Queueing {file} Profile on Device!',timeout_period*1000)
         # open file
-        with open(filename) as f:
-            lines = f.readlines()
+        gcode_str = generate_gcode_from_profile(filename)
         # send lines
         global gcode_ack
-        for line in lines:
-            print(f'sending gcode: {line}')
-            command = gcode_to_dict(line)
-            global gcode_ack_lock
-            with gcode_ack_lock:
-                gcode_ack = "NONE"
-            communication.set_motion_command(command)
-            timeout = time.time() + timeout_period   # 5 seconds from now
-            retries = 0
-            while True:
-                result = "NONE"
-                with gcode_ack_lock:
-                    result = gcode_ack
-                if result == "OK":
-                    break
-                elif result == "FAIL":
-                    communication.set_motion_command(command) # try again
-                    retries += 1
-                    if retries > 5:
-                        emit_notification('error', 'Failed to send gcode, too many retries!')
-                        gcode_lock.release()
-                        return
-                elif result == "BUSY":
-                    # should wait for ok before trying again...
-                    communication.set_motion_command(command) # try again
-                    socketio.sleep(0.5) # slow down sending
-                elif result == "NONE":
-                    if time.time() > timeout:
-                        emit_notification('error', 'Timeout sending gcode to device!')
-                        gcode_lock.release()
-                        return
-                socketio.sleep(0.1)
+        send_gcode(start_command)
+        for line in gcode_str.splitlines():
+            if send_gcode(line) is None:
+                gcode_lock.release()
+                continue
+
+        send_gcode(end_command)
         gcode_lock.release()
         emit_notification('success', 'Gcode sent successfully')
     else:

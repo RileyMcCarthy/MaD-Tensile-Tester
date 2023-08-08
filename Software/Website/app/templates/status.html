@@ -81,6 +81,11 @@
         <div class="col-xl">
             <div class="row-xl">
                 <div class="shadow p-3 mb-3 bg-white rounded">
+                    <div id="chart-tension" style="height: 500px; width:100%;"></div>
+                </div>
+            </div>
+            <div class="row-xl">
+                <div class="shadow p-3 mb-3 bg-white rounded">
                     <div id="chart-position" style="height: 370px; width:100%;"></div>
                 </div>
             </div>
@@ -91,13 +96,10 @@
             </div>
             <div class="row-xl">
                 <div class="shadow p-3 mb-3 bg-white rounded">
-                    <canvas id="chart-tension" style="width:100%;"></canvas>
+                    <h3 class="mt-5">Live Streaming</h3>
+                    <img src="{{ url_for('video_feed') }}" width="100%">
                 </div>
             </div>
-        </div>
-        <div class="col-xl">
-            <h3 class="mt-5">Live Streaming</h3>
-            <img src="{{ url_for('video_feed') }}" width="100%">
         </div>
     </div>
 </div>
@@ -196,7 +198,6 @@
 
         var chartForceData = []; // dataPoints
         var chartForce = new CanvasJS.Chart("chart-force", {
-            
             title :{
                 text: "Force"
             },
@@ -212,6 +213,23 @@
                 return " ";
                 }
             }
+        });
+
+        var chartTensileData = []; // dataPoints
+        var chartTensile = new CanvasJS.Chart("chart-tension", {
+            title :{
+                text: "Force Stretch"
+            },
+            axisY:{
+                title:"N",
+            },
+            axisX:{
+                title:"mm",
+            },
+            data: [{
+                type: "line",
+                dataPoints: chartTensileData
+            }],
         });
 
         var socket = io('/serial');
@@ -246,6 +264,15 @@
                 chartForceData.shift();
             }
             chartForce.render();
+
+            chartTensileData.push({
+                x: positionmm,
+                y: force
+            });
+            if (chartTensileData.length > max) {
+                chartTensileData.shift();
+            }
+            chartTensile.render();
 
         });
 

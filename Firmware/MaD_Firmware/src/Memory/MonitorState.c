@@ -23,37 +23,41 @@ int init_monitor_state()
         _monitor_sd_lock = _locknew();
     }
 
+    if (_monitor_sd_lock == -1)
+    {
+        DEBUG_ERROR("%s","Failed to create monitor state lock\n");
+        return -1;
+    }
+
     _monitor_data_lock = false;
 
     return _monitor_sd_lock;
 }
 
-bool lock_monitor_data(MonitorData ** data)
+MonitorData * lock_monitor_data()
 {
-    if (_monitor_data_lock)
+    while (_monitor_data_lock)
     {
-        *data = NULL;
-        return false;
+        return NULL;
     }
     _monitor_data_lock = true;
-
-    *data = &monitor_data;
-
-    return true;
+    
+    return &monitor_data;
 }
 
-bool lock_monitor_data_ms(MonitorData ** data, int ms)
+MonitorData * lock_monitor_data_ms(int ms)
 {
     int start = _getms();
-    while (!lock_monitor_data(data))
+    while (_monitor_data_lock)
     {
         if (_getms() - start > ms)
         {
             DEBUG_ERROR("Failed to lock monitor state, waited %dms\n", ms);
-            return false;
+            return NULL;
         }
     }
-    return true;
+    _monitor_data_lock = true;
+    return &monitor_data;
 }
 
 bool unlock_monitor_data()
@@ -71,7 +75,7 @@ bool lock_sd_card(MonitorSDCard ** data)
 {
     if (_monitor_sd_lock == -1)
     {
-        DEBUG_ERROR("%s","Monitor state lock not initialized\n");
+        DEBUG_ERROR("%s","Monitor state not initialized\n");
         return false;
     }
     if (_locktry(_monitor_sd_lock) == 0)

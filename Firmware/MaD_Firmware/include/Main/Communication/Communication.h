@@ -24,6 +24,20 @@
 #define MAD_VERSION 1
 
 
+#define NOTIFICATION_ERROR "ERROR"
+#define NOTIFICATION_WARNING "WARNING"
+#define NOTIFICATION_INFO "INFO"
+#define NOTIFICATION_SUCCESS "SUCCESS"
+
+#define MAX_SIZE_NOTIFICATION_BUFFER 20
+#define MAX_SIZE_NOTIFICATION_TYPE 15
+#define MAX_SIZE_NOTIFICATION_MESSAGE 100
+typedef struct Notification {
+    char type[MAX_SIZE_NOTIFICATION_TYPE];
+    char message[MAX_SIZE_NOTIFICATION_MESSAGE];
+} Notification;
+
+
 void beginCommunication(void *arg);
 
 #endif

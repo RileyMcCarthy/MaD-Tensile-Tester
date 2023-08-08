@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <propeller.h>
 #include "Main/MaD.h"
+#include "Memory/CogStatus.h"
 
 extern long motion_position_steps;
 static ForceGauge forceGauge;
@@ -14,27 +15,21 @@ static Encoder encoder;
 
 bool loaded_mp = false;
 static bool monitorLogData;
-
 static bool get_force(int lastLog)
 {
   if (forceGauge.responding)
   {
+    state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 1);
     return forceGauge.counter != lastLog;
   }
-  DEBUG_ERROR("%s","Force Gauge disconnected, attempting to reconnect\n");
+  static int last_error = 0;
+  if ((_getms() - last_error) > 3000)
+  {
+    DEBUG_ERROR("%s","Force Gauge not responding\n");
+    last_error = _getms();
+  }
   // maybe force gauge should do this reconnect itself?
-  force_gauge_stop(&forceGauge);
-  if (force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX))
-  {
-    //printf("Force Gauge reconnected\n");
-    DEBUG_INFO("%s","Force Gauge reconnected\n");
-    state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 1);
-  }
-  else
-  {
-    DEBUG_ERROR("%s","Force Gauge failed to reconnect\n");
-    state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 0);
-  }
+  state_machine_set(PARAM_MACHINE_FORCE_GAUGE_COM, 0);
   return false;
 }
 
@@ -193,8 +188,8 @@ static void read_sd()
 
 bool get_monitor_data(MonitorData *data, int timeout_ms)
 {
-  MonitorData *monitor_data;
-  if (!lock_monitor_data_ms(&monitor_data, timeout_ms))
+  MonitorData *monitor_data = lock_monitor_data_ms(timeout_ms);
+  if (monitor_data == NULL)
   {
     DEBUG_WARNING("%s","Failed to lock monitor data\n");
     return false;
@@ -209,18 +204,110 @@ bool get_monitor_data(MonitorData *data, int timeout_ms)
 static bool trigger_set_gauge = false;
 void set_gauge_length()
 {
-trigger_set_gauge = true;
+  trigger_set_gauge = true;
+}
+
+static void load_machine_profile()
+{
+    DEBUG_INFO("%s","Loading machine profile\n");
+    FILE *mp = fopen("/sd/profile.bin", "r");
+    if (mp == NULL)
+    {
+       // Load default profile, one does not exist
+        DEBUG_WARNING("%s","No machine profile found, loading default\n");
+        MachineProfile temp_profile;
+        memset(&temp_profile, 0, sizeof(MachineProfile));
+        strcpy(temp_profile.name,"DEFAULT");
+        FILE* mp_temp = fopen("/sd/profile.bin", "w");
+        if (mp_temp == NULL)
+        {
+            DEBUG_ERROR("%s","Failed to open file machine profile for writing\n");
+            _waitms(1000);
+            _reboot();
+        }
+        int n = fwrite(&temp_profile, sizeof(MachineProfile), 1, mp_temp);
+        if (n != sizeof(MachineProfile))
+        {
+            DEBUG_ERROR("incorrect number of bytes written: %d\n", n);
+            _waitms(1000);
+            _reboot();
+        }
+        fclose(mp_temp);
+    }
+    
+    DEBUG_INFO("%s","Reading sd profile from sd\n");
+    MachineProfile machine_profile_temp;
+    int n = fread(&machine_profile_temp, sizeof(MachineProfile), 1, mp);
+    if (n != sizeof(MachineProfile))
+    {
+        DEBUG_ERROR("incorrect number of bytes read: %d\n", n);
+        _waitms(1000);
+        _reboot();
+    }
+
+    DEBUG_INFO("%s","Loading machine profile from SD card\n");
+    
+    // Load profile from SD card
+    MachineProfile *machine_profile;
+    if (!lock_machine_profile_ms(&machine_profile, 100))
+    {
+        DEBUG_ERROR("%s","Failed to lock machine profile, default should have been loaded!\n");
+        return;
+    }
+    memcpy(machine_profile, &machine_profile_temp, sizeof(MachineProfile));
+    unlock_machine_profile();
+
+    DEBUG_NOTIFY("%s","Machine profile loaded from SD Card\n");
+    set_machine_profile_loaded(true);
+    return;
+    
 }
 
 /*responsible for reading/writing data to buffer/test output*/
 static void monitor_cog(int samplerate)
 {
-  init_monitor_state();
+  if (init_monitor_state() == -1)
+  {
+    DEBUG_ERROR("%s","Failed to initialize monitor state REBOOTING\n");
+    _reboot();
+  }
+
+  load_machine_profile();
+
+  // Save copy of machine profile
+  MachineProfile machine_profile;
+  MachineProfile *profile_ptr = NULL;
+  if (!lock_machine_profile_ms(&profile_ptr,1000))
+  {
+    DEBUG_ERROR("%s","Failed to lock machine profile REBOOTING\n");
+    _waitms(1000);
+    _reboot();
+    return;
+  }
+  else
+  {
+    if (profile_ptr == NULL)
+    {
+      DEBUG_ERROR("%s","Machine profile is NULL REBOOTING\n");
+       _waitms(1000);
+      _reboot();
+      return;
+    }
+    else
+    {
+      memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
+    }
+  }
+  unlock_machine_profile();
+  
+  DEBUG_INFO("%s","Starting Monitor Cog\n");
 
   FILE *testFile = NULL;
 
-  MachineProfile machine_profile;
   monitorLogData = false;
+
+  // Set up force gauge
+  force_gauge_begin(&forceGauge, FORCE_GAUGE_RX, FORCE_GAUGE_TX);
   
   // Set up encoder
   encoder.start(SERVO_ENCODER_A, SERVO_ENCODER_B, -1, false, 0, -100000, 100000);
@@ -230,19 +317,9 @@ static void monitor_cog(int samplerate)
   int gauge_length = 0;
   while (1)
   {
+    set_monitor_status(_getms());
     long start = _getus();
     bool update = false;
-    if (machine_profile_loaded() && !loaded_mp)
-    {
-      MachineProfile *profile_ptr = NULL;
-      while (!lock_machine_profile_ms(&profile_ptr,1000))
-      {
-        DEBUG_ERROR("%s","Failed to lock machine profile\n");
-      }
-      memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
-      unlock_machine_profile();
-      loaded_mp = true;
-    }
 
     if (get_force(force_count))
     {
@@ -257,35 +334,38 @@ static void monitor_cog(int samplerate)
     
     long forceus = _getus() - start;
 
-    MonitorData *monitor_data;
+    MonitorData *monitor_data = NULL;
     if (update)
-    if (lock_monitor_data_ms(&monitor_data, 1000))
     {
-      monitor_data->log = monitor_data->log + 1; // Increment when new data is added to buffer, used for checking if data is new.
-      monitor_data->forceRaw = force_raw;
-      monitor_data->encoderRaw = encoder.value();
-      monitor_data->timems = _getms();
-      monitor_data->timeus = _getus();
-      monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
-      monitor_data->encoderum = motion_get_position()*1000/machine_profile.configuration.encoderStepsPermm;
-      monitor_data->gauge = monitor_data->encoderum - gauge_length;
-      monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
-      monitor_data->position = motion_get_position()*1000/machine_profile.configuration.encoderStepsPermm;
-      monitor_data->setpoint = motion_get_setpoint()*1000/machine_profile.configuration.encoderStepsPermm;
-      if (trigger_set_gauge)
+      monitor_data = lock_monitor_data_ms(1000);
+      if (monitor_data != NULL)
       {
-        trigger_set_gauge = false;
-        gauge_length = monitor_data->encoderum;
+        set_monitor_status(_getms());
+        monitor_data->log = monitor_data->log + 1; // Increment when new data is added to buffer, used for checking if data is new.
+        monitor_data->forceRaw = force_raw;
+        monitor_data->encoderRaw = encoder.value();
+        monitor_data->timems = _getms();
+        monitor_data->timeus = _getus();
+        monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
+        monitor_data->encoderum = monitor_data->encoderRaw*1000/machine_profile.configuration.encoderStepsPermm;
+        monitor_data->gauge = monitor_data->encoderum - gauge_length;
+        monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
+        monitor_data->position = monitor_data->encoderRaw/machine_profile.configuration.encoderStepsPermm;
+        monitor_data->setpoint = motion_get_setpoint()*1000/machine_profile.configuration.encoderStepsPermm;
+        DEBUG_INFO("Force: %d, Encoder: %d, Time: %d\n", monitor_data->forceRaw, monitor_data->encoderRaw, monitor_data->timems);
+        if (trigger_set_gauge)
+        {
+          trigger_set_gauge = false;
+          gauge_length = monitor_data->encoderum;
+        }
+        update = true;
+      }
+      else
+      {
+        DEBUG_WARNING("%s","Failed to lock monitor data\n");
       }
       unlock_monitor_data();
-      update = true;
     }
-    else
-    {
-      DEBUG_WARNING("%s","Failed to lock monitor data\n");
-    }
-
-    long encoderus = _getus() - start - forceus;
     
     MachineState machineState;
     get_machine_state(&machineState);
@@ -301,20 +381,30 @@ static void monitor_cog(int samplerate)
         {
           DEBUG_ERROR("%s","Failed to open file test.txt for writing\n");
           state_machine_set(PARAM_MOTION_MODE, MODE_TEST);
-        }else{
-          fprintf(testFile,"Time (us), Force (mN), Encoder (um), Gauge (um) Setpoint (um)\n");
+          umount("/sd");
+          _waitms(100);
+          mount("/sd", _vfs_open_sdcard());
         }
       }
       if (update && testFile != NULL)
       {
         // Write data to file
-        fprintf(testFile, "%d, %d, %d,%d\n",  monitor_data->timeus, monitor_data->forcemN, monitor_data->encoderum,monitor_data->gauge,monitor_data->setpoint);
+        monitor_data = lock_monitor_data_ms(1000);
+        if (monitor_data != NULL)
+        {
+          fwrite(&monitor_data, sizeof(MonitorData), 1, testFile);
+          //fprintf(testFile, "%d,%d,%d,%d,%d\n",  monitor_data->timeus, monitor_data->forcemN, monitor_data->encoderum,monitor_data->gauge,monitor_data->setpoint);
+        }
+        else
+        {
+          DEBUG_ERROR("%s","Failed to lock monitor data while writing to sd card\n");
+        }
+        unlock_monitor_data();
       }
     }
     else if (testFile != NULL)
     {
       monitorLogData = false;
-      // Stop Logging
       fclose(testFile);
       testFile = NULL;
     }
@@ -334,7 +424,7 @@ static bool sd_card_file_exists(const char *filename)
   }
   
   MonitorSDCard *sd_card;
-  if (!lock_sd_card(&sd_card))
+  if (!lock_sd_card_ms(&sd_card,100))
   {
     DEBUG_WARNING("Failed to lock monitor checking file exists: %s\n", filename);
     return false;

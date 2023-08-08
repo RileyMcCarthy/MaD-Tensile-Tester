@@ -32,7 +32,7 @@ typedef struct MonitorSDCard
 {
   SDCardState sd_card_state;
   MachineProfile sd_card_profile; // Storage for machine profile read from SD card
-  MonitorData sd_card_data[255]; // Storage for sd card data read from SD card
+  char * sd_card_data[3000]; // Storage for sd card data read from SD card
   char sd_card_file_name[255]; // Storage for file name read from SD card
   int read_data_index;
   int read_data_count;
@@ -41,8 +41,8 @@ typedef struct MonitorSDCard
 } MonitorSDCard;
 
 int init_monitor_data();
-bool lock_monitor_data(MonitorData ** data);
-bool lock_monitor_data_ms(MonitorData ** data, int ms);
+MonitorData * lock_monitor_data();
+MonitorData * lock_monitor_data_ms(int ms);
 bool unlock_monitor_data();
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 bool lock_sd_card(MonitorSDCard ** data);

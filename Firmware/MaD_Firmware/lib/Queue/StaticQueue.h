@@ -11,7 +11,7 @@ typedef struct StaticQueue_t {
     int _lock;
 } StaticQueue;
 
-void queue_init(StaticQueue *queue, void *buf, int max_size, int item_size);
+bool queue_init(StaticQueue *queue, void *buf, int max_size, int item_size);
 bool queue_push(StaticQueue *queue, void *data);
 bool queue_pop(StaticQueue *queue, void *data);
 void queue_empty(StaticQueue *queue);

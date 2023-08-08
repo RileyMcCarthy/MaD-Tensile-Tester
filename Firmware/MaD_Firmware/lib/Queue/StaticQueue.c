@@ -1,14 +1,13 @@
 #include "StaticQueue.h"
 
-void queue_init(StaticQueue *queue, void *buf, int max_size, int item_size) {
+bool queue_init(StaticQueue *queue, void *buf, int max_size, int item_size) {
     queue->buf = buf;
     queue->max_size = max_size;
     queue->item_size = item_size;
     queue->front = 0;
     queue->rear = 0;
     queue->_lock = _locknew();
-    if (queue->_lock ==  -1)
-        return;
+    return queue->_lock !=  -1;
 }
 
 bool queue_push(StaticQueue *queue, void *data) {

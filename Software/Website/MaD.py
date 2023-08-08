@@ -1,7 +1,7 @@
 from app import app, socketio, serial_thread, state_thread, data_thread
 import subprocess
 import configparser
-
+import logging
 @app.route("/restart")
 def restart():
     subprocess.run("shutdown -r 0", shell=True, check=True)
@@ -13,6 +13,7 @@ def shutdown():
     return "Shutting down!"
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='error.log',level=logging.DEBUG)
     data_rate = 0.2
     status_rate = 0.5
     serial_port = "/dev/serial0"

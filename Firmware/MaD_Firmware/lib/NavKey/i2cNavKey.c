@@ -331,11 +331,6 @@ static void writeNavKey24(NavKey *navkey, uint8_t reg, uint32_t data)
 }
 
 /*********************************** Public functions *************************************/
-
-void navkey_destroy(NavKey *navkey)
-{
-  free(navkey);
-}
 /** Used for initialize the NavKey **/
 void navkey_begin(NavKey *navkey, int scl, int sda, uint8_t addr, uint8_t conf)
 {
@@ -566,13 +561,13 @@ void navkey_write_counter(NavKey *navkey, int value)
 /** Write the maximum threshold value **/
 void navkey_write_max(NavKey *navkey, int32_t max)
 {
-  writeNavKeyFloat(navkey, REG_CMAXB4, max);
+  writeNavKey32(navkey, REG_CMAXB4, max);
 }
 
 /** Write the minimum threshold value **/
 void navkey_write_min(NavKey *navkey, int32_t min)
 {
-  writeNavKeyFloat(navkey, REG_CMINB4, min);
+  writeNavKey32(navkey, REG_CMINB4, min);
 }
 
 /** Write the Step increment value **/

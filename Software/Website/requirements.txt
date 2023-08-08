@@ -1,14 +1,7 @@
 flask_socketio
-flask_wtf
 pyserial
-pigpio
-WTForms
-ctypesgen
-simple_websocket
 pylibmc
 eventlet
-flask_sqlalchemy
-flask_migrate
 Werkzeug
 numpy
 opencv-python

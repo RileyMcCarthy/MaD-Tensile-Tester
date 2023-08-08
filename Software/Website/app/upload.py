@@ -1,7 +1,7 @@
 from app import app, socketio, ALLOWED_EXTENSIONS
 from flask import render_template, request, jsonify, Response, flash, redirect, url_for
 from werkzeug.utils import secure_filename
-from .base import gcode_sender_thread, gcode_to_dict, emit_notification
+from .base import gcode_sender_thread, gcode_to_dict, emit_notification, generate_gcode_from_profile
 import app.communication as communication
 import os
 import numpy as np
@@ -12,7 +12,7 @@ import json
 
 @app.route('/upload', methods=['GET'])
 def upload_page():
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    files = os.listdir(app.config['PROFILE_FOLDER'])
     return render_template('upload.html', files=files)
 
 def allowed_file(filename):
@@ -40,7 +40,7 @@ def upload_file():
 @app.route('/select', methods=['POST'])
 def select():
     selected_file = request.form['selected_file']
-    path = os.path.join(app.config['UPLOAD_FOLDER'], selected_file)
+    path = os.path.join(app.config['PROFILE_FOLDER'], selected_file)
     socketio.start_background_task(target=gcode_sender_thread, filename=path)
     return f"Sending {selected_file} file to machine"
 
@@ -48,17 +48,16 @@ def select():
 def gcode_file_to_moves():
     selected_file_json = request.get_json()
     selected_file = selected_file_json['filename']
-    print(selected_file)
-    path = os.path.join(app.config['UPLOAD_FOLDER'], selected_file)
-    with open(path) as f:
-        lines = f.readlines()
-    # Convert gcode lines to array of dict
+    path = os.path.join(app.config['PROFILE_FOLDER'], selected_file)
+    gcode_str = generate_gcode_from_profile(path)
+    print(gcode_str)
     cordinates = []
     last_position = 0
     time = 0
-    for line in lines:
-        print(f'sending gcode: {line}')
+    for line in gcode_str.splitlines():
         command = gcode_to_dict(line)
+        if command is None:
+            continue
         if command['G'] == 4:
             position = last_position
             time += command['P']/1000.0

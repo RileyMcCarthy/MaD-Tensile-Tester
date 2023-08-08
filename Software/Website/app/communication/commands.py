@@ -18,6 +18,7 @@ CMD_TESTDATA = 12
 CMD_TESTDATA_COUNT = 13
 CMD_MANUAL = 14
 CMD_GAUGE_LENGTH = 15
+CMD_NOTIFICATION = 16
 
 def test():
     return serial_test()
@@ -83,6 +84,7 @@ def process_recieved():
     if res is None:
         return None
     cmd, data, size = res
-    decoded = data.decode("utf-8")
-    json_dict = json.loads(decoded)
+    decoded = data.decode("utf-8").rstrip()
+    stripped = decoded.replace('\n', '')
+    json_dict = json.loads(stripped)
     return cmd, json_dict

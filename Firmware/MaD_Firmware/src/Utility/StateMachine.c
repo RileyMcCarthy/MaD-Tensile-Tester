@@ -213,6 +213,11 @@ bool get_machine_state(MachineState *machineState)
     return true;
 }
 
+MachineState * get_machine_state_ptr()
+{
+    return &machine_state;
+}
+
 #define SELF_CHECK_STRING "SELF CHECK"
 #define MACHINE_CHECK_STRING "MACHINE CHECK"
 #define MOTION_STRING "MOTION"

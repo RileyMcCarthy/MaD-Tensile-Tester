@@ -16,6 +16,8 @@ static long control_stack[CONTROL_MEMORY_SIZE];
 
 #define SERVO_CHECK_COUNT_MAX 3
 
+#define NAVKEY_MAX_COUNT 100000
+
 typedef enum MoveModes
 {
     FUNC_MANUAL_OFF,               // Terminates current motion
@@ -46,6 +48,19 @@ typedef enum movetype_e
     MOVE_STOP
 } MoveType;
 
+static void init_navkey()
+{
+    /*Initialize NavKey*/
+    navkey_reset(&navkey);
+    navkey_begin(&navkey, NAVKEY_SCL, NAVKEY_SDA, NAVKEY_I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
+    navkey_write_counter(&navkey, 0);              /* Reset the counter value */
+    navkey_write_max(&navkey, NAVKEY_MAX_COUNT);             /* Set the maximum threshold*/
+    navkey_write_min(&navkey, -NAVKEY_MAX_COUNT);            /* Set the minimum threshold */
+    navkey_write_step(&navkey, 1);                 /* Set the step to 1*/
+    navkey_write_double_push_period(&navkey, 300); /*Set a period for the double push of 300ms */
+    navkey_write_counter(&navkey, 0);              // reset counter to position
+}
+
 /*responsible for sending moves from using navkey, updating state machine, checking for faults*/
 static void control_cog(void *arg)
 {
@@ -59,16 +74,6 @@ static void control_cog(void *arg)
     _pinr(ENDSTOP_LOWER_PIN);
     _pinr(ENDSTOP_DOOR_PIN);
 
-
-    /*Initialize NavKey*/
-    navkey_begin(&navkey, NAVKEY_SCL, NAVKEY_SDA, NAVKEY_I2C_ADDR, INT_DATA | WRAP_DISABLE | DIRE_RIGHT | IPUP_ENABLE);
-    navkey_write_counter(&navkey, 0);              /* Reset the counter value */
-    navkey_write_max(&navkey, 100000);             /* Set the maximum threshold*/
-    navkey_write_min(&navkey, -100000);            /* Set the minimum threshold */
-    navkey_write_step(&navkey, 1);                 /* Set the step to 1*/
-    navkey_write_double_push_period(&navkey, 300); /*Set a period for the double push of 300ms */
-    navkey_write_counter(&navkey, 0);              // reset counter to position
-
     MachineState lastState;
     get_machine_state(&lastState);
 
@@ -77,12 +82,16 @@ static void control_cog(void *arg)
     int lastEncoderRead = 0; // Used to check if the machine is stopped
     
     MonitorData lastData;
-    get_monitor_data(&lastData, 10);
+    while (!get_monitor_data(&lastData, 10))
+    {
+        DEBUG_ERROR("%s","Failed to get monitor data in control\n");
+        _waitms(500);
+    }
 
     MoveModes currentMoveMode = FUNC_MANUAL_OFF;
     MoveModes lastMoveMode = -1;
     int currentMoveModeParameter = 0;
-    Move manual_move;
+    Move manual_move = {0};
 
     // Need to get initial copy of machine profile
     MachineProfile *profile_ptr;
@@ -233,154 +242,169 @@ static void control_cog(void *arg)
                     /* Set functions based on navkey */
                     navkey_update_status(&navkey); // Update navkey status registers
                     NavKeyStatus *status = &(navkey.status);
-                    if (status->raw != 0)
+                    int max_counter = navkey_read_max(&navkey);
+                    if (max_counter != NAVKEY_MAX_COUNT)
                     {
-                        DEBUG_INFO("NAVKEY=UPR:%d,UPP:%d,DNR:%d,DNP:%d,RTR:%d,RTP:%d,LTR:%d,LTP:%d,CTRR:%d,CTRP:%d,CTRDP:%d,RINC:%d,RDEC:%d,RMAX:%d,RMIN:%d\n",
-                                   status->UPR, status->UPP, status->DNR, status->DNP, status->RTR, status->RTP, status->LTR, status->LTP, status->CTRR, status->CTRP, status->CTRDP, status->RINC, status->RDEC, status->RMAX, status->RMIN);
+                        DEBUG_ERROR("Navkey is not responding!!! %d!=%d\n", max_counter, NAVKEY_MAX_COUNT);
+                        init_navkey();
                     }
-                    // WARNING PRESSED AND RELEASE CAN OCCUR ON SAME STATUS CYCLE, DO NOT USE ELSE IF
-                    if (navkey.status.CTRR)    // Center button released
+                    else
                     {
-                        currentMoveMode++;
-                        if (currentMoveMode == FUNC_MAX)
+                        if (status->raw != 0)
                         {
-                            currentMoveMode = FUNC_MANUAL_OFF;
+                            DEBUG_INFO("NAVKEY=UPR:%d,UPP:%d,DNR:%d,DNP:%d,RTR:%d,RTP:%d,LTR:%d,LTP:%d,CTRR:%d,CTRP:%d,CTRDP:%d,RINC:%d,RDEC:%d,RMAX:%d,RMIN:%d\n",
+                                    status->UPR, status->UPP, status->DNR, status->DNP, status->RTR, status->RTP, status->LTR, status->LTP, status->CTRR, status->CTRP, status->CTRDP, status->RINC, status->RDEC, status->RMAX, status->RMIN);
                         }
-                        DEBUG_INFO("FUNC=%d\n", currentMoveMode);
-                    }
-
-                    // Execute manual mode functions
-                    switch (currentMoveMode)
-                    {
-                    case FUNC_MANUAL_OFF: // Stop current motion
-                        break;
-                    case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
-                        if (lastMoveMode != FUNC_MANUAL_INCREMENTAL_JOG)
+                        // WARNING PRESSED AND RELEASE CAN OCCUR ON SAME STATUS CYCLE, DO NOT USE ELSE IF
+                        if (navkey.status.CTRR)    // Center button released
                         {
-                            manual_move.f = 10; // 10mm/min
-                            manual_move.g = 1; // G1 Command
-                            manual_move.x = 1; // Move in 1mm in x direction
-                        }
-                        if (navkey.status.LTR) // Left released
-                        {
-                            if (manual_move.x > 1) // No step size below 1mm
+                            currentMoveMode++;
+                            if (currentMoveMode == FUNC_MAX)
                             {
-                                manual_move.x /= 10;   // Decrease step size by multiple of 10
+                                currentMoveMode = FUNC_MANUAL_OFF;
                             }
-                            DEBUG_INFO("DECREASING STEP SIZE, STEP=%f\n", manual_move.x);
+                            DEBUG_INFO("FUNC=%d\n", currentMoveMode);
                         }
-                        if (navkey.status.RTR) // Right released
+
+                        // Execute manual mode functions
+                        switch (currentMoveMode)
                         {
-                            if (manual_move.x < 100) // No step size above 100mm
+                        case FUNC_MANUAL_OFF: // Stop current motion
+                            break;
+                        case FUNC_MANUAL_INCREMENTAL_JOG: // Setup the navkey for incremental jog (turn off hold)
+                            if (lastMoveMode != FUNC_MANUAL_INCREMENTAL_JOG)
                             {
-                                manual_move.x *= 10; // Increase step size by multiple of 10
+                                manual_move.f = 10; // 10mm/min
+                                manual_move.g = 1; // G1 Command
+                                manual_move.x = 1; // Move in 1mm in x direction
                             }
-                            DEBUG_INFO("INCREASING STEP SIZE, STEP=%f\n", manual_move.x);
-                        }
-                        Move absolute;
-                        Move manual_move_copy;
-                        memcpy(&absolute, &manual_move, sizeof(Move));
-                        absolute.g = 90;
-                        if (navkey.status.UPR) // Up released
-                        {
-                            manual_move_copy.x = abs(manual_move.x);
-                            motion_add_move(&absolute);
-                            motion_add_move(&manual_move_copy);
-                            DEBUG_INFO("FUNCTION=INCREMENTAL_JOG, SPEED=%f, STEP=%f\n", manual_move_copy.f, manual_move_copy.x);
-                        }
-                        if (navkey.status.DNR > 0) // Down released
-                        {
-                            manual_move_copy.x = -1*abs(manual_move.x);
-                            motion_add_move(&absolute);
-                            motion_add_move(&manual_move_copy);
-                            DEBUG_INFO("FUNCTION=INCREMENTAL_JOG, SPEED=%f, STEP=%f\n", manual_move_copy.f, manual_move_copy.x);
-                        }
-                        break;
-                    case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
-                        if (lastMoveMode != FUNC_MANUAL_CONTINUOUS_JOG)
-                        {
-                            //move_servo(control, MOVE_STOP, 0);
-                            currentMoveModeParameter = 10000; // 10000um/s = 10mm/s
-                        }
-                        if (navkey.status.LTR > 0) // Left released
-                        {
-                            currentMoveModeParameter -= 1000; // Increase step size by 1mm
-                        }
-                        if (navkey.status.RTR > 0) // Right released
-                        {
-                            currentMoveModeParameter += 1000; // Decrease step size by 1mm
-                        }
-                        if (navkey.status.UPP > 0) // Up pressed
-                        {
-                            //move_servo(control, MOVE_SPEED, currentMoveModeParameter);
-                        }
-                        if (navkey.status.DNP > 0) // Down pressed
-                        {
-                            //move_servo(control, MOVE_SPEED, -1 * currentMoveModeParameter);
-                        }
-                        if (navkey.status.UPR > 0) // Up released
-                        {
-                            //move_servo(control, MOVE_STOP, 0);
-                        }
-                        if (navkey.status.DNR > 0) // Down released
-                        {
-                            //move_servo(control, MOVE_STOP, 0);
-                        }
-                        break;
-                    case FUNC_MANUAL_HOME:
-                        if (lastMoveMode != FUNC_MANUAL_HOME)
-                        {
-                            //move_servo(control, MOVE_STOP, 0);
-                            currentMoveModeParameter = HOMING_NONE; // Set to false, will be set to true when home is complete
-                        }
+                            if (navkey.status.LTR) // Left released
+                            {
+                                if (manual_move.x > 1) // No step size below 1mm
+                                {
+                                    manual_move.x /= 10;   // Decrease step size by multiple of 10
+                                }
+                                DEBUG_INFO("DECREASING STEP SIZE, STEP=%f\n", manual_move.x);
+                            }
+                            if (navkey.status.RTR) // Right released
+                            {
+                                if (manual_move.x < 100) // No step size above 100mm
+                                {
+                                    manual_move.x *= 10; // Increase step size by multiple of 10
+                                }
+                                DEBUG_INFO("INCREASING STEP SIZE, STEP=%f\n", manual_move.x);
+                            }
+                            Move absolute;
+                            Move manual_move_copy;
+                            memcpy(&absolute, &manual_move, sizeof(Move));
+                            absolute.g = 90;
+                            if (navkey.status.UPR) // Up released
+                            {
+                                manual_move_copy.x = abs(manual_move.x);
+                                motion_add_move(&absolute);
+                                motion_add_move(&manual_move_copy);
+                                DEBUG_INFO("FUNCTION=INCREMENTAL_JOG, SPEED=%f, STEP=%f\n", manual_move_copy.f, manual_move_copy.x);
+                            }
+                            if (navkey.status.DNR > 0) // Down released
+                            {
+                                manual_move_copy.x = -1*abs(manual_move.x);
+                                motion_add_move(&absolute);
+                                motion_add_move(&manual_move_copy);
+                                DEBUG_INFO("FUNCTION=INCREMENTAL_JOG, SPEED=%f, STEP=%f\n", manual_move_copy.f, manual_move_copy.x);
+                            }
+                            break;
+                        case FUNC_MANUAL_CONTINUOUS_JOG: // Setup the navkey for continuous jog (turn on hold)
+                            if (lastMoveMode != FUNC_MANUAL_CONTINUOUS_JOG)
+                            {
+                                //move_servo(control, MOVE_STOP, 0);
+                                currentMoveModeParameter = 10000; // 10000um/s = 10mm/s
+                            }
+                            if (navkey.status.LTR > 0) // Left released
+                            {
+                                currentMoveModeParameter -= 1000; // Increase step size by 1mm
+                            }
+                            if (navkey.status.RTR > 0) // Right released
+                            {
+                                currentMoveModeParameter += 1000; // Decrease step size by 1mm
+                            }
+                            if (navkey.status.UPP > 0) // Up pressed
+                            {
+                                //move_servo(control, MOVE_SPEED, currentMoveModeParameter);
+                            }
+                            if (navkey.status.DNP > 0) // Down pressed
+                            {
+                                //move_servo(control, MOVE_SPEED, -1 * currentMoveModeParameter);
+                            }
+                            if (navkey.status.UPR > 0) // Up released
+                            {
+                                //move_servo(control, MOVE_STOP, 0);
+                            }
+                            if (navkey.status.DNR > 0) // Down released
+                            {
+                                //move_servo(control, MOVE_STOP, 0);
+                            }
+                            break;
+                        case FUNC_MANUAL_HOME:
+                            if (lastMoveMode != FUNC_MANUAL_HOME)
+                            {
+                                //move_servo(control, MOVE_STOP, 0);
+                                currentMoveModeParameter = HOMING_NONE; // Set to false, will be set to true when home is complete
+                            }
 
-                        /*if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && currentMoveModeParameter == HOMING_SEEKING) // Wait for limit switch trigger
-                        {
-                            move_servo(control, MOVE_STOP, 0);
-                            _waitms(100);
-                            move_servo(control, MOVE_SPEED, -1500); // Turn CWW at homing speeds/10
+                            /*if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && currentMoveModeParameter == HOMING_SEEKING) // Wait for limit switch trigger
+                            {
+                                move_servo(control, MOVE_STOP, 0);
+                                _waitms(100);
+                                move_servo(control, MOVE_SPEED, -1500); // Turn CWW at homing speeds/10
 
-                            currentMoveModeParameter = HOMING_BACKING_OFF; // Set to 2, will be set to 1 when home is complete
-                                                                                       // dyn4_send_command(&dyn4, dyn4_set_origin, 0);
+                                currentMoveModeParameter = HOMING_BACKING_OFF; // Set to 2, will be set to 1 when home is complete
+                                                                                        // dyn4_send_command(&dyn4, dyn4_set_origin, 0);
+                            }
+                            else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && currentMoveModeParameter == HOMING_BACKING_OFF)
+                            {
+                                move_servo(control, MOVE_STOP, 0);
+                                _waitms(100);
+                                move_servo(control, MOVE_SPEED, 1500); // Turn CCW at homing speeds/10
+                                currentMoveModeParameter = HOMING_SEEKING_SLOW;
+                            }
+                            else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && currentMoveModeParameter == HOMING_SEEKING_SLOW)
+                            {
+                                move_servo(control, MOVE_STOP, 0);
+                                _waitms(1000);
+                                // dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
+                                //  move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
+                                currentMoveModeParameter = HOMING_COMPLETE;
+                            }*/
+                            if (navkey.status.UPR > 0) // Up released
+                            {
+                                currentMoveModeParameter = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                                //move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
+                            }
+                            if (navkey.status.DNR > 0) // Down released
+                            {
+                                currentMoveModeParameter = HOMING_SEEKING; // Set to false, will be set to true when home is complete
+                                //move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
+                            }
+                            break;
+                        case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
+                            //move_servo(control, MOVE_STOP, 0);
+                            break;
                         }
-                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 0 && currentMoveModeParameter == HOMING_BACKING_OFF)
-                        {
-                            move_servo(control, MOVE_STOP, 0);
-                            _waitms(100);
-                            move_servo(control, MOVE_SPEED, 1500); // Turn CCW at homing speeds/10
-                            currentMoveModeParameter = HOMING_SEEKING_SLOW;
-                        }
-                        else if (mcp_get_pin(&mcp, DISTANCE_LIMIT_MIN, DISTANCE_LIMIT_MIN_REGISTER) == 1 && currentMoveModeParameter == HOMING_SEEKING_SLOW)
-                        {
-                            move_servo(control, MOVE_STOP, 0);
-                            _waitms(1000);
-                            // dyn4_send_command(&dyn4, dyn4_set_origin, 0x00); // Set dyn4 origin
-                            //  move_servo(control, MOVE_RELATIVE, 5000); // Move 5mm to clear the limit switch
-                            currentMoveModeParameter = HOMING_COMPLETE;
-                        }*/
-                        if (navkey.status.UPR > 0) // Up released
-                        {
-                            currentMoveModeParameter = HOMING_SEEKING; // Set to false, will be set to true when home is complete
-                            //move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
-                        }
-                        if (navkey.status.DNR > 0) // Down released
-                        {
-                            currentMoveModeParameter = HOMING_SEEKING; // Set to false, will be set to true when home is complete
-                            //move_servo(control, MOVE_SPEED, 10000);                // Turn CW at homing speeds
-                        }
-                        break;
-                    case FUNC_MANUAL_MOVE_GAUGE_LENGTH:
-                        //move_servo(control, MOVE_STOP, 0);
-                        break;
                     }
                 }
                 else if (currentMachineState.motionParameters.mode == MODE_TEST)
                 {
+                    if (lastState.motionParameters.mode != MODE_TEST)
+                    {
+                        DEBUG_NOTIFY("%s","Now in Test Mode\n");
+                    }
+                    else if (lastState.motionParameters.mode == MODE_TEST_RUNNING)
+                    {
+                    }
                 }
                 else if (currentMachineState.motionParameters.mode == MODE_TEST_RUNNING)
                 {
                 
-                    
                 }
             }
         }
@@ -389,6 +413,11 @@ static void control_cog(void *arg)
             motion_disable();
         }
 
+        set_control_status(_getms());
+        if (!get_machine_status())
+        {
+            state_machine_set(PARAM_SELF_CHARGE_PUMP, false);
+        }
         lastMoveMode = currentMoveMode;
         lastEncoderRead = monitor_data.encoderRaw;
         memcpy(&lastState, &currentMachineState, sizeof(MachineState));

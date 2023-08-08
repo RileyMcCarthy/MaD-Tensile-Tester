@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdarg.h>
 #include "Main/Communication/Communication.h"
 #include "Utility/StateMachine.h"
 #include "Utility/JsonEncoder.h"
@@ -23,6 +24,37 @@ static long comm_stack[COMMUNICATION_MEMORY_SIZE];
 typedef struct __using("lib/Protocol/jm_fullduplexserial.spin2") FDS;
 
 static FDS fds;
+
+static Notification notification_buffer[MAX_SIZE_NOTIFICATION_BUFFER];
+static StaticQueue notification_queue;
+
+static bool notification_initialized = false;
+
+void notification_init()
+{
+    if (queue_init(&notification_queue, notification_buffer, MAX_SIZE_NOTIFICATION_BUFFER, sizeof(Notification)))
+    {
+        notification_initialized = true;
+    }
+}
+
+void notification_add_debug(const char * type, const char * format, ...)
+{
+    va_list args;
+    if (!notification_initialized)
+    {
+        return;
+    }
+    Notification notification;
+    strncpy(notification.type, type, MAX_SIZE_NOTIFICATION_TYPE);
+    va_start(args, format);
+    vsnprintf(notification.message, MAX_SIZE_NOTIFICATION_MESSAGE, format, args);
+    va_end(args);
+    queue_push(&notification_queue, &notification);
+    return ;
+}
+
+//bool notification_send();
 
 #define CMD_WRITE 128
 #define CMD_PING 0           // test communication
@@ -120,10 +152,20 @@ static int recieveCMD()
     while (1)
     {
         int res;
-        //DEBUG_INFO("%s","about to wait\n");
-        while ((res = fds.rxtime(1000)) != 0x55)
+        while ((res = fds.rxtime(10)) != 0x55)
         {
-            
+            set_communication_status(_getms());
+            Notification notification;
+            if (queue_pop(&notification_queue, &notification))
+            {
+                char * notification_json = notification_to_json(&notification);
+                if (notification_json == NULL)
+                {
+                    continue;
+                }
+                send(CMD_NOTIICATION, notification_json, strlen(notification_json));
+                unlock_json_buffer();
+            }
         }
         int cmd = fds.rxtime(10);
         if (cmd != -1)
@@ -205,48 +247,6 @@ static uint16_t receive(uint8_t cmd, char *buf, int max_size)
     return size;
 }
 
-static void load_machine_profile()
-{
-    DEBUG_INFO("%s","Loading machine profile\n");
-    if (!sd_profile_exists())
-    {
-        // Load default profile, one does not exist
-        DEBUG_WARNING("%s","No machine profile found, loading default\n");
-        MachineProfile temp_profile;
-        memset(&temp_profile, 0, sizeof(MachineProfile));
-        strcpy(temp_profile.name,"DEFAULT");
-        if (!write_sd_profile(&temp_profile))
-        {
-            DEBUG_ERROR("%s","Failed to write machine profile!\n");
-        }
-    }
-    
-    DEBUG_INFO("%s","Reading sd profile from sd\n");
-    MachineProfile machine_profile_temp;
-    if (!read_sd_profile(&machine_profile_temp))
-    {
-        DEBUG_ERROR("%s","Failed to read machine profile from SD card, default should have been loaded!\n");
-        _reboot();
-    }
-
-    DEBUG_INFO("%s","Loading machine profile from SD card\n");
-    
-    // Load profile from SD card
-    MachineProfile *machine_profile;
-    if (!lock_machine_profile_ms(&machine_profile, 100))
-    {
-        DEBUG_ERROR("%s","Failed to lock machine profile, default should have been loaded!\n");
-        return;
-    }
-    memcpy(machine_profile, &machine_profile_temp, sizeof(MachineProfile));
-    unlock_machine_profile();
-
-    set_machine_profile_loaded(true);    
-    DEBUG_INFO("%s","Machine profile loaded\n");
-    return;
-    
-}
-
 #define MAX_BUFFER_SIZE 1000
 static char recieved_json[MAX_BUFFER_SIZE];
 
@@ -312,6 +312,7 @@ static void command_respond(uint8_t cmd)
         MachineProfile *machine_profile;
         if (!lock_machine_profile_ms(&machine_profile, 10))
         {
+            DEBUG_ERROR("%s","Failed to access machine profile in memory\n");
             return;
         }
     
@@ -405,10 +406,14 @@ void command_recieve(uint8_t cmd)
         }
 
         memcpy(machine_profile, &temp, sizeof(MachineProfile));
-        write_sd_profile(machine_profile);
-
+        bool res = write_sd_profile(machine_profile);
         unlock_machine_profile();
-        DEBUG_INFO("%s","Machine profile updated\n");
+        if (!res)
+        {
+            DEBUG_ERROR("%s","Failed to write machine profile to sd card\n");
+            break;
+        }
+        DEBUG_NOTIFY("%s","Machine profile saved to SD Card\n");
         break;
     }
     case CMD_MOTIONMODE:
@@ -445,21 +450,20 @@ void command_recieve(uint8_t cmd)
     }
     case CMD_MOVE:
     {
-        DEBUG_WARNING("%s","Getting test command\n");
+        DEBUG_INFO("%s","Getting test command\n");
 
         Move move;
         if (json_to_move(&move, recieved_json))
         {
             if (motion_test_add_move(&move))
             {
-                DEBUG_WARNING("%s","move added\n");
+                DEBUG_INFO("%s","move added\n");
                 send_awk(CMD_MOVE, "OK");
                 break;
             }
             else
             {
                 send_awk(CMD_MOVE, "BUSY");
-                DEBUG_WARNING("%s","failed to add move\n");
                 break;
             }
         }
@@ -505,7 +509,7 @@ void command_recieve(uint8_t cmd)
 
 static void beginCommunication(void *arg)
 {
-    load_machine_profile();
+    _waitms(500); // wait for monitor to start, should be replaced by cog status!
     // Begin main loop
     fds.start(RPI_RX, RPI_TX, 0, 115200);
     while (1)

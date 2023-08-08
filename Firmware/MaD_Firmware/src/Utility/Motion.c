@@ -8,6 +8,7 @@
 #include <smartpins.h>
 #include <math.h>
 #include "Utility/StateMachine.h"
+#include "Memory/CogStatus.h"
 
 #define G0_RAPID_MOVE 0
 #define G1_LINEAR_MOVE 1
@@ -121,8 +122,6 @@ static void motion_cog(void *arg)
     }
     memcpy(&machine_profile, profile_ptr, sizeof(MachineProfile));
     unlock_machine_profile();
-    
-    int steps_per_mm = 1;
 
     motion_setpoint_steps = 0;
     motion_position_steps = 0;
@@ -132,13 +131,15 @@ static void motion_cog(void *arg)
     motion_enabled = true;
     int queue_last_time = 0;
 
+    // Get machine motion state ptr for read only
+    MachineState *machine_state_ptr = get_machine_state_ptr();
+    MotionMode * motion_mode = &(machine_state_ptr->motionParameters.mode);
     while(true)
     {
-        MachineState machineState;
-        get_machine_state(&machineState);
         Move command;
         StaticQueue *queue = &manual_queue;
-        bool test_running = machineState.motionParameters.mode == MODE_TEST_RUNNING;
+        bool test_running = *motion_mode == MODE_TEST_RUNNING;
+        set_motion_status(_getms());
         if (test_running)
         {
             queue = &test_queue;
@@ -209,14 +210,15 @@ static void motion_cog(void *arg)
                     
                     // need to use floating point math as 60*clockfreq is greater then max integer
                     // SHOULD CHECK IF GREATER THEN MAX INTEGER (VERY SLOW SPEEDS)
-                    uint32_t clkticks_per_step = (60.0/(double)feedrate)*_clockfreq();
-                    DEBUG_WARNING("CLOCKFREQ: %d, FEEDRATE: %d\n",_clockfreq()*60, feedrate);
+                    uint32_t clkticks_per_step = (1.0/(double)feedrate)*_clockfreq();
+                    DEBUG_INFO("CLOCKFREQ: %d, FEEDRATE: %d\n",_clockfreq(), feedrate);
                     if (clkticks_per_step > 65535)
                     {
                         DEBUG_INFO("Slow step pulses: %d\n", clkticks_per_step);
                         // Pulses too slow for hardware
                         for (int i =0;i<abs(delta_steps);i++)
                         {
+                            set_motion_status(_getms());
                             _pinl(PIN_SERVO_PUL);
                             _waitx(clkticks_per_step >> 1);
                             _pinh(PIN_SERVO_PUL);
@@ -225,6 +227,8 @@ static void motion_cog(void *arg)
                                 motion_position_steps++;
                             else
                                 motion_position_steps--;
+                            if (*motion_mode != MODE_TEST_RUNNING)
+                                break;
                         }
                         if (motion_position_steps != motion_setpoint_steps)
                         {
@@ -233,24 +237,16 @@ static void motion_cog(void *arg)
                     }
                     else
                     {
-                        DEBUG_ERROR("Feature not implemented, using fast pulse: %d\n",clkticks_per_step);
-                        continue;
+                        //continue;
                         // Fast enough to use hardware
                         uint32_t pulseTiming = ((clkticks_per_step >> 1) << 16) | clkticks_per_step; // Frequency of Pulse in ms
-                        _pinstart(PIN_SERVO_PUL, P_PULSE, pulseTiming, delta_steps);
-                        
-                        int start_position_steps = motion_position_steps;
-                        int remaining_steps = delta_steps;
-
-                        // wait for smartpin to finish
-                        while ((remaining_steps = _rqpin(PIN_SERVO_PUL)) != 0)
+                        _pinstart(PIN_SERVO_PUL, P_PULSE | P_OE, pulseTiming, 0);
+                        _wypin( PIN_SERVO_PUL, abs(delta_steps));
+                        while(_pinr(PIN_SERVO_PUL) == 0);
                         {
-                            // Update position steps
-                            motion_position_steps = start_position_steps + (delta_steps - remaining_steps);
-                            if (!motion_enabled)
-                                break; // Exit early if motion is disabled
+                            set_motion_status(_getms());
                         }
-                        motion_position_steps = start_position_steps + delta_steps;
+                        motion_position_steps += delta_steps;
                     }
                     break;
                 }
@@ -280,7 +276,7 @@ static void motion_cog(void *arg)
                 case G122:
                 {
                     state_machine_set(PARAM_MOTION_MODE, MODE_TEST); // End of profile
-                    DEBUG_WARNING("%s","End of profile\n");
+                    DEBUG_NOTIFY("%s","Test Complete!\n");
                     break;
                 }
             }
