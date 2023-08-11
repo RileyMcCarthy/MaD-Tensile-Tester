@@ -20,5 +20,6 @@ void motion_test_clear();
 bool motion_test_is_empty();
 bool motion_test_add_move(Move *command);
 long motion_get_position();
+void motion_set_position(int position);
 long motion_get_setpoint();
 #endif

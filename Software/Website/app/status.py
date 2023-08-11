@@ -67,10 +67,20 @@ def toggleStatus():
         communication.set_motion_status("DISABLED")
     return Response('success')
 
+@app.route('/set_gauge_length', methods=['POST'])
+def gauge_length():
+    print("setting gauge length")
+    communication.set_gauge_length()
+    return Response('success')
+
+@app.route('/set_gauge_force', methods=['POST'])
+def gauge_force():
+    print("setting gauge force")
+    communication.set_gauge_force()
+    return Response('success')
+
 @app.route('/run', methods=['POST'])
 def run():
     app.logger.info("Running device motion profile")
-     
-    communication.set_motion_mode("TEST_RUNNING")
-
+    communication.run_test()
     return Response('success')

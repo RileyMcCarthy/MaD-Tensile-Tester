@@ -1,5 +1,6 @@
 #include "Utility/JsonEncoder.h"
 #include "JSON.h"
+#include "Utility/Debug.h"
 
 /** Private Structure to JSON **/
 static int _json_encode_lock = -1;
@@ -257,6 +258,7 @@ char *test_data_to_json(MonitorData *data, int count, int index)
 
     for (int i = 0; i < count; i++)
     {
+        success &= custom_string_to_json("{");
         // Add the index as a field
         success &= int_to_json("Index", index+i);
 
@@ -284,7 +286,6 @@ char *test_data_to_json(MonitorData *data, int count, int index)
 
     // Close the JSON string
     success &= custom_string_to_json("]}");
-
     if (success)
     {
         return get_json_buffer();

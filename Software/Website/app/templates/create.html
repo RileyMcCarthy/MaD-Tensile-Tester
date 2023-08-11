@@ -85,7 +85,6 @@
             contentType: 'application/json',
             data: JSON.stringify({ profile_name: profileName }),
             success: function (data) {
-                alert(data.message);
             }
         });
     }
@@ -105,7 +104,6 @@
                 set_gcode: setGCode
             }),
             success: function (data) {
-                alert(data.message);
             }
         });
     }
@@ -120,7 +118,7 @@
             type: 'POST',
             url: '/create/save',
             success: function (data) {
-                alert(data.message);
+                alert('Profile Saved');
             }
         });
     };
@@ -131,7 +129,6 @@
             type: 'POST',
             url: '/create/remove_set/' + setId,
             success: function (data) {
-                alert(data.message);
                 location.reload();
             }
         });
@@ -151,7 +148,6 @@
                 url: '/create/add_set',
                 contentType: 'application/json',
                 success: function (data) {
-                    alert(data.message);
                     location.reload();
                 }
             });

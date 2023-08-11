@@ -57,14 +57,14 @@ void motion_clear()
 }
 
 // returns false if queue is full
-bool motion_add_move(Move *command)
+bool  motion_add_move(Move *command)
 {
     if (!motion_enabled)
     {
         return false;
     }
 
-    DEBUG_INFO("Adding manual motion command with %d steps and %d feedrate\n", command->x, command->f);
+    DEBUG_INFO("Adding manual motion command with %f steps and %f feedrate\n", command->x, command->f);
     return queue_push(&manual_queue, command);
 }
 
@@ -105,6 +105,12 @@ long motion_get_position()
     return motion_position_steps;
 }
 
+void motion_set_position(int position)
+{
+    motion_position_steps = position;
+    motion_setpoint_steps = position;
+}
+
 long motion_get_setpoint()
 {
     return motion_setpoint_steps;
@@ -133,9 +139,11 @@ static void motion_cog(void *arg)
 
     // Get machine motion state ptr for read only
     MachineState *machine_state_ptr = get_machine_state_ptr();
+    State * state_ptr = &(machine_state_ptr->state);
     MotionMode * motion_mode = &(machine_state_ptr->motionParameters.mode);
     while(true)
     {
+        
         Move command;
         StaticQueue *queue = &manual_queue;
         bool test_running = *motion_mode == MODE_TEST_RUNNING;
@@ -192,12 +200,15 @@ static void motion_cog(void *arg)
                     {
                         delta_steps = steps;
                         motion_setpoint_steps += delta_steps;
+                        printf("Relative mode: %d\n", motion_setpoint_steps);
                     }
                     else
                     {
                         motion_setpoint_steps = steps;
                         delta_steps = motion_setpoint_steps - motion_position_steps;
+                        printf("Absolute mode: %d\n", motion_setpoint_steps);
                     }
+
                     bool direction = delta_steps > 0;
                     if (direction)
                     {
@@ -207,16 +218,32 @@ static void motion_cog(void *arg)
                     {
                         _pinh(PIN_SERVO_DIR);
                     }
+
+                    delta_steps = abs(delta_steps);
+
+                    if (feedrate <= 0)
+                    {
+                        DEBUG_WARNING("G0/G1 Command has zero or negative feedrate: %d\n", feedrate);
+                        continue;
+                    }
+
+                    if (delta_steps == 0)
+                    {
+                        //DEBUG_WARNING("%s","G0/G1 Command has zero steps\n");
+                        continue;
+                    }
+
+                    DEBUG_INFO("G0/G1 Command with %d steps and %d feedrate\n", delta_steps, feedrate);
                     
                     // need to use floating point math as 60*clockfreq is greater then max integer
                     // SHOULD CHECK IF GREATER THEN MAX INTEGER (VERY SLOW SPEEDS)
                     uint32_t clkticks_per_step = (1.0/(double)feedrate)*_clockfreq();
-                    DEBUG_INFO("CLOCKFREQ: %d, FEEDRATE: %d\n",_clockfreq(), feedrate);
                     if (clkticks_per_step > 65535)
                     {
                         DEBUG_INFO("Slow step pulses: %d\n", clkticks_per_step);
+                        _pinclear(PIN_SERVO_PUL);
                         // Pulses too slow for hardware
-                        for (int i =0;i<abs(delta_steps);i++)
+                        for (int i = 0;i<delta_steps;i++)
                         {
                             set_motion_status(_getms());
                             _pinl(PIN_SERVO_PUL);
@@ -227,12 +254,12 @@ static void motion_cog(void *arg)
                                 motion_position_steps++;
                             else
                                 motion_position_steps--;
-                            if (*motion_mode != MODE_TEST_RUNNING)
+                            if (*state_ptr != STATE_MOTION)
+                            {
+                                motion_setpoint_steps = motion_position_steps;
+                                DEBUG_NOTIFY("%s","Motion mode changed, stopping motion\n");
                                 break;
-                        }
-                        if (motion_position_steps != motion_setpoint_steps)
-                        {
-                            DEBUG_ERROR("Position doesnt equal setpoint: %d != %d\n",motion_position_steps,motion_setpoint_steps);
+                            }
                         }
                     }
                     else
@@ -241,12 +268,37 @@ static void motion_cog(void *arg)
                         // Fast enough to use hardware
                         uint32_t pulseTiming = ((clkticks_per_step >> 1) << 16) | clkticks_per_step; // Frequency of Pulse in ms
                         _pinstart(PIN_SERVO_PUL, P_PULSE | P_OE, pulseTiming, 0);
-                        _wypin( PIN_SERVO_PUL, abs(delta_steps));
+                        _wypin( PIN_SERVO_PUL, delta_steps);
+                        if (direction)
+                            motion_position_steps += delta_steps;
+                        else
+                            motion_position_steps -= delta_steps;
                         while(_pinr(PIN_SERVO_PUL) == 0);
                         {
                             set_motion_status(_getms());
+                            if (*state_ptr != STATE_MOTION)
+                            {
+                                _pinclear(PIN_SERVO_PUL);
+                                MonitorData temp;
+                                if (get_monitor_data(&temp, 1000))
+                                {
+                                    int current_pos_steps = temp.encoderum/machine_profile.configuration.servoStepPermm;
+                                    motion_setpoint_steps = current_pos_steps;
+                                    motion_position_steps = current_pos_steps;
+                                }
+                                else
+                                {
+                                    DEBUG_ERROR("%s","Failed to get monitor data to sync motion\n");
+                                }
+                                
+                                DEBUG_NOTIFY("%s","Motion mode changed, stopping motion\n");
+                                break;
+                            }
                         }
-                        motion_position_steps += delta_steps;
+                    }
+                    if (motion_position_steps != motion_setpoint_steps)
+                    {
+                        DEBUG_ERROR("Position != setpoint : %d != %d\n",motion_position_steps,motion_setpoint_steps);
                     }
                     break;
                 }

@@ -19,6 +19,8 @@ CMD_TESTDATA_COUNT = 13
 CMD_MANUAL = 14
 CMD_GAUGE_LENGTH = 15
 CMD_NOTIFICATION = 16
+CMD_RUN = 17
+CMD_GAUGE_FORCE = 18
 
 def test():
     return serial_test()
@@ -43,7 +45,7 @@ def get_machine_profile():
 
 def get_test_data(index, count = 1):
     data = {"Index": index, "Count": count}
-    serial_read(CMD_TESTDATA, json.dumps(data))
+    serial_write(CMD_TESTDATA, json.dumps(data))
 
 def get_test_data_count():
     serial_read(CMD_TESTDATA_COUNT)
@@ -73,16 +75,23 @@ def set_motion_mode(mode):
 def set_gauge_length():
     serial_read(CMD_GAUGE_LENGTH)
 
+def set_gauge_force():
+    serial_read(CMD_GAUGE_FORCE)
+
 def set_motion_status(status):
     # Converts status value to json
     data = {"Status": status}
     serial_write(CMD_MOTIONSTATUS, json.dumps(data))
+
+def run_test():
+    serial_read(CMD_RUN)
 
 def process_recieved():
     # read data from serial
     res = serial_recieve()
     if res is None:
         return None
+
     cmd, data, size = res
     decoded = data.decode("utf-8").rstrip()
     stripped = decoded.replace('\n', '')

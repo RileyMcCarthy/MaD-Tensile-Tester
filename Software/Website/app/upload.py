@@ -84,9 +84,3 @@ def jog_machine():
     print(command)
     communication.set_manual_command(command)
     return redirect(url_for('upload_page'))
-
-@app.route('/set_gauge_length', methods=['POST'])
-def gauge_length():
-    print("setting gauge length")
-    communication.set_gauge_length()
-    return redirect(url_for('upload_page'))

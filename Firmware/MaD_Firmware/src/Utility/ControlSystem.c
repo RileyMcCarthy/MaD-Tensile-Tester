@@ -102,14 +102,17 @@ static void control_cog(void *arg)
     }
     memcpy(&profile, profile_ptr, sizeof(MachineProfile));
     unlock_machine_profile();
-
+    init_navkey();
     while (1)
     {
         MachineState currentMachineState;
         get_machine_state(&currentMachineState);
 
         MonitorData monitor_data;
-        get_monitor_data(&monitor_data,10);
+        while (!get_monitor_data(&monitor_data,100))
+        {
+            DEBUG_ERROR("%s","Failed to get monitor data in control\n");
+        }
 
         // Attempt to update machine profile information
         if (lock_machine_profile(&profile_ptr))
@@ -296,8 +299,8 @@ static void control_cog(void *arg)
                             }
                             Move absolute;
                             Move manual_move_copy;
-                            memcpy(&absolute, &manual_move, sizeof(Move));
-                            absolute.g = 90;
+                            memcpy(&manual_move_copy, &manual_move, sizeof(Move));
+                            absolute.g = 91;
                             if (navkey.status.UPR) // Up released
                             {
                                 manual_move_copy.x = abs(manual_move.x);

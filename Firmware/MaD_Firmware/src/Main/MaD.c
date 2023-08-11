@@ -72,23 +72,6 @@ void test_navkey()
 #include <smartpins.h>
 void mad_begin()
 {
- /* _pinh(28);
-  uint32_t clkticks_per_step = (60.0/(double)200000)*_clockfreq();
-  if (clkticks_per_step >= 65535)
-    printf("too slow for hardware :()");
-  printf("Clock Freq: %lu\n", clkticks_per_step);
-  uint32_t pulseTiming = ((clkticks_per_step >> 1) << 16) | clkticks_per_step; // Frequency of Pulse in ms
-  printf("Pulse Timing: %lu\n", pulseTiming);
-  _pinstart(PIN_SERVO_PUL, P_PULSE | P_OE, pulseTiming, 0);
-  _wypin( PIN_SERVO_PUL, 10000 );
-  while(_pinr(PIN_SERVO_PUL) == 0);
-  printf("Done pin!\n");
-  while(1)
-  {
-  }*/
-  //test_navkey();
- // test_sd_card();
-  //while(1);
   notification_init();
   machine_state_init(); // Initialize the machine state default values, memory, and lock
   init_machine_profile(); // Initialize the machine profile memory and lock

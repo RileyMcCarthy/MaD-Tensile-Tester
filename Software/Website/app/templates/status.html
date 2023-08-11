@@ -69,6 +69,8 @@
                             <button onclick=toggleStatus()>Toggle Status</button>
                             <button onclick=toggleMode()>Toggle Mode</button>
                             <button onclick=run()>Run Test</button>
+                            <button onclick=set_gauge_length()>Zero Length</button>
+                            <button onclick=set_gauge_force()>Zero Force</button>
                         </div>
                     </div>
                     <div class="row-xl">
@@ -167,6 +169,32 @@
             data: JSON.stringify({mode: get_value("mode")}),
             success: function (data) {
                 console.log("Toggling Mode");
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function set_gauge_length() {
+        $.ajax({
+            url: "/set_gauge_length",
+            type: "post",
+            success: function (data) {
+                console.log("Set Gauge Length");
+            },
+            error: function (xhr) {
+                //Handel error
+            }
+        });
+    };
+
+    function set_gauge_force() {
+        $.ajax({
+            url: "/set_gauge_force",
+            type: "post",
+            success: function (data) {
+                console.log("Set Gauge Force");
             },
             error: function (xhr) {
                 //Handel error

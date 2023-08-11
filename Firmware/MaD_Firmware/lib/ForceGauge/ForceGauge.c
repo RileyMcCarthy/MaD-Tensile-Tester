@@ -10,7 +10,7 @@
 #define CONFIG_4 0x04 // Configuration register 4
 
 // 0bxxx first three determines speed
-#define CONFIG_DATA1 0b00001000
+#define CONFIG_DATA1 0b11001000
 #define CONFIG_DATA2 0b00000000
 #define CONFIG_DATA3 0b00000001
 #define CONFIG_DATA4 0b01110111

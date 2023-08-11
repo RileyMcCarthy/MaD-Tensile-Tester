@@ -15,7 +15,6 @@ enum
 // all stdio must be done in main thread (or same cog)
 int main()
 {
-    mount("/sd", _vfs_open_sdcard());
     mad_begin();
     while (1)
         ;

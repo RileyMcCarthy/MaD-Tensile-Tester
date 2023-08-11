@@ -1,1 +1,1 @@
-{"name": "Ramp", "sets": [{"name": "linear", "executions": 10, "gcode": "G1 X120.0 F100.0\nG1 X0.0 F100.0"}]}
+{"name": "Ramp", "sets": [{"name": "linear", "executions": 2, "gcode": "G1 X50.0 F20.0\nG1 X0.0 F20.0"}]}

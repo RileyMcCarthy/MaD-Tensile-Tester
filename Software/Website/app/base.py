@@ -12,7 +12,7 @@ import re
 import time
 import csv
 from datetime import datetime
-
+import os
 
 gcode_lock = Lock()
 gcode_ack = "NONE"
@@ -95,13 +95,11 @@ def serial_thread(serial_port, serial_baud):
         elif cmd == CMD_AWK:
             ack_handler(data_json)
         elif cmd == CMD_TESTDATA:
-            print('Recieving test data: ', data_json)
             global test_data_complete
             global test_data
-            test_data_complete = data_json.Test_Data is None
-            test_data = data_json.Test_Data
-            print('got:',test_data,' of size ',len(test_data))
-            #socketio.emit('test_data', {'json': json.dumps(data_integer)}, namespace = '/serial')
+            test_data_complete = data_json['Test_Data'] is None
+            test_data = data_json['Test_Data']
+            print('got test data of size ',len(test_data))
         elif cmd == CMD_TESTDATA_COUNT:
             #print('Recieving test data count: ', data.value)
             global test_data_count
@@ -142,10 +140,12 @@ def test_data_reciever_thread():
     with test_data_lock:
         global test_data
         global test_data_count
-        with open("test_data.csv","w") as f:
+        # save data into test folder 
+        path = os.path.join(app.config['TEST_FOLDER'], 'test_data.csv')
+        with open(path,"w") as f:
             print('file opened')
             writer = csv.writer(f, delimiter=',', quotechar='|')
-            writer.writerow(['index','time(us)', 'position(um)', 'force(mN)'])
+            writer.writerow(['Time(us)', 'Position(um)', 'Force(mN)','Setpoint(um)'])
             communication.get_test_data_count()
             timeout = time.time() + 5   # 5 seconds from now
             while test_data_count == 0:
@@ -158,30 +158,28 @@ def test_data_reciever_thread():
             data_count = test_data_count
             test_data_count = 0 # reset global variable
             while data_count > index:
-                block_size = 20
+                block_size = 40
                 print(f'getting test data: {index}')
                 communication.get_test_data(index, block_size)
                 start_time = datetime.now()
                 while test_data is None:
                     time_delta = datetime.now() - start_time
-                    if time_delta.total_seconds() >= 1:
+                    if time_delta.total_seconds() >= 5:
                         emit_notification('error', 'Failed to recieve test data, timeout')
                         break
                     if test_data_complete:
                         emit_notification('success', 'Recieved all test data')
                         return
-                    socketio.sleep(0.01)
+                    socketio.sleep(0.001)
                 if test_data is None:
                     continue
-                print(" size of test data is ", len(test_data))
                 index += len(test_data)
                 # Ilterate through list test_data
                 for i in range(len(test_data)):
-                    print(f'got test data: {test_data[i].encoderum, test_data[i].forcemN}')
-                    writer.writerow([test_data[i].timeus, test_data[i].encoderum, test_data[i].forcemN])
-                    socketio.emit('testdata', {'json': json.dumps(flatten_dict(test_data[i].getdict()))}, namespace = '/serial')
+                    writer.writerow([test_data[i]['Time'], test_data[i]['Position'], test_data[i]['Force'], test_data[i]['Setpoint']])
+                    #socketio.emit('testdata', {'json': json.dumps(test_data[i])}, namespace = '/serial')
                 test_data = None
-                socketio.sleep(0.01)
+                socketio.sleep(0.0001)
         emit_notification('success', 'Recieved all test data')
         print("Done gathering data")
 

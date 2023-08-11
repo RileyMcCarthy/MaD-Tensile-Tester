@@ -43,6 +43,7 @@ MonitorData * lock_monitor_data()
     _monitor_data_lock = true;
     
     return &monitor_data;
+
 }
 
 MonitorData * lock_monitor_data_ms(int ms)

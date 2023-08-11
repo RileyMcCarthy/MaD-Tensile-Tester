@@ -72,62 +72,12 @@ void notification_add_debug(const char * type, const char * format, ...)
 #define CMD_TESTDATA 12   // send/recieve test data
 #define CMD_TESTDATA_COUNT 13 // send/recieve test data count
 #define CMD_MANUAL 14 // send/recieve manual control data
-#define CMD_SET_GAUGE 15
+#define CMD_SET_GAUGE_LENGTH 15
 #define CMD_NOTIICATION 16
+#define CMD_RUN 17
+#define CMD_SET_GAUGE_FORCE 18
 
 #define MAD_VERSION 1
-static bool command_to_string(char *buf, int size, uint8_t cmd)
-{
-    switch(cmd)
-    {
-        case CMD_PING:
-            snprintf(buf, size, "CMD_PING");
-            break;
-        case CMD_DATA:
-            snprintf(buf, size, "CMD_DATA");
-            break;
-        case CMD_STATE:
-            snprintf(buf, size, "CMD_STATE");
-            break;
-        case CMD_MPROFILE:
-            snprintf(buf, size, "CMD_MPROFILE");
-            break;
-        case CMD_MCONFIG:
-            snprintf(buf, size, "CMD_MCONFIG");
-            break;
-        case CMD_MPERFORMANCE:
-            snprintf(buf, size, "CMD_MPERFORMANCE");
-            break;
-        case CMD_MOTIONPROFILE:
-            snprintf(buf, size, "CMD_MOTIONPROFILE");
-            break;
-        case CMD_MOTIONMODE:
-            snprintf(buf, size, "CMD_MOTIONMODE");
-            break;
-        case CMD_MOTIONFUNCTION:
-            snprintf(buf, size, "CMD_MOTIONFUNCTION");
-            break;
-        case CMD_MOTIONSTATUS:
-            snprintf(buf, size, "CMD_MOTIONSTATUS");
-            break;
-        case CMD_MOVE:
-            snprintf(buf, size, "CMD_MOVE");
-            break;
-        case CMD_AWK:
-            snprintf(buf, size, "CMD_AWK");
-            break;
-        case CMD_TESTDATA:
-            snprintf(buf, size, "CMD_TESTDATA");
-            break;
-        case CMD_TESTDATA_COUNT:
-            snprintf(buf, size, "CMD_TESTDATA_COUNT");
-            break; 
-        default:
-            snprintf(buf, size, "UNKNOWN");
-            return false;
-    }
-    return true;
-}
 
 static bool send(int cmd, char *buf, uint16_t size)
 {
@@ -333,28 +283,6 @@ static void command_respond(uint8_t cmd)
         unlock_json_buffer();
         break;
     }
-    case CMD_TESTDATA:
-    {
-        DEBUG_INFO("%s","Sending test data\n");
-        uint32_t index;
-        uint8_t count;
-
-        TestDataRequest req;
-        json_to_test_data_request(&req, recieved_json);
-
-        if (read_sd_card_data(test_data_buffer, req.index, req.count) != 0)
-        {
-            char *buf = test_data_to_json(test_data_buffer, req.count, req.index);
-            if (buf == NULL)
-            {
-                DEBUG_ERROR("%s","Failed to convert test data to json\n");
-                return;
-            }
-            send(CMD_TESTDATA, buf, strlen(buf));
-            unlock_json_buffer();
-        }
-        break;
-    }
     case CMD_TESTDATA_COUNT:
     {
         // send the number of test data points
@@ -364,10 +292,22 @@ static void command_respond(uint8_t cmd)
         send(CMD_TESTDATA_COUNT, response_json, strlen(response_json));
         break;
     }
-    case CMD_SET_GAUGE:
+    case CMD_SET_GAUGE_LENGTH:
     {
         DEBUG_WARNING("%s","Setting gauge\n");
         set_gauge_length();
+        break;
+    }
+    case CMD_SET_GAUGE_FORCE:
+    {
+        DEBUG_WARNING("%s","Setting gauge Force\n");
+        set_gauge_force();
+        break;
+    }
+    case CMD_RUN:
+    {
+        DEBUG_INFO("%s","Attempting to run Test\n");
+        monitor_run_test();
         break;
     }
     default:
@@ -414,6 +354,7 @@ void command_recieve(uint8_t cmd)
             break;
         }
         DEBUG_NOTIFY("%s","Machine profile saved to SD Card\n");
+        _reboot();
         break;
     }
     case CMD_MOTIONMODE:
@@ -496,6 +437,30 @@ void command_recieve(uint8_t cmd)
         {
             DEBUG_ERROR("%s","failed to parse manual command\n");
             break;
+        }
+        break;
+    }
+    case CMD_TESTDATA:
+    {
+        DEBUG_INFO("%s","Sending test data\n");
+
+        TestDataRequest req;
+        if (!json_to_test_data_request(&req, recieved_json))
+        {
+            DEBUG_ERROR("%s","Failed to convert json to test data request\n");
+            return;
+        }
+        DEBUG_INFO("Sending test data: index=%d, count=%d\n", req.index, req.count);
+        if (read_sd_card_data(test_data_buffer, req.index, req.count) != 0)
+        {
+            char *buf = test_data_to_json(test_data_buffer, req.count, req.index);
+            if (buf == NULL)
+            {
+                DEBUG_ERROR("%s","Failed to convert test data to json\n");
+                return;
+            }
+            send(CMD_TESTDATA, buf, strlen(buf));
+            unlock_json_buffer();
         }
         break;
     }

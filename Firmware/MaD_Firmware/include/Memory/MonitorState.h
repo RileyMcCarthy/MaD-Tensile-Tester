@@ -32,7 +32,7 @@ typedef struct MonitorSDCard
 {
   SDCardState sd_card_state;
   MachineProfile sd_card_profile; // Storage for machine profile read from SD card
-  char * sd_card_data[3000]; // Storage for sd card data read from SD card
+  char *sd_card_data; // Storage for sd card data read from SD card
   char sd_card_file_name[255]; // Storage for file name read from SD card
   int read_data_index;
   int read_data_count;

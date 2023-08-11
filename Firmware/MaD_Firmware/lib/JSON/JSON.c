@@ -1,11 +1,11 @@
 #include "JSON.h"
 
 // Used for decoding string into tokens
-#define MAX_TOKENS 200
+#define MAX_TOKENS 300
 static json_t mem[MAX_TOKENS];
 
 // Used for encoding structure into a string
-#define JSON_BUFFER_SIZE 1000
+#define JSON_BUFFER_SIZE 5000
 static char json_buffer[JSON_BUFFER_SIZE];
 
 /* Decoding */
