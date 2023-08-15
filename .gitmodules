@@ -4,3 +4,6 @@
 [submodule "Software/MaD-Website"]
 	path = Software/MaD-Website
 	url = https://github.com/RileyMcCarthy/MaD-Website.git
+[submodule "Hardware/MaD-Edge-Board"]
+	path = Hardware/MaD-Edge-Board
+	url = https://github.com/RileyMcCarthy/MaD-Edge-Board.git
