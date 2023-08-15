@@ -1,3 +1,6 @@
 [submodule "Firmware/MaD-Firmware"]
 	path = Firmware/MaD-Firmware
 	url = https://github.com/RileyMcCarthy/MaD-Firmware.git
+[submodule "Software/MaD-Website"]
+	path = Software/MaD-Website
+	url = https://github.com/RileyMcCarthy/MaD-Website.git

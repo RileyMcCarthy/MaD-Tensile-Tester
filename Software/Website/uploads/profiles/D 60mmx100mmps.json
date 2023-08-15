@@ -1,1 +1,0 @@
-{"name": "D 60mmx100mmps", "sets": [{"name": "linear", "executions": 10, "gcode": "G1 X0.0 F100.0\nG1 X60.0 F100.0\nG1 X0.0 F100.0"}]}
