@@ -21,6 +21,7 @@ CMD_GAUGE_LENGTH = 15
 CMD_NOTIFICATION = 16
 CMD_RUN = 17
 CMD_GAUGE_FORCE = 18
+CMD_TEST_HEADER = 19
 
 def test():
     return serial_test()
@@ -82,6 +83,10 @@ def set_motion_status(status):
     # Converts status value to json
     data = {"Status": status}
     serial_write(CMD_MOTIONSTATUS, json.dumps(data))
+
+def set_test_header(header):
+    # Converts header dict to json
+    serial_write(CMD_TEST_HEADER, json.dumps(header))
 
 def run_test():
     serial_read(CMD_RUN)

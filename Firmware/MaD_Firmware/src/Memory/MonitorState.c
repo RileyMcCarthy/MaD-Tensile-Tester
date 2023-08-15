@@ -53,7 +53,22 @@ MonitorData * lock_monitor_data_ms(int ms)
     {
         if (_getms() - start > ms)
         {
-            DEBUG_ERROR("Failed to lock monitor state, waited %dms\n", ms);
+            DEBUG_WARNING("Failed to lock monitor state, waited %dms\n", ms);
+            return NULL;
+        }
+    }
+    _monitor_data_lock = true;
+    return &monitor_data;
+}
+
+MonitorData * lock_monitor_data_us(int us)
+{
+    int start = _getus();
+    while (_monitor_data_lock)
+    {
+        if (_getus() - start > us)
+        {
+            DEBUG_WARNING("Failed to lock monitor state, waited %dus\n", us);
             return NULL;
         }
     }

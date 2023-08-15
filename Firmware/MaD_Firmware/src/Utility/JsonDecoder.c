@@ -197,6 +197,14 @@ bool json_to_test_data_request(TestDataRequest *request, char *json)
     return success;
 }
 
+bool json_to_test_header_name(char *name, char *json)
+{
+    // Use tiny-json to parse the string
+    const json_t *parser = json_create_static(json);
+
+    return json_property_to_string_ref(parser, "test_name", name, 255);
+}
+
 bool json_to_motion_mode(MotionMode *mode, char *json)
 {
     // Use tiny-json to parse the string

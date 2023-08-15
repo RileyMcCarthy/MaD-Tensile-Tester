@@ -181,7 +181,7 @@ static void motion_cog(void *arg)
         if (!queue_pop(queue, &command))
             continue;
         DEBUG_INFO("Running command: %d\n", command.g);
-
+        monitor_send_move(command.g,command.x,command.f,command.p);
         if (motion_enabled)
         {
             switch(command.g)
@@ -200,13 +200,11 @@ static void motion_cog(void *arg)
                     {
                         delta_steps = steps;
                         motion_setpoint_steps += delta_steps;
-                        printf("Relative mode: %d\n", motion_setpoint_steps);
                     }
                     else
                     {
                         motion_setpoint_steps = steps;
                         delta_steps = motion_setpoint_steps - motion_position_steps;
-                        printf("Absolute mode: %d\n", motion_setpoint_steps);
                     }
 
                     bool direction = delta_steps > 0;

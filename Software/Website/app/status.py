@@ -5,8 +5,12 @@ from app import app, socketio
 from .helpers import flatten_dict, unflatten_dict
 import app.communication as communication
 import cv2
+import os
+from .base import gcode_sender_thread, gcode_to_dict, emit_notification, generate_gcode_from_profile, set_gcode_sender_thread_path
 
 camera = cv2.VideoCapture(-1)
+
+last_serial_test_run_number = {}
 
 def gen_frames():
     while True:
@@ -34,7 +38,47 @@ def video_feed():
 @app.route('/')
 @app.route('/status')
 def status():
-    return render_template('status.html')
+    profile_files = os.listdir(app.config['PROFILE_FOLDER'])
+    print(profile_files)
+    return render_template('status.html', motion_profiles = profile_files)
+
+# create endpoint "/status/run_number/" + serial_number, which returns the last run number for that serial number
+@app.route('/status/run_number/<serial_number>')
+def get_last_run_number(serial_number):
+    if serial_number in last_serial_test_run_number:
+        return Response(str(last_serial_test_run_number[serial_number]))
+    else:
+        return Response('0')
+
+@app.route('/status/setup_test', methods=['POST'])
+def setup_test():
+    test_description = request.form.get('test_description')
+    test_name = request.form.get('test_name')
+    run_number = request.form.get('run_number')
+    data_time = request.form.get('data_time')
+    serial_number = request.form.get('serial_number')
+    motion_profile = request.form.get('motion_profile')
+    gauge_length = request.form.get('gauge_length')
+
+    header = {
+        'test_description': test_description,
+        'test_name': test_name,
+        'run_number': run_number,
+        'date_time': data_time,
+        'sample_serial_number': serial_number,
+        'motion_profile': motion_profile,
+        'gauge_length': gauge_length
+    }
+
+    global last_serial_test_run_number
+    last_serial_test_run_number[serial_number] = run_number
+
+    communication.set_test_header(header)
+    path = os.path.join(app.config['PROFILE_FOLDER'], motion_profile)
+    # TODO add method of killing thread if it is already running
+    set_gcode_sender_thread_path(path)
+    return Response('success')
+
 
 @app.route('/toggleMode', methods=['POST'])
 def toggleMode():

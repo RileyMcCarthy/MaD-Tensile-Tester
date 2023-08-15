@@ -76,6 +76,7 @@ void notification_add_debug(const char * type, const char * format, ...)
 #define CMD_NOTIICATION 16
 #define CMD_RUN 17
 #define CMD_SET_GAUGE_FORCE 18
+#define CMD_TEST_HEADER 19
 
 #define MAD_VERSION 1
 
@@ -462,6 +463,27 @@ void command_recieve(uint8_t cmd)
             send(CMD_TESTDATA, buf, strlen(buf));
             unlock_json_buffer();
         }
+        break;
+    }
+    case CMD_TEST_HEADER:
+    {
+        DEBUG_INFO("%s","Recieving test header\n");
+
+        if (!monitor_set_header(recieved_json))
+        {
+            send_awk(CMD_TEST_HEADER, "FAIL");
+        }
+
+        char *name;
+        if (!json_to_test_header_name(&name, recieved_json))
+        {
+            DEBUG_ERROR("%s","Failed to get name for test header\n");
+            return;
+        }
+        monitor_set_test_name(name);
+        motion_test_clear(); // clear any remaining motion test moves before new profile
+        unlock_json_buffer();
+        send_awk(CMD_TEST_HEADER, "OK");
         break;
     }
     default:

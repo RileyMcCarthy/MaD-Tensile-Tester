@@ -4,7 +4,7 @@ from .helpers import ctypes_to_dict
 import json
 from app import app, socketio
 import app.communication as communication
-from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT,CMD_STATE,CMD_DATA,CMD_MPROFILE,CMD_MOVE, CMD_NOTIFICATION
+from app.communication.commands import CMD_AWK, CMD_TESTDATA,CMD_TESTDATA_COUNT,CMD_STATE,CMD_DATA,CMD_MPROFILE,CMD_MOVE, CMD_NOTIFICATION, CMD_TEST_HEADER
 from collections.abc import MutableMapping
 from .helpers import flatten_dict
 from threading import Lock
@@ -22,6 +22,8 @@ test_data_lock = Lock()
 test_data = None
 test_data_count = 0
 test_data_complete = False
+
+gcode_sender_thread_path = None
 
 def emit_notification(type, message, timeout = None):
     type = type.lower()
@@ -46,6 +48,10 @@ def emit_notification(type, message, timeout = None):
     notification = {'type': type, 'message': trimmed_message, 'timeout': timeout}
     socketio.emit('notification', {'json': json.dumps(notification)}, namespace = '/serial')
 
+def set_gcode_sender_thread_path(path):
+    global gcode_sender_thread_path
+    gcode_sender_thread_path = path
+
 def ack_handler(data_json):
     cmd = int(data_json['cmd'])
     print('Recieved ack command:', cmd ,':', data_json['awk'])
@@ -63,6 +69,17 @@ def ack_handler(data_json):
         with gcode_ack_lock:
             gcode_ack = data_json['awk']
             print('Recieving ack command:"', gcode_ack,'"')
+    elif cmd == CMD_TEST_HEADER:
+        if data_json['awk'] == "OK":
+            emit_notification('success', 'Test is setup on Device!')
+            global gcode_sender_thread_path
+            if gcode_sender_thread_path is not None:
+                socketio.start_background_task(target=gcode_sender_thread, filename=gcode_sender_thread_path)
+                gcode_sender_thread_path = None
+            else:
+                print('gcode_sender_thread_path is None')
+        elif data_json['awk'] == "FAIL":
+            emit_notification('error', 'Failed to setup test on device')
 
 
 def serial_thread(serial_port, serial_baud):

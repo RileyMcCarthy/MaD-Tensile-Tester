@@ -268,7 +268,7 @@ static void control_cog(void *arg)
                             }
                             DEBUG_INFO("FUNC=%d\n", currentMoveMode);
                         }
-
+                        currentMoveMode = FUNC_MANUAL_INCREMENTAL_JOG;
                         // Execute manual mode functions
                         switch (currentMoveMode)
                         {

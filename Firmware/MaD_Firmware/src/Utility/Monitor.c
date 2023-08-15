@@ -15,6 +15,46 @@ static Encoder encoder;
 
 bool loaded_mp = false;
 static bool monitorLogData;
+static char gcode[200] = "";
+static char header[512] = "";
+static char test_path[219] = "/sd/test.csv";
+
+bool monitor_set_test_name(char *name)
+{
+  if (strlen(name) > 8)
+  {
+    DEBUG_ERROR("%s","Test name too long\n");
+    return false;
+  }
+  
+  strncpy(test_path, "/sd/", 5);
+  strncat(test_path, name, 8);
+  strncat(test_path, ".csv", 4);
+  return true;
+}
+
+bool monitor_set_header(char *h)
+{
+  if (strlen(header) > 512)
+  {
+    DEBUG_ERROR("%s","Header too long\n");
+    return false;
+  }
+  
+  strncpy(header, h, 512);
+  return true;
+}
+
+static bool gcode_locked = false;
+void monitor_send_move(int g, int x, int f, int p)
+{
+  while (gcode_locked)
+  {
+
+  }
+  snprintf(gcode, 200, "G%d X%d F%d P%d", g, x, f, p);
+  gcode_locked = true;
+}
 
 void monitor_run_test()
 {
@@ -326,6 +366,8 @@ static void monitor_cog(int samplerate)
   int force_raw = 0;
   int gauge_length = 0;
   int gauge_force = 0;
+  int test_start_time = 0;
+  MonitorData monitor_data_local;
   while (1)
   {
     set_monitor_status(_getms());
@@ -349,24 +391,20 @@ static void monitor_cog(int samplerate)
     
     long forceus = _getus();
 
-    MonitorData *monitor_data = NULL;
     if (update)
     {
-      monitor_data = lock_monitor_data_ms(1000);
-      if (monitor_data != NULL)
-      {
         set_monitor_status(_getms());
-        monitor_data->log = force_count; // Increment when new data is added to buffer, used for checking if data is new.
-        monitor_data->forceRaw = force_raw;
-        monitor_data->encoderRaw = encoder.value();
-        monitor_data->timems = _getms();
-        monitor_data->timeus = _getus();
-        monitor_data->forcemN = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain) - gauge_force;
-        monitor_data->encoderum = monitor_data->encoderRaw*1000/machine_profile.configuration.encoderStepsPermm;
-        monitor_data->gauge = monitor_data->encoderum - gauge_length;
-        monitor_data->force = monitor_data->forcemN / 1000.0; // Convert Force to N
-        monitor_data->position = monitor_data->encoderRaw/machine_profile.configuration.encoderStepsPermm;
-        monitor_data->setpoint = motion_get_setpoint()*1000/machine_profile.configuration.encoderStepsPermm;
+        monitor_data_local.log = force_count; // Increment when new data is added to buffer, used for checking if data is new.
+        monitor_data_local.forceRaw = force_raw;
+        monitor_data_local.encoderRaw = encoder.value();
+        monitor_data_local.timems = _getms();
+        monitor_data_local.timeus = _getus();
+        monitor_data_local.forcemN = raw_to_force(monitor_data_local.forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain) - gauge_force;
+        monitor_data_local.encoderum = monitor_data_local.encoderRaw*1000/machine_profile.configuration.encoderStepsPermm;
+        monitor_data_local.gauge = monitor_data_local.encoderum - gauge_length;
+        monitor_data_local.force = monitor_data_local.forcemN / 1000.0; // Convert Force to N
+        monitor_data_local.position = monitor_data_local.encoderRaw/machine_profile.configuration.encoderStepsPermm;
+        monitor_data_local.setpoint = motion_get_setpoint()*1000/machine_profile.configuration.encoderStepsPermm;
         if (trigger_set_gauge)
         {
           DEBUG_NOTIFY("%s","Gauge Length Set!");
@@ -378,15 +416,8 @@ static void monitor_cog(int samplerate)
         {
           DEBUG_NOTIFY("%s","Gauge Force Set!");
           trigger_set_gauge_force = false;
-          gauge_force = raw_to_force(monitor_data->forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
+          gauge_force = raw_to_force(monitor_data_local.forceRaw, machine_profile.configuration.forceGaugeOffset, machine_profile.configuration.forceGaugeGain);
         }
-        update = true;
-      }
-      else
-      {
-        DEBUG_WARNING("%s","Failed to lock monitor data\n");
-      }
-      unlock_monitor_data();
     }
 
     long update_us = _getus();
@@ -397,19 +428,21 @@ static void monitor_cog(int samplerate)
       {
         // Begin Logging data
         mount("/sd", _vfs_open_sdcard());
-        testFileCsv = fopen("/sd/test.csv", "w");
+        testFileCsv = fopen(test_path, "w");
         testFileBin = fopen("/sd/test.bin", "w");
         if (testFileCsv == NULL || testFileBin == NULL)
         {
-          DEBUG_ERROR("%s","Failed to open file test.txt for writing\n");
+          DEBUG_ERROR("Failed to open file %s for writing\n", test_path);
           umount("/sd");
           _waitms(100);
           mount("/sd", _vfs_open_sdcard());
         }
+        fprintf(testFileCsv, "%s\n", header);
         fprintf(testFileCsv, "Time,Force,Distance,Setpoint\n");
         if (state_machine_set(PARAM_MOTION_MODE, MODE_TEST_RUNNING))
         {
            DEBUG_NOTIFY("%s","Starting Test!\n");
+           test_start_time = _getus();
         }
         else
         {
@@ -429,17 +462,18 @@ static void monitor_cog(int samplerate)
       if (monitorLogData && update && testFileCsv != NULL)
       {
         // Write data to file
-        monitor_data = lock_monitor_data_ms(1000);
-        if (monitor_data != NULL)
+        while (gcode_locked) // wait for motion to finish writing gcode
         {
-          fwrite(monitor_data, sizeof(MonitorData), 1, testFileBin);
-          fprintf(testFileCsv, "%d,%d,%d,%d\n", monitor_data->timeus, monitor_data->forcemN, monitor_data->encoderum, monitor_data->setpoint);
+          if (strncmp(gcode,"",1) != 0) // if gcode is not empty
+          {
+            fprintf(testFileCsv, "%s\n", gcode); // embedd gcode in csv file
+            strncpy(gcode,"",1); // clear gcode
+            gcode_locked = false; // allow motion to write new gcode
+          }
         }
-        else
-        {
-          DEBUG_ERROR("%s","Failed to lock monitor data while writing to sd card\n");
-        }
-        unlock_monitor_data();
+        monitor_data_local.timeus = _getus() - test_start_time;
+        fwrite(&monitor_data_local, sizeof(MonitorData), 1, testFileBin);
+        fprintf(testFileCsv, "%d,%d,%d,%d\n", monitor_data_local.timeus, monitor_data_local.forcemN, monitor_data_local.encoderum, monitor_data_local.setpoint);
       }
     }
     else if (testFileCsv != NULL)
@@ -454,6 +488,17 @@ static void monitor_cog(int samplerate)
     {
       // Execute SD card commands
       read_sd();
+    }
+
+    MonitorData * monitor_data_global = lock_monitor_data_us(100);
+    if (monitor_data_global != NULL)
+    {
+      memcpy(monitor_data_global, &monitor_data_local, sizeof(MonitorData));
+      unlock_monitor_data();
+    }
+    else
+    {
+      DEBUG_WARNING("%s","Failed to lock monitor data while writing to sd card\n");
     }
 
     long write_sd_us = _getus();
