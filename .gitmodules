@@ -7,3 +7,6 @@
 [submodule "Hardware/MaD-Edge-Board"]
 	path = Hardware/MaD-Edge-Board
 	url = https://github.com/RileyMcCarthy/MaD-Edge-Board.git
+[submodule "Hardware/DS2-Addon"]
+	path = Hardware/DS2-Addon
+	url = https://github.com/RileyMcCarthy/DS2-Addon.git
